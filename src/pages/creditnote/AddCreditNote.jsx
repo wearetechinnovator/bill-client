@@ -295,6 +295,13 @@ const CreditNote = ({ mode }) => {
       }
     }
 
+    // Add Per Item Tax and Amound before save
+    ItemRows.forEach((row, index) => {
+      row.taxAmount = calculatePerTaxAmount(index);
+      row.amount = calculatePerAmount(index);
+    });
+    setItemRows([...ItemRows]);
+
     try {
       const url = process.env.REACT_APP_API_URL + "/creditnote/add";
       const token = Cookies.get("token");

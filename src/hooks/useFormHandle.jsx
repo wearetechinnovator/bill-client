@@ -4,8 +4,7 @@ import useApi from './useApi';
 const useFormHandle = () => {
     const { getApiData } = useApi();
 
-
-    //========================================= Add item row ========================================;
+    //========================================= [Add item row] ========================================;
     const addItem = (which, itemRowSet, setItemRows, setFormData, additionalRowSet, setAdditionalRow) => {
         if (which === 1) {
             setItemRows((prevItemRows) => {
@@ -42,7 +41,7 @@ const useFormHandle = () => {
         }
     };
 
-    // ===================================== On Item chagne ====================================;
+    // ===================================== [On Item chagne ]====================================;
     const onItemChange = async (value, index, tax, ItemRows, setItemRows, setItems) => {
         const data = await getApiData("item");
         setItems([...data.data]);
@@ -70,7 +69,7 @@ const useFormHandle = () => {
 
     }
 
-    // =================================== Delete item and additional row ==============================;
+    // ===================================[Delete item and additional row] ==============================;
     const deleteItem = (which, ItemId, setItemRows, setFormData, setAdditionalRow) => {
         if (which === 1) {
             setItemRows((prevItemRows) => {
@@ -100,7 +99,7 @@ const useFormHandle = () => {
     };
 
 
-    // ========================= When change discount type `before` `after` `no` ==========================;
+    // ========================= [When change discount type `before` `after` `no`] ==========================;
     const changeDiscountType = (e, ItemRows, formData, setFormData, setDiscountToggler, toast) => {
         if (e.target.value !== "no") {
             if (e.target.value === "before") {
@@ -126,7 +125,7 @@ const useFormHandle = () => {
     }
 
 
-    //======================================= Calculate Final Amount ===================================='
+    //======================================= [Calculate Final Amount] ===================================='
     const calculateFinalAmount = (additionalRows, formData, subTotal) => {
         let totalParticular = 0;
         let total = 0;

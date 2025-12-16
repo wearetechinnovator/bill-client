@@ -317,12 +317,10 @@ const SalesInvoice = ({ mode }) => {
 
   // *Save bill
   const saveBill = async () => {
-
     // if ([formData.party, formData.salesInvoiceNumber, formData.invoiceDate]
     //   .some((field) => field === "")) {
     //   return toast("Fill the blank", "error");
     // }
-
 
     if (!formData.party) {
       return toast("Please select party", "error");
@@ -331,8 +329,6 @@ const SalesInvoice = ({ mode }) => {
     } else if (!formData.invoiceDate) {
       return toast("Please select invoice date", "error");
     }
-
-
 
 
     for (let row of ItemRows) {
@@ -346,6 +342,13 @@ const SalesInvoice = ({ mode }) => {
         return toast("Please enter price", "error");
       }
     }
+
+    // Add Per Item Tax and Amound before save
+    ItemRows.forEach((row, index) => {
+      row.taxAmount = calculatePerTaxAmount(index);
+      row.amount = calculatePerAmount(index);
+    });
+    setItemRows([...ItemRows]);
 
     try {
       const url = process.env.REACT_APP_API_URL + "/salesinvoice/add";
@@ -529,7 +532,7 @@ const SalesInvoice = ({ mode }) => {
                           <MySelect2
                             model={"item"}
                             onType={(v) => onItemChange(v, index, tax, ItemRows, setItemRows, setItems)}
-                            value={ItemRows[index].itemName}
+                            value={ItemRows[index].itemId}
                           />
                           <input type='text' className='input-style' placeholder='Description'
                             onChange={(e) => {

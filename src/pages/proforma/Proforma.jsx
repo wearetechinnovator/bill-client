@@ -17,8 +17,6 @@ import Pagination from '../../components/Pagination';
 
 
 
-
-
 // Proforma page
 document.title = "Proforma"
 const Proforma = () => {
@@ -241,7 +239,6 @@ const Proforma = () => {
       });
       const res = await req.json();
 
-      console.log(res)
       setTotalData(res?.totalData)
       setBillData([...res?.data])
 

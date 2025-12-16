@@ -194,7 +194,7 @@ const DeliveryChalan = ({ mode }) => {
     setItemRows(item);
 
   }
- 
+
 
 
   const calculatePerTaxAmount = (index) => {
@@ -226,11 +226,6 @@ const DeliveryChalan = ({ mode }) => {
       finalAmount
     }));
   }, [ItemRows, additionalRows]);
-
-
-
-
-
 
   // Return Sub-Total
   /*
@@ -296,6 +291,13 @@ const DeliveryChalan = ({ mode }) => {
         return toast("Please enter price", "error")
       }
     }
+
+    // Add Per Item Tax and Amound before save
+    ItemRows.forEach((row, index) => {
+      row.taxAmount = calculatePerTaxAmount(index);
+      row.amount = calculatePerAmount(index);
+    });
+    setItemRows([...ItemRows]);
 
     try {
       const url = process.env.REACT_APP_API_URL + "/deliverychalan/add";

@@ -300,6 +300,13 @@ const DebitNote = ({ mode }) => {
       }
     }
 
+    // Add Per Item Tax and Amound before save
+    ItemRows.forEach((row, index) => {
+      row.taxAmount = calculatePerTaxAmount(index);
+      row.amount = calculatePerAmount(index);
+    });
+    setItemRows([...ItemRows]);
+
     try {
       const url = process.env.REACT_APP_API_URL + "/debitnote/add";
       const token = Cookies.get("token");

@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-// import MyBreadCrumb from '../../components/BreadCrumb';
 import { useNavigate } from 'react-router-dom';
 import useExportTable from '../../hooks/useExportTable';
 import useMyToaster from '../../hooks/useMyToaster';
@@ -69,7 +68,6 @@ const SalesInvoice = () => {
         body: JSON.stringify(data)
       });
       const res = await req.json();
-      console.log(res)
       setTotalData(res.totalData)
       setTotalPaymentIn(res.totalPaymentAmount)
       setTotalDuePayment(res.totalDueAmount)

@@ -25,6 +25,8 @@ import { TbFileInvoice } from "react-icons/tb";
 import { GoPencil } from "react-icons/go";
 import { FaRegFile } from "react-icons/fa";
 import { FaRegUser } from "react-icons/fa";
+import { HiArrowsRightLeft } from "react-icons/hi2";
+
 
 
 
@@ -53,7 +55,7 @@ export const Icons = {
   NEXT_PAGE_ARROW: GrFormNext,
   CHECK: FaRegCheckCircle,
   ADD_LIST: CgPlayListAdd,
-  CONVERT: SiConvertio,
+  CONVERT: HiArrowsRightLeft,
   BUSINESS: LuBriefcaseBusiness,
   INVOICE: TbFileInvoice,
   PENCIL: GoPencil,

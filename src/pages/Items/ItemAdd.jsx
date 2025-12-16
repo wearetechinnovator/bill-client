@@ -169,11 +169,11 @@ const AddItemComponent = ({ mode, save }) => {
       <div className='  flex justify-between  gap-5 flex-col lg:flex-row'>
         <div className='w-full'>
           <div >
-            <p className='mb-2 '>Item Name <span className='required__text'>*</span></p>
+            <p className='mb-1'>Item Name <span className='required__text'>*</span></p>
             <input type='text' onChange={(e) => setForm({ ...form, title: e.target.value })} value={form.title} />
           </div>
           <div>
-            <p className='mb-2 mt-2 ml-1'>Type</p>
+            <p className='mb-1 mt-2 ml-1'>Type</p>
             <select onChange={(e) => setForm({ ...form, type: e.target.value })} value={form.type}>
               <option value={""}>--select--</option>
               <option value={"goods"}>Goods</option>
@@ -181,13 +181,13 @@ const AddItemComponent = ({ mode, save }) => {
             </select>
           </div>
           <div>
-            <p className='mt-2 mb-2'>Price  <span className='required__text'>*</span></p>
+            <p className='mt-2 mb-1'>Price  <span className='required__text'>*</span></p>
             <input type="text" onChange={(e) => setForm({ ...form, salePrice: e.target.value })} value={form.salePrice} />
           </div>
         </div>
-        <div className='w-full pt-1'>
+        <div className='w-full'>
           <div>
-            <p className='ml-1'>Select Category <span className='required__text'>*</span></p>
+            <p className='ml-1 mb-1'>Select Category <span className='required__text'>*</span></p>
             {/* <SelectPicker className='w-full'
               data={category}
               onChange={(v) => categoryChange(v)}
@@ -202,14 +202,14 @@ const AddItemComponent = ({ mode, save }) => {
             />
           </div>
           <div>
-            <p className='ml-1 mb-2 mt-2'>Select Tax</p>
+            <p className='ml-1 mb-1 mt-2'>Select Tax</p>
             <SelectPicker className='w-full'
               data={tax}
               onChange={(v) => setForm({ ...form, tax: v })}
               value={form.tax} />
           </div>
           <div>
-            <p className=' mt-2 mb-2 ml-1'>HSN/SAC</p>
+            <p className=' mt-2 mb-1 ml-1'>HSN/SAC</p>
             <input type='text'
               onChange={(e) => setForm({ ...form, hsn: e.target.value })}
               value={form.hsn} />

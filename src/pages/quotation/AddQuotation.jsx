@@ -94,7 +94,6 @@ const Quotation = ({ mode }) => {
       const res = await req.json();
       setFormData({ ...formData, ...res.data });
       setAdditionalRow([...res.data.additionalCharge])
-      console.log("hhh");
       console.log(res.data.items);
       setItemRows([...res.data.items]);
 
@@ -146,7 +145,6 @@ const Quotation = ({ mode }) => {
       }
       {
         const data = await getApiData("party");
-        console.log('run party')
         const party = data.data.map(d => ({ label: d.name, value: d._id }));
         setParty([...party]);
       }
@@ -204,8 +202,6 @@ const Quotation = ({ mode }) => {
     setItemRows(item);
 
   }
-
-
 
 
 
@@ -287,7 +283,6 @@ const Quotation = ({ mode }) => {
 
   // *Save bill
   const saveBill = async () => {
-
     if (formData.party === "") {
       return toast("Please select party", "error")
     } else if (formData.estimateDate === "") {
@@ -305,6 +300,13 @@ const Quotation = ({ mode }) => {
         return toast("Please enter price", "error")
       }
     }
+
+    // Add Per Item Tax and Amound before save
+    ItemRows.forEach((row, index) => {
+      row.taxAmount = calculatePerTaxAmount(index);
+      row.amount = calculatePerAmount(index);
+    });
+    setItemRows([...ItemRows]);
 
     try {
       const url = process.env.REACT_APP_API_URL + "/quotation/add";
@@ -366,7 +368,6 @@ const Quotation = ({ mode }) => {
 
         <div className='content__body'>
           <div className='content__body__main bg-white' id='addQuotationTable'>
-
             <div className='top__btn__grp'>
 
               <div className='extra__btns'>
@@ -388,7 +389,7 @@ const Quotation = ({ mode }) => {
                   <Icons.COPY />Duplicate invoice
                 </button>}
 
-                <button onClick={saveBill}><Icons.CHECK />{mode ? "Update" : "Save"}</button>
+                {/* <button onClick={saveBill}><Icons.CHECK />{mode ? "Update" : "Save"}</button> */}
               </div>
 
               <div className='flex justify-end w-full'>
