@@ -94,7 +94,6 @@ const MySelect2 = ({ model, onType, value }) => {
           body: JSON.stringify({ token: Cookies.get("token"), search: true, searchText: v })
         })
         const res = await req.json();
-        console.log(res);
         setLoading(false);
 
         if (req.status === 200) {
@@ -216,11 +215,10 @@ const MySelect2 = ({ model, onType, value }) => {
             {loading && <li className='p-2 text-center'>Searching...</li>}
             {
               searchList.map((d, i) => {
-                console.log(d);
                 return <li
                   key={i}
                   onMouseDown={() => setSelectedData(d)}
-                  className={`${model === "item" ? 'p-3' : 'p-1 px-2'}  cursor-pointer`}
+                  className={`${model === "item" ? 'p-[6px]' : 'p-1 px-2'}  cursor-pointer text-left text-[11px]`}
                 >
                   {(d.title || d.name) || d}
                 </li>

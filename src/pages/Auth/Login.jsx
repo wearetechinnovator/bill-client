@@ -47,7 +47,8 @@ const Login = () => {
         return toast(res.err, "error")
       }
 
-      Cookies.set("token", res.token, { secure: true });
+      // Cookies.set("token", res.token, { secure: true });
+      Cookies.set("token", res.token);
       navigate("/admin/dashboard")
 
     } catch (error) {

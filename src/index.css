@@ -443,7 +443,7 @@ select {
 }
 
 .select__add__button {
-  @apply w-full bg-[#003E32] rounded text-white flex items-center gap-1 justify-center;
+  @apply w-full bg-[#003E32] rounded text-white flex items-center gap-1 justify-center font-light;
   padding: 7px;
 }
 

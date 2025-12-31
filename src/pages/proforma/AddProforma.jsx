@@ -443,11 +443,6 @@ const Proforma = ({ mode }) => {
             <div className='flex flex-col lg:flex-row items-center justify-around gap-4'>
               <div className='flex flex-col gap-2 w-full'>
                 <p className='text-xs'>Select Party <span className='required__text'>*</span></p>
-                {/* <SelectPicker
-                  onChange={(data) => setFormData({ ...formData, party: data })}
-                  data={party}
-                  value={formData.party?._id}
-                /> */}
                 <MySelect2
                   model={"party"}
                   onType={(v) => {
@@ -509,7 +504,7 @@ const Proforma = ({ mode }) => {
                           <MySelect2
                             model={"item"}
                             onType={(v) => onItemChange(v, index, tax, ItemRows, setItemRows, setItems)}
-                            value={ItemRows[index].itemName}
+                            value={ItemRows[index].itemId}
                           />
                           <input type='text' className='input-style' placeholder='Description'
                             onChange={(e) => {
