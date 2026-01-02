@@ -25,18 +25,15 @@ const AddParty = ({ mode }) => {
 
 
 
-const PartyComponent = ({ mode, save }) => {
-  const editorRef = useRef(null);
+const PartyComponent = ({ mode, save, getRes }) => {
   const { id } = useParams()
   const toast = useMyToaster()
   const [partyData, setPartyData] = useState({
-    name: "", type: "", contactNumber: "", billingAddress: "", shippingAddress: '',
+    name: "", type: "customer", contactNumber: "", billingAddress: "", shippingAddress: '',
     pan: "", gst: "", openingBalance: "0", details: '', email: '',
     partyCategory: '', creditPeriod: '', creditLimit: '', dob: '', partyCategory: ''
   })
   const navigate = useNavigate();
-
-
 
 
 
@@ -68,16 +65,9 @@ const PartyComponent = ({ mode, save }) => {
     if (partyData.name === "") {
       return toast("Name is required", "error");
     }
-    if (partyData.type === "") {
-      return toast("Type is required", "error");
-    }
     if (partyData.contactNumber === "") {
       return toast("Contact Number is required", "error");
     }
-    if (partyData.billingAddress === "") {
-      return toast("Billing Address is required", "error");
-    }
-
 
 
     try {
@@ -99,6 +89,9 @@ const PartyComponent = ({ mode, save }) => {
         clear();
       }
 
+      // Send Response to MySelect2 Component for auto select party;
+      if (getRes) getRes(res);
+
       toast(!mode ? "Party create success" : "Party update success", 'success');
       // for close sidebar in MySelect2
       if (save) {
@@ -117,7 +110,7 @@ const PartyComponent = ({ mode, save }) => {
 
   const clear = () => {
     setPartyData({
-      name: "", type: "", contactNumber: "", address: "",
+      name: "", type: "customer", contactNumber: "", address: "",
       pan: "", gst: "", country: "", state: "", openingBalance: "0",
       details: '', email: '', billingAddress: '', shippingAddress: '',
       creditPeriod: '', creditLimit: '', dob: '', partyCategory: ''
@@ -143,7 +136,7 @@ const PartyComponent = ({ mode, save }) => {
               value={partyData.contactNumber} />
           </div>
           <div>
-            <p className='mb-1'>Type <span className='required__text'>*</span></p>
+            <p className='mb-1'>Party Type</p>
             <select onChange={(e) => setPartyData({ ...partyData, type: e.target.value })}
               value={partyData.type}>
               <option value="none">--Select--</option>
@@ -235,14 +228,14 @@ const PartyComponent = ({ mode, save }) => {
           <div>
             <div className='mb-1 mt-1 flex items-center'>
               <p>Shipping Address</p>
-              <input type="checkbox" className='ml-5' onChange={(e) => {
+              <input type="checkbox" className='ml-2' onChange={(e) => {
                 if (e.target.checked) {
                   setPartyData({ ...partyData, shippingAddress: partyData.billingAddress })
                 } else {
                   setPartyData({ ...partyData, shippingAddress: "" })
                 }
               }} />
-              <p>Same as billing address</p>
+              <sub className='ml-1'>Same as billing address</sub>
             </div>
             <textarea rows={3}
               value={partyData.shippingAddress}

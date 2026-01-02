@@ -58,6 +58,7 @@
   font-size: 13px !important;
   background-color: white;
 }
+
 /* .content__body__main:hover{
   box-shadow: 0px 0px 5px lightgrey;
   border: none;
@@ -317,24 +318,26 @@ select {
 }
 
 .add-bill-btn {
-  @apply bg-green-500 hover:bg-green-400 text-white rounded w-[70px];
+  @apply bg-green-500 hover:bg-green-400 text-white rounded w-[75px];
   @apply flex items-center justify-center gap-1 py-2;
 }
 
 .reset-bill-btn {
   @apply bg-blue-800 hover:bg-blue-700 text-white;
-  @apply rounded w-[60px] flex items-center justify-center gap-1 py-2;
+  @apply rounded w-[70px] flex items-center justify-center gap-1 py-2;
 }
 
 #invoice tr td {
-  border: 1px solid black;
+  border: 1px solid #c5c5c5;
   padding: 3px;
   color: black;
-  font-size: 11px;
+  font-size: 10px;
+  page-break-inside: avoid;
+  line-height: 10px;
 }
 
 #invoice thead td {
-  font-weight: bold;
+  font-weight: 500;
 }
 
 #dashboard table th {
@@ -430,7 +433,7 @@ select {
 }
 
 .add_new_compnent {
-  @apply mb-5 w-full bg-white rounded p-2 shadow-sm overflow-hidden transition-all;
+  @apply mb-3 w-full bg-white rounded p-2 shadow-sm overflow-hidden transition-all;
 }
 
 .add_new_compnent button {
@@ -443,7 +446,7 @@ select {
 }
 
 .select__add__button {
-  @apply w-full bg-[#003E32] rounded text-white flex items-center gap-1 justify-center font-light;
+  @apply w-full bg-[#003E32] rounded text-white flex items-center gap-1 justify-center;
   padding: 7px;
 }
 
@@ -500,7 +503,7 @@ select {
   padding: 3px;
   color: white;
   font-size: 18px;
-  @apply bg-red-500;
+  @apply bg-red-500 hover:bg-red-400;
 }
 
 
@@ -508,29 +511,30 @@ select {
   @apply flex justify-between items-center mt-2;
 }
 
-.paginate__button__back{
+.paginate__button__back {
   @apply border border-blue-700 w-[20px] h-[20px] grid place-items-center cursor-pointer
 }
 
-.paginate__button__number{
+.paginate__button__number {
   @apply w-[20px] h-[20px] text-center cursor-pointer
 }
 
-.paginate__button__number:first-child{
+.paginate__button__number:first-child {
   border: 1px solid rgb(65, 65, 238);
 }
-.paginate__button__number{
-  border:1px solid rgb(66, 66, 241) ;
+
+.paginate__button__number {
+  border: 1px solid rgb(66, 66, 241);
   border-left: none;
 }
 
-.active__page{
+.active__page {
   @apply bg-blue-700 text-white;
 }
 
-.paginate__button__next{
+.paginate__button__next {
   @apply border border-blue-700 border-l-0 w-[20px] h-[20px] flex items-center justify-center cursor-pointer;
-}  
+}
 
 
 .list__table {
@@ -737,26 +741,31 @@ input[type="checkbox"]:checked::before {
 .swal-modal {
   width: 350px;
 }
+
 .swal-title {
   font-size: 20px;
   padding: 0px !important;
 }
+
 .swal-icon {
   width: 60px;
   height: 60px;
 }
-.swal-icon--warning__body{
+
+.swal-icon--warning__body {
   height: 30px;
 }
 
 
-.details__header{
+.details__header {
   @apply flex justify-between items-center;
 }
-.details__header p{
+
+.details__header p {
   @apply font-bold flex items-center gap-1;
 }
-.pencil{
+
+.pencil {
   width: 25px;
   height: 25px;
   color: #003E32;
@@ -764,15 +773,17 @@ input[type="checkbox"]:checked::before {
   padding: 5px;
   border-radius: 100%;
 }
-.pencil:hover{
+
+.pencil:hover {
   background-color: #F6F7FB;
   border: 1px solid #e9e9ec;
 }
-.pencil:active{
-  border:none;
+
+.pencil:active {
+  border: none;
 }
 
-.save__and__reset__btns{
+.save__and__reset__btns {
   @apply text-[13px] text-white rounded w-[70px] flex items-center justify-center gap-1 py-[5px];
 }
 
@@ -783,18 +794,183 @@ input[type="checkbox"]:checked::before {
 }
 
 .table__responsive table {
-  min-width: 600px; /* Adjust as needed */
+  min-width: 600px;
+  /* Adjust as needed */
   border-collapse: collapse;
 }
 
-.party__details__header{
+.party__details__header {
   @apply flex items-center gap-4 mb-5 border-b border-gray-200;
 }
 
-.party__details__header button{
+.party__details__header button {
   @apply text-[13px] w-[70px] flex items-center justify-center gap-1 py-[5px];
 }
 
-.party__details__header .active{
+.party__details__header .active {
   @apply text-blue-600 font-semibold border-b-2 border-blue-600;
+}
+
+.item__details__table {
+  @apply overflow-x-auto mt-3 rounded;
+
+}
+
+.item__details__table table {
+  @apply w-full border rounded;
+}
+
+.item__details__table table thead {
+  @apply bg-gray-200
+}
+
+.item__details__table table thead td {
+  @apply font-semibold
+}
+
+.item__details__table table tbody {
+  @apply text-xs;
+}
+
+.item__details__table table tr td {
+  @apply p-[8px] border border-gray-100;
+}
+
+.item__details__table table tr:nth-child(even) {
+  @apply bg-gray-50
+}
+
+.badge {
+  padding: 1px 5px;
+  border-radius: 10px;
+  font-size: 10px;
+  color: white;
+}
+
+.item__table {
+  table-layout: fixed;
+}
+
+/* .table__wrapper {
+  min-height: 500px;
+} */
+
+/* .table__wrapper table.item__table {
+  height: 100%;
+} */
+.table__wrapper table {
+  page-break-inside: avoid;
+}
+
+.item__table tr td {
+  word-wrap: break-word;
+}
+
+.table__wrapper table.item__table tfoot {
+  margin-top: auto;
+}
+
+.without__border {
+  border: none !important;
+  border-left: 1px solid #c5c5c5 !important;
+  border-right: 1px solid #c5c5c5 !important;
+}
+
+.discount-font {
+  font-size: 8px;
+}
+
+@media print {
+  table {
+    margin: 0;
+    padding: 0;
+    border-collapse: collapse !important;
+    border-spacing: none !important;
+    /* space between cells */
+  }
+
+  th,
+  td {
+    padding: 5px !important;
+    /* space inside cells */
+    border: 1px solid #c5c5c5 !important;
+  }
+
+  table.item__table td {
+    max-width: 80mm;
+    word-wrap: break-word;
+  }
+
+  .without__border {
+    border: none !important;
+    border-left: 1px solid #c5c5c5 !important;
+    border-right: 1px solid #c5c5c5 !important;
+  }
+
+  .second-page-fixed {
+    page-break-before: always;
+    /* move to 2nd page */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  #mainBill {
+    position: relative;
+  }
+
+  #invoiceBill td {
+    border: 1px solid #c5c5c5;
+    padding: 2px;
+    color: black;
+    font-size: 10px;
+    page-break-inside: avoid;
+    line-height: 9px;
+  }
+}
+
+@media print {
+
+  /* Force HSN section to next page */
+  .print-page-break {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* Prevent HSN table from breaking */
+  .print-page-break table,
+  .print-page-break tr,
+  .print-page-break td {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Prevent cutting rows in main table */
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+}
+
+@media print {
+
+  /* Page-1 height control */
+  .items-page {
+    /* Adjust once and forget */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* Filler rows auto stretch */
+  .without__border td {
+    height: 24px;
+  }
+
 }

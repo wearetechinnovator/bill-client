@@ -390,6 +390,7 @@ const DeliveryChalan = ({ mode }) => {
                 /> */}
                 <MySelect2
                   model={"party"}
+                  partyType={"customer"}
                   onType={(v) => {
                     setFormData({ ...formData, party: v })
                   }}
@@ -430,14 +431,14 @@ const DeliveryChalan = ({ mode }) => {
                 <thead >
                   <tr>
                     <th style={{ "width": "*" }}>Item</th>
-                    <th style={{ "width": "6%" }}>HSN/SAC</th>
-                    <th style={{ "width": "5%" }}>QTY</th>
-                    <th style={{ "width": "7%" }}>Unit</th>
-                    <th style={{ "width": "10%" }}>Price/Item</th>
-                    <th style={{ "width": "10%" }}>Discount</th>
-                    <th style={{ "width": "10%" }}>Tax</th>
-                    <th style={{ "width": "10%" }}>Amount</th>
-                    <th style={{ "width": "3%" }}></th>
+                    <th style={{ "width": "5%"}}>HSN/SAC</th>
+                    <th style={{ "width": "5%"}}>QTY</th>
+                    <th style={{ "width": "5%"}}>Unit</th>
+                    <th style={{ "width": "5%" }}>Price/Item</th>
+                    <th style={{ "width": "7%" }}>Discount</th>
+                    <th style={{ "width": "8%" }}>Tax</th>
+                    <th style={{ "width": "7%" }}>Amount</th>
+                    <th style={{ "width": "3%"}}></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -450,7 +451,7 @@ const DeliveryChalan = ({ mode }) => {
                           <MySelect2
                             model={"item"}
                             onType={(v) => onItemChange(v, index, tax, ItemRows, setItemRows, setItems)}
-                            value={ItemRows[index].itemName}
+                            value={ItemRows[index].itemId}
                           />
                           <input type='text' className='input-style' placeholder='Description'
                             onChange={(e) => {
@@ -521,7 +522,7 @@ const DeliveryChalan = ({ mode }) => {
                         </div>
                       </td>
                       <td> {/** Discount amount and percentage */}
-                        <div className={`w-[100px] flex flex-col gap-2 items-center`} >
+                        <div className={`w-full flex flex-col gap-2 items-center`} >
                           <div className='add-table-discount-input'>
                             <input type="text"
                               className={`${formData.discountType === 'before' ? 'bg-gray-100' : ''} `}
@@ -617,21 +618,21 @@ const DeliveryChalan = ({ mode }) => {
               <table className='table-style w-full'>
                 <thead>
                   <tr>
-                    <td className='font-bold'>Total Taxable Amount</td>
-                    <td className='font-bold'>Total Tax Amount</td>
-                    <td>
+                    <th className='font-bold'>Total Taxable Amount</th>
+                    <th className='font-bold'>Total Tax Amount</th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Type</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td>
+                    </th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Amount</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td>
+                    </th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Percentage</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td className='font-bold'>Total Amount</td>
+                    </th>
+                    <th className='font-bold'>Total Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -738,9 +739,9 @@ const DeliveryChalan = ({ mode }) => {
                   <table className='table-style w-full'>
                     <thead className='bg-gray-100'>
                       <tr>
-                        <td>Particular</td>
-                        <td>Amount</td>
-                        <td>Actions</td>
+                        <th>Particular</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>

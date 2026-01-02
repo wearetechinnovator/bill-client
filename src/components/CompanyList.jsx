@@ -1,12 +1,13 @@
 import { Modal } from 'rsuite';
 import { toggleModal } from '../store/copanyListSlice';
 import { useSelector, useDispatch } from 'react-redux';
-import { FaCheck } from "react-icons/fa6";
 import { IoIosAddCircle } from "react-icons/io";
 import Cookies from 'js-cookie';
 import useMyToaster from '../hooks/useMyToaster';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { IoIosCheckmarkCircle } from "react-icons/io";
+
 
 
 const CompanyList = ({ isOpen, getCompanyName }) => {
@@ -15,7 +16,7 @@ const CompanyList = ({ isOpen, getCompanyName }) => {
   const storeVal = useSelector((state) => state.companyListModal.show);
   const userData = useSelector((state) => state.userDetail);
   const companies = Object.keys(userData).length === 0 ? [] : userData.companies;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
 
 
@@ -26,6 +27,7 @@ const CompanyList = ({ isOpen, getCompanyName }) => {
       }
     });
   }, [companies])
+
 
   const switchCompany = async (id) => {
     try {
@@ -48,15 +50,15 @@ const CompanyList = ({ isOpen, getCompanyName }) => {
       document.location = "/admin/dashboard";
 
     } catch (error) {
-      console.log(error);
       return toast("Something went wrong", 'error')
     }
 
   }
 
+  
   return (
     <div id='companyList'>
-      <Modal open={storeVal} onClose={() => dispatch(toggleModal(false))} size={300}>
+      <Modal open={storeVal} onClose={() => dispatch(toggleModal(false))} size={300} >
         <Modal.Header>
           <p className='font-bold'>Your companies</p>
         </Modal.Header>
@@ -65,11 +67,13 @@ const CompanyList = ({ isOpen, getCompanyName }) => {
             companies.map((v, index) => (
               <div key={index}
                 onClick={() => switchCompany(v._id)}
-                className='flex items-center justify-between w-full hover:bg-gray-100 p-1 rounded cursor-pointer'>
-                <p className='text-[12px] p-1'>{v.name}</p>
+                className='border-b flex items-center justify-between w-full hover:bg-gray-100 p-1 rounded cursor-pointer'>
+                <p className='text-[12px] p-1 w-[90%]'>{v.name}</p>
                 {
                   userData.activeCompany == v._id ?
-                    <FaCheck className='text-orange-400 w-[120px]' /> : ""
+                    <IoIosCheckmarkCircle
+                      className='text-orange-400 text-xl'
+                    /> : ""
                 }
               </div>
             ))

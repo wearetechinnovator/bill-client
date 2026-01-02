@@ -47,7 +47,7 @@ const DebitNote = ({ mode }) => {
   const [additionalRows, setAdditionalRow] = useState([additionalRowSet]); //{ additionalRowsItem: 1 }
   const [formData, setFormData] = useState({
     party: '', debitNoteNumber: '', debitNoteDate: new Date().toISOString().split('T')[0],
-    items: ItemRows, additionalCharge: additionalRows, note: '', terms: '',
+    purchaseInvoice: '', items: ItemRows, additionalCharge: additionalRows, note: '', terms: '',
     discountType: '', discountAmount: '', discountPercentage: '', finalAmount: ''
   })
 
@@ -67,6 +67,9 @@ const DebitNote = ({ mode }) => {
   const [tax, setTax] = useState([]);
   // Store party
   const [party, setParty] = useState([]);
+
+  // Sales Invoices for Credit Note;
+  const [purchaseInvoice, setPurchaseInvoice] = useState([]);
 
 
   // store label and value pair for dropdown
@@ -113,6 +116,35 @@ const DebitNote = ({ mode }) => {
     }
   }, [mode])
 
+  // Get Sales invoice;
+  useEffect(() => {
+    (async () => {
+      try {
+        if (formData.party) {
+          const url = `${process.env.REACT_APP_API_URL}/debitnote/get-purchase-invoice`;
+          const cookie = Cookies.get("token");
+          const req = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": 'application/json'
+            },
+            body: JSON.stringify({ token: cookie, partyId: formData.party })
+          })
+          const res = await req.json();
+
+          if (req.status !== 200) {
+            setPurchaseInvoice([]);
+            return toast(res.err, 'error');
+          }
+
+          setPurchaseInvoice([...res.data]);
+        }
+      } catch (error) {
+        console.log(error)
+        return toast("Sales inovoice not get", 'error')
+      }
+    })()
+  }, [formData.party])
 
 
   // Get all data from api
@@ -398,10 +430,42 @@ const DebitNote = ({ mode }) => {
                 /> */}
                 <MySelect2
                   model={"party"}
+                  partyType={"supplier"}
                   onType={(v) => {
                     setFormData({ ...formData, party: v })
                   }}
                   value={formData.party?._id}
+                />
+              </div>
+              <div className='flex flex-col gap-2 w-full lg:max-w-[300px]'>
+                <p className='text-xs'>Select Bill <span className='text-red-600'>*</span></p>
+                <SelectPicker
+                  data={purchaseInvoice?.map((inv, i) => {
+                    return {
+                      label: `${inv.purchaseInvoiceNumber} | ${new Date(inv.invoiceDate).toLocaleDateString()} | ${inv.dueAmount}`,
+                      value: inv.purchaseInvoiceNumber
+                    }
+                  })}
+
+                  onChange={(v) => {
+                    if (!v) {
+                      setItemRows([itemRowSet]);
+                      setAdditionalRow([additionalRowSet]);
+                      setFormData({ ...formData, purchaseInvoice: '' });
+                      return;
+                    }
+
+                    const selectedInvoice = purchaseInvoice.find((inv, i) => inv.purchaseInvoiceNumber === v);
+
+                    setAdditionalRow([...selectedInvoice?.additionalCharge])
+                    setItemRows([...selectedInvoice?.items]);
+                    setFormData({
+                      ...formData, purchaseInvoice: v,
+                      items: selectedInvoice?.items
+                    });
+                  }}
+
+                  value={formData.purchaseInvoice}
                 />
               </div>
               <div className='flex flex-col gap-2 w-full lg:w-1/3'>
@@ -428,13 +492,13 @@ const DebitNote = ({ mode }) => {
                 <thead >
                   <tr>
                     <th style={{ "width": "*" }}>Item</th>
-                    <th style={{ "width": "6%" }}>HSN/SAC</th>
+                    <th style={{ "width": "5%" }}>HSN/SAC</th>
                     <th style={{ "width": "5%" }}>QTY</th>
-                    <th style={{ "width": "7%" }}>Unit</th>
-                    <th style={{ "width": "10%" }}>Price/Item</th>
-                    <th style={{ "width": "10%" }}>Discount</th>
-                    <th style={{ "width": "10%" }}>Tax</th>
-                    <th style={{ "width": "10%" }}>Amount</th>
+                    <th style={{ "width": "5%" }}>Unit</th>
+                    <th style={{ "width": "5%" }}>Price/Item</th>
+                    <th style={{ "width": "7%" }}>Discount</th>
+                    <th style={{ "width": "8%" }}>Tax</th>
+                    <th style={{ "width": "7%" }}>Amount</th>
                     <th style={{ "width": "3%" }}></th>
                   </tr>
                 </thead>
@@ -448,7 +512,7 @@ const DebitNote = ({ mode }) => {
                           <MySelect2
                             model={"item"}
                             onType={(v) => onItemChange(v, index, tax, ItemRows, setItemRows, setItems)}
-                            value={ItemRows[index].itemName}
+                            value={ItemRows[index].itemId}
                           />
                           <input type='text' className='input-style' placeholder='Description'
                             onChange={(e) => {
@@ -519,7 +583,7 @@ const DebitNote = ({ mode }) => {
                         </div>
                       </td>
                       <td> {/** Discount amount and percentage */}
-                        <div className={`w-[100px] flex flex-col gap-2 items-center`} >
+                        <div className={`w-full flex flex-col gap-2 items-center`} >
                           <div className='add-table-discount-input'>
                             <input type="text"
                               className={`${formData.discountType === 'before' ? 'bg-gray-100' : ''} `}
@@ -615,21 +679,21 @@ const DebitNote = ({ mode }) => {
               <table className='table-style w-full'>
                 <thead>
                   <tr>
-                    <td className='font-bold'>Total Taxable Amount</td>
-                    <td className='font-bold'>Total Tax Amount</td>
-                    <td>
+                    <th className='font-bold'>Total Taxable Amount</th>
+                    <th className='font-bold'>Total Tax Amount</th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Type</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td>
+                    </th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Amount</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td>
+                    </th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Percentage</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td className='font-bold'>Total Amount</td>
+                    </th>
+                    <th className='font-bold'>Total Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -736,9 +800,9 @@ const DebitNote = ({ mode }) => {
                   <table className='table-style w-full'>
                     <thead className='bg-gray-100'>
                       <tr>
-                        <td>Particular</td>
-                        <td>Amount</td>
-                        <td>Actions</td>
+                        <th>Particular</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>

@@ -14,7 +14,7 @@ import { toggle } from '../store/partyModalSlice';
 
 
 
-const MySelect2 = ({ model, onType, value }) => {
+const MySelect2 = ({ model, onType, value, partyType }) => {
   const dispatch = useDispatch()
   const toast = useMyToaster();
   const [selectedValue, setSelectedValue] = useState('');
@@ -42,29 +42,27 @@ const MySelect2 = ({ model, onType, value }) => {
 
 
   // if alredy value define
+  const get = async (value) => {
+    try {
+      const url = process.env.REACT_APP_API_URL + `/${model}/get`;
+      const req = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": 'application/json'
+        },
+        body: JSON.stringify({ token: Cookies.get("token"), id: value })
+      })
+      const res = await req.json();
+
+      setSelectedData(res.data || res)
+
+    } catch (error) {
+      return toast("Something went wrong", 'error')
+    }
+  }
   useEffect(() => {
     if (value) {
-      const get = async () => {
-        try {
-          const url = process.env.REACT_APP_API_URL + `/${model}/get`;
-          const req = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": 'application/json'
-            },
-            body: JSON.stringify({ token: Cookies.get("token"), id: value })
-          })
-          const res = await req.json();
-
-          setSelectedData(res.data || res)
-
-        } catch (error) {
-          return toast("Something went wrong", 'error')
-        }
-
-      }
-
-      get()
+      get(value);
     }
 
     // if (model === "item") {
@@ -86,12 +84,19 @@ const MySelect2 = ({ model, onType, value }) => {
     debounceTime.current = setTimeout(async () => {
       try {
         const url = process.env.REACT_APP_API_URL + `/${model}/get`;
+        const payload = {
+          token: Cookies.get("token"),
+          search: true,
+          searchText: v
+        };
+        if (model === "party") payload.partyType = partyType;
+
         const req = await fetch(url, {
           method: "POST",
           headers: {
             "Content-Type": 'application/json'
           },
-          body: JSON.stringify({ token: Cookies.get("token"), search: true, searchText: v })
+          body: JSON.stringify(payload)
         })
         const res = await req.json();
         setLoading(false);
@@ -125,6 +130,10 @@ const MySelect2 = ({ model, onType, value }) => {
   }
 
 
+  const getResForAutoSelect = (res) => {
+    get(res._id);
+  }
+
 
   return (
     <>
@@ -142,7 +151,7 @@ const MySelect2 = ({ model, onType, value }) => {
             </Drawer.Actions>
           </Drawer.Header>
           <Drawer.Body>
-            <PartyComponent save={closeDrawer} />
+            <PartyComponent save={closeDrawer} getRes={getResForAutoSelect} />
           </Drawer.Body>
         </Drawer>
 
@@ -158,7 +167,7 @@ const MySelect2 = ({ model, onType, value }) => {
             </Drawer.Actions>
           </Drawer.Header>
           <Drawer.Body>
-            <AddItemComponent save={closeDrawer} />
+            <AddItemComponent save={closeDrawer} getRes={getResForAutoSelect} />
           </Drawer.Body>
         </Drawer>
 
@@ -177,10 +186,11 @@ const MySelect2 = ({ model, onType, value }) => {
             <CategoryComponent save={closeDrawer} />
           </Drawer.Body>
         </Drawer>
-
         <AddPartyModal open={getPartyModalState} />
 
-        <input type="text"
+
+        <input
+          type="text"
           className='w-full border rounded-[3px]'
           value={selectedValue || searchText}
           onFocus={() => setShowDropDown(true)}
@@ -196,7 +206,7 @@ const MySelect2 = ({ model, onType, value }) => {
           placeholder='Search...'
         />
         {selectedValue ? <IoClose
-          className='absolute right-2 top-[5px] text-[16px] cursor-pointer'
+          className='absolute right-2 top-[5px] text-[16px] cursor-pointer text-gray-500'
           onClick={() => {
             setKeyCount(0);
             setSelectedValue("")
@@ -207,7 +217,8 @@ const MySelect2 = ({ model, onType, value }) => {
           }}
         /> : <IoIosSearch className='absolute right-2 top-[5px] text-[16px] cursor-pointer' />}
 
-        {/* List dropdown */}
+
+        {/* List of Dropdown */}
         {showDropDown && <div
           className='w-full max-h-[250px] overflow-y-auto bg-white absolute z-[9999999] rounded mt-1'
           style={{ boxShadow: "0px 0px 5px lightgray" }}>
@@ -218,29 +229,33 @@ const MySelect2 = ({ model, onType, value }) => {
                 return <li
                   key={i}
                   onMouseDown={() => setSelectedData(d)}
-                  className={`${model === "item" ? 'p-[6px]' : 'p-1 px-2'}  cursor-pointer text-left text-[11px]`}
+                  className={`${model === "item" ? 'p-3 text-left' : 'p-1 px-2'}  cursor-pointer`}
                 >
                   {(d.title || d.name) || d}
                 </li>
+
               })
             }
           </ul>
           <button
             onMouseDown={() => {
-              if (model === "party") {
-                setPartyDrawer(true);
-              }
-              else if (model === "item") {
-                setItemDrawer(true)
-              }
-              else if (model === "category") {
-                setCategoryDrawer(true)
-              }
-              else if (model === "partycategory") {
-                dispatch(toggle(true))
+              switch (model) {
+                case "party":
+                  setPartyDrawer(true);
+                  break;
+                case "item":
+                  setItemDrawer(true);
+                  break;
+                case "category":
+                  setCategoryDrawer(true);
+                  break;
+                case "partycategory":
+                  dispatch(toggle(true));
+                  break;
               }
             }}
-            className='select__add__button z-50'>
+            className='select__add__button z-50'
+          >
             <IoAddCircleSharp className='text-lg' />
             Add New
             <FaArrowRight className='text-[15px]' />

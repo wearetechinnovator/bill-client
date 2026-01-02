@@ -251,8 +251,8 @@ const PurchaseInvoice = ({ mode }) => {
 
     // Add Per Item Tax and Amound before save
     ItemRows.forEach((row, index) => {
-      row.taxAmount = calculatePerTaxAmount(index);
-      row.amount = calculatePerAmount(index);
+      row.taxAmount = calculatePerTaxAmount(index, ItemRows);
+      row.amount = calculatePerAmount(index, ItemRows);
     });
     setItemRows([...ItemRows]);
 
@@ -345,6 +345,7 @@ const PurchaseInvoice = ({ mode }) => {
                 </p>
                 <MySelect2
                   model={"party"}
+                  partyType={"supplier"}
                   onType={(v) => {
                     setFormData({ ...formData, party: v })
                   }}
@@ -392,14 +393,14 @@ const PurchaseInvoice = ({ mode }) => {
                 <thead >
                   <tr>
                     <th style={{ "width": "*" }}>Item</th>
-                    <th style={{ "width": "7%" }}>Expiry Date</th>
+                    <th style={{ "width": "5%" }}>Expiry Date</th>
                     <th style={{ "width": "5%" }}>HSN/SAC</th>
-                    <th style={{ "width": "4%" }}>QTY</th>
+                    <th style={{ "width": "5%" }}>QTY</th>
                     <th style={{ "width": "5%" }}>Unit</th>
-                    <th style={{ "width": "6%" }}>Price/Item</th>
-                    <th style={{ "width": "3%" }}>Discount</th>
+                    <th style={{ "width": "5%" }}>Price/Item</th>
+                    <th style={{ "width": "7%" }}>Discount</th>
                     <th style={{ "width": "8%" }}>Tax</th>
-                    <th style={{ "width": "10%" }}>Amount</th>
+                    <th style={{ "width": "7%" }}>Amount</th>
                     <th style={{ "width": "3%" }}></th>
                   </tr>
                 </thead>
@@ -497,7 +498,7 @@ const PurchaseInvoice = ({ mode }) => {
                         </div>
                       </td>
                       <td> {/** Discount amount and percentage */}
-                        <div className={`w-[100px] flex flex-col gap-2 items-center`} >
+                        <div className={`w-full flex flex-col gap-2 items-center`} >
                           <div className='add-table-discount-input'>
                             <input type="text"
                               className={`${formData.discountType === 'before' ? 'bg-gray-100' : ''} `}
@@ -594,21 +595,21 @@ const PurchaseInvoice = ({ mode }) => {
               <table className='table-style w-full'>
                 <thead>
                   <tr>
-                    <td className='font-bold'>Total Taxable Amount</td>
-                    <td className='font-bold'>Total Tax Amount</td>
-                    <td>
+                    <th className='font-bold'>Total Taxable Amount</th>
+                    <th className='font-bold'>Total Tax Amount</th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Type</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td>
+                    </th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Amount</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td>
+                    </th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Percentage</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td className='font-bold'>Total Amount</td>
+                    </th>
+                    <th className='font-bold'>Total Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -743,9 +744,9 @@ const PurchaseInvoice = ({ mode }) => {
                   <table className='table-style w-full'>
                     <thead className='bg-gray-100'>
                       <tr>
-                        <td>Particular</td>
-                        <td>Amount</td>
-                        <td>Actions</td>
+                        <th>Particular</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>

@@ -8,17 +8,18 @@ import { toWords } from 'number-to-words';
 import { Document, Page, View, Text, Image, StyleSheet, PDFViewer, pdf } from '@react-pdf/renderer';
 import downloadPdf from '../../helper/downloadPdf';
 import useMyToaster from '../../hooks/useMyToaster';
-import Loading from '../../components/Loading';
 import MailModal from '../../components/MailModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggle } from '../../store/mailSlice';
-import { Popover, Whisper } from 'rsuite';
+import { Drawer, Modal, Popover, Sidebar, Whisper } from 'rsuite';
 import { MdOutlineArrowDropDown } from "react-icons/md";
 import { IoIosShareAlt } from "react-icons/io";
 import { HiOutlineMail } from "react-icons/hi";
 import { MdOutlineWhatsapp } from "react-icons/md";
 import swal from 'sweetalert';
 import { Icons } from '../../helper/icons';
+import { AddPaymentOutComponent } from '../paymentout/AddPayment';
+import { AddPaymentInComponent } from '../paymentin/AddPayment';
 
 
 
@@ -43,6 +44,7 @@ const Invoice = () => {
   const [billName, setBillName] = useState('');
   const [shareDrpdwn, setShareDrpdwn] = useState(false);
   const [route, setRoute] = useState('');
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
 
 
@@ -101,7 +103,6 @@ const Invoice = () => {
 
         if (urlRoute) {
           const url = process.env.REACT_APP_API_URL + `/${urlRoute}/get`;
-          console.log(url)
           const req = await fetch(url, {
             method: "POST",
             headers: {
@@ -110,7 +111,6 @@ const Invoice = () => {
             body: JSON.stringify({ token: Cookies.get("token"), id: id })
           });
           const res = await req.json();
-          console.log(res.data)
           setBillData(res.data)
           return res;
         }
@@ -133,7 +133,6 @@ const Invoice = () => {
           body: JSON.stringify({ token: Cookies.get("token") })
         });
         const res = await req.json();
-        console.log(res)
         setCompanyDetails(res);
         return res;
 
@@ -184,7 +183,6 @@ const Invoice = () => {
     })
 
     setHsnData([...data]);
-
   }, [billData]);
 
 
@@ -198,11 +196,10 @@ const Invoice = () => {
     billData && billData.items.map((b, _) => {
       qun += parseInt(b.qun)
       taxAmount += (parseInt(b.qun) * parseInt(b.price)) / 100 * b.tax;
-      discount += parseInt(b.discountPerAmount);
+      discount += parseInt(b.discountPerAmount || 0);
 
       let a = ((parseInt(b.qun) * parseInt(b.price)) + (parseInt(b.qun) * parseInt(b.price)) / 100 * b.tax);
-      amount += a - parseInt(b.discountPerAmount)
-
+      amount += a - parseInt(b.discountPerAmount || 0);
     })
 
     setBillDetails({
@@ -228,7 +225,10 @@ const Invoice = () => {
 
     try {
       const blob = await pdf(
-        InvoicePdf({ companyDetails, billData, billDetails, hsnData, totalAmountInText, billname: urlRoute.toUpperCase() })
+        InvoicePdf({
+          companyDetails, billData, billDetails,
+          hsnData, totalAmountInText, billname: urlRoute.toUpperCase()
+        })
       ).toBlob();
 
       let pdfData = await blobToBase64(blob);
@@ -241,7 +241,10 @@ const Invoice = () => {
       toast("Something went wrong", 'error')
       return error;
     }
+  }
 
+  const openPaymentSideBar = async () => {
+    setDrawerOpen(true);
   }
 
 
@@ -251,13 +254,47 @@ const Invoice = () => {
       <Nav />
       <main id='main'>
         <SideNav />
+
+        {/* <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} >
+          <Drawer.Header>
+            <Drawer.Actions>
+              Make Payment
+            </Drawer.Actions>
+          </Drawer.Header>
+          <Drawer.Body>
+            {
+              urlRoute === "purchaseinvoice" && <AddPaymentOutComponent
+                partyId={billData?.party?._id}
+                invoiceNumber={billData?.purchaseInvoiceNumber}
+                due={billData?.dueAmount}
+              />
+            }
+
+            {
+              urlRoute === "salesinvoice" && <AddPaymentInComponent
+                partyId={billData?.party?._id}
+                invoiceNumber={billData?.purchaseInvoiceNumber}
+                due={billData?.dueAmount}
+              />
+            }
+          </Drawer.Body>
+        </Drawer> */}
+        {/* Payment drawer close */}
         <MailModal open={openModal} pdf={pdfData} email={billData?.party?.email} />
+
         <div className="content__body">
           <div id='invoice' className='content__body__main w-[100%] min-h-[100vh] bg-gray-100 flex justify-center'>
             <div className='bg-white /*w-[190mm]*/ w-[80%]  p-5'>
+
               {/* Action buttons */}
               <div id='invoiceBtn' className='flex gap-2 w-full justify-end mb-5'>
-
+                {/* {((urlRoute === "purchaseinvoice" || urlRoute === "salesinvoice") && billData?.dueAmount > 0) &&
+                  <button
+                    onClick={openPaymentSideBar}
+                    className='bg-[#003E32] text-white rounded-[5px] px-2 py-[5px] gap-1'>
+                    Make Payment
+                  </button>
+                } */}
                 <button
                   onClick={() => {
                     swal({
@@ -327,169 +364,215 @@ const Invoice = () => {
                     <MdOutlineArrowDropDown />
                   </div>
                 </Whisper>
+
+                <button
+                  onClick={() => {
+                    const printContents = document.getElementById('mainBill').innerHTML;
+                    document.body.innerHTML = printContents;
+                    window.print();
+                    window.location.reload();
+                  }}
+                  title='Print Bill'
+                  className='bg-[#003E32] text-white rounded-[5px] flex justify-center items-center px-2 py-[5px]'>
+                  <Icons.PRINTER className="text-white text-[15px] mr-1" />
+                  Print
+                </button>
               </div>
 
-              <div>
-                <p className='font-bold text-center'>{urlRoute.toUpperCase()}</p>
-                <div className='border-black border border-b-0 w-full mt-3'>
-                  <div className='flex w-full border-b border-black h-[130px]'>
-                    <div className='p-3 w-[60%] flex items-center gap-5 border border-r' style={{ borderRight: "1px solid black" }}>
-                      <div>
-                        <img src={companyDetails?.invoiceLogo} className='h-[40px]' />
+              <div id='mainBill'>
+                <div className='border border-black p-4'>
+                  <p className='font-semibold text-center uppercase'>{urlRoute.toUpperCase()} Invoice</p>
+                  <div className='border border-b-0 w-full mt-3'>
+                    <div className='flex w-full border-b'>
+                      <div className='p-3 w-[60%] flex items-center gap-5 border-r'>
+                        <div>
+                          <img src={companyDetails?.invoiceLogo} className='h-[100px]' />
+                        </div>
+                        <div className='flex flex-col gap-1 text-[12px]'>
+                          <p className='text-blue-700 font-semibold text-[12px]'>
+                            {companyDetails?.name}
+                          </p>
+                          <p>{companyDetails?.address}</p>
+                          <p className='leading-[0]'>
+                            <span className='font-semibold'>GSTIN</span>:  {companyDetails?.gst}
+                          </p>
+                          <p><span className='font-semibold'>PAN</span>: {companyDetails?.pan}</p>
+                          <p className='leading-[0]'>
+                            <span className='font-semibold'>Mobile</span>:  {companyDetails?.phone}
+                          </p>
+                        </div>
                       </div>
-                      <div className='flex flex-col gap-1 text-[12px]'>
-                        <p className='text-blue-700 font-bold text-[16px] leading-none'>
-                          {companyDetails?.name}
+                      <div className='w-[40%] flex flex-col justify-center px-3 text-[12px]'>
+                        <p><span className='font-semibold'>{billName} No: </span>{
+                          billData?.quotationNumber || billData?.proformaNumber || billData?.poNumber || billData?.purchaseInvoiceNumber ||
+                          billData?.purchaseReturnNumber || billData?.debitNoteNumber ||
+                          billData?.salesInvoiceNumber || billData?.salesReturnNumber || billData?.creditNoteNumber ||
+                          billData?.deliveryChalanNumber
+                        }</p>
+                        <p><span className='font-semibold'>{billName} Date: </span>
+                          {
+                            new Date(
+                              billData?.estimateDate || billData?.invoiceDate || billData?.debitNoteDate ||
+                              billData?.returnDate || billData?.poDate || billData?.purchaseInvoiceDate
+                              || billData?.creditNoteDate || billData?.purchaseReturnDate
+                              || billData?.chalanDate
+                            ).toLocaleDateString()
+                          }
                         </p>
-                        <p>{companyDetails?.address}</p>
-                        <p className='leading-[0]'>
-                          <span className='font-bold'>GSTIN</span>:  {companyDetails?.gst}
-                          <span className='font-bold ml-5'>Mobile</span>:  {companyDetails?.phone}</p>
-                        <p><span className='font-bold'>PAN Number</span>: {companyDetails?.pan}</p>
                       </div>
                     </div>
-                    <div className='w-[40%] flex flex-col justify-center px-3 text-[12px]'>
-                      <p><span className='font-bold'>{billName} No: </span>{
-                        billData?.quotationNumber || billData?.proformaNumber || billData?.poNumber || billData?.purchaseInvoiceNumber ||
-                        billData?.purchaseReturnNumber || billData?.debitNoteNumber ||
-                        billData?.salesInvoiceNumber || billData?.salesReturnNumber || billData?.creditNoteNumber ||
-                        billData?.deliveryChalanNumber
-                      }</p>
-                      <p><span className='font-bold'>{billName} Date: </span>
-                        {
-                          new Date(
-                            billData?.estimateDate || billData?.invoiceDate || billData?.debitNoteDate ||
-                            billData?.returnDate || billData?.poDate || billData?.purchaseInvoiceDate
-                            || billData?.creditNoteDate || billData?.purchaseReturnDate
-                            || billData?.chalanDate
-                          ).toLocaleDateString()
-                        }
+
+                    <div className='p-3'>
+                      <p className='text-[12px]'>TO</p>
+                      <p className='text-black font-semibold text-[12px] uppercase'>{billData?.party.name}</p>
+                      <p className='text-[12px]'><span className='text-black font-semibold'>Address:</span> {billData?.party.billingAddress}</p>
+                      <p className='text-[12px]'><span className='text-black font-semibold'>Mobile:</span> {billData?.party.contactNumber}</p>
+                      <p className='text-[12px] uppercase text-black'>
+                        <span className='font-semibold'>GSTIN:</span> {billData?.party.gst}
+                        <span className='font-semibold ml-2'>PAN:</span> {billData?.party.pan}
                       </p>
                     </div>
                   </div>
-
-                  <div className='p-3'>
-                    <p className='text-[12px]'>TO</p>
-                    <p className='text-black font-bold text-[12px] uppercase'>{billData?.party.name}</p>
-                    <p className='text-[12px]'><span className='text-black font-bold'>Address:</span> {billData?.party.address}</p>
-                    <p className='text-[12px] uppercase text-black'>
-                      <span className='font-bold'>GSTIN:</span> {billData?.party.gst}
-                      <span className='font-bold ml-2'>State:</span> {billData?.party.state}
-                    </p>
-                  </div>
-                </div>
-                <table className='w-full text-[12px] '>
-                  <thead className='bg-gray-100'>
-                    <tr>
-                      <td className='p-2'>S.NO.</td>
-                      <td>ITEM</td>
-                      <td>HSN/SAC</td>
-                      <td>QTY.</td>
-                      <td>RATE</td>
-                      <td>DISCOUNT</td>
-                      <td>TAX</td>
-                      <td>AMOUNT</td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {
-                      billData && billData.items.map((data, index) => {
-                        return <tr key={index} className=''>
-                          <td className='p-2'>{index + 1}</td>
-                          <td>{data.itemName}</td>
-                          <td>{data.hsn}</td>
-                          <td>{data.qun}</td>
-                          <td>{data.price}</td>
-                          <td align='right'>
-                            {data.discountPerAmount || "0.00"}
-                            <div className='text-gray-500'>
-                              {
-                                isNaN(parseFloat(data.discountPerAmount) / (parseFloat(data.price) * parseFloat(data.qun)) * 100)
-                                  ? "(0.00%)"
-                                  : `(${((parseFloat(data.discountPerAmount) / (parseFloat(data.price) * parseFloat(data.qun))) * 100).toFixed(2)}%)`
-                              }
-                            </div>
-                          </td>
-                          <td align='right'>
-                            {((data.qun * data.price) / 100 * data.tax).toFixed(2)}
-                            <div className='text-gray-500'>{`(${data.tax || '0.00'}%)`}</div>
-                          </td>
-                          <td>{
-                            (parseFloat(data.price) * parseFloat(data.qun) - parseFloat(data.discountPerAmount || 0) + ((data.qun * data.price) / 100 * data.tax)).toFixed(2)
-                          }</td>
+                  <div className='table__wrapper items-page'>
+                    <table className='w-full text-[12px] border item__table'>
+                      <thead className='bg-gray-100'>
+                        <tr>
+                          <td align='center' valign='center' className='p-2' width={"5%"}>SL.NO.</td>
+                          <td align='center' width={"49%"}>ITEM</td>
+                          <td align='center' width={"7%"}>HSN/SAC</td>
+                          <td align='center' width={"7%"}>QTY.</td>
+                          <td align='center' width={"7%"}>RATE</td>
+                          <td align='center' width={"8%"}>DISCOUNT</td>
+                          <td align='center' width={"7%"}>TAX</td>
+                          <td align='center' width={"10%"}>AMOUNT(INR.)</td>
                         </tr>
-                      })
-                    }
-
-                  </tbody>
-                  <tfoot>
-                    <tr className='font-bold bg-[#F3F4F6]'>
-                      <td colSpan={3} align='right'>TOTAL</td>
-                      <td>{billDetails.qun}</td>
-                      <td></td>
-                      <td>INR. {billDetails.discount}</td>
-                      <td>INR. {billDetails.taxAmount}</td>
-                      <td>INR. {billDetails.amount}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-
-                <table className='w-full text-[12px] mt-2'>
-                  <thead className='bg-gray-100'>
-                    <tr>
-                      <td>HSN Code</td>
-                      <td>Tax Type</td>
-                      <td>Rate</td>
-                      <td>Amount</td>
-                      <td>Total Tax Amount</td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {hsnData && (
-                      [...new Map(hsnData.map(item => [item.hsn, item]))].map(([hsn, data], i) => {
-                        return <>
-                          <tr key={`${i}-sgst`}>
-                            <td rowSpan={2}>{data.hsn}</td>
-                            <td>SGST</td>
-                            <td>{data.rate / 2}%</td>
-                            <td>{data.price / 2}</td>
-                            <td>{(data.taxAmount).toFixed(2)}</td>
-                          </tr>
-                          <tr key={`${i}-cgst`}>
-                            <td>CGST</td>
-                            <td>{data.rate / 2}%</td>
-                            <td>{data.price / 2}</td>
-                            <td>{(data.taxAmount).toFixed(2)}</td>
-                          </tr>
-                        </>
-                      })
-                    )}
-                  </tbody>
-
-                </table>
-
-                <div className='border border-black w-full mt-2'>
-                  <div className='w-full border-b border-black'>
-                    <p className='text-[12px] p-1'>
-                      <span className='font-bold '>Total Amount (in words) : </span>
-                      {/* five hundred and fifty four Rupees .six Paise */}
-                      {totalAmountInText}
-                    </p>
+                      </thead>
+                      <tbody>
+                        {
+                          billData && billData.items.map((data, index) => {
+                            return <tr key={index} >
+                              <td valign='top' align='center' className='p-2 border'>{index + 1}</td>
+                              <td valign='top' align='left'>{data.itemName}</td>
+                              <td valign='top' align='right'>{data.hsn}</td>
+                              <td valign='top' align='right'>{data.qun} <sub>{data.selectedUnit}</sub></td>
+                              <td valign='top' align='right'>{data.price}</td>
+                              <td valign='top' align='right'>
+                                {data.discountPerAmount || "0.00"}
+                                <div className='discount-font text-gray-500'>
+                                  {
+                                    isNaN(parseFloat(data.discountPerAmount) / (parseFloat(data.price) * parseFloat(data.qun)) * 100)
+                                      ? "(0.00%)"
+                                      : `(${((parseFloat(data.discountPerAmount) / (parseFloat(data.price) * parseFloat(data.qun))) * 100).toFixed(2)}%)`
+                                  }
+                                </div>
+                              </td>
+                              <td valign='top' align='right'>
+                                {((data.qun * data.price) / 100 * data.tax).toFixed(2)}
+                                <div className='text-gray-500 discount-font'>{`(${data.tax || '0.00'}%)`}</div>
+                              </td>
+                              <td valign='top' align='right'> {
+                                (parseFloat(data.price) * parseFloat(data.qun) - parseFloat(data.discountPerAmount || 0) + ((data.qun * data.price) / 100 * data.tax)).toFixed(2)
+                              }</td>
+                            </tr>
+                          })
+                        }
+                        {
+                          Array.from({
+                            length: Math.max(0, 8 - (billData?.items?.length || 0))
+                          }).map((_, i) => (
+                            <tr key={i + 100} className='without__border'>
+                              <td className='p-2 border without__border'>&nbsp;</td>
+                              <td className='without__border'>&nbsp;</td>
+                              <td className='without__border'>&nbsp;</td>
+                              <td className='without__border'>&nbsp;</td>
+                              <td className='without__border'>&nbsp;</td>
+                              <td className='without__border'>&nbsp;</td>
+                              <td className='without__border'>&nbsp;</td>
+                              <td className='without__border'>&nbsp;</td>
+                            </tr>
+                          ))
+                        }
+                      </tbody>
+                      <tfoot className='w-full'>
+                        <tr className='font-bold bg-[#F3F4F6]'>
+                          <td colSpan={3} align='right'>TOTAL</td>
+                          <td>{billDetails.qun}</td>
+                          <td></td>
+                          <td>INR. {billDetails.discount}</td>
+                          <td>INR. {billDetails.taxAmount}</td>
+                          <td>INR. {billDetails.amount}</td>
+                        </tr>
+                        {billData?.roundOffAmount && <tr className='font-bold bg-[#F3F4F6]'>
+                          <td colSpan={7} align='right' className='italic'>Round Off</td>
+                          <td>{billData?.roundOffAmount}</td>
+                        </tr>}
+                        {billData?.roundOffAmount && <tr className='font-bold bg-[#F3F4F6]'>
+                          <td colSpan={7} align='right' className='font-semibold'>SUB TOTAL</td>
+                          <td>{billDetails.amount - billData?.roundOffAmount}</td>
+                        </tr>}
+                      </tfoot>
+                    </table>
                   </div>
-                  <div className='w-full flex'>
-                    <div className='w-full p-2'>
-                      <p className='font-semibold text-md'>Note:</p>
-                      <p>{billData?.note}</p>
 
-                      <br />
+                  {/* ===============================[HSN AND TAX TYPES TABLE] ======================== */}
+                  {/* ================================================================================= */}
+                  <div className="print-page-break mt-2 ">
+                    <table className='w-full text-[12px] ' >
+                      <thead className='bg-gray-100'>
+                        <tr>
+                          <td>HSN Code</td>
+                          <td>Tax Type</td>
+                          <td>Rate</td>
+                          <td>Amount</td>
+                          <td>Total Tax Amount</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {hsnData && (
+                          [...new Map(hsnData.map(item => [item.hsn, item]))].map(([hsn, data], i) => {
+                            return <>
+                              <tr key={`${i}-sgst`}>
+                                <td rowSpan={2}>{data.hsn}</td>
+                                <td>SGST</td>
+                                <td>{data.rate / 2}%</td>
+                                <td>{data.price / 2}</td>
+                                <td>{(data.taxAmount).toFixed(2)}</td>
+                              </tr>
+                              <tr key={`${i}-cgst`}>
+                                <td>CGST</td>
+                                <td>{data.rate / 2}%</td>
+                                <td>{data.price / 2}</td>
+                                <td>{(data.taxAmount).toFixed(2)}</td>
+                              </tr>
+                            </>
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
 
-                      <p className='font-semibold text-md'>Terms:</p>
-                      <p>{billData?.terms}</p>
+                  <div className='border w-full mt-2'>
+                    <div className='w-full border-b'>
+                      <p className='text-[12px] p-1'>
+                        <span className='font-bold '>Total Amount (in words) : </span>
+                        {/* five hundred and fifty four Rupees .six Paise */}
+                        {totalAmountInText}
+                      </p>
                     </div>
-                    <div className='border-l border-black w-full text-center p-2'>
-                      <img src={companyDetails?.signature} alt="signature" className='mx-auto' />
-                      <p className='text-[10px] leading-[0] mt-5'>Authorised Signatory For</p>
-                      <p className='text-[10px]'>{companyDetails?.name}</p>
+                    <div className='w-full flex'>
+                      <div className='w-full p-2'>
+                        <p className='font-semibold text-md'>Note:</p>
+                        <p>{billData?.note}</p>
+                        <br />
+
+                        <p className='font-semibold text-md'>Terms:</p>
+                        <p>{billData?.terms}</p>
+                      </div>
+                      <div className='border-l w-full text-center p-2'>
+                        <img src={companyDetails?.signature} alt="signature" className='mx-auto h-[30px]' />
+                        <p className='text-[10px] leading-[0] mt-5'>Authorised Signatory For</p>
+                        <p className='text-[10px]'>{companyDetails?.name}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -507,13 +590,11 @@ const Invoice = () => {
 
 
 
-// :::::::::::::::::::::::::
-// PDF Generate component
-// :::::::::::::::::::::::::
-
+// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+// ==================================== [PDF Generate component] ===================================
+// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 const InvoicePdf = ({ companyDetails, billData, billDetails, hsnData, totalAmountInText, billname }) => {
-
   const styles = StyleSheet.create({
     page: { padding: 20 },
     section: { marginBottom: 0 },

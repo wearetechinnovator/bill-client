@@ -26,13 +26,27 @@ const Item = ({ mode }) => {
   const [tableStatusData, setTableStatusData] = useState('active');
   const [itemData, setItemData] = useState([]);
   const tableRef = useRef(null);
-  const exportData = useMemo(() => {
-    return itemData && itemData.map(({ title, category }, _) => ({
-      Title: title,
-      HSN: category?.hsn
-    }));
-  }, [itemData]);
   const [loading, setLoading] = useState(true);
+  const [stock, setStock] = useState([]);
+  const [currentData, setCurrentData] = useState();
+  const exportData = useMemo(() => {
+    return itemData && itemData.map((data, i) => {
+      let currentItemStock = stock?.find((s, _) => s.itemId == data._id);
+      let stockKeys = Object.keys(currentItemStock.stock);
+      let stockValues = Object.values(currentItemStock.stock);
+
+      let stockStr = "";
+      for (let i = 0; i < stockKeys.length; i++) {
+        stockStr += `${stockValues[i]} ${stockKeys[i]} `;
+      }
+      return {
+        Title: data.title,
+        HSN: data.category?.hsn || data.hsn || "--",
+        "Sale Price": data.salePrice,
+        "STOCK": stockStr
+      }
+    });
+  }, [itemData]);
 
 
 
@@ -56,9 +70,11 @@ const Item = ({ mode }) => {
         const res = await req.json();
         setTotalData(res.totalData)
         setItemData([...res.data])
+        setStock([...res.stock]);
         setLoading(false);
 
       } catch (error) {
+        setLoading(false);
         console.log(error)
       }
     }
@@ -287,7 +303,15 @@ const Item = ({ mode }) => {
                   <tbody>
                     {
                       itemData.map((data, i) => {
-                        console.log(data);
+                        let currentItemStock = stock?.find((s, _) => s.itemId == data._id);
+                        let stockKeys = Object.keys(currentItemStock.stock);
+                        let stockValues = Object.values(currentItemStock.stock);
+
+                        let stockStr = "";
+                        for (let i = 0; i < stockKeys.length; i++) {
+                          stockStr += `${stockValues[i]} ${stockKeys[i]} `;
+                        }
+
                         return <tr key={i} onClick={() => navigate("/admin/item/details/" + data._id)} className='cursor-pointer hover:bg-gray-100'>
                           <td className='py-2 px-4 border-b max-w-[10px]'>
                             <input type='checkbox' checked={selected.includes(data._id)} onChange={() => handleCheckboxChange(data._id)} />
@@ -296,20 +320,14 @@ const Item = ({ mode }) => {
                             {data.title}
                             {
                               data.category &&
-                              <p className="text-[10px] bg-gray-100 rounded w-fit px-[2px] border mb-[2p]">{data.category?.title}</p>
+                              <span className="text-[10px] bg-gray-100 rounded w-fit px-[2px] border ms-[5px]">{data.category?.title}</span>
                             }
                           </td>
-                          <td className='px-4 border-b' align='center'>{data.category?.hsn}</td>
+                          <td className='px-4 border-b' align='center'>{data.category?.hsn || data.hsn || "--"}</td>
                           <td className='px-4 border-b' align='center'>{data.salePrice || 0.00}</td>
                           <td className='px-4 border-b' align='center'>
                             <div className='flex items-center justify-center gap-2'>
-                              {
-                                data.stock.map((stock, _) => {
-                                  return stock.stock !== "" ? <p key={_}>
-                                    {stock.stock} <sub className='font-bold'>{stock.unit}</sub>
-                                  </p> : "";
-                                })
-                              }
+                              {stockStr}
                             </div>
                           </td>
 

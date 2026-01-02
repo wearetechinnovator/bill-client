@@ -91,7 +91,7 @@ const PO = ({ mode }) => {
       body: JSON.stringify({ token: cookie, id: id })
     })
     const res = await req.json();
-    console.log(res)
+    
     setFormData({ ...formData, ...res.data });
     setAdditionalRow([...res.data.additionalCharge])
     setItemRows([...res.data.items]);
@@ -403,6 +403,7 @@ const PO = ({ mode }) => {
                 /> */}
                 <MySelect2
                   model={"party"}
+                  partyType={"supplier"}
                   onType={(v) => {
                     setFormData({ ...formData, party: v })
                   }}
@@ -608,7 +609,7 @@ const PO = ({ mode }) => {
                 <tfoot>
                   <tr>
                     <td colSpan={9}>
-                      <Button color='blue' className='float-right w-full font-bold' onClick={() => addItem(2, itemRowSet, setItemRows, setFormData, additionalRowSet, setAdditionalRow)}>
+                      <Button color='blue' className='float-right w-full font-bold' onClick={() => addItem(1, itemRowSet, setItemRows, setFormData, additionalRowSet, setAdditionalRow)}>
                         <MdOutlinePlaylistAdd className='text-lg mr-1' />
                         Add Item
                       </Button>
@@ -795,7 +796,7 @@ const PO = ({ mode }) => {
                     <tfoot>
                       <tr>
                         <td colSpan={3}>
-                          <Button color='blue' className='float-right w-full font-bold' onClick={() => addItem(1, itemRowSet, setItemRows, setFormData, additionalRowSet, setAdditionalRow)}>
+                          <Button color='blue' className='float-right w-full font-bold' onClick={() => addItem(2, itemRowSet, setItemRows, setFormData, additionalRowSet, setAdditionalRow)}>
                             <MdOutlinePlaylistAdd className='text-lg mr-1' />
                             Add Item
                           </Button>

@@ -178,6 +178,7 @@ const useFormHandle = () => {
     }
 
     const calculatePerTaxAmount = (index, ItemRows) => {
+        console.log(ItemRows)
         const tax = ItemRows[index].tax / 100;
         const qun = ItemRows[index].qun;
         const price = ItemRows[index].price;

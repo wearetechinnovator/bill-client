@@ -31,12 +31,12 @@ const ItemAdd = ({ mode }) => {
   )
 }
 
-const AddItemComponent = ({ mode, save }) => {
+const AddItemComponent = ({ mode, save, getRes }) => {
   const toast = useMyToaster();
   const { getApiData } = useApi()
-  const editorRef = useRef(null);
   const [form, setForm] = useState({
-    title: '', type: '', salePrice: '', category: '', details: '', hsn: '', tax: ''
+    title: '', type: 'goods', salePrice: '', category: '', details: '', hsn: '', tax: '',
+    purchasePrice: '', purchaseTaxType: '1', saleTaxType: '1', itemCode: '' //Barcode Number
   })
   const { id } = useParams();
   const [category, setCategory] = useState([])
@@ -44,7 +44,7 @@ const AddItemComponent = ({ mode, save }) => {
   const [unit, setUnit] = useState([]);
   const [fullCategory, setFullCategory] = useState([]);
   const unitRowSet = {
-    unit: "", conversion: '', opening: '', alert: ''
+    unit: "", conversion: '1', opening: '', alert: ''
   }
   const [unitRow, setUnitRow] = useState([unitRowSet]);
   const navigate = useNavigate();
@@ -68,7 +68,9 @@ const AddItemComponent = ({ mode, save }) => {
         const data = res.data;
         setForm({
           title: data.title, type: data.type, salePrice: data.salePrice,
-          category: data.category?._id, details: data.details, hsn: data.category?.hsn, tax: data.category?.tax
+          category: data.category?._id, details: data.details, hsn: data.hsn,
+          tax: data?.tax, purchasePrice: data.purchasePrice, purchaseTaxType: data.purchaseTaxType,
+          saleTaxType: data.saleTaxType, itemCode: data.itemCode
         });
         setUnitRow([...data.unit]);
       }
@@ -102,15 +104,12 @@ const AddItemComponent = ({ mode, save }) => {
   }, [])
 
 
-  const savebutton = async (e) => {
+  const saveData = async (e) => {
     if (form.title === "") {
       return toast("Item name can't be blank", "error")
     }
     else if (form.salePrice === "") {
-      return toast("Price can't be blank", "error")
-    }
-    else if (form.category === "") {
-      return toast("Category can't be blank", "error")
+      return toast("Sale Price can't be blank", "error")
     }
 
     try {
@@ -133,12 +132,17 @@ const AddItemComponent = ({ mode, save }) => {
 
       if (!mode) clearData();
 
+      // Send Response to MySelect2 Component for auto select item;
+      if (getRes)
+        getRes(res);
+
       toast(!mode ? "Item create success" : "Item update success", 'success');
+
       // for close sidebar in MySelect2
-      if(save){
+      if (save) {
         save(true)
         return
-      }else{
+      } else {
         return navigate("/admin/item")
       }
 
@@ -166,58 +170,96 @@ const AddItemComponent = ({ mode, save }) => {
 
   return (
     <div className='content__body__main bg-white'>
-      <div className='  flex justify-between  gap-5 flex-col lg:flex-row'>
+      <div className='  flex justify-between gap-5 flex-col lg:flex-row'>
         <div className='w-full'>
-          <div >
+          <div>
             <p className='mb-1'>Item Name <span className='required__text'>*</span></p>
-            <input type='text' onChange={(e) => setForm({ ...form, title: e.target.value })} value={form.title} />
+            <input type='text'
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              value={form.title} />
           </div>
-          <div>
-            <p className='mb-1 mt-2 ml-1'>Type</p>
-            <select onChange={(e) => setForm({ ...form, type: e.target.value })} value={form.type}>
-              <option value={""}>--select--</option>
-              <option value={"goods"}>Goods</option>
-              <option value={"service"}>Service</option>
-            </select>
+
+          <div className='w-full flex-col md:flex-row flex items-center gap-2 mt-3'>
+            <div className='w-full'>
+              <p className='mb-1'>Sale Price <span className='required__text'>*</span></p>
+              <input type="text"
+                onChange={(e) => setForm({ ...form, salePrice: e.target.value })}
+                value={form.salePrice} />
+            </div>
+            <div className='w-full mt-[20px]'>
+              <select
+                value="1"
+                onChange={(e) => setForm({ ...form, saleTaxType: e.target.value })}>
+                <option value={"1"}>With Tax</option>
+                <option value={"0"}>Without Tax</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <p className='mt-2 mb-1'>Price  <span className='required__text'>*</span></p>
-            <input type="text" onChange={(e) => setForm({ ...form, salePrice: e.target.value })} value={form.salePrice} />
-          </div>
-        </div>
-        <div className='w-full'>
-          <div>
-            <p className='ml-1 mb-1'>Select Category <span className='required__text'>*</span></p>
-            {/* <SelectPicker className='w-full'
-              data={category}
-              onChange={(v) => categoryChange(v)}
-              value={form.category} /> */}
-            <MySelect2
-              model={"category"}
-              onType={(v) => {
-                console.log(v)
-                setForm({ ...form, category: v })
-              }}
-              value={form.category}
-            />
-          </div>
-          <div>
-            <p className='ml-1 mb-1 mt-2'>Select Tax</p>
+
+          <div className='mt-3'>
+            <p className='ml-1 mb-1'>GST Tax (%)</p>
             <SelectPicker className='w-full'
               data={tax}
               onChange={(v) => setForm({ ...form, tax: v })}
               value={form.tax} />
           </div>
-          <div>
-            <p className=' mt-2 mb-1 ml-1'>HSN/SAC</p>
-            <input type='text'
-              onChange={(e) => setForm({ ...form, hsn: e.target.value })}
-              value={form.hsn} />
+        </div>
+        {/* =================== [First Collumn End] ================ */}
+
+        <div className='w-full'>
+          <div className='w-full flex-col md:flex-row flex items-center gap-3'>
+            <div className='w-full'>
+              <p className='mb-1 ml-1'>Item Type</p>
+              <select onChange={(e) => setForm({ ...form, type: e.target.value })} value={form.type}>
+                <option value={""}>Select</option>
+                <option value={"goods"}>Goods</option>
+                <option value={"service"}>Service</option>
+              </select>
+            </div>
+            <div className='w-full'>
+              <p className='ml-1 mb-1'>Select Category</p>
+              <MySelect2
+                model={"category"}
+                onType={(v) => {
+                  console.log(v)
+                  setForm({ ...form, category: v })
+                }}
+                value={form.category}
+              />
+            </div>
+          </div>
+
+          <div className='w-full flex-col md:flex-row flex items-center gap-3'>
+            <div className='w-full'>
+              <p className='mt-2 mb-1'>Purchase Price <span className='required__text'>*</span></p>
+              <input type="text"
+                onChange={(e) => setForm({ ...form, purchasePrice: e.target.value })}
+                value={form.purchasePrice} />
+            </div>
+            <div className='w-full mt-[28px]'>
+              <select
+                value="1"
+                onChange={(e) => setForm({ ...form, purchaseTaxType: e.target.value })}>
+                <option value={"1"}>With Tax</option>
+                <option value={"0"}>Without Tax</option>
+              </select>
+            </div>
+          </div>
+
+          <div className='w-full flex-col md:flex-row flex items-center gap-3 mt-3'>
+            <div className='w-full'>
+              <p className='mb-1 ml-1'>HSN/SAC</p>
+              <input type='text'
+                onChange={(e) => setForm({ ...form, hsn: e.target.value })}
+                value={form.hsn} />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className='w-full overflow-auto mt-2'>
+      {/* ============================= [UNIT TABLE START =========================] */}
+
+      <div className='w-full overflow-auto mt-4'>
         <table className='w-full border'>
           <thead className='bg-gray-200'>
             <tr>
@@ -237,18 +279,31 @@ const AddItemComponent = ({ mode, save }) => {
                     newUnitRow[i].unit = e.target.value;
                     setUnitRow(newUnitRow);
                   }} value={u.unit}>
-                    <option value={""}>--select--</option>
+                    <option value={""}>Select</option>
                     {unit.map((u, i) => (
                       <option key={i} value={u.label}>{u.label}</option>
                     ))}
                   </select>
                 </td>
                 <td className='p-1'>
-                  <input type="text" onChange={(e) => {
-                    const newUnitRow = [...unitRow];
-                    newUnitRow[i].conversion = e.target.value;
-                    setUnitRow(newUnitRow);
-                  }} value={u.conversion} />
+                  <div className='flex items-center'>
+                    {
+                      i !== 0 && (
+                        <p className='text-gray-500 text-xs flex items-center gap-1 mr-2'>
+                          1 <sub>{unitRow[i - 1].unit}</sub> ✖
+                        </p>
+                      )
+                    }
+                    <input type="text"
+                      onChange={i === 0 ? null : (e) => {
+                        const newUnitRow = [...unitRow];
+                        newUnitRow[i].conversion = e.target.value;
+                        setUnitRow(newUnitRow);
+                      }}
+                      value={u.conversion}
+                      disabled={i === 0}
+                    />
+                  </div>
                 </td>
                 <td className='p-1'>
                   <input type="text" onChange={(e) => {
@@ -293,15 +348,15 @@ const AddItemComponent = ({ mode, save }) => {
           </tfoot>
         </table>
       </div>
-      <div className='flex justify-center mt-3'>
-        <div className='flex rounded-sm bg-green-500 text-white'>
-          <Icons.CHECK className='mt-3 ml-2' />
-          <button className='p-2' onClick={savebutton}>{mode ? "Update" : "Save"}</button>
-        </div>
-        <div className='flex rounded-sm ml-4 bg-blue-500 text-white'>
-          <Icons.RESET className='mt-3 ml-2' />
-          <button className='p-2' onClick={clearData}>Reset</button>
-        </div>
+      <div className='flex gap-4 justify-center mt-3'>
+        <button onClick={saveData} className='flex items-center rounded-sm bg-green-500 text-white p-2 gap-2'>
+          <Icons.CHECK />
+          {mode ? "Update" : "Save"}
+        </button>
+        <button className='flex items-center rounded-sm bg-blue-500 text-white p-2  gap-2' onClick={clearData}>
+          <Icons.RESET />
+          Reset
+        </button>
       </div>
     </div>
   )

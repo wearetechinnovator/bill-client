@@ -39,7 +39,7 @@ const CreditNote = ({ mode }) => {
   const [additionalRows, setAdditionalRow] = useState([additionalRowSet]); //{ additionalRowsItem: 1 }
   const [formData, setFormData] = useState({
     party: '', creditNoteNumber: '', creditNoteDate: new Date().toISOString().split('T')[0],
-    items: ItemRows, additionalCharge: additionalRows, note: '', terms: '',
+    salesInvoice: '', items: ItemRows, additionalCharge: additionalRows, note: '', terms: '',
     discountType: '', discountAmount: '', discountPercentage: '', finalAmount: ''
   })
 
@@ -59,6 +59,10 @@ const CreditNote = ({ mode }) => {
   const [tax, setTax] = useState([]);
   // Store party
   const [party, setParty] = useState([]);
+
+  // Sales Invoices for Credit Note;
+  const [salesInvoice, setSalesInvoice] = useState([]);
+
 
 
   // store label and value pair for dropdown
@@ -85,6 +89,7 @@ const CreditNote = ({ mode }) => {
       body: JSON.stringify({ token: cookie, id: id })
     })
     const res = await req.json();
+
     setFormData({ ...formData, ...res.data });
     setAdditionalRow([...res.data.additionalCharge])
     setItemRows([...res.data.items]);
@@ -98,6 +103,37 @@ const CreditNote = ({ mode }) => {
       get();
     }
   }, [id])
+
+
+  // Get Sales invoice;
+  useEffect(() => {
+    (async () => {
+      try {
+        if (formData.party) {
+          const url = `${process.env.REACT_APP_API_URL}/creditnote/get-sales-invoice`;
+          const cookie = Cookies.get("token");
+          const req = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": 'application/json'
+            },
+            body: JSON.stringify({ token: cookie, partyId: formData.party })
+          })
+          const res = await req.json();
+
+          if (req.status !== 200) {
+            setSalesInvoice([]);
+            return toast(res.err, 'error');
+          }
+
+          setSalesInvoice([...res.data]);
+        }
+      } catch (error) {
+        console.log(error)
+        return toast("Sales inovoice not get", 'error')
+      }
+    })()
+  }, [formData.party])
 
 
   useEffect(() => {
@@ -116,7 +152,6 @@ const CreditNote = ({ mode }) => {
       {
         const data = await getApiData("item");
         setItems([...data.data]);
-        console.log(data.data);
 
         const newItemData = data.data.map(d => ({ label: d.title, value: d.title }));
         setItemData(newItemData);
@@ -278,22 +313,25 @@ const CreditNote = ({ mode }) => {
       return toast("Please select party", "error")
     } else if (formData.creditNoteNumber === "") {
       return toast("Please enter credit note number", "error")
+    } else if (formData.salesInvoice === "") {
+      return toast("Please Select Return Invoice", "error")
     } else if (formData.creditNoteDate === "") {
       return toast("Please select credit note date", "error")
     }
 
 
     for (let row of ItemRows) {
-      if (row.itemName === "") {
+      if (row.itemName === "" || !row.itemName) {
         return toast("Please select item", "error")
-      } else if (row.qun === "") {
+      } else if (row.qun === "" || !row.qun) {
         return toast("Please enter quantity", "error")
-      } else if (row.unit === "") {
+      } else if (row.unit === "" || !row.unit) {
         return toast("Please select unit", "error")
-      } else if (row.price === "") {
+      } else if (row.price === "" || !row.price) {
         return toast("Please enter price", "error")
       }
     }
+
 
     // Add Per Item Tax and Amound before save
     ItemRows.forEach((row, index) => {
@@ -397,17 +435,44 @@ const CreditNote = ({ mode }) => {
             <div className='flex flex-col lg:flex-row items-center justify-around gap-4'>
               <div className='flex flex-col gap-2 w-full lg:max-w-[450px]'>
                 <p className='text-xs'>Select Party <span className='text-red-600'>*</span></p>
-                {/* <SelectPicker
-                  onChange={(data) => setFormData({ ...formData, party: data })}
-                  data={party}
-                  value={formData.party?._id}
-                /> */}
                 <MySelect2
                   model={"party"}
+                  partyType={"customer"}
                   onType={(v) => {
                     setFormData({ ...formData, party: v })
                   }}
                   value={formData.party?._id}
+                />
+              </div>
+              <div className='flex flex-col gap-2 w-full lg:max-w-[300px]'>
+                <p className='text-xs'>Select Bill <span className='text-red-600'>*</span></p>
+                <SelectPicker
+                  data={salesInvoice?.map((inv, i) => {
+                    return {
+                      label: `${inv.salesInvoiceNumber} | ${new Date(inv.invoiceDate).toLocaleDateString()} | ${inv.dueAmount}`,
+                      value: inv.salesInvoiceNumber
+                    }
+                  })}
+
+                  onChange={(v) => {
+                    if (!v) {
+                      setItemRows([itemRowSet]);
+                      setAdditionalRow([additionalRowSet]);
+                      setFormData({ ...formData, salesInvoice: '' });
+                      return;
+                    }
+
+                    const selectedInvoice = salesInvoice.find((inv, i) => inv.salesInvoiceNumber === v);
+
+                    setAdditionalRow([...selectedInvoice?.additionalCharge])
+                    setItemRows([...selectedInvoice?.items]);
+                    setFormData({
+                      ...formData, salesInvoice: v,
+                      items: selectedInvoice?.items
+                    });
+                  }}
+
+                  value={formData.salesInvoice}
                 />
               </div>
               <div className='flex flex-col gap-2 w-full lg:w-1/3'>
@@ -434,13 +499,13 @@ const CreditNote = ({ mode }) => {
                 <thead >
                   <tr>
                     <th style={{ "width": "*" }}>Item</th>
-                    <th style={{ "width": "6%" }}>HSN/SAC</th>
+                    <th style={{ "width": "5%" }}>HSN/SAC</th>
                     <th style={{ "width": "5%" }}>QTY</th>
-                    <th style={{ "width": "7%" }}>Unit</th>
-                    <th style={{ "width": "10%" }}>Price/Item</th>
-                    <th style={{ "width": "10%" }}>Discount</th>
-                    <th style={{ "width": "10%" }}>Tax</th>
-                    <th style={{ "width": "10%" }}>Amount</th>
+                    <th style={{ "width": "5%" }}>Unit</th>
+                    <th style={{ "width": "5%" }}>Price/Item</th>
+                    <th style={{ "width": "7%" }}>Discount</th>
+                    <th style={{ "width": "8%" }}>Tax</th>
+                    <th style={{ "width": "7%" }}>Amount</th>
                     <th style={{ "width": "3%" }}></th>
                   </tr>
                 </thead>
@@ -456,7 +521,7 @@ const CreditNote = ({ mode }) => {
                             onType={(v) => {
                               onItemChange(v, index, tax, ItemRows, setItemRows, setItems);
                             }}
-                            value={ItemRows[index].itemName}
+                            value={ItemRows[index].itemId}
                           />
                           <input type='text' className='input-style' placeholder='Description'
                             onChange={(e) => {
@@ -527,7 +592,7 @@ const CreditNote = ({ mode }) => {
                         </div>
                       </td>
                       <td> {/** Discount amount and percentage */}
-                        <div className={`w-[100px] flex flex-col gap-2 items-center`} >
+                        <div className={`w-full flex flex-col gap-2 items-center`} >
                           <div className='add-table-discount-input'>
                             <input type="text"
                               className={`${formData.discountType === 'before' ? 'bg-gray-100' : ''} `}
@@ -623,21 +688,21 @@ const CreditNote = ({ mode }) => {
               <table className='table-style w-full'>
                 <thead>
                   <tr>
-                    <td className='font-bold'>Total Taxable Amount</td>
-                    <td className='font-bold'>Total Tax Amount</td>
-                    <td>
+                    <th className='font-bold'>Total Taxable Amount</th>
+                    <th className='font-bold'>Total Tax Amount</th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Type</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td>
+                    </th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Amount</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td>
+                    </th>
+                    <th>
                       <span className='font-bold mr-1'>Discount Percentage</span>
                       <span>(Additional)</span>
-                    </td>
-                    <td className='font-bold'>Total Amount</td>
+                    </th>
+                    <th className='font-bold'>Total Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -742,9 +807,9 @@ const CreditNote = ({ mode }) => {
                   <table className='table-style w-full'>
                     <thead className='bg-gray-100'>
                       <tr>
-                        <td>Particular</td>
-                        <td>Amount</td>
-                        <td>Actions</td>
+                        <th>Particular</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -798,7 +863,7 @@ const CreditNote = ({ mode }) => {
                   name="final_amount"
                   className='bg-gray-100 custom-disabled w-full'
                   disabled
-                  value={() => calculateFinalAmount(additionalRows, formData, subTotal)}
+                  value={calculateFinalAmount(additionalRows, formData, subTotal)}
                 />
               </div>
             </div>

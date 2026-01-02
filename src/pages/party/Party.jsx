@@ -71,7 +71,7 @@ const Party = () => {
 
 
   useEffect(() => {
-    const getTotaoCollectAndPay = async (whichType) => {
+    const getTotalCollectAndPay = async (whichType) => {
       try {
         const url = process.env.REACT_APP_API_URL + `/${whichType}/get`;
         const req = await fetch(url, {
@@ -97,9 +97,8 @@ const Party = () => {
 
     }
 
-    getTotaoCollectAndPay("paymentin");
-    getTotaoCollectAndPay("paymentout");
-
+    getTotalCollectAndPay("paymentin");
+    getTotalCollectAndPay("paymentout");
 
   }, [])
 
@@ -334,9 +333,9 @@ const Party = () => {
                       </th>
                       <td className='py-2 px-4'>Name</td>
                       <td className='py-2 px-4'>Phone</td>
-                      <th className='py-2 px-4'>Type</th>
-                      <th className='py-2 px-4'>Balance</th>
-                      <th className='py-2 px-4 w-[100px]'>Action</th>
+                      <td className='py-2 px-4'>Type</td>
+                      <td className='py-2 px-4'>Balance</td>
+                      <td className='py-2 px-4 w-[100px]'>Action</td>
                     </tr>
                   </thead>
                   <tbody>
@@ -348,13 +347,13 @@ const Party = () => {
                           </td>
                           <td className='px-4'>{data.name}</td>
                           <td className='px-4'>{data.contactNumber}</td>
-                          <td className='px-4 text-center'>
+                          <td className='px-4'>
                             <span className='customer_badge'>
                               {data.type}
                             </span>
                           </td>
-                          <td className='px-4 text-center'>{data.openingBalance}</td>
-                          <td className='px-4 text-center'>
+                          <td className='px-4'>{data.openingBalance}</td>
+                          <td className='px-4'>
                             <Whisper
                               onClick={(e) => e.stopPropagation()}
                               placement='leftStart'
