@@ -26,6 +26,17 @@ import { GoPencil } from "react-icons/go";
 import { FaRegFile } from "react-icons/fa";
 import { FaRegUser } from "react-icons/fa";
 import { HiArrowsRightLeft } from "react-icons/hi2";
+import { IoHome } from "react-icons/io5";
+import { FaBoxOpen } from "react-icons/fa";
+import { TbArrowBadgeRightFilled } from "react-icons/tb";
+import { FaUserTie } from "react-icons/fa";
+import { FaMoneyCheck } from "react-icons/fa6";
+import { MdCoPresent } from "react-icons/md";
+import { FaBoxes } from "react-icons/fa";
+import { HiReceiptTax } from "react-icons/hi";
+import { BiSolidCategoryAlt } from "react-icons/bi";
+import { IoSettingsOutline } from "react-icons/io5";
+
 
 
 
@@ -61,5 +72,15 @@ export const Icons = {
   PENCIL: GoPencil,
   FILE: FaRegFile,
   USER: FaRegUser,
+  USER2: IoHome,
+  ITEMS: FaBoxOpen,
+  SMAEICON: TbArrowBadgeRightFilled,
+  ACCOUNT: FaUserTie,
+  OTHERTRANSACTION: FaMoneyCheck,
+  PRESENT: MdCoPresent,
+  UNITS: FaBoxes,
+  TAXES: HiReceiptTax,
+  CATEGORY: BiSolidCategoryAlt,
+  SETTING: IoSettingsOutline,
 };
 

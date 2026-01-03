@@ -476,7 +476,7 @@ const Invoice = () => {
                             </tr>
                           })
                         }
-                        {
+                        {/* {
                           Array.from({
                             length: Math.max(0, 8 - (billData?.items?.length || 0))
                           }).map((_, i) => (
@@ -491,7 +491,7 @@ const Invoice = () => {
                               <td className='without__border'>&nbsp;</td>
                             </tr>
                           ))
-                        }
+                        } */}
                       </tbody>
                       <tfoot className='w-full'>
                         <tr className='font-bold bg-[#F3F4F6]'>

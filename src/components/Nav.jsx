@@ -117,7 +117,7 @@ const Nav = ({ title }) => {
               </span>
               <HiOutlineSwitchHorizontal className="text-[16px] ml-2 text-white" />
             </div>
-            <Whisper className='flex items-center' trigger={'click'} placement='bottomEnd' speaker={<Popover full>
+            <Whisper className='flex items-center overflow-hidden' trigger={'click'} placement='bottomEnd' speaker={<Popover full>
               <Link className='menu-link' to={"/admin/site"}>
                 <CiSettings size={"20px"} />
                 <span>Site/Company Creation</span>
@@ -147,7 +147,7 @@ const Nav = ({ title }) => {
       {/* Company list modal */}
       <CompanyList getCompanyName={(n) => {
         let name = n;
-        if(name.length > 20) {
+        if (name.length > 20) {
           name = n.substring(0, 20) + "...";
         }
         setCompanyName(name);

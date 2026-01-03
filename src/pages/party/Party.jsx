@@ -34,9 +34,9 @@ const Party = () => {
       OpeningBalance: openingBalance,
     }));
   }, [partyData]);
-  const [loading, setLoading] = useState(true)
-  const [totalCollection, setTotalCollection] = useState(null)
-  const [totalPay, setTotalPay] = useState(null)
+  const [loading, setLoading] = useState(true);
+  const [totalCollection, setTotalCollection] = useState(null);
+  const [totalPay, setTotalPay] = useState(null);
 
 
 

@@ -81,12 +81,30 @@ h6 {
   @apply hover:no-underline focus-within:no-underline rounded;
   @apply text-[15px] flex items-center gap-2 py-2 text-gray-600 p-4;
   color: #003628 !important;
+  border-right: 4px solid #ffffff;
+  transition: .3s;
+  overflow: hidden;
 }
 
 .menu-link:hover {
   background-color: rgb(247, 247, 247) !important;
   color: #003628 !important;
   border-right: 4px solid #003628;
+  transform: translateX(-10px);
+}
+
+.chart-btn-see {
+  color: #003e32;
+  font-weight: 500;
+  border: 1px solid #003e32;
+  border-radius: 3px;
+  padding: 3px 15px;
+  transition: .3s;
+}
+
+.chart-btn-see:hover {
+  color: #ffffff;
+  background: #003628;
 }
 
 /* Sidenav */
@@ -223,7 +241,8 @@ select {
 }
 
 .table-style thead tr th {
-  padding: 2px;
+  padding: 5px 0;
+  line-height: normal;
 }
 
 #taxAmountTable .table-style td,
@@ -437,7 +456,7 @@ select {
 }
 
 .add_new_compnent button {
-  @apply px-3 py-1 rounded flex items-center gap-2 text-[13px];
+  @apply px-2 py-1 rounded flex items-center gap-1 text-[13px];
 }
 
 .admin__area span {
@@ -609,9 +628,10 @@ select {
 .customer_badge {
   background: rgb(42, 116, 42);
   border-radius: 30px;
-  padding: 1px 5px;
+  padding: 0px 6px 2px;
   color: white;
   font-size: 12px;
+  line-height: 0 !important;
 }
 
 
@@ -808,7 +828,12 @@ input[type="checkbox"]:checked::before {
 }
 
 .party__details__header .active {
-  @apply text-blue-600 font-semibold border-b-2 border-blue-600;
+  border-bottom-width: 2px;
+  --tw-border-opacity: 1;
+  border-color: rgb(0 62 50);
+  font-weight: 600;
+  --tw-text-opacity: 1;
+  color: rgb(0 62 50);
 }
 
 .item__details__table {
@@ -930,47 +955,65 @@ input[type="checkbox"]:checked::before {
   }
 }
 
-@media print {
+input {
+  transition: .5s;
+}
 
-  /* Force HSN section to next page */
-  .print-page-break {
-    page-break-before: always;
-    break-before: page;
-  }
-
-  /* Prevent HSN table from breaking */
-  .print-page-break table,
-  .print-page-break tr,
-  .print-page-break td {
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
-
-  /* Prevent cutting rows in main table */
-  table {
-    page-break-inside: auto;
-  }
-
-  tr {
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
+.pagination-custom {
+  padding: 6px 6px;
+  background: #d6fff7;
+  border-radius: 30px;
 
 }
 
-@media print {
+.pagination-custom .paginate__button__number {
+  border: 1px solid #003e32;
+  border-radius: 30px;
+  height: 23px;
+  width: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  font-size: 12px;
+  font-weight: 500;
+}
 
-  /* Page-1 height control */
-  .items-page {
-    /* Adjust once and forget */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+.pagination-custom .paginate__button__number.active__page {
+  background: #003e32;
+}
 
-  /* Filler rows auto stretch */
-  .without__border td {
-    height: 24px;
-  }
+.pagination-custom .paginate__button__next {
+  border: 1px solid #003e32;
+  border-radius: 30px;
+  height: 23px;
+  width: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
 
+.pagination-custom .paginate__button__back {
+  border: 1px solid #003e32;
+  border-radius: 30px;
+  height: 23px;
+  width: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.attendance__chip__btn {
+  @apply bg-gray-100 border border-gray-300 rounded w-[25px] h-[25px];
+  @apply text-center grid place-items-center text-gray-500;
+}
+
+.attendace__setting__time__drp {
+  @apply w-[26%];
 }

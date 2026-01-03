@@ -95,6 +95,8 @@ const Dashboard = () => {
           return acc;
         }, [])
 
+        console.log(accountBalanceDataChartData);
+
         setAccountBalanceData(accountBalanceDataChartData)
 
       } catch (error) {
@@ -118,6 +120,7 @@ const Dashboard = () => {
         });
         const res = await req.json();
 
+        console.log(res);
         if (req.status === 200) {
           if (res.length > 0) {
             setTotalPay(res[0].totalAmount)
@@ -251,8 +254,8 @@ const Dashboard = () => {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="collect" fill="#00C49F" />
-                  <Bar dataKey="pay" fill="#FF5A5F" />
+                  <Bar dataKey="Collect" fill="#00C49F" />
+                  <Bar dataKey="Pay" fill="#FF5A5F" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -289,7 +292,7 @@ const Dashboard = () => {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Recent Sales</h3>
                 <Link to="/admin/sales-invoice"
-                  className="text-xs text-blue-500 hover:text-blue-500 cursor-pointer">
+                  className="text-xs text-blue-500 hover:text-blue-500 cursor-pointer chart-btn-see">
                   See All
                 </Link>
               </div>
@@ -322,7 +325,7 @@ const Dashboard = () => {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Recent Purchases</h3>
                 <Link to="/admin/purchase-invoice"
-                  className="text-xs text-blue-500 cursor-pointer">
+                  className="text-xs text-blue-500 cursor-pointer chart-btn-see">
                   See All
                 </Link>
               </div>

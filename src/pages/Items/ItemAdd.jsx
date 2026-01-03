@@ -170,7 +170,7 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 
   return (
     <div className='content__body__main bg-white'>
-      <div className='  flex justify-between gap-5 flex-col lg:flex-row'>
+      <div className='flex justify-between gap-5 flex-col lg:flex-row'>
         <div className='w-full'>
           <div>
             <p className='mb-1'>Item Name <span className='required__text'>*</span></p>

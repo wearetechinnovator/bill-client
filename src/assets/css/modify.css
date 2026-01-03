@@ -86,7 +86,8 @@ ol, ul{
 }
 
 .rs-modal-content{
-  background-color: #eff1f1 !important;
+  /* background-color: #eff1f1 !important; */
+  background-color: white !important;
 }
 .rs-picker-default .rs-picker-toggle.rs-btn .rs-picker-toggle-indicator .rs-picker-clean{
   /* display: none; */
@@ -115,4 +116,7 @@ a:active, a:focus, a:hover{
 
 .rs-message-body{
   font-size: 13px !important;
+}
+.rs-picker-default .rs-picker-toggle.rs-btn .rs-picker-toggle-indicator .rs-picker-caret-icon, .rs-picker-default .rs-picker-toggle.rs-btn .rs-picker-toggle-indicator .rs-picker-clean {
+    top: 4px !important;
 }

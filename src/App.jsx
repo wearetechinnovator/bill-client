@@ -60,8 +60,8 @@ const Ladger = React.lazy(() => import("./pages/party/Ladger"));
 const PartyDetails = React.lazy(() => import("./pages/party/Details"));
 const ItemDetails = React.lazy(() => import("./pages/Items/Details"));
 const CategoryDetails = React.lazy(() => import("./pages/Item/Details"));
-
-
+const StaffAttendance = React.lazy(() => import("./pages/StaffAttendance/StaffAttendance"));
+const AddStaffAttendance = React.lazy(() => import("./pages/StaffAttendance/AddStaffAttendance"));
 
 
 const App = () => {
@@ -225,6 +225,12 @@ const App = () => {
         <Route path="/admin/payment-in/add" element={<ProtectRoute><AddPaymentIn /></ProtectRoute>} />
         <Route path="/admin/payment-in/edit/:id" element={<ProtectRoute><AddPaymentIn mode={"edit"} /></ProtectRoute>} />
         <Route path="/admin/payment-in" element={<ProtectRoute><PaymentIn /></ProtectRoute>} />
+
+        <Route path="/admin/staff-attendance" element={<ProtectRoute><StaffAttendance /></ProtectRoute>} />
+        <Route path="/admin/staff-attendance/add" element={<ProtectRoute><AddStaffAttendance /></ProtectRoute>} />
+        <Route path="/admin/staff-attendance/edit/:id" element={<ProtectRoute><AddStaffAttendance mode="edit" /></ProtectRoute>} />
+
+
 
         <Route path="*" element={< NotFound />} />
       </Routes>
