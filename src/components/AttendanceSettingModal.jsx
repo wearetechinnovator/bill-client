@@ -1,17 +1,71 @@
 import { useEffect, useState } from "react";
 import { Modal, Toggle } from "rsuite";
+import useMyToaster from "../hooks/useMyToaster";
+import Cookies from 'js-cookie';
 
 
-const AttendanceModal = ({ open, closeModal }) => {
+const AttendanceSettingModal = ({ open, closeModal }) => {
+    const toast = useMyToaster();
+    const token = Cookies.get("token");
     const [modelOpen, setModelOpen] = useState(null);
     const weekDay = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const [selectedWeekDay, setSelectedWeekDay] = useState([]);
+    const [settings, setSettings] = useState({
+        attendanceReminder: '', reminderTime: "", defaultPresent: '',
+        workingHourFrom: "", workingHourTo: "", weeklyOffDays: []
+    })
 
 
     useEffect(() => {
-        console.log("modal status", open);
         setModelOpen(open);
     }, [open])
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const url = process.env.REACT_APP_API_URL + "/staff/attendance-setting/get";
+                const req = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ token })
+                })
+                const res = await req.json();
+                if (req.status === 200) {
+                    console.log(res.data);
+                    setSettings({...res.data, attendanceReminder: res.data.attendanceReminder});
+                }
+
+            } catch (error) {
+                return toast("Setting not fetch", "error")
+            }
+        })()
+    }, [open])
+
+
+    const saveSettings = async () => {
+        try {
+            const url = process.env.REACT_APP_API_URL + "/staff/attendance-setting/add";
+            const req = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ ...settings, token })
+            })
+            const res = await req.json();
+            if (req.status !== 200 || res.err) {
+                return toast(res.err, 'error');
+            }
+
+            toast("Setting update success", 'success');
+            return
+
+        } catch (error) {
+            return toast("Something went wrong", "error")
+        }
+    }
+
 
 
     return (
@@ -30,10 +84,16 @@ const AttendanceModal = ({ open, closeModal }) => {
                             <p className="text-[13px]">Enable Daily Attendance Reminder</p>
                             <Toggle
                                 size={'sm'}
+                                onChange={(v) => setSettings({ ...settings, attendanceReminder: v })}
+                                checked={settings.attendanceReminder}
                             />
                         </div>
                         <p className="text-gray-500 text-xs mt-2 mb-1">Reminder time: 10:00</p>
-                        <select className="w-[50%]">
+                        <select
+                            onChange={(e) => setSettings({ ...settings, reminderTime: e.target.value })}
+                            value={settings.reminderTime}
+                            className="w-[50%]"
+                        >
                             <option value="10:00">10:00</option>
                             <option value="9:00">9:00</option>
                             <option value="11:00">11:00</option>
@@ -44,6 +104,8 @@ const AttendanceModal = ({ open, closeModal }) => {
                         <p className="text-[13px]">Mark Present By Default</p>
                         <Toggle
                             size={'sm'}
+                            onChange={(v) => setSettings({ ...settings, defaultPresent: v })}
+                            checked={settings.defaultPresent}
                         />
                     </div>
 
@@ -51,13 +113,21 @@ const AttendanceModal = ({ open, closeModal }) => {
                         <p className="text-[13px]">Set Up Working Hour In A Shift</p>
                         <p className="text-gray-500 text-xs mt-2 mb-1">Number of hours</p>
                         <div className="w-full flex items-center gap-2">
-                            <select className="attendace__setting__time__drp">
+                            <select
+                                onChange={(e) => setSettings({ ...settings, workingHourFrom: e.target.value })}
+                                value={settings.workingHourFrom}
+                                className="attendace__setting__time__drp"
+                            >
                                 <option value="10:00">10:00</option>
                                 <option value="9:00">9:00</option>
                                 <option value="11:00">11:00</option>
                             </select>
                             <span>:</span>
-                            <select className="attendace__setting__time__drp">
+                            <select
+                                onChange={(e) => setSettings({ ...settings, workingHourTo: e.target.value })}
+                                value={settings.workingHourTo}
+                                className="attendace__setting__time__drp"
+                            >
                                 <option value="10:00">10:00</option>
                                 <option value="9:00">9:00</option>
                                 <option value="11:00">11:00</option>
@@ -76,17 +146,17 @@ const AttendanceModal = ({ open, closeModal }) => {
                                     return (
                                         <div key={_}
                                             onClick={() => {
-                                                let weekDay = [...selectedWeekDay];
+                                                let weekDay = [...settings.weeklyOffDays];
 
                                                 if (weekDay.includes(day)) {
                                                     weekDay = weekDay.filter((d, _) => d !== day);
                                                 } else {
                                                     weekDay.push(day)
                                                 }
-                                                setSelectedWeekDay(weekDay);
+                                                setSettings({ ...settings, weeklyOffDays: weekDay });
                                             }}
                                             className={
-                                                `${selectedWeekDay.includes(day) ? 'bg-blue-100 text-blue-500' : 'bg-gray-100'}  
+                                                `${settings.weeklyOffDays.includes(day) ? 'bg-blue-100 text-blue-500' : 'bg-gray-100'}  
                                                 p-[6px] rounded-full text-[11px] cursor-pointer`
                                             }>
                                             {day}
@@ -103,13 +173,16 @@ const AttendanceModal = ({ open, closeModal }) => {
                 <Modal.Footer>
                     <div className="flex justify-end items-center gap-2">
                         <button
-                            onClick={() => { }}
+                            onClick={() => {
+                                setModelOpen(false);
+                                closeModal(false);
+                            }}
                             className="border bg-gray-50 rounded w-[120px] p-1 text-xs"
                         >
-                            Cancel
+                            Close
                         </button>
                         <button
-                            onClick={() => { }}
+                            onClick={saveSettings}
                             className="bg-[#003e32] p-1 rounded w-[120px] text-xs text-white"
                         >
                             Save
@@ -121,4 +194,4 @@ const AttendanceModal = ({ open, closeModal }) => {
     )
 }
 
-export default AttendanceModal
+export default AttendanceSettingModal

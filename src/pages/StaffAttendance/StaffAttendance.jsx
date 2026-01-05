@@ -18,7 +18,7 @@ import { IoIosAdd, IoMdMore } from 'react-icons/io';
 import AddNew from '../../components/AddNew';
 import { FiMoreHorizontal } from 'react-icons/fi';
 import { Icons } from '../../helper/icons';
-import AttendanceModal from '../../components/AttendanceModal';
+import AttendanceSettingModal from '../../components/AttendanceSettingModal';
 
 
 
@@ -40,20 +40,21 @@ const StaffAttendance = () => {
     }, [data]);
     const [loading, setLoading] = useState(true);
     const [settingModel, setSettingModel] = useState(false);
+    const [attendanceSheet, setAttendanceSheet] = useState([])
 
 
 
 
     // Get data;
     useEffect(() => {
-        const getParty = async () => {
+        const get = async () => {
             try {
                 const data = {
                     token: Cookies.get("token"),
                     trash: tableStatusData === "trash" ? true : false,
                     all: tableStatusData === "all" ? true : false
                 }
-                const url = process.env.REACT_APP_API_URL + `/unit/get?page=${activePage}&limit=${dataLimit}`;
+                const url = process.env.REACT_APP_API_URL + `/staff/get?page=${activePage}&limit=${dataLimit}`;
                 const req = await fetch(url, {
                     method: "POST",
                     headers: {
@@ -62,6 +63,7 @@ const StaffAttendance = () => {
                     body: JSON.stringify(data)
                 });
                 const res = await req.json();
+
                 setTotalData(res.totalData)
                 setdata([...res.data]);
                 setLoading(false);
@@ -70,8 +72,9 @@ const StaffAttendance = () => {
                 console.log(error)
             }
         }
-        getParty();
+        get();
     }, [tableStatusData, dataLimit, activePage])
+
 
     const searchTable = (e) => {
         const value = e.target.value.toLowerCase();
@@ -93,6 +96,7 @@ const StaffAttendance = () => {
         });
     }
 
+
     const selectAll = (e) => {
         if (e.target.checked) {
             setSelected(data.map((e, _) => e._id));
@@ -100,6 +104,7 @@ const StaffAttendance = () => {
             setSelected([]);
         }
     };
+
 
     const handleCheckboxChange = (id) => {
         setSelected((prevSelected) => {
@@ -132,7 +137,7 @@ const StaffAttendance = () => {
         if (selected.length === 0 || tableStatusData !== 'active') {
             return;
         }
-        const url = process.env.REACT_APP_API_URL + "/unit/delete";
+        const url = process.env.REACT_APP_API_URL + "/staff/delete";
         try {
             const req = await fetch(url, {
                 method: "DELETE",
@@ -162,12 +167,19 @@ const StaffAttendance = () => {
         }
     }
 
+    const handleAttendance = async (userData, type) => {
+        // First check staff id already in array or not;
+        // If  id in array then filter it then push it;
 
+    }
 
     return (
         <>
             <Nav title={"Staff Attendance"} />
-            <AttendanceModal open={settingModel} closeModal={() => setSettingModel(false)} />
+            <AttendanceSettingModal
+                open={settingModel}
+                closeModal={() => setSettingModel(false)}
+            />
             <main id='main'>
                 <SideNav />
                 <Tooltip id='unitTooltip' />
@@ -274,34 +286,25 @@ const StaffAttendance = () => {
                                                             onChange={() => handleCheckboxChange(data._id)}
                                                         />
                                                     </td>
-                                                    <td className='px-4 border-b'>{"Sourav Bishai"}</td>
-                                                    <td className='px-4 border-b'>{"7098125507"}</td>
+                                                    <td className='px-4 border-b'>{data.staffName}</td>
+                                                    <td className='px-4 border-b'>{data.mobileNumber}</td>
                                                     <td className='px-4 border-b'>
                                                         <div className='flex gap-2 items-center'>
+                                                            <div
+                                                                onClick={() => handleAttendance(data, "P")}
+                                                                className='attendance__chip__btn'>
+                                                                P
+                                                            </div>
+                                                            <div
+                                                                onClick={() => handleAttendance(data, "A")}
+                                                                className='attendance__chip__btn'>
+                                                                A
+                                                            </div>
                                                             <select className='w-[80px]'>
                                                                 <option value="">Select</option>
                                                                 <option value="present">Present</option>
                                                                 <option value="absent">Absent</option>
                                                             </select>
-                                                            <div>
-                                                                <Whisper
-                                                                    placement='leftStart'
-                                                                    trigger={"click"}
-                                                                    speaker={<Popover full>
-                                                                        <div
-                                                                            className='table__list__action__icon'
-                                                                            onClick={() => navigate(`/admin/unit/edit/${data._id}`)}
-                                                                        >
-                                                                            <FaRegEdit className='text-[16px]' />
-                                                                            Edit
-                                                                        </div>
-                                                                    </Popover>}
-                                                                >
-                                                                    <div className='attendance__chip__btn' >
-                                                                        <Icons.MORE />
-                                                                    </div>
-                                                                </Whisper>
-                                                            </div>
                                                         </div>
                                                     </td>
                                                     <td className=''>
@@ -311,7 +314,7 @@ const StaffAttendance = () => {
                                                             speaker={<Popover full>
                                                                 <div
                                                                     className='table__list__action__icon'
-                                                                    onClick={() => navigate(`/admin/unit/edit/${data._id}`)}
+                                                                    onClick={() => navigate(`/admin/staff-attendance/edit/${data._id}`)}
                                                                 >
                                                                     <FaRegEdit className='text-[16px]' />
                                                                     Edit

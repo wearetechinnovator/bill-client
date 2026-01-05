@@ -1011,7 +1011,7 @@ input {
 
 .attendance__chip__btn {
   @apply bg-gray-100 border border-gray-300 rounded w-[25px] h-[25px];
-  @apply text-center grid place-items-center text-gray-500;
+  @apply text-center grid place-items-center text-gray-500 cursor-pointer;
 }
 
 .attendace__setting__time__drp {
