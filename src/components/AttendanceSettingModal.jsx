@@ -32,8 +32,7 @@ const AttendanceSettingModal = ({ open, closeModal }) => {
                 })
                 const res = await req.json();
                 if (req.status === 200) {
-                    console.log(res.data);
-                    setSettings({...res.data, attendanceReminder: res.data.attendanceReminder});
+                    setSettings({ ...res.data, attendanceReminder: res.data.attendanceReminder });
                 }
 
             } catch (error) {
@@ -94,9 +93,13 @@ const AttendanceSettingModal = ({ open, closeModal }) => {
                             value={settings.reminderTime}
                             className="w-[50%]"
                         >
-                            <option value="10:00">10:00</option>
-                            <option value="9:00">9:00</option>
-                            <option value="11:00">11:00</option>
+                            {Array.from({ length: 21 }, (_, t) =>
+                                t > 8 ? (
+                                    <option key={t} value={`${t}:00`}>
+                                        {t}:00
+                                    </option>
+                                ) : null
+                            )}
                         </select>
                     </div>
 
@@ -118,9 +121,13 @@ const AttendanceSettingModal = ({ open, closeModal }) => {
                                 value={settings.workingHourFrom}
                                 className="attendace__setting__time__drp"
                             >
-                                <option value="10:00">10:00</option>
-                                <option value="9:00">9:00</option>
-                                <option value="11:00">11:00</option>
+                                {Array.from({ length: 25 }, (_, t) =>
+                                    t > 0 ? (
+                                        <option key={t} value={`${t}:00`}>
+                                            {t}:00
+                                        </option>
+                                    ) : null
+                                )}
                             </select>
                             <span>:</span>
                             <select
@@ -128,9 +135,13 @@ const AttendanceSettingModal = ({ open, closeModal }) => {
                                 value={settings.workingHourTo}
                                 className="attendace__setting__time__drp"
                             >
-                                <option value="10:00">10:00</option>
-                                <option value="9:00">9:00</option>
-                                <option value="11:00">11:00</option>
+                                {Array.from({ length: 31 }, (_, t) =>
+                                    t > 0 ? (
+                                        <option key={t} value={`${t}:00`}>
+                                            {t}:00
+                                        </option>
+                                    ) : null
+                                )}
                             </select>
                         </div>
                         <p className="text-gray-500 text-[11px] mt-2 mb-1">

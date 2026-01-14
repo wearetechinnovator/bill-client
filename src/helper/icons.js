@@ -36,6 +36,8 @@ import { FaBoxes } from "react-icons/fa";
 import { HiReceiptTax } from "react-icons/hi";
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import { IoSettingsOutline } from "react-icons/io5";
+import { FaRegEye } from "react-icons/fa";
+import { MdDownload } from "react-icons/md";
 
 
 
@@ -82,5 +84,7 @@ export const Icons = {
   TAXES: HiReceiptTax,
   CATEGORY: BiSolidCategoryAlt,
   SETTING: IoSettingsOutline,
+  EYE: FaRegEye,
+  DOWNLOAD: MdDownload
 };
 

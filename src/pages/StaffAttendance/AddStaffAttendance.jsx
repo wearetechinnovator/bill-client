@@ -5,6 +5,7 @@ import useMyToaster from '../../hooks/useMyToaster';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { Icons } from '../../helper/icons';
+import { Tooltip, Whisper } from 'rsuite';
 
 
 const AddStaffAttendance = ({ mode }) => {
@@ -32,16 +33,20 @@ const AddStaffAttendance = ({ mode }) => {
                     body: JSON.stringify({ token: cookie, id: id })
                 })
                 const res = await req.json();
-                setData({ ...data, ...res.data });
+                setData({
+                    ...data,
+                    ...res.data,
+                    dob: res.data?.dob?.split("T")[0]
+                });
             }
 
             get();
         }
     }, [mode])
 
-    
+
     const saveData = async (e) => {
-        if (!data.staffName || !data.mobileNumber || !data.salary) {
+        if (!data.staffName || !data.mobileNumber || !data.salary || !data.joiningDate) {
             return toast("fill the required fields", "error")
         }
 
@@ -129,7 +134,10 @@ const AddStaffAttendance = ({ mode }) => {
                                     />
                                 </div>
                                 <div className='w-full p-2'>
-                                    <p className='pb-1'>Joining Date</p>
+                                    <p className='pb-1'>
+                                        Joining Date
+                                        <span className='required__text'>*</span>
+                                    </p>
                                     <input type='date'
                                         onChange={(e) => setData({ ...data, joiningDate: e.target.value })}
                                         value={data.joiningDate}
@@ -141,9 +149,9 @@ const AddStaffAttendance = ({ mode }) => {
                                         onChange={(e) => setData({ ...data, salaryPayOutType: e.target.value })}
                                         value={data.salaryPayOutType}
                                     >
+                                        <option value="">Select</option>
                                         <option value="monthly">Monthly</option>
-                                        <option value="">Test</option>
-                                        <option value="">Test</option>
+                                        <option value="daily">Daily</option>
                                     </select>
                                 </div>
                             </div>
@@ -165,13 +173,33 @@ const AddStaffAttendance = ({ mode }) => {
                                         onChange={(e) => setData({ ...data, salaryCycle: e.target.value })}
                                         value={data.salaryCycle}
                                     >
-                                        <option value="1-1-month">1 to 1 Every month</option>
-                                        <option value="">Test</option>
-                                        <option value="">Test</option>
+                                        <option value="none">Select</option>
+                                        {
+                                            Array.from({ length: 29 }, (_, v) => {
+                                                return v > 0 ? (
+                                                    <option value={`${v}-${v}-month`} key={_}>
+                                                        {v} to {v} Every month
+                                                    </option>
+                                                ) : null
+                                            })
+                                        }
                                     </select>
                                 </div>
                                 <div className='w-full p-2'>
-                                    <p className='pb-1'>Outstanding/Opening Balance</p>
+                                    <div className='flex items-center pb-1 gap-1'>
+                                        <p>Outstanding/Opening Balance</p>
+                                        <Whisper
+                                            placement="bottom"
+                                            controlId="control-id-hover"
+                                            trigger="hover"
+                                            speaker={<Tooltip>
+                                                The opening balance is the outstanding amount owed to the staff
+                                                member at the time they are registered in the system.
+                                            </Tooltip>}
+                                        >
+                                            <Icons.INFO_DETAILS />
+                                        </Whisper>
+                                    </div>
                                     <div className='flex border rounded p-[1px]'>
                                         <input
                                             type="text"
@@ -187,7 +215,6 @@ const AddStaffAttendance = ({ mode }) => {
                                         >
                                             <option value="pay">To Pay</option>
                                             <option value="collect">To Collect</option>
-                                            <option value="test">Test</option>
                                         </select>
                                     </div>
                                 </div>

@@ -1,235 +1,354 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Nav from "../components/Nav";
 import SideNav from "../components/SideNav";
+import {
+  PieChart, Pie, Cell, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, Tooltip, Legend
+} from "recharts";
+import { FiTrendingUp, FiTrendingDown } from "react-icons/fi";
+import { Link } from "react-router-dom";
+import Cookies from 'js-cookie';
 
-import { PiPrinterFill } from "react-icons/pi";
-import { FaCopy, FaFilePdf, FaFileExcel } from "react-icons/fa";
-import { LuArrowUpDown } from "react-icons/lu";
-import { MdEditSquare } from "react-icons/md";
-import { IoInformationCircle } from "react-icons/io5";
-import { Pagination } from "rsuite";
+
+
 
 document.title = "Dashboard";
-
-// Reusable export & search header
-const TableHeader = ({ title }) => (
-  <div className="flex justify-between flex-col lg:flex-row gap-3">
-    <div className="flex gap-2 pt-4">
-      <PiPrinterFill className="bg-[#008AA8] w-[30px] h-[30px] rounded-full p-[8px] text-white" />
-      <FaCopy className="bg-[#008AA8] w-[30px] h-[30px] rounded-full p-[8px] text-white" />
-      <FaFilePdf className="bg-[#008AA8] w-[30px] h-[30px] rounded-full p-[8px] text-white" />
-      <FaFileExcel className="bg-[#008AA8] w-[30px] h-[30px] rounded-full p-[8px] text-white" />
-    </div>
-    <div className="pt-2">
-      <p>Search:</p>
-      <input type="text" className="border w-full px-2 py-1 rounded" />
-    </div>
-  </div>
-);
-
 const Dashboard = () => {
-  const [accountpaginationPage, setAccountpaginationPage] = useState(1);
-  const [recentsalepagination, setRecentsalepagination] = useState(1);
-  const [recentpurchasepagination, setRecentpurchasepagination] =
-    useState(1);
-  const [stockalertpagination, setStockalertpagination] = useState(1);
+  const [accountBalanceData, setAccountBalanceData] = useState([])
+  const [recentPurchase, setRecentPurchase] = useState([]);
+  const [recentSales, setRecentSales] = useState([]);
+  const [totalCollect, setTotalCollect] = useState(null);
+  const [totalPay, setTotalPay] = useState(null);
+  const [cashFlowData, setCashFlowData] = useState([]);
+  const COLORS = ["#00C49F", "#0088FE", "#FF8042", "#FFBB28"];
+
+
+
+  // Get Payment In Details
+  useEffect(() => {
+    // Dummy data
+    const cashFlowData = [
+      { name: "Jan" },
+      { name: "Feb" },
+      { name: "Mar" },
+      { name: "Apr" },
+      { name: "May" },
+      { name: "Jun" },
+      { name: "Jul" },
+      { name: "Aug" },
+      { name: "Sep" },
+      { name: "Oct" },
+      { name: "Nov" },
+      { name: "Dec" },
+    ];
+
+    (async () => {
+      try {
+        const [res, res2] = await Promise.all([
+          fetch(process.env.REACT_APP_API_URL + `/paymentin/month-wise`, {
+            method: "POST",
+            headers: { "Content-Type": 'application/json' },
+            body: JSON.stringify({ token: Cookies.get("token") })
+          }).then(res => res.json()),
+
+          fetch(process.env.REACT_APP_API_URL + `/paymentout/month-wise`, {
+            method: "POST",
+            headers: { "Content-Type": 'application/json' },
+            body: JSON.stringify({ token: Cookies.get("token") })
+          }).then(res => res.json()),
+        ]);
+
+        cashFlowData.forEach((month, index) => {
+          month.Collect = res[index]?.totalAmount || 0;
+          month.Pay = res2[index]?.totalAmount || 0;
+        });
+
+        setCashFlowData(cashFlowData);
+
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, []);
+
+
+  // Get Account Details;
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = {
+          token: Cookies.get("token"),
+          all: true
+        }
+        const url = process.env.REACT_APP_API_URL + `/account/get?page=${1}&limit=${100000}`;
+        const req = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        const res = await req.json();
+
+        const accountBalanceDataChartData = res.data.reduce((acc, i) => {
+          acc.push({ name: i.title, value: i.openingBalance });
+          return acc;
+        }, [])
+
+        console.log(accountBalanceDataChartData);
+
+        setAccountBalanceData(accountBalanceDataChartData)
+
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, [])
+
+
+  // Get Total Pay;
+  useEffect(() => {
+    (async () => {
+      try {
+        const url = process.env.REACT_APP_API_URL + `/purchaseinvoice/get-total-pay`;
+        const req = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": 'application/json'
+          },
+          body: JSON.stringify({ token: Cookies.get('token') })
+        });
+        const res = await req.json();
+
+        console.log(res);
+        if (req.status === 200) {
+          if (res.length > 0) {
+            setTotalPay(res[0].totalAmount)
+          } else {
+            setTotalPay(0)
+          }
+        }
+
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, [])
+
+
+  // Get Total Collect;
+  useEffect(() => {
+    (async () => {
+      try {
+        const url = process.env.REACT_APP_API_URL + `/salesinvoice/get-total-collect`;
+        const req = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": 'application/json'
+          },
+          body: JSON.stringify({ token: Cookies.get('token') })
+        });
+        const res = await req.json();
+        if (req.status === 200) {
+          if (res.length > 0) {
+            setTotalCollect(res[0].totalAmount)
+          } else {
+            setTotalCollect(0)
+          }
+        }
+
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, [])
+
+  // Get Recent Purchase Invoice
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = {
+          token: Cookies.get("token"),
+          all: false
+        }
+        const url = process.env.REACT_APP_API_URL + `/purchaseinvoice/get?page=${1}&limit=${2}`;
+        const req = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        const res = await req.json();
+        setRecentPurchase(res?.data || []);
+
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, [])
+
+
+  // Get Recent Sales Invoice
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = {
+          token: Cookies.get("token"),
+          all: false
+        }
+        const url = process.env.REACT_APP_API_URL + `/salesinvoice/get?page=${1}&limit=${2}`;
+        const req = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        const res = await req.json();
+        setRecentSales(res?.data || [])
+
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, [])
+
 
   return (
     <>
       <Nav title={"Dashboard"} />
-      <main id="main" className="flex">
+      <main id="main">
         <SideNav />
-        <div className="content__body w-full p-4 space-y-6">
+        <div className="content__body p-4">
           {/* Summary Cards */}
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="w-full lg:w-1/3 flex flex-col gap-6">
-              {/* To Collect */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="bg-white shadow rounded-md px-4 py-2 flex items-center justify-between">
               <div>
-                <div className="p-3 flex justify-between bg-white rounded-t-lg">
-                  <p className="text-2xl text-[#003628] font-semibold">
-                    3594.6
-                  </p>
-                </div>
-                <div className="bg-[#006853] w-full rounded-b-lg">
-                  <p className="p-2 text-white">To Collect</p>
-                </div>
-              </div>
-
-              {/* To Pay */}
-              <div>
-                <div className="p-3 flex justify-between bg-white rounded-t-lg">
-                  <p className="text-2xl text-orange-500 font-semibold">
-                    424.8
-                  </p>
-                </div>
-                <div className="bg-[#E9762B] w-full rounded-b-lg">
-                  <p className="p-2 text-white">To Pay</p>
-                </div>
+                <p className="text-gray-500">To Collect</p>
+                <p className="text-3xl font-bold text-green-600">{totalCollect?.toFixed(2)}</p>
+                <p className="text-sm text-green-500 flex items-center gap-1 mt-1">
+                  <FiTrendingUp />
+                </p>
               </div>
             </div>
+            <div className="bg-white shadow rounded-md px-4 py-2 flex items-center justify-between">
+              <div>
+                <p className="text-gray-500">To Pay</p>
+                <p className="text-3xl font-bold text-red-600">{totalPay?.toFixed(2)}</p>
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <FiTrendingDown />
+                </p>
+              </div>
+            </div>
+          </div>
 
-            {/* Account Wise Balance */}
-            <div className="w-full lg:w-2/3 bg-white shadow-sm p-4 rounded-lg">
-              <p className="text-lg font-bold">Account Wise Balance</p>
-              <TableHeader />
-              <table className="w-full border mt-3 text-sm">
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* Bar Chart */}
+            <div className="bg-white shadow rounded-md p-6">
+              <h3 className="text-lg font-semibold mb-4">Cash Flow</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={cashFlowData}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="Collect" fill="#00C49F" />
+                  <Bar dataKey="Pay" fill="#FF5A5F" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Pie Chart */}
+            <div className="bg-white shadow rounded-md p-6">
+              <h3 className="text-lg font-semibold mb-4">Account Wise Balance</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={accountBalanceData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label
+                  >
+                    {accountBalanceData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Tables */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            {/* Recent Sales */}
+            <div className="bg-white shadow rounded-md p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Recent Sales</h3>
+                <Link to="/admin/sales-invoice"
+                  className="text-xs text-blue-500 hover:text-blue-500 cursor-pointer chart-btn-see">
+                  See All
+                </Link>
+              </div>
+              <table className="w-full text-left border">
                 <thead className="bg-gray-100">
                   <tr>
-                    <th className="p-2">Title</th>
-                    <th className="p-2 flex justify-between">
-                      <span>Type</span>
-                      <LuArrowUpDown />
-                    </th>
-                    <th className="p-2 flex justify-between">
-                      <span>Balance</span>
-                      <LuArrowUpDown />
-                    </th>
+                    <th className="p-2">Party</th>
+                    <th className="p-2">Invoice No</th>
+                    <th className="p-2">Date</th>
+                    <th className="p-2">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td className="p-2">Cash</td>
-                    <td>Cash</td>
-                    <td>0</td>
-                  </tr>
+                  {
+                    recentSales?.map((s, i) => {
+                      return <tr className="border-b" key={i}>
+                        <td className="p-2">{s.party?.name}</td>
+                        <td className="p-2">{s.salesInvoiceNumber}</td>
+                        <td className="p-2">{s.invoiceDate.split("T")[0]}</td>
+                        <td className="p-2 text-green-600">{s.finalAmount}</td>
+                      </tr>
+                    })
+                  }
                 </tbody>
               </table>
-              <p className="mt-3 text-sm">Showing 1 to 1 of 1 entries</p>
-              <div className="flex justify-end">
-                <Pagination
-                  total={100}
-                  maxButtons={4}
-                  activePage={accountpaginationPage}
-                  onChangePage={setAccountpaginationPage}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Sales + Purchases */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Recent Sales */}
-            <div className="bg-white p-4 rounded-lg shadow">
-              <p className="font-bold text-lg">Recent Due Dates (Sales)</p>
-              <TableHeader />
-              <div className="overflow-x-auto mt-3">
-                <table className="w-full border text-sm">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="p-2">Invoice Date</th>
-                      <th className="p-2">INV.no.</th>
-                      <th className="p-2">Party Name</th>
-                      <th className="p-2">Due Date</th>
-                      <th className="p-2">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="p-2">19 Dec 2024</td>
-                      <td>INV3</td>
-                      <td>Das Computer</td>
-                      <td>28 Dec 2024</td>
-                      <td className="flex gap-2 justify-end">
-                        <button className="bg-[rgb(0,138,168)] text-white px-2 py-1 rounded">
-                          <MdEditSquare />
-                        </button>
-                        <button className="bg-[#ce0018] text-white px-2 py-1 rounded">
-                          <IoInformationCircle />
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p className="mt-3 text-sm">Showing 1 to 1 of 1 entries</p>
-              <div className="flex justify-end">
-                <Pagination
-                  total={100}
-                  maxButtons={4}
-                  activePage={recentsalepagination}
-                  onChangePage={setRecentsalepagination}
-                />
-              </div>
             </div>
 
             {/* Recent Purchases */}
-            <div className="bg-white p-4 rounded-lg shadow">
-              <p className="font-bold text-lg">Recent Due Dates (Purchase)</p>
-              <TableHeader />
-              <div className="overflow-x-auto mt-3">
-                <table className="w-full border text-sm">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="p-2">Invoice Date</th>
-                      <th className="p-2">INV.no.</th>
-                      <th className="p-2">Party Name</th>
-                      <th className="p-2">Due Date</th>
-                      <th className="p-2">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="p-2">28 Dec 2024</td>
-                      <td>001</td>
-                      <td>Bishai Computer Shop</td>
-                      <td>28 Dec 2024</td>
-                      <td className="flex gap-2 justify-end">
-                        <button className="bg-[rgb(0,138,168)] text-white px-2 py-1 rounded">
-                          <MdEditSquare />
-                        </button>
-                        <button className="bg-[#ce0018] text-white px-2 py-1 rounded">
-                          <IoInformationCircle />
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+            <div className="bg-white shadow rounded-md p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Recent Purchases</h3>
+                <Link to="/admin/purchase-invoice"
+                  className="text-xs text-blue-500 cursor-pointer chart-btn-see">
+                  See All
+                </Link>
               </div>
-              <p className="mt-3 text-sm">Showing 1 to 1 of 1 entries</p>
-              <div className="flex justify-end">
-                <Pagination
-                  total={100}
-                  maxButtons={4}
-                  activePage={recentpurchasepagination}
-                  onChangePage={setRecentpurchasepagination}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Stock Alert */}
-          <div className="bg-white p-4 rounded-lg shadow">
-            <p className="font-bold text-lg">Stock Alert</p>
-            <TableHeader />
-            <table className="w-full border mt-3 text-sm">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="p-2">Title</th>
-                  <th className="p-2 flex justify-between">
-                    <span>Stock</span>
-                    <LuArrowUpDown />
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="p-2">Dell Al-mouse</td>
-                  <td>✔️</td>
-                </tr>
-                <tr>
-                  <td className="p-2">Birla Cement</td>
-                  <td>✔️</td>
-                </tr>
-              </tbody>
-            </table>
-            <p className="mt-3 text-sm">Showing 1 to 2 of 2 entries</p>
-            <div className="flex justify-end">
-              <Pagination
-                total={100}
-                maxButtons={4}
-                activePage={stockalertpagination}
-                onChangePage={setStockalertpagination}
-              />
+              <table className="w-full text-left border">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="p-2">Party</th>
+                    <th className="p-2">Invoice No</th>
+                    <th className="p-2">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    recentPurchase?.map((p, i) => {
+                      return <tr className="border-b" key={i}>
+                        <td className="p-2">{p.party?.name}</td>
+                        <td className="p-2">{p.originalInvoiceNumber}</td>
+                        <td className="p-2 text-red-600">{p.finalAmount}</td>
+                      </tr>
+                    })
+                  }
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

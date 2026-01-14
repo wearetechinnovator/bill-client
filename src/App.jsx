@@ -62,6 +62,7 @@ const ItemDetails = React.lazy(() => import("./pages/Items/Details"));
 const CategoryDetails = React.lazy(() => import("./pages/Item/Details"));
 const StaffAttendance = React.lazy(() => import("./pages/StaffAttendance/StaffAttendance"));
 const AddStaffAttendance = React.lazy(() => import("./pages/StaffAttendance/AddStaffAttendance"));
+const AttendanceDetails = React.lazy(() => import("./pages/StaffAttendance/AttendanceDetails"));
 
 
 const App = () => {
@@ -229,7 +230,7 @@ const App = () => {
         <Route path="/admin/staff-attendance" element={<ProtectRoute><StaffAttendance /></ProtectRoute>} />
         <Route path="/admin/staff-attendance/add" element={<ProtectRoute><AddStaffAttendance /></ProtectRoute>} />
         <Route path="/admin/staff-attendance/edit/:id" element={<ProtectRoute><AddStaffAttendance mode="edit" /></ProtectRoute>} />
-
+        <Route path="/admin/staff-attendance/details/:id" element={<ProtectRoute><AttendanceDetails /></ProtectRoute>} />
 
 
         <Route path="*" element={< NotFound />} />

@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-import { Pagination, Popover, Whisper } from 'rsuite';
+import { Popover, Whisper } from 'rsuite';
+import Pagination from '../../components/Pagination';
 import { BiPrinter } from "react-icons/bi";
 import { FaRegCopy, FaRegEdit } from "react-icons/fa";
 import { FaRegFilePdf } from "react-icons/fa";
@@ -19,6 +20,8 @@ import AddNew from '../../components/AddNew';
 import { FiMoreHorizontal } from 'react-icons/fi';
 import { Icons } from '../../helper/icons';
 import AttendanceSettingModal from '../../components/AttendanceSettingModal';
+import AttendanceOverTime from '../../components/AttendanceOverTimeModal';
+
 
 
 
@@ -34,13 +37,26 @@ const StaffAttendance = () => {
     const tableRef = useRef(null);
     const [tableStatusData, setTableStatusData] = useState('active');
     const exportData = useMemo(() => {
-        return data && data.map(({ title }) => ({
-            Title: title
+        return data && data.map((d) => ({
+            "Staff Name": d.staffName,
+            "Mobile Number": d.mobileNumber,
+            "Attendance": ""
         }));
     }, [data]);
     const [loading, setLoading] = useState(true);
-    const [settingModel, setSettingModel] = useState(false);
-    const [attendanceSheet, setAttendanceSheet] = useState([])
+    const [settingModal, setSettingModal] = useState(false);
+    const [overTimeModal, setOverTimeModal] = useState(false);
+    const attendanceDateRef = useRef(null)
+    const [attendanceDatePickerValue, setAttendanceDatePickervalue] = useState(
+        new Date().toISOString().split("T")[0]
+    );
+    const [attendanceSheet, setAttendanceSheet] = useState([]); //{staffId, date, attendance}
+    const attendanceSaveTimer = useRef(null);
+    const ATTENDANCE_SAVE_TIME = 2000; // Debounce time;
+    const [currentStaffData, setCurrentStaffData] = useState(null); // Send staff id in overTime modal;
+    const [allTotalData, setAllTotalData] = useState({
+        present: 0, absent: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0
+    })
 
 
 
@@ -75,6 +91,90 @@ const StaffAttendance = () => {
         get();
     }, [tableStatusData, dataLimit, activePage])
 
+
+    // Get Attendance
+    useEffect(() => {
+        (async () => {
+            try {
+                setLoading(true)
+                const URL = `${process.env.REACT_APP_API_URL}/attendance/get`;
+                const token = Cookies.get("token");
+                const req = await fetch(URL, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ date: attendanceDatePickerValue, token })
+                })
+                const res = await req.json();
+
+                if (res.data.length > 0) {
+                    const fetchedAttendanceSheet = res.data.reduce((acc, item) => {
+                        const newObj = {
+                            staffId: item.staffId,
+                            date: item.date,
+                            attendance: item.attendance,
+                            attendanceType: item.attendanceType,
+                            overTimeType: item.overTimeType,
+                            overTimeHour: item.overTimeHour,
+                            overTimeMinute: item.overTimeMinute,
+                            overTimeRate: item.overTimeRate,
+                            customeOverTimeRate: item.customeOverTimeRate,
+                            fixedOverTimeAmount: item.fixedOverTimeAmount
+                        };
+                        acc.push(newObj);
+
+                        return acc;
+                    }, []);
+
+                    setAttendanceSheet(fetchedAttendanceSheet);
+
+                    const total = res.data.reduce((acc, item) => {
+                        if (item.attendance === "1") {
+                            acc.p += 1;
+                            if (item.attendanceType === "half-day") {
+                                acc.hd += 1;
+                            }
+                        }
+                        else if (item.attendance === "0") {
+                            acc.a += 1;
+                            if (item.attendanceType === "paid-leave") {
+                                acc.pl += 1;
+                            }
+                            else if (item.attendanceType === "week-off") {
+                                acc.wo += 1;
+                            }
+                        }
+
+                        return acc;
+                    }, { p: 0, a: 0, hd: 0, pl: 0, wo: 0 },)
+
+                    setAllTotalData({
+                        present: total.p,
+                        absent: total.a,
+                        halfDay: total.hd,
+                        paidLeave: total.pl,
+                        weeklyOff: total.wo
+                    })
+                } else {
+                    setAttendanceSheet([]);
+                    setAllTotalData({
+                        present: 0,
+                        absent: 0,
+                        halfDay: 0,
+                        paidLeave: 0,
+                        weeklyOff: 0,
+                    })
+                }
+
+                setLoading(false)
+
+            } catch (error) {
+                setLoading(false)
+                return toast("Attendance not get", "error");
+            }
+        })()
+    }, [attendanceDatePickerValue])
 
     const searchTable = (e) => {
         const value = e.target.value.toLowerCase();
@@ -119,19 +219,20 @@ const StaffAttendance = () => {
 
     const exportTable = async (whichType) => {
         if (whichType === "copy") {
-            copyTable("listOfTax"); // Pass tableid
+            copyTable("staffTable"); // Pass tableid
         }
         else if (whichType === "excel") {
-            downloadExcel(exportData, 'unit-list.xlsx') // Pass data and filename
+            downloadExcel(exportData, 'staff-attendance.xlsx') // Pass data and filename
         }
         else if (whichType === "print") {
-            printTable(tableRef, "Unit List"); // Pass table ref and title
+            printTable(tableRef, "Attendance List"); // Pass table ref and title
         }
         else if (whichType === "pdf") {
-            let document = exportPdf('Tax List', exportData);
+            let document = exportPdf('Attendance List', exportData);
             downloadPdf(document)
         }
     }
+
 
     const removeData = async (trash) => {
         if (selected.length === 0 || tableStatusData !== 'active') {
@@ -167,18 +268,134 @@ const StaffAttendance = () => {
         }
     }
 
-    const handleAttendance = async (userData, type) => {
-        // First check staff id already in array or not;
-        // If  id in array then filter it then push it;
 
+    // When click attendance button `A` | `P`
+    const handleAttendance = async (userData, attendance, type = "none") => {
+        let attSheet = [...attendanceSheet];
+        attSheet = attSheet.filter((a, _) => a.staffId !== userData._id);
+
+        let attendanceDataSet = {
+            staffId: userData._id,
+            date: attendanceDatePickerValue,
+            attendance: attendance, // `P` | `A`
+            attendanceType: type
+        };
+
+        attSheet.push(attendanceDataSet);
+        localStorage.setItem("attendance", JSON.stringify(attSheet));
+        localStorage.setItem("attendance_timestamp", Date.now());
+
+        setAttendanceSheet(attSheet);
     }
+
+
+    // Attendance Debounce Logic here;
+    useEffect(() => {
+        if (attendanceSaveTimer.current) {
+            clearTimeout(attendanceSaveTimer.current);
+        }
+
+        const timestamp = Number(localStorage.getItem("attendance_timestamp"));
+        if (!timestamp) {
+            return
+        };
+
+        const elapsed = Date.now() - timestamp;
+        const remaining = Math.max(ATTENDANCE_SAVE_TIME - elapsed, 0);
+
+        attendanceSaveTimer.current = setTimeout(() => {
+            const attendanceData = JSON.parse(localStorage.getItem('attendance'));
+
+            if (!attendanceData || attendanceData.length === 0) {
+                clearTimeout(attendanceSaveTimer.current);
+                return;
+            }
+
+            (async () => {
+                try {
+                    const URL = `${process.env.REACT_APP_API_URL}/attendance/add`;
+                    const token = Cookies.get("token");
+                    const req = await fetch(URL, {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ attendanceData: attendanceSheet, token })
+                    })
+                    const res = await req.json();
+                    if (req.status !== 200) {
+                        localStorage.removeItem('attendance');
+                        localStorage.removeItem("attendance_timestamp");
+
+                        return toast(res.err, "error")
+                    }
+
+                    return toast("Staff attendance successfully", "success");
+
+                } catch (er) {
+                    return toast("Attendance failed", "error")
+                }
+                finally {
+                    localStorage.removeItem('attendance');
+                    localStorage.removeItem("attendance_timestamp");
+                }
+            })()
+
+        }, remaining);
+
+        //return () => clearTimeout(attendanceSaveTimer.current);
+
+    }, [attendanceSheet])
+
+
+    // Jodi page refrash kora hoy r data thake tahole
+    // Storage theke data variable a rakha hobe;
+    useEffect(() => {
+        const attendanceData = JSON.parse(localStorage.getItem("attendance"));
+
+        if (attendanceData && attendanceData.length > 0) {
+            setAttendanceSheet(attendanceData);
+        }
+    }, []);
+
+
+    // Custom Date change on Attendance `Next` | `Prev` Button;
+    const dateChanger = (type) => {
+        const d = new Date(attendanceDatePickerValue);
+
+        if (type === "prev") {
+            d.setDate(d.getDate() - 1);
+        } else if (type === "next") {
+            d.setDate(d.getDate() + 1);
+        }
+
+        setAttendanceDatePickervalue(d.toISOString().split("T")[0]);
+    }
+
 
     return (
         <>
             <Nav title={"Staff Attendance"} />
             <AttendanceSettingModal
-                open={settingModel}
-                closeModal={() => setSettingModel(false)}
+                open={settingModal}
+                closeModal={() => setSettingModal(false)}
+            />
+            <AttendanceOverTime
+                open={overTimeModal}
+                closeModal={() => setOverTimeModal(false)}
+                staffData={currentStaffData}
+                sendData={(d) => {
+                    let allSheetData = [...attendanceSheet]
+
+                    let getStaffAttendanceSheet = allSheetData.find((a, _) => a.staffId === d.staffId);
+                    allSheetData = allSheetData.filter((a, _) => a.staffId !== d.staffId);
+                    let marge = { ...getStaffAttendanceSheet, ...d };
+
+                    localStorage.setItem("attendance_timestamp", Date.now());
+                    localStorage.setItem("attendance", JSON.stringify([...allSheetData, { ...marge }]));
+
+                    setAttendanceSheet([...allSheetData, { ...marge }]);
+                }}
             />
             <main id='main'>
                 <SideNav />
@@ -213,11 +430,11 @@ const StaffAttendance = () => {
                                     Delete
                                 </button>
                                 <button
-                                    onClick={() => setSettingModel(true)}
+                                    onClick={() => setSettingModal(true)}
                                     className='bg-gray-50 border'
                                 >
                                     <Icons.SETTING
-                                        className={`text-md text-gray-500 ${settingModel ? 'rotate-90' : ''} transition-all`}
+                                        className={`text-md text-gray-500 ${settingModal ? 'rotate-90' : ''} transition-all`}
                                     />
                                     Attendance Setting
                                 </button>
@@ -225,7 +442,7 @@ const StaffAttendance = () => {
                                     onClick={() => navigate("/admin/staff-attendance/add")}
                                     className='bg-[#003E32] text-white '>
                                     <IoIosAdd className='text-xl text-white' />
-                                    Add New
+                                    Add Staff
                                 </button>
                                 <div className='flex justify-end'>
                                     <Whisper placement='leftStart' enterable
@@ -262,24 +479,79 @@ const StaffAttendance = () => {
 
                     {
                         !loading ? data.length > 0 ? <div className='content__body__main'>
+                            <div className='flex flex-col lg:flex-row justify-between'>
+                                <div className='w-full lg:w-[60%] flex items-center justify-between gap-3'>
+                                    <div className='shadow w-full rounded p-2'>
+                                        <p>Present (P)</p>
+                                        <span>{allTotalData.present}</span>
+                                    </div>
+                                    <div className='shadow w-full rounded p-2'>
+                                        <p>Absent (A)</p>
+                                        <span>{allTotalData.absent}</span>
+                                    </div>
+                                    <div className='shadow w-full rounded p-2'>
+                                        <p>Half day (HD)</p>
+                                        <span>{allTotalData.halfDay}</span>
+                                    </div>
+                                    <div className='shadow w-full rounded p-2'>
+                                        <p>Paid leave (PL)</p>
+                                        <span>{allTotalData.paidLeave}</span>
+                                    </div>
+                                    <div className='shadow w-full rounded p-2'>
+                                        <p>Weekly off (WO)</p>
+                                        <span>{allTotalData.weeklyOff}</span>
+                                    </div>
+                                </div>
+                                <div className='bg-gray-50 h-[30px] border rounded p-1 flex items-center gap-2 w-[180px] justify-center'>
+                                    <button onClick={(e) => dateChanger("prev")}>
+                                        <Icons.PREV_PAGE_ARROW />
+                                    </button>
+                                    <div className="relative w-[150px] text-center">
+                                        <input
+                                            type="date"
+                                            ref={attendanceDateRef}
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                            onChange={(e) => setAttendanceDatePickervalue(e.target.value)}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => attendanceDateRef.current.showPicker()}
+                                            className="relative z-10"
+                                        >
+                                            {
+                                                attendanceDatePickerValue &&
+                                                new Date(attendanceDatePickerValue).toDateString() === new Date().toDateString() &&
+                                                "TODAY: "
+                                            }
+                                            {attendanceDatePickerValue || "Select date"}
+                                        </button>
+                                    </div>
+                                    <button onClick={() => dateChanger("next")} >
+                                        <Icons.NEXT_PAGE_ARROW />
+                                    </button>
+                                </div>
+                            </div>
                             {/* Table start */}
-                            <div className='overflow-x-auto list__table'>
-                                <table className='min-w-full bg-white' id='listQuotation' ref={tableRef}>
+                            <div className='overflow-x-auto list__table mt-2'>
+                                <table className='min-w-full bg-white' id='staffTable' ref={tableRef}>
                                     <thead className='list__table__head'>
                                         <tr>
                                             <th className='py-2 px-4 border-b w-[10px]'>
                                                 <input type='checkbox' onChange={selectAll} checked={data.length > 0 && selected.length === data.length} />
                                             </th>
-                                            <td className='py-2 px-4 border-b'>STAFF NAME</td>
-                                            <td className='py-2 px-4 border-b'>MOBILE NUMBER</td>
-                                            <td className='py-2 px-4 border-b'>ATTENDANCE</td>
+                                            <td className='py-2 px-4 border-b w-[30%]'>STAFF NAME</td>
+                                            <td className='py-2 px-4 border-b w-[30%]'>MOBILE NUMBER</td>
+                                            <td className='py-2 px-4 border-b w-[25%]'>ATTENDANCE</td>
                                             <td className='py-2 px-4 border-b' align='center'>ACTION</td>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {
                                             data.map((data, i) => {
-                                                return <tr key={i}>
+                                                const userAttendanceData = attendanceSheet?.find((a, _) => a.staffId === data._id);
+                                                const userAttendance = userAttendanceData?.attendance;
+
+                                                return <tr key={data._id}>
                                                     <td className='py-2 px-4 border-b'>
                                                         <input type='checkbox'
                                                             checked={selected.includes(data._id)}
@@ -291,24 +563,53 @@ const StaffAttendance = () => {
                                                     <td className='px-4 border-b'>
                                                         <div className='flex gap-2 items-center'>
                                                             <div
-                                                                onClick={() => handleAttendance(data, "P")}
-                                                                className='attendance__chip__btn'>
+                                                                onClick={() => handleAttendance(data, "1")}
+                                                                className={`attendance__chip__btn ${userAttendance === "1" ? 'attendance__active__present' : ''}`}
+                                                            >
                                                                 P
                                                             </div>
                                                             <div
-                                                                onClick={() => handleAttendance(data, "A")}
-                                                                className='attendance__chip__btn'>
+                                                                onClick={() => handleAttendance(data, "0")}
+                                                                className={`attendance__chip__btn ${userAttendance === "0" ? 'attendance__active__absent' : ''}`}
+                                                            >
                                                                 A
                                                             </div>
-                                                            <select className='w-[80px]'>
-                                                                <option value="">Select</option>
-                                                                <option value="present">Present</option>
-                                                                <option value="absent">Absent</option>
-                                                            </select>
+                                                            {
+                                                                userAttendance === "0" && (
+                                                                    <select
+                                                                        className='w-[100px]'
+                                                                        onChange={(e) => handleAttendance(data, "0", e.target.value)}
+                                                                        value={userAttendanceData.attendanceType}
+                                                                    >
+                                                                        <option value="none">Select</option>
+                                                                        <option value="paid-leave">Paid Leave</option>
+                                                                        <option value="week-off">Week Off</option>
+                                                                    </select>
+                                                                )
+                                                            }
+                                                            {
+                                                                userAttendance === "1" && (
+                                                                    <select
+                                                                        className='w-[100px]'
+                                                                        onChange={async (e) => {
+                                                                            await handleAttendance(data, "1", e.target.value)
+                                                                            if (e.target.value === "over-time") {
+                                                                                setOverTimeModal(true);
+                                                                                setCurrentStaffData(data);
+                                                                            }
+                                                                        }}
+                                                                        value={userAttendanceData.attendanceType}
+                                                                    >
+                                                                        <option value="none">Select</option>
+                                                                        <option value="half-day">Half Day</option>
+                                                                        <option value="over-time">Over Time</option>
+                                                                    </select>
+                                                                )
+                                                            }
                                                         </div>
                                                     </td>
-                                                    <td className=''>
-                                                        <Whisper
+                                                    <td className='' align='center'>
+                                                        {/* <Whisper
                                                             placement='leftStart'
                                                             trigger={"click"}
                                                             speaker={<Popover full>
@@ -324,7 +625,21 @@ const StaffAttendance = () => {
                                                             <div className='table__list__action' >
                                                                 <FiMoreHorizontal />
                                                             </div>
-                                                        </Whisper>
+                                                        </Whisper> */}
+                                                        <div className='flex items-center justify-center gap-2'>
+                                                            <div
+                                                                onClick={() => navigate(`/admin/staff-attendance/details/${data._id}`)}
+                                                                className='rounded__circle'
+                                                            >
+                                                                <Icons.EYE />
+                                                            </div>
+                                                            <div
+                                                                onClick={() => navigate(`/admin/staff-attendance/edit/${data._id}`)}
+                                                                className='rounded__circle'
+                                                            >
+                                                                <Icons.PENCIL />
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             })
@@ -342,7 +657,7 @@ const StaffAttendance = () => {
                                 </div>
                             </div>
                         </div>
-                            : <AddNew title={"Unit"} link={"/admin/unit/add"} />
+                            : <AddNew title={"Staff"} link={"/admin/staff-attendance/add"} />
                             : <DataShimmer />
                     }
                 </div>

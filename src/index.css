@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 
 
 
@@ -8,8 +9,8 @@
 
 * {
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-  font-weight: 400;
+  font-family: "Nunito Sans", sans-serif;
+  font-weight: 500;
   font-style: normal;
 }
 
@@ -45,8 +46,8 @@
 
 .content__body {
   width: 100%;
-  background-color: #F6F7FB;
-  padding: 20px;
+  background: linear-gradient(90deg, rgba(230, 236, 223, 1) 56%, rgba(237, 244, 251, 1) 86%);
+  padding: 10px;
   overflow-y: auto;
 }
 
@@ -905,6 +906,31 @@ input[type="checkbox"]:checked::before {
   font-size: 8px;
 }
 
+.rounded__circle {
+  @apply w-[25px] h-[25px] bg-gray-100 rounded-full grid place-items-center border cursor-pointer;
+  @apply hover:bg-gray-200;
+}
+
+.tab{
+  @apply bg-gray-400 flex items-center rounded overflow-hidden;
+}
+.tab__btn {
+  @apply bg-gray-50 px-3 py-1 border border-r;
+  @apply hover:bg-gray-100;
+}
+.active__tab__btn{
+  @apply bg-gray-200;
+  @apply hover:bg-gray-100;
+}
+
+.user__details__tab {
+  @apply w-full flex flex-col lg:flex-row gap-2
+}
+
+.user__details__tab p {
+  @apply text-gray-500;
+}
+
 @media print {
   table {
     margin: 0;
@@ -1014,6 +1040,103 @@ input {
   @apply text-center grid place-items-center text-gray-500 cursor-pointer;
 }
 
+.attendance__active__present {
+  @apply bg-green-100 border-green-700
+}
+
+.attendance__active__absent {
+  @apply bg-red-100 border-red-400
+}
+
 .attendace__setting__time__drp {
   @apply w-[26%];
+}
+
+.dashboard-main-box h1,
+.dashboard-main-box h2,
+.dashboard-main-box h3,
+.dashboard-main-box h4,
+.dashboard-main-box h5,
+.dashboard-main-box h6 {
+  line-height: normal !important;
+}
+
+.dashboard-main-box {
+  border: 1px solid #ffffff;
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 15px 15px 15px;
+  background: #ffffff2b;
+}
+
+.glow-shape {
+  position: relative;
+  z-index: 2;
+}
+
+.glow-shape::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  width: 40%;
+  height: 82%;
+  animation: glow 20s linear infinite;
+  filter: blur(65px);
+  background-color: #B7D7D3;
+  box-shadow: 0 0 20px #B7D7D3;
+  z-index: -1;
+  border-radius: 100%;
+}
+
+.glow-shape::before {
+  content: '';
+  position: absolute;
+  top: 69%;
+  right: 3%;
+  width: 37%;
+  height: 69%;
+  animation: glow 20s linear infinite;
+  filter: blur(65px);
+  background-color: #d9d7e9;
+  box-shadow: 0 0 20px #C2BDDF;
+  z-index: -1;
+  border-radius: 100%;
+}
+
+
+
+.dashboard-main-box .products-status td .active {
+  padding: 5px 15px;
+  background-color: #DDFFF8;
+  color: #003E32;
+  border-radius: 20px;
+  display: inline-block;
+  width: max-content;
+  /* height: 29px; */
+  text-align: center;
+  font-size: 13px;
+}
+.dashboard-main-box .products-status td .active a{
+  color: #003E32;
+}
+.dashboard-main-box .products-status td .active.red a{
+  color: #A51B1D;
+}
+
+.dashboard-main-box .products-status td .active.red {
+  background-color: #FFE6E7;
+  color: #A51B1D;
+}
+
+.dashboard-main-box .products-status table tr {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid #fff;
+
+}
+
+.dashboard-main-box .products-status table tr:last-child {
+  border-bottom: 0;
 }

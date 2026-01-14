@@ -7,7 +7,7 @@ const DataShimmer = () => {
       <div>
         <div className='flex flex-col gap-2'>
           {Array.from({ length: 8 }).map((i, _) =>
-            <div key={i} className='animate w-full h-[20px] rounded'></div>)}
+            <div key={_ + Math.random()} className='animate w-full h-[20px] rounded'></div>)}
         </div>
       </div>
     </div>
