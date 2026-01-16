@@ -63,7 +63,7 @@ const CategoryDetails = React.lazy(() => import("./pages/Item/Details"));
 const StaffAttendance = React.lazy(() => import("./pages/StaffAttendance/StaffAttendance"));
 const AddStaffAttendance = React.lazy(() => import("./pages/StaffAttendance/AddStaffAttendance"));
 const AttendanceDetails = React.lazy(() => import("./pages/StaffAttendance/AttendanceDetails"));
-
+const SalarySlip = React.lazy(() => import("./pages/StaffAttendance/SalarySlip"));
 
 const App = () => {
   const navigate = useNavigate();
@@ -231,7 +231,7 @@ const App = () => {
         <Route path="/admin/staff-attendance/add" element={<ProtectRoute><AddStaffAttendance /></ProtectRoute>} />
         <Route path="/admin/staff-attendance/edit/:id" element={<ProtectRoute><AddStaffAttendance mode="edit" /></ProtectRoute>} />
         <Route path="/admin/staff-attendance/details/:id" element={<ProtectRoute><AttendanceDetails /></ProtectRoute>} />
-
+        <Route path="/admin/staff-attendance/salary-slip" element={<ProtectRoute><SalarySlip /></ProtectRoute>} />
 
         <Route path="*" element={< NotFound />} />
       </Routes>

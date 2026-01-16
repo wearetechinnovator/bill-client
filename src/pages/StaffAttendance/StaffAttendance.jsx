@@ -17,7 +17,6 @@ import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
 import { IoIosAdd, IoMdMore } from 'react-icons/io';
 import AddNew from '../../components/AddNew';
-import { FiMoreHorizontal } from 'react-icons/fi';
 import { Icons } from '../../helper/icons';
 import AttendanceSettingModal from '../../components/AttendanceSettingModal';
 import AttendanceOverTime from '../../components/AttendanceOverTimeModal';
@@ -50,12 +49,13 @@ const StaffAttendance = () => {
     const [attendanceDatePickerValue, setAttendanceDatePickervalue] = useState(
         new Date().toISOString().split("T")[0]
     );
-    const [attendanceSheet, setAttendanceSheet] = useState([]); //{staffId, date, attendance}
+    const [attendanceSheet, setAttendanceSheet] = useState([]); // {staffId, date, attendance}
     const attendanceSaveTimer = useRef(null);
     const ATTENDANCE_SAVE_TIME = 2000; // Debounce time;
     const [currentStaffData, setCurrentStaffData] = useState(null); // Send staff id in overTime modal;
+    const [attendanceDataForModal, setAttendanceDataForModal] = useState(null);
     const [allTotalData, setAllTotalData] = useState({
-        present: 0, absent: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0
+        present: 0, absent: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0, overTime: 0
     })
 
 
@@ -135,6 +135,9 @@ const StaffAttendance = () => {
                             if (item.attendanceType === "half-day") {
                                 acc.hd += 1;
                             }
+                            else if (item.attendanceType === "over-time") {
+                                acc.ot += 1;
+                            }
                         }
                         else if (item.attendance === "0") {
                             acc.a += 1;
@@ -147,14 +150,15 @@ const StaffAttendance = () => {
                         }
 
                         return acc;
-                    }, { p: 0, a: 0, hd: 0, pl: 0, wo: 0 },)
+                    }, { p: 0, a: 0, hd: 0, pl: 0, wo: 0, ot: 0 })
 
                     setAllTotalData({
                         present: total.p,
                         absent: total.a,
                         halfDay: total.hd,
                         paidLeave: total.pl,
-                        weeklyOff: total.wo
+                        weeklyOff: total.wo,
+                        overTime: total.ot
                     })
                 } else {
                     setAttendanceSheet([]);
@@ -175,6 +179,7 @@ const StaffAttendance = () => {
             }
         })()
     }, [attendanceDatePickerValue])
+
 
     const searchTable = (e) => {
         const value = e.target.value.toLowerCase();
@@ -384,6 +389,7 @@ const StaffAttendance = () => {
                 open={overTimeModal}
                 closeModal={() => setOverTimeModal(false)}
                 staffData={currentStaffData}
+                attendanceData={attendanceDataForModal}
                 sendData={(d) => {
                     let allSheetData = [...attendanceSheet]
 
@@ -402,10 +408,7 @@ const StaffAttendance = () => {
                 <Tooltip id='unitTooltip' />
                 <div className='content__body'>
                     {/* top section */}
-                    <div
-                        className={`mb-5 w-full bg-white rounded p-4 shadow-sm add_new_compnent overflow-hidden
-                            transition-all
-                        `}>
+                    <div className="add_new_compnent">
                         <div className='flex justify-between items-center'>
                             <div className='flex flex-col'>
                                 <select value={dataLimit} onChange={(e) => setDataLimit(e.target.value)}>
@@ -472,15 +475,12 @@ const StaffAttendance = () => {
                                 </div>
                             </div>
                         </div>
-
-                        <div id='itemFilter'>
-                        </div>
                     </div>
 
                     {
                         !loading ? data.length > 0 ? <div className='content__body__main'>
-                            <div className='flex flex-col lg:flex-row justify-between'>
-                                <div className='w-full lg:w-[60%] flex items-center justify-between gap-3'>
+                            <div className='flex flex-col-reverse justify-between items-end'>
+                                <div className='w-full flex items-center justify-between gap-3 mt-4'>
                                     <div className='shadow w-full rounded p-2'>
                                         <p>Present (P)</p>
                                         <span>{allTotalData.present}</span>
@@ -500,6 +500,10 @@ const StaffAttendance = () => {
                                     <div className='shadow w-full rounded p-2'>
                                         <p>Weekly off (WO)</p>
                                         <span>{allTotalData.weeklyOff}</span>
+                                    </div>
+                                    <div className='shadow w-full rounded p-2'>
+                                        <p>Over Time (OT)</p>
+                                        <span>{allTotalData.overTime}</span>
                                     </div>
                                 </div>
                                 <div className='bg-gray-50 h-[30px] border rounded p-1 flex items-center gap-2 w-[180px] justify-center'>
@@ -576,56 +580,104 @@ const StaffAttendance = () => {
                                                             </div>
                                                             {
                                                                 userAttendance === "0" && (
-                                                                    <select
-                                                                        className='w-[100px]'
-                                                                        onChange={(e) => handleAttendance(data, "0", e.target.value)}
-                                                                        value={userAttendanceData.attendanceType}
-                                                                    >
-                                                                        <option value="none">Select</option>
-                                                                        <option value="paid-leave">Paid Leave</option>
-                                                                        <option value="week-off">Week Off</option>
-                                                                    </select>
+                                                                    <>
+                                                                        <Whisper
+                                                                            placement='leftStart'
+                                                                            trigger={"click"}
+                                                                            speaker={<Popover full>
+                                                                                <div
+                                                                                    className='table__list__action__icon'
+                                                                                    onClick={() => handleAttendance(data, "0", "paid-leave")}
+                                                                                >
+                                                                                    Paid Leave
+                                                                                </div>
+                                                                                <div
+                                                                                    className='table__list__action__icon'
+                                                                                    onClick={() => handleAttendance(data, "0", "week-off")}
+                                                                                >
+                                                                                    Week Off
+                                                                                </div>
+                                                                            </Popover>}
+                                                                        >
+                                                                            <div className='attendance__more__icon' >
+                                                                                <Icons.MORE />
+                                                                            </div>
+                                                                        </Whisper>
+
+                                                                        {userAttendanceData.attendanceType === "paid-leave" && (
+                                                                            <div className={`attendance__chip__btn red`}>
+                                                                                PL
+                                                                            </div>
+                                                                        )}
+
+                                                                        {userAttendanceData.attendanceType === "week-off" && (
+                                                                            <div className={`attendance__chip__btn green`}>
+                                                                                WO
+                                                                            </div>
+                                                                        )}
+                                                                    </>
                                                                 )
                                                             }
                                                             {
                                                                 userAttendance === "1" && (
-                                                                    <select
-                                                                        className='w-[100px]'
-                                                                        onChange={async (e) => {
-                                                                            await handleAttendance(data, "1", e.target.value)
-                                                                            if (e.target.value === "over-time") {
-                                                                                setOverTimeModal(true);
-                                                                                setCurrentStaffData(data);
-                                                                            }
-                                                                        }}
-                                                                        value={userAttendanceData.attendanceType}
-                                                                    >
-                                                                        <option value="none">Select</option>
-                                                                        <option value="half-day">Half Day</option>
-                                                                        <option value="over-time">Over Time</option>
-                                                                    </select>
+                                                                    <>
+                                                                        <Whisper
+                                                                            placement='leftStart'
+                                                                            trigger={"click"}
+                                                                            speaker={<Popover full>
+                                                                                <div
+                                                                                    className='table__list__action__icon'
+                                                                                    onClick={async () => {
+                                                                                        await handleAttendance(data, "1", "half-day")
+                                                                                    }}
+                                                                                >
+                                                                                    Half Day
+                                                                                </div>
+                                                                                <div
+                                                                                    className='table__list__action__icon'
+                                                                                    onClick={async () => {
+                                                                                        await handleAttendance(data, "1", "over-time");
+                                                                                        setOverTimeModal(true);
+
+                                                                                        //Modal a data deyar jonno rakha holo
+                                                                                        setCurrentStaffData(data);
+                                                                                        setAttendanceDataForModal(userAttendanceData);
+                                                                                    }}
+                                                                                >
+                                                                                    Over Time
+                                                                                </div>
+                                                                            </Popover>}
+                                                                        >
+                                                                            <div className='attendance__more__icon' >
+                                                                                <Icons.MORE />
+                                                                            </div>
+                                                                        </Whisper>
+
+                                                                        {userAttendanceData.attendanceType === "half-day" && (
+                                                                            <div className={`attendance__chip__btn yellow`}>
+                                                                                HD
+                                                                            </div>
+                                                                        )}
+
+                                                                        {userAttendanceData.attendanceType === "over-time" && (
+                                                                            <div
+                                                                                onClick={() => {
+                                                                                    setOverTimeModal(true);
+
+                                                                                    //Modal a data deyar jonno rakha holo
+                                                                                    setCurrentStaffData(data);
+                                                                                    setAttendanceDataForModal(userAttendanceData);
+                                                                                }}
+                                                                                className={`attendance__chip__btn blue`}>
+                                                                                OT
+                                                                            </div>
+                                                                        )}
+                                                                    </>
                                                                 )
                                                             }
                                                         </div>
                                                     </td>
                                                     <td className='' align='center'>
-                                                        {/* <Whisper
-                                                            placement='leftStart'
-                                                            trigger={"click"}
-                                                            speaker={<Popover full>
-                                                                <div
-                                                                    className='table__list__action__icon'
-                                                                    onClick={() => navigate(`/admin/staff-attendance/edit/${data._id}`)}
-                                                                >
-                                                                    <FaRegEdit className='text-[16px]' />
-                                                                    Edit
-                                                                </div>
-                                                            </Popover>}
-                                                        >
-                                                            <div className='table__list__action' >
-                                                                <FiMoreHorizontal />
-                                                            </div>
-                                                        </Whisper> */}
                                                         <div className='flex items-center justify-center gap-2'>
                                                             <div
                                                                 onClick={() => navigate(`/admin/staff-attendance/details/${data._id}`)}

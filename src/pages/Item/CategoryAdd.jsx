@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav'
 import { useRef } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
 import useMyToaster from '../../hooks/useMyToaster';
 import { SelectPicker } from 'rsuite';
 import { useNavigate, useParams } from 'react-router-dom';

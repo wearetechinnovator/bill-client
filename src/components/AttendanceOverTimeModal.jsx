@@ -7,7 +7,7 @@ const OVER_TIME_AMOUNT = "amount";
 const OVER_TIME_RATE_CUSTOM = "custom";
 const WORK_TIME_HOUR = 240;
 
-const AttendanceOverTime = ({ open, closeModal, sendData, staffData }) => {
+const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceData }) => {
     const [modelOpen, setModelOpen] = useState(null);
     const [overTimeType, setOverTimeType] = useState(OVER_TIME_HOURLY);
     const [overTimeRate, setOverTimeRate] = useState(null);
@@ -20,8 +20,17 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData }) => {
 
     useEffect(() => {
         setModelOpen(open);
-        console.log(staffData);
-    }, [open])
+        console.log(attendanceData);
+
+        if(attendanceData){
+            setOverTimeType(attendanceData.overTimeType);
+            setFixedOverTimeAmount(attendanceData.fixedOverTimeAmount);
+            setOverTimeHour(attendanceData.overTimeHour);
+            setOverTimeMinute(attendanceData.overTimeMinute);
+            setOverTimeRate(attendanceData.overTimeRate);
+            setCustomeOverTimeRate(attendanceData.customeOverTimeRate);
+        }
+    }, [open, attendanceData])
 
 
     useEffect(() => {
@@ -118,7 +127,6 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData }) => {
                             </div>
                         </div>
                     </div>
-
                     {
                         overTimeType === "amount" && (
                             <div className="mt-5 bg-gray-50 p-2 rounded">

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav'
 import { useRef } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
 import { FaRegCheckCircle } from "react-icons/fa";
 import { LuRefreshCcw } from "react-icons/lu";
 import useMyToaster from '../../hooks/useMyToaster';

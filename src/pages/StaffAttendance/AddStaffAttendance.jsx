@@ -19,6 +19,8 @@ const AddStaffAttendance = ({ mode }) => {
     const navigate = useNavigate();
 
 
+
+    // Get Data
     useEffect(() => {
         if (mode) {
             const get = async () => {

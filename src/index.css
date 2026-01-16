@@ -911,14 +911,16 @@ input[type="checkbox"]:checked::before {
   @apply hover:bg-gray-200;
 }
 
-.tab{
+.tab {
   @apply bg-gray-400 flex items-center rounded overflow-hidden;
 }
+
 .tab__btn {
   @apply bg-gray-50 px-3 py-1 border border-r;
   @apply hover:bg-gray-100;
 }
-.active__tab__btn{
+
+.active__tab__btn {
   @apply bg-gray-200;
   @apply hover:bg-gray-100;
 }
@@ -1036,8 +1038,28 @@ input {
 }
 
 .attendance__chip__btn {
-  @apply bg-gray-100 border border-gray-300 rounded w-[25px] h-[25px];
+  @apply bg-gray-100 border border-gray-300 rounded w-[25px] h-[25px] text-xs;
   @apply text-center grid place-items-center text-gray-500 cursor-pointer;
+}
+
+.attendance__more__icon {
+  @apply text-[16px] cursor-pointer
+}
+
+.attendance__chip__btn.yellow {
+  @apply border-yellow-400 text-yellow-500 bg-yellow-50
+}
+
+.attendance__chip__btn.blue {
+  @apply border-blue-400 text-blue-500 bg-blue-50
+}
+
+.attendance__chip__btn.red {
+  @apply border-red-400 text-red-500 bg-red-50
+}
+
+.attendance__chip__btn.green {
+  @apply border-green-400 text-green-500 bg-green-50
 }
 
 .attendance__active__present {
@@ -1117,10 +1139,12 @@ input {
   text-align: center;
   font-size: 13px;
 }
-.dashboard-main-box .products-status td .active a{
+
+.dashboard-main-box .products-status td .active a {
   color: #003E32;
 }
-.dashboard-main-box .products-status td .active.red a{
+
+.dashboard-main-box .products-status td .active.red a {
   color: #A51B1D;
 }
 
@@ -1139,4 +1163,35 @@ input {
 
 .dashboard-main-box .products-status table tr:last-child {
   border-bottom: 0;
+}
+
+.salary__slip {
+  background-color: white;
+  width: "210mm";
+  min-height: "297mm";
+  padding: 35px;
+  box-sizing: "border-box";
+}
+
+.salary__slip__table tr {
+  @apply border;
+}
+
+.salary__slip__table tr td {
+  @apply p-2 text-xs;
+}
+
+@media print {
+  .salary__slip {
+    background-color: white;
+    padding: 40px;
+  }
+
+  .salary__slip__table tr {
+    @apply border;
+  }
+
+  .salary__slip__table tr td {
+    @apply p-2 text-xs;
+  }
 }

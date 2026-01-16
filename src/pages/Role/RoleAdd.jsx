@@ -2,10 +2,8 @@ import React, { useState } from 'react'
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav'
 import { useRef } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
 import { FaRegCheckCircle } from "react-icons/fa";
 import { LuRefreshCcw } from "react-icons/lu";
-import { IoMdArrowRoundBack } from "react-icons/io";
 import useMyToaster from '../../hooks/useMyToaster';
 import { SelectPicker, DatePicker, Button } from 'rsuite';
 
@@ -74,7 +72,7 @@ const RoleAdd = ({mode}) => {
                         </div>
                         <div className='mt-3 '>
                             <p className='ml-2 pb-2'>Details</p>
-                            <Editor 
+                            {/* <Editor 
                                 apiKey='765rof3c4qgyk8u59xk0o3vvhvji0y156uwtbjgezhnbcct7'
                                 onInit={(_evt, editor) => editorRef.current = editor}
                                 init={{  
@@ -91,7 +89,7 @@ const RoleAdd = ({mode}) => {
                                          'removeformat | help',
                                        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
                                 }}
-                            />
+                            /> */}
                         </div>
                        <div className='flex justify-center pt-9 mb-6'>
                              <div className='flex rounded-sm bg-green-500 text-white'>
