@@ -13,6 +13,7 @@ import { Tooltip } from 'react-tooltip';
 import AddNew from '../../components/AddNew';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
@@ -45,7 +46,7 @@ const Proforma = () => {
     gst: "", billDate: ''
   })
   const [ascending, setAscending] = useState(true);
-
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
   // Get data;
@@ -91,7 +92,6 @@ const Proforma = () => {
 
 
   const searchTable = (e) => {
-
     const value = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('.list__table tbody tr');
 
@@ -265,6 +265,15 @@ const Proforma = () => {
       <main id='main'>
         <SideNav />
         <Tooltip id='proformaTooltip' />
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected Proforma?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
         <div className='content__body'>
           {/* top section */}
           <div
@@ -294,7 +303,10 @@ const Proforma = () => {
                   Filter
                 </button>
                 <button
-                  onClick={() => removeData(false)}
+                  onClick={() => {
+                    if (selected.length === 0 || tableStatusData !== 'active') return;
+                    setOpenConfirm(true);
+                  }}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <Icons.DELETE className='text-lg' />
                   Delete

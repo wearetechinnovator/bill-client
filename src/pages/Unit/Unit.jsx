@@ -23,6 +23,7 @@ import { Tooltip } from 'react-tooltip';
 import { IoIosAdd, IoMdMore } from 'react-icons/io';
 import AddNew from '../../components/AddNew';
 import { FiMoreHorizontal } from 'react-icons/fi';
+import ConfirmModal from '../../components/ConfirmModal';
 
 const Unit = () => {
   const toast = useMyToaster();
@@ -40,7 +41,8 @@ const Unit = () => {
       Title: title
     }));
   }, [unitData]);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
   // Get data;
@@ -201,6 +203,15 @@ const Unit = () => {
       <main id='main'>
         <SideNav />
         <Tooltip id='unitTooltip' />
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected Units?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
         <div className='content__body'>
           {/* top section */}
           <div
@@ -225,7 +236,10 @@ const Unit = () => {
                   />
                 </div>
                 <button
-                  onClick={() => removeData(false)}
+									onClick={() => {
+										if (selected.length === 0 || tableStatusData !== 'active') return;
+										setOpenConfirm(true);
+									}}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <MdDeleteOutline className='text-lg' />
                   Delete

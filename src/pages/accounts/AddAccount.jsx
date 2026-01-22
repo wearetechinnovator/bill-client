@@ -16,7 +16,7 @@ const AddAccount = ({ mode }) => {
     const { id } = useParams();
     const [from, setForm] = useState({
         title: '', accountName: '', accountNumber: '', ifscCode: '', bankName: '', openingBalance: '',
-        type: '', details: ''
+        type: '', details: '', holderName:''
     })
     const navigate = useNavigate()
 
@@ -74,7 +74,6 @@ const AddAccount = ({ mode }) => {
                 return toast("Account updated successfully", 'success')
             }
 
-
             toast("Account created successfully", 'success')
             navigate("/admin/account")
             clearData()
@@ -92,7 +91,7 @@ const AddAccount = ({ mode }) => {
     const clearData = (e) => {
         setForm({
             title: '', accountName: '', accountNumber: '', ifscCode: '',
-            bankName: '', openingBalance: '', type: ''
+            bankName: '', openingBalance: '', type: '', holderName:''
         })
     }
 
@@ -111,7 +110,7 @@ const AddAccount = ({ mode }) => {
                                 </div>
                                 <div className='p-2'>
                                     <p className='pb-1'>Account Holder Name (If Bank)</p>
-                                    <input type='text' onChange={(e) => setForm({ ...from, accountName: e.target.value })} value={from.accountName} />
+                                    <input type='text' onChange={(e) => setForm({ ...from, holderName: e.target.value })} value={from.holderName} />
                                 </div>
                                 <div className='p-2'>
                                     <p className='pb-1'>Account Number (If Bank)</p>

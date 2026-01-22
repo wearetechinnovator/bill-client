@@ -136,11 +136,9 @@ const AttendanceSettingModal = ({ open, closeModal }) => {
                                 className="attendace__setting__time__drp"
                             >
                                 {Array.from({ length: 31 }, (_, t) =>
-                                    t > 0 ? (
-                                        <option key={t} value={`${t}:00`}>
-                                            {t}:00
-                                        </option>
-                                    ) : null
+                                    <option key={t} value={`${t}:00`}>
+                                        {t}:00
+                                    </option>
                                 )}
                             </select>
                         </div>

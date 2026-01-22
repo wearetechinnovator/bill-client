@@ -6,7 +6,6 @@ const SalarySlip = forwardRef(({ staffData, salaryAttendance, userDetails }, ref
     const [companyName, setCompanyName] = useState("");
     const [companyMobile, setCompanyMobile] = useState("");
     const [companyLogo, setCompanyLogo] = useState("");
-    const [oneDaySalay, setOneDaySalary] = useState(0);
     const [attendanceAmount, setAttendanceAmount] = useState({
         present: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0, overTime: 0,
         grossEarn: 0

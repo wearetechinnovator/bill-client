@@ -12,6 +12,7 @@ import { Tooltip } from 'react-tooltip';
 import AddNew from '../../components/AddNew';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
@@ -33,6 +34,7 @@ const Category = () => {
     }));
   }, [categoryData]);
   const [loading, setLoading] = useState(true);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -65,6 +67,7 @@ const Category = () => {
     getCategory();
   }, [tableStatusData, dataLimit, activePage])
 
+
   const searchTable = (e) => {
     const value = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('.list__table tbody tr');
@@ -85,6 +88,7 @@ const Category = () => {
     });
   }
 
+
   const selectAll = (e) => {
     if (e.target.checked) {
       setSelected(categoryData.map((category, _) => category._id));
@@ -92,6 +96,7 @@ const Category = () => {
       setSelected([]);
     }
   };
+
 
   const handleCheckboxChange = (id) => {
     setSelected((prevSelected) => {
@@ -102,6 +107,7 @@ const Category = () => {
       }
     });
   };
+
 
   const exportTable = async (whichType) => {
     if (whichType === "copy") {
@@ -154,6 +160,7 @@ const Category = () => {
     }
   }
 
+
   const restoreData = async () => {
     if (selected.length === 0 || tableStatusData !== "trash") {
       return;
@@ -194,6 +201,15 @@ const Category = () => {
       <main id='main'>
         <SideNav />
         <Tooltip id='categoryTooltip' />
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected Categories?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
         <div className='content__body'>
           {/* top section */}
           <div
@@ -217,12 +233,11 @@ const Category = () => {
                     className='p-[6px]'
                   />
                 </div>
-                {/* <button className='bg-gray-100 border'>
-                  <Icons.FILTER className='text-xl' />
-                  Filter
-                </button> */}
                 <button
-                  onClick={() => removeData(false)}
+                  onClick={() => {
+                    if (selected.length === 0 || tableStatusData !== 'active') return;
+                    setOpenConfirm(true);
+                  }}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <Icons.DELETE className='text-lg' />
                   Delete
@@ -289,7 +304,11 @@ const Category = () => {
                       categoryData.map((data, i) => {
                         return <tr key={i} onClick={() => navigate(`/admin/item-category/details/${data._id}`)} className='cursor-pointer hover:bg-gray-100'>
                           <td className='py-2 px-4 border-b max-w-[10px]'>
-                            <input type='checkbox' checked={selected.includes(data._id)} onChange={() => handleCheckboxChange(data._id)} />
+                            <input type='checkbox'
+                              checked={selected.includes(data._id)}
+                              onChange={() => handleCheckboxChange(data._id)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
                           </td>
                           <td className='px-4 border-b'>{data.title}</td>
                           <td className='px-4 border-b' align='center'>{data.hsn}</td>

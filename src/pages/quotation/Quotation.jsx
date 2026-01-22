@@ -15,6 +15,7 @@ import AddNew from '../../components/AddNew';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 // QuotationList page
@@ -46,7 +47,7 @@ const Quotation = () => {
   })
   const [ascending, setAscending] = useState(true);
   const [advanceFilterMore, setAdvanceFilterMore] = useState(false);
-
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -67,7 +68,6 @@ const Quotation = () => {
         body: JSON.stringify(data)
       });
       const res = await req.json();
-      console.log(res)
 
       setTotalData(res?.totalData)
       setBillData([...res?.data])
@@ -222,7 +222,6 @@ const Quotation = () => {
 
 
   const getFilterData = async () => {
-
     if ([
       filterData.billDate, filterData.party, filterData.billNo, filterData.fromDate,
       filterData.toDate, filterData.gst, filterData.productName
@@ -263,11 +262,9 @@ const Quotation = () => {
 
 
   const advaneFilter = async (filterUnit) => {
-
     const filterData = await getAdvanceFilterData(
       filterUnit, "quotation", activePage, dataLimit
     );
-    console.log(filterData)
     setTotalData(filterData.totalData);
     setBillData([...filterData.data])
 
@@ -281,6 +278,15 @@ const Quotation = () => {
       <main id='main'>
         <SideNav />
         <Tooltip id='dataTooltip' />
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected Quotation?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
         <div className='content__body'>
 
           {/* top section */}
@@ -312,7 +318,10 @@ const Quotation = () => {
                   Filter
                 </button>
                 <button
-                  onClick={() => removeData(false)}
+                  onClick={() => {
+                    if (selected.length === 0 || tableStatusData !== 'active') return;
+                    setOpenConfirm(true);
+                  }}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <Icons.DELETE className='text-lg' />
                   Delete

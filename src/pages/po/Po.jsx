@@ -25,6 +25,7 @@ import { LuSearch } from 'react-icons/lu';
 import { FiMoreHorizontal } from 'react-icons/fi';
 import { RiArrowDropUpFill } from "react-icons/ri";
 import Pagination from '../../components/Pagination';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
@@ -57,6 +58,7 @@ const PO = () => {
     gst: "", billDate: ''
   });
   const [ascending, setAscending] = useState(true);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -103,7 +105,6 @@ const PO = () => {
 
 
   const searchTable = (e) => {
-
     const value = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('.list__table tbody tr');
 
@@ -231,7 +232,6 @@ const PO = () => {
 
 
   const getFilterData = async () => {
-
     if ([
       filterData.billDate, filterData.party, filterData.billNo, filterData.fromDate,
       filterData.toDate, filterData.gst, filterData.productName
@@ -280,6 +280,15 @@ const PO = () => {
       <main id='main'>
         <SideNav />
         <Tooltip id='poTooltip' />
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected PO?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
         <div className='content__body'>
           {/* top section */}
           <div className={`add_new_compnent ${filterToggle ? 'h-[265px]' : 'h-[45px]'} `}>
@@ -308,7 +317,10 @@ const PO = () => {
                   Filter
                 </button>
                 <button
-                  onClick={() => removeData(false)}
+                  onClick={() => {
+                    if (selected.length === 0 || tableStatusData !== 'active') return;
+                    setOpenConfirm(true);
+                  }}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <MdDeleteOutline className='text-lg' />
                   Delete

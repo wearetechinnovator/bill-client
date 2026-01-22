@@ -25,6 +25,7 @@ import { Tooltip } from 'react-tooltip';
 import { IoIosAdd, IoMdInformationCircleOutline, IoMdMore } from 'react-icons/io';
 import AddNew from '../../components/AddNew';
 import { FiMoreHorizontal } from 'react-icons/fi';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
@@ -50,6 +51,7 @@ const Account = () => {
     }));
   }, [billData]);
   const [loading, setLoading] = useState(true);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
   // Get data;
@@ -83,7 +85,6 @@ const Account = () => {
 
 
   const searchTable = (e) => {
-
     const value = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('.list__table tbody tr');
 
@@ -215,6 +216,15 @@ const Account = () => {
       <main id='main'>
         <SideNav />
         <Tooltip id='accoutnTooltip' />
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected Accounts?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
         <div className='content__body'>
           <div
             className={`mb-5 w-full bg-white rounded p-4 shadow-sm add_new_compnent overflow-hidden
@@ -242,7 +252,10 @@ const Account = () => {
                   Filter
                 </button>
                 <button
-                  onClick={() => removeData(false)}
+									onClick={() => {
+										if (selected.length === 0 || tableStatusData !== 'active') return;
+										setOpenConfirm(true);
+									}}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <MdDeleteOutline className='text-lg' />
                   Delete

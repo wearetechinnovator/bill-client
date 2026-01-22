@@ -464,7 +464,7 @@ const PO = ({ mode }) => {
                           <MySelect2
                             model={"item"}
                             onType={(v) => onItemChange(v, index, tax, ItemRows, setItemRows, setItems)}
-                            value={ItemRows[index].itemName}
+                            value={ItemRows[index].itemId}
                           />
                           <input type='text' className='input-style' placeholder='Description'
                             onChange={(e) => {

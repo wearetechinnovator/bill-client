@@ -4,7 +4,7 @@ import SideNav from '../../components/SideNav';
 import { Popover, Whisper } from 'rsuite';
 import Pagination from '../../components/Pagination';
 import { BiPrinter } from "react-icons/bi";
-import { FaRegCopy, FaRegEdit } from "react-icons/fa";
+import { FaRegCopy } from "react-icons/fa";
 import { FaRegFilePdf } from "react-icons/fa";
 import { FaRegFileExcel } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
@@ -20,10 +20,11 @@ import AddNew from '../../components/AddNew';
 import { Icons } from '../../helper/icons';
 import AttendanceSettingModal from '../../components/AttendanceSettingModal';
 import AttendanceOverTime from '../../components/AttendanceOverTimeModal';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
-
+document.title = "Staff Attendance"
 const StaffAttendance = () => {
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -57,6 +58,7 @@ const StaffAttendance = () => {
     const [allTotalData, setAllTotalData] = useState({
         present: 0, absent: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0, overTime: 0
     })
+    const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -168,6 +170,7 @@ const StaffAttendance = () => {
                         halfDay: 0,
                         paidLeave: 0,
                         weeklyOff: 0,
+                        overTime: 0
                     })
                 }
 
@@ -403,6 +406,15 @@ const StaffAttendance = () => {
                     setAttendanceSheet([...allSheetData, { ...marge }]);
                 }}
             />
+            <ConfirmModal
+                openConfirm={openConfirm}
+                openStatus={(status) => { setOpenConfirm(status) }}
+                title={"Are you sure you want to delete the selected Staff?"}
+                fun={() => {
+                    removeData(true);
+                    setOpenConfirm(false);
+                }}
+            />
             <main id='main'>
                 <SideNav />
                 <Tooltip id='unitTooltip' />
@@ -427,7 +439,10 @@ const StaffAttendance = () => {
                                     />
                                 </div>
                                 <button
-                                    onClick={() => removeData(false)}
+									onClick={() => {
+										if (selected.length === 0 || tableStatusData !== 'active') return;
+										setOpenConfirm(true);
+									}}
                                     className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-50'} border `}>
                                     <MdDeleteOutline className='text-md' />
                                     Delete

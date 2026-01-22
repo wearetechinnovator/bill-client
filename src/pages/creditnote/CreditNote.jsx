@@ -13,6 +13,7 @@ import { Tooltip } from 'react-tooltip';
 import AddNew from '../../components/AddNew';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
@@ -45,6 +46,7 @@ const CreditNote = () => {
     gst: "", billDate: ''
   })
   const [ascending, setAscending] = useState(true);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -150,7 +152,6 @@ const CreditNote = () => {
   }
 
 
-
   const removeData = async (trash) => {
     if (selected.length === 0 || tableStatusData !== 'active') {
       return;
@@ -223,7 +224,6 @@ const CreditNote = () => {
 
 
   const getFilterData = async () => {
-
     if ([
       filterData.billDate, filterData.party, filterData.billNo, filterData.fromDate,
       filterData.toDate, filterData.gst, filterData.productName
@@ -270,6 +270,15 @@ const CreditNote = () => {
       <main id='main'>
         <SideNav />
         <Tooltip id='creditTooltip' />
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected Credit Note?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
         <div className='content__body'>
           {/* top section */}
           <div className={`add_new_compnent ${filterToggle ? 'h-[265px]' : 'h-[45px]'} `}>
@@ -298,7 +307,10 @@ const CreditNote = () => {
                   Filter
                 </button>
                 <button
-                  onClick={() => removeData(false)}
+                  onClick={() => {
+                    if (selected.length === 0 || tableStatusData !== 'active') return;
+                    setOpenConfirm(true);
+                  }}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <Icons.DELETE className='text-lg' />
                   Delete

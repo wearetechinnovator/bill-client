@@ -1,8 +1,7 @@
-import React from 'react'
 // Circular Progress indicator
 const Loading = () => {
   return (
-    <div class="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+    <div className="w-4 h-4 border-2 border-t-blue-500 border-blue-300 rounded-full animate-spin"></div>
   )
 }
 

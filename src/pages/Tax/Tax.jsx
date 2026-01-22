@@ -18,6 +18,7 @@ import { IoIosAdd, IoMdMore } from 'react-icons/io';
 import { Popover, Whisper } from 'rsuite';
 import AddNew from '../../components/AddNew';
 import { FiMoreHorizontal } from 'react-icons/fi';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
@@ -38,6 +39,7 @@ const Tax = ({ mode }) => {
     }));
   }, [taxData]);
   const [loading, setLoading] = useState(true);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
   // Get data;
@@ -202,6 +204,15 @@ const Tax = ({ mode }) => {
       <main id='main'>
         <SideNav />
         <Tooltip id='taxTooltip' />
+				<ConfirmModal
+					openConfirm={openConfirm}
+					openStatus={(status) => { setOpenConfirm(status) }}
+					title={"Are you sure you want to delete the selected Taxes?"}
+					fun={() => {
+						removeData(true);
+						setOpenConfirm(false);
+					}}
+				/>
         <div className='content__body'>
           {/* top section */}
           <div
@@ -226,7 +237,10 @@ const Tax = ({ mode }) => {
                   />
                 </div>
                 <button
-                  onClick={() => removeData(false)}
+									onClick={() => {
+										if (selected.length === 0 || tableStatusData !== 'active') return;
+										setOpenConfirm(true);
+									}}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <MdDeleteOutline className='text-lg' />
                   Delete

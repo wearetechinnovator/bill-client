@@ -175,7 +175,6 @@ const PartyComponent = ({ mode, save, getRes }) => {
 
         {/* Second Column */}
         <div className='flex flex-col gap-2'>
-
           <div className='flex flex-col md:flex-row gap-2 items-center w-full'>
             <div className='w-full'>
               <p className='mb-1'>PAN</p>

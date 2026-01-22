@@ -13,6 +13,7 @@ import { Tooltip } from 'react-tooltip';
 import AddNew from '../../components/AddNew';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
@@ -45,6 +46,7 @@ const DeliveryChalan = () => {
     gst: "", billDate: ''
   })
   const [ascending, setAscending] = useState(true);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -92,7 +94,6 @@ const DeliveryChalan = () => {
 
 
   const searchTable = (e) => {
-
     const value = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('.list__table tbody tr');
 
@@ -219,7 +220,6 @@ const DeliveryChalan = () => {
 
 
   const getFilterData = async () => {
-
     if ([
       filterData.billDate, filterData.party, filterData.billNo, filterData.fromDate,
       filterData.toDate, filterData.gst, filterData.productName
@@ -266,6 +266,16 @@ const DeliveryChalan = () => {
       <main id='main'>
         <SideNav />
         <Tooltip id='deliverTooltip' />
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected parties?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
+        
         <div className='content__body'>
           {/* top section */}
           <div className={`add_new_compnent ${filterToggle ? 'h-[265px]' : 'h-[45px]'} `}>
@@ -294,7 +304,10 @@ const DeliveryChalan = () => {
                   Filter
                 </button>
                 <button
-                  onClick={() => removeData(false)}
+                  onClick={() => {
+                    if (selected.length === 0 || tableStatusData !== 'active') return;
+                    setOpenConfirm(true);
+                  }}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <Icons.DELETE className='text-lg' />
                   Delete

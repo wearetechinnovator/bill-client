@@ -13,6 +13,7 @@ import { Tooltip } from 'react-tooltip';
 import AddNew from '../../components/AddNew';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
@@ -44,6 +45,7 @@ const SalesReturn = () => {
     gst: "", billDate: ''
   })
   const [ascending, setAscending] = useState(true);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -75,7 +77,6 @@ const SalesReturn = () => {
     }
   }
   useEffect(() => {
-
     getData();
   }, [tableStatusData, dataLimit, activePage])
 
@@ -93,7 +94,6 @@ const SalesReturn = () => {
 
 
   const searchTable = (e) => {
-
     const value = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('.list__table tbody tr');
 
@@ -112,7 +112,6 @@ const SalesReturn = () => {
       }
     });
   }
-
 
   const selectAll = (e) => {
     if (e.target.checked) {
@@ -149,8 +148,6 @@ const SalesReturn = () => {
       downloadPdf(document)
     }
   }
-
-
 
   const removeData = async (trash) => {
     if (selected.length === 0 || tableStatusData !== 'active') {
@@ -223,7 +220,6 @@ const SalesReturn = () => {
 
 
   const getFilterData = async () => {
-
     if ([
       filterData.billDate, filterData.party, filterData.billNo, filterData.fromDate,
       filterData.toDate, filterData.gst, filterData.productName
@@ -270,6 +266,16 @@ const SalesReturn = () => {
       <main id='main'>
         <SideNav />
         <Tooltip id='salesReturnTooltip' />
+
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected Sales Return?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
         <div className='content__body'>
           {/* top section */}
           <div className={`add_new_compnent ${filterToggle ? 'h-[265px]' : 'h-[45px]'} `}>
@@ -298,7 +304,10 @@ const SalesReturn = () => {
                   Filter
                 </button>
                 <button
-                  onClick={() => removeData(false)}
+                  onClick={() => {
+                    if (selected.length === 0 || tableStatusData !== 'active') return;
+                    setOpenConfirm(true);
+                  }}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <Icons.DELETE className='text-lg' />
                   Delete

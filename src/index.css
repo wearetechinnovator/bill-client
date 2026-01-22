@@ -673,25 +673,32 @@ input[type="checkbox"]:checked::before {
   opacity: 1;
 }
 
-.party__data {
-  @apply border w-full p-4 rounded-md bg-white;
+.party__data.active{
+  @apply border-blue-300;
 }
-
-.party__data:hover {
-  /* border: 1px solid #003E32; */
-  box-shadow: 0px 0px 5px lightgrey;
+.party__data.active h6{
+  @apply text-blue-400;
+}
+.party__data.active h6 svg{
+  @apply text-blue-400;
+}
+.party__data {
+  @apply border w-full p-[9px] rounded-md bg-white cursor-pointer;
 }
 
 .party__data h6 {
-  font-weight: bold;
-  line-height: 25px !important;
+  font-weight: 500;
+  line-height: 20px !important;
   display: flex;
   align-items: center;
   gap: 10px;
+  color: gray;
+  font-size: 14px !important;
 }
 
 .party__data h6 svg {
-  font-size: 20px;
+  font-size: 18px;
+  color: gray;
 }
 
 .party__data p {
@@ -1117,7 +1124,7 @@ input {
   top: 69%;
   right: 3%;
   width: 37%;
-  height: 69%;
+  /* height: 69%; */
   animation: glow 20s linear infinite;
   filter: blur(65px);
   background-color: #d9d7e9;
@@ -1141,11 +1148,11 @@ input {
 }
 
 .dashboard-main-box .products-status td .active a {
-  color: #003E32;
+  color: #003E32 !important;
 }
 
 .dashboard-main-box .products-status td .active.red a {
-  color: #A51B1D;
+  color: #A51B1D !important;
 }
 
 .dashboard-main-box .products-status td .active.red {
@@ -1193,5 +1200,88 @@ input {
 
   .salary__slip__table tr td {
     @apply p-2 text-xs;
+  }
+}
+
+.payment__button {
+  @apply bg-blue-600 text-white px-2 py-1 border rounded border-blue-600 font-bold;
+  @apply hover:bg-blue-700;
+}
+
+.confirm__modal button {
+  width: 120px;
+  height: 30px;
+  border-radius: 3px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.confirm__modal button:hover {
+  background-color: #e7f5f3;
+}
+
+.confirm__modal button.cancel {
+  border: 1px solid #cfd0d3;
+}
+
+.confirm__modal button.yes {
+  border: 1px solid red;
+  color: red;
+  margin-left: 10px;
+}
+
+.add_account__section {
+  @apply w-full bg-gray-50 border-gray-200 p-2 rounded;
+}
+
+.add_account__section .add__button{
+  @apply border-blue-400 border bg-blue-50 rounded px-1 py-[2px] text-blue-500
+}
+
+.add_account__section .account__details__body{
+  @apply flex items-center gap-10 text-xs;
+}
+.add_account__section .acc__details__text{
+  @apply text-gray-500
+}
+.add_account__section  .account__details__top__bar{
+  @apply flex justify-between items-center mb-4;
+}
+.add_account__section  .account__details__top__bar .details__title{
+  @apply font-semibold text-[13px];
+}
+.add_account__section .change__remove__btns{
+  @apply flex items-center gap-4;
+}
+
+.add_account__section .change__remove__btns div{
+  @apply text-blue-500 cursor-pointer hover:underline
+}
+.add_account__section .change__remove__btns div:last-child{
+  @apply text-red-500
+}
+
+/* =================== */
+/* Invoice bill print */
+/* =================== */
+@media print {
+  body {
+    margin: 0;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #mainBill,
+  #mainBill * {
+    visibility: visible;
+  }
+
+  #mainBill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    /* width: 100%; */
   }
 }

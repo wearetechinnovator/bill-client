@@ -12,6 +12,8 @@ import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
 import AddNew from '../../components/AddNew';
 import { Icons } from '../../helper/icons';
+import ConfirmModal from '../../components/ConfirmModal';
+import Pagination from '../../components/Pagination';
 
 
 
@@ -38,6 +40,7 @@ const PaymentIn = () => {
   }, [billData]);
   const [loading, setLoading] = useState(true);
   const [ascending, setAscending] = useState(true);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
   // Get data;
@@ -213,6 +216,15 @@ const PaymentIn = () => {
       <main id='main'>
         <SideNav />
         <Tooltip id='payInTooltip' />
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected Payment?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
         <div className='content__body'>
           {/* top section */}
           <div
@@ -241,7 +253,10 @@ const PaymentIn = () => {
                   Filter
                 </button>
                 <button
-                  onClick={() => removeData(false)}
+                  onClick={() => {
+                    if (selected.length === 0 || tableStatusData !== 'active') return;
+                    setOpenConfirm(true);
+                  }}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <Icons.DELETE className='text-lg' />
                   Delete
@@ -350,33 +365,12 @@ const PaymentIn = () => {
                 <div className='paginate__parent'>
                   <p>Showing {billData.length} of {totalData} entries</p>
                   {/* ----- Paginatin ----- */}
-                  <div className='flex justify-end gap-2 pb-3'>
-                    {
-                      activePage > 1 ? <div
-                        onClick={() => setActivePage(activePage - 1)}
-                        className='border bg-blue-600 text-white w-[20px] h-[20px] grid place-items-center rounded cursor-pointer'>
-                        <Icons.PREV_PAGE_ARROW />
-                      </div> : null
-                    }
-                    {
-                      Array.from({ length: Math.ceil((totalData / dataLimit)) }).map((_, i) => {
-                        return <div
-                          onClick={() => setActivePage(i + 1)}
-                          className='border-blue-400 border w-[20px] h-[20px] text-center rounded cursor-pointer'
-                          style={activePage === i + 1 ? { border: "1px solid blue" } : {}}
-                        >
-                          {i + 1}
-                        </div>
-                      })
-                    }
-                    {
-                      (totalData / dataLimit) > activePage ? <div
-                        onClick={() => setActivePage(activePage + 1)}
-                        className='border bg-blue-600 text-white w-[20px] h-[20px] flex items-center justify-center rounded cursor-pointer'>
-                        <Icons.NEXT_PAGE_ARROW />
-                      </div> : null
-                    }
-                  </div>
+                  <Pagination
+                    activePage={activePage}
+                    totalData={totalData}
+                    dataLimit={dataLimit}
+                    setActivePage={setActivePage}
+                  />
                 </div>
                 {/* pagination end */}
               </div>

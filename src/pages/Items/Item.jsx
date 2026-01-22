@@ -12,6 +12,7 @@ import AddNew from '../../components/AddNew';
 import { Popover, Whisper } from 'rsuite';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 document.title = "Items"
@@ -47,6 +48,7 @@ const Item = ({ mode }) => {
       }
     });
   }, [itemData]);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -212,6 +214,15 @@ const Item = ({ mode }) => {
       <main id='main'>
         <SideNav />
         <Tooltip id='itemTooltip' />
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected Item?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
         <div className='content__body'>
           {/* top section */}
           <div
@@ -235,12 +246,11 @@ const Item = ({ mode }) => {
                     className='p-[6px]'
                   />
                 </div>
-                {/* <button className='bg-gray-100 border'>
-                  <MdFilterList className='text-xl' />
-                  Filter
-                </button> */}
                 <button
-                  onClick={() => removeData(false)}
+                  onClick={() => {
+                    if (selected.length === 0 || tableStatusData !== 'active') return;
+                    setOpenConfirm(true);
+                  }}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <Icons.DELETE className='text-lg' />
                   Delete
@@ -291,7 +301,9 @@ const Item = ({ mode }) => {
                   <thead className='bg-gray-100 list__table__head'>
                     <tr>
                       <th className='py-2 px-4 border-b w-[50px]'>
-                        <input type='checkbox' onChange={selectAll} checked={itemData.length > 0 && selected.length === itemData.length} />
+                        <input type='checkbox'
+                          onChange={selectAll}
+                          checked={itemData.length > 0 && selected.length === itemData.length} />
                       </th>
                       <td className='py-2 px-4 border-b '>Name</td>
                       <th className='py-2 px-4 border-b '>HSN</th>
@@ -314,7 +326,10 @@ const Item = ({ mode }) => {
 
                         return <tr key={i} onClick={() => navigate("/admin/item/details/" + data._id)} className='cursor-pointer hover:bg-gray-100'>
                           <td className='py-2 px-4 border-b max-w-[10px]'>
-                            <input type='checkbox' checked={selected.includes(data._id)} onChange={() => handleCheckboxChange(data._id)} />
+                            <input type='checkbox'
+                              checked={selected.includes(data._id)}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={() => handleCheckboxChange(data._id)} />
                           </td>
                           <td className='px-4 border-b'>
                             {data.title}

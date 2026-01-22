@@ -13,7 +13,7 @@ import { Popover, Whisper } from 'rsuite';
 
 
 
-
+document.title="Staff Attendance"
 const AttendanceDetails = () => {
     const userDetails = useSelector((store) => store.userDetail); //get use details from store
     const toast = useMyToaster();
@@ -386,9 +386,25 @@ const AttendanceDetails = () => {
                             >
                                 Details
                             </button>
+                            <button
+                                className={`tab__btn ${tab === 2 ? 'active__tab__btn' : ''}`}
+                                onClick={() => setTab(2)}
+                            >
+                                Payroll
+                            </button>
+                            <button
+                                className={`tab__btn ${tab === 3 ? 'active__tab__btn' : ''}`}
+                                onClick={() => setTab(3)}
+                            >
+                                Transactions
+                            </button>
                         </div>
 
                         <div className='flex items-center gap-2'>
+                            <button className='bg-blue-500 text-white px-2 py-1 rounded border-blue-600 border'>
+                                <Icons.RUPES className='inline ml-1'/>
+                                Make Payment
+                            </button>
                             <div className='relative'>
                                 <button
                                     onClick={() => downloadDateRef.current.showPicker()}
@@ -650,9 +666,11 @@ const AttendanceDetails = () => {
                                         <div>
                                             <p>Outstanding/Opening Balance</p>
                                             <span>{staffData.openingBalance || "--"}</span>
-                                            <span className='bg-gray-200 rounded px-1 ml-1 text-gray-500'>
-                                                {staffData.openingBalanceType}
-                                            </span>
+                                            {
+                                                staffData.openingBalance && <span className='bg-gray-200 rounded px-1 ml-1 text-gray-500'>
+                                                    {staffData.openingBalanceType}
+                                                </span>
+                                            }
                                         </div>
                                     </div>
                                 </div>

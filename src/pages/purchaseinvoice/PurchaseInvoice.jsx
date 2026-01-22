@@ -25,6 +25,7 @@ import { LuSearch } from 'react-icons/lu';
 import { FiMoreHorizontal } from 'react-icons/fi';
 import { RiArrowDropUpFill } from "react-icons/ri";
 import Pagination from '../../components/Pagination';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
@@ -59,6 +60,7 @@ const PurchaseInvoice = () => {
 		gst: "", billDate: ''
 	});
 	const [ascending, setAscending] = useState(true);
+	const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -234,7 +236,6 @@ const PurchaseInvoice = () => {
 
 
 	const getFilterData = async () => {
-
 		if ([
 			filterData.billDate, filterData.party, filterData.billNo, filterData.fromDate,
 			filterData.toDate, filterData.gst, filterData.productName
@@ -281,6 +282,15 @@ const PurchaseInvoice = () => {
 			<main id='main'>
 				<SideNav />
 				<Tooltip id='purchaseIncoiceTooltip' />
+				<ConfirmModal
+					openConfirm={openConfirm}
+					openStatus={(status) => { setOpenConfirm(status) }}
+					title={"Are you sure you want to delete the selected Purchase Invoice?"}
+					fun={() => {
+						removeData(true);
+						setOpenConfirm(false);
+					}}
+				/>
 				<div className='content__body'>
 					{/* top section */}
 					<div
@@ -328,7 +338,10 @@ const PurchaseInvoice = () => {
 									Filter
 								</button>
 								<button
-									onClick={() => removeData(false)}
+									onClick={() => {
+										if (selected.length === 0 || tableStatusData !== 'active') return;
+										setOpenConfirm(true);
+									}}
 									className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
 									<MdDeleteOutline className='text-lg' />
 									Delete

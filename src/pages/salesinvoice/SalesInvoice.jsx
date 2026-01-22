@@ -13,6 +13,7 @@ import { Popover, Whisper } from 'rsuite';
 import AddNew from '../../components/AddNew';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
@@ -48,6 +49,7 @@ const SalesInvoice = () => {
   const [ascending, setAscending] = useState(true);
   const [totalPaymentIn, setTotalPaymentIn] = useState(0);
   const [totalDuePayment, setTotalDuePayment] = useState(0);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -95,7 +97,6 @@ const SalesInvoice = () => {
 
 
   const searchTable = (e) => {
-
     const value = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('.list__table tbody tr');
 
@@ -224,7 +225,6 @@ const SalesInvoice = () => {
 
 
   const getFilterData = async () => {
-
     if ([
       filterData.billDate, filterData.party, filterData.billNo, filterData.fromDate,
       filterData.toDate, filterData.gst, filterData.productName
@@ -270,6 +270,15 @@ const SalesInvoice = () => {
       <main id='main'>
         <SideNav />
         <Tooltip id='salesTooltip' />
+        <ConfirmModal
+          openConfirm={openConfirm}
+          openStatus={(status) => { setOpenConfirm(status) }}
+          title={"Are you sure you want to delete the selected invoices?"}
+          fun={() => {
+            removeData(true);
+            setOpenConfirm(false);
+          }}
+        />
         <div className='content__body'>
           {/* top section */}
           <div
@@ -317,7 +326,10 @@ const SalesInvoice = () => {
                   Filter
                 </button>
                 <button
-                  onClick={() => removeData(false)}
+                  onClick={() => {
+                    if (selected.length === 0 || tableStatusData !== 'active') return;
+                    setOpenConfirm(true);
+                  }}
                   className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                   <Icons.DELETE className='text-lg' />
                   Delete

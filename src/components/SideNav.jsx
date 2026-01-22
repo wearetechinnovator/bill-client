@@ -387,7 +387,7 @@ const SideNav = () => {
           </ul>
         </div>
       </div>
-      <Tooltip id='sideBarItemToolTip' />
+      <Tooltip id='sideBarItemToolTip' className='z-50'/>
     </aside>
   );
 }
