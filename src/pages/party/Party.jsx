@@ -17,20 +17,20 @@ import ConfirmModal from '../../components/ConfirmModal';
 
 
 document.title = "Party";
-
 const TOTAL_PARTY = 'total_party';
 const TOTAL_PAY = 'total_pay';
 const TOTAL_COLLECT = 'total_collect';
 const Party = () => {
+	const token = Cookies.get("token");
+	const navigate = useNavigate();
 	const toast = useMyToaster();
+	const tableRef = useRef(null);
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
 	const [activePage, setActivePage] = useState(1);
 	const [dataLimit, setDataLimit] = useState(10);
 	const [totalData, setTotalData] = useState()
 	const [selected, setSelected] = useState([]);
-	const navigate = useNavigate();
 	const [partyData, setPartyData] = useState([]);
-	const tableRef = useRef(null);
 	const [tableStatusData, setTableStatusData] = useState('active');
 	const exportData = useMemo(() => {
 		return partyData && partyData.map((p) => ({
@@ -44,7 +44,6 @@ const Party = () => {
 	const [totalPay, setTotalPay] = useState(null);
 	const [openConfirm, setOpenConfirm] = useState(false);
 	const [selectedTab, setSelectedTab] = useState(TOTAL_PARTY);
-	const token = Cookies.get("token");
 
 
 
