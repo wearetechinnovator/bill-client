@@ -15,7 +15,6 @@ import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
 
 
-document.title = "Items"
 const Item = ({ mode }) => {
   const toast = useMyToaster();
   const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -83,6 +82,7 @@ const Item = ({ mode }) => {
     getCategory();
   }, [tableStatusData, dataLimit, activePage])
 
+
   const searchTable = (e) => {
     const value = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('.list__table tbody tr');
@@ -103,6 +103,7 @@ const Item = ({ mode }) => {
     });
   }
 
+
   const selectAll = (e) => {
     if (e.target.checked) {
       setSelected(itemData.map((item, _) => item._id));
@@ -110,6 +111,7 @@ const Item = ({ mode }) => {
       setSelected([]);
     }
   };
+
 
   const handleCheckboxChange = (id) => {
     setSelected((prevSelected) => {
@@ -173,6 +175,7 @@ const Item = ({ mode }) => {
     }
   }
 
+  
   const restoreData = async () => {
     if (selected.length === 0 || tableStatusData !== "trash") {
       return;

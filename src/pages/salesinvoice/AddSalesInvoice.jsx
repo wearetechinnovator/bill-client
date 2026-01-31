@@ -8,7 +8,6 @@ import useBillPrefix from '../../hooks/useBillPrefix';
 import Cookies from 'js-cookie';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import swal from 'sweetalert';
 import AddPartyModal from '../../components/AddPartyModal';
 import AddItemModal from '../../components/AddItemModal';
 import MySelect2 from '../../components/MySelect2';
@@ -18,7 +17,7 @@ import SelectAccountModal from '../../components/SelectAccountModal';
 
 
 
-document.title = "Sales Invoice";
+
 const SalesInvoice = ({ mode }) => {
 	const toast = useMyToaster();
 	const { id } = useParams()
@@ -40,9 +39,9 @@ const SalesInvoice = ({ mode }) => {
 	const [additionalRows, setAdditionalRow] = useState([additionalRowSet]); //{ additionalRowsItem: 1 }
 	const [formData, setFormData] = useState({
 		party: '', salesInvoiceNumber: '', invoiceDate: new Date().toISOString().split('T')[0], DueDate: '',
-		items: ItemRows, additionalCharge: additionalRows, note: '', terms: '',
-		discountType: '', discountAmount: '', discountPercentage: '', paymentStatus: '0',
-		paymentAccount: '', finalAmount: '', paymentAmount: '',
+		items: ItemRows, additionalCharge: additionalRows, note: '', terms: '', discountType: '',
+		discountAmount: '', discountPercentage: '', paymentStatus: '0', paymentAccount: '', finalAmount: '',
+		paymentAmount: '', autoRoundOff: '', roundOffType: '0', roundOffAmount: ''
 	})
 	const location = useLocation();
 	const fromWhichBill = location.state?.fromWhichBill || null;
@@ -155,7 +154,6 @@ const SalesInvoice = ({ mode }) => {
 	}, [getBillPrefix?.length, mode]);
 
 
-
 	// Get all data from api
 	useState(() => {
 		const apiData = async () => {
@@ -191,7 +189,6 @@ const SalesInvoice = ({ mode }) => {
 		apiData();
 
 	}, [])
-
 
 
 	// When `discount type is before` and apply discount this useEffect run;
@@ -263,13 +260,19 @@ const SalesInvoice = ({ mode }) => {
 	}
 
 
+	// Calculate Final Amount;
 	useEffect(() => {
-		const finalAmount = calculateFinalAmount(additionalRows, formData, subTotal);
+		const finalAmount = calculateFinalAmount(
+			additionalRows, formData, subTotal, 
+			formData.autoRoundOff,
+			formData.roundOffAmount, 
+			formData.roundOffType
+		);
 		setFormData((prevData) => ({
 			...prevData,
 			finalAmount
 		}));
-	}, [ItemRows, additionalRows]);
+	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType]);
 
 
 
@@ -967,11 +970,51 @@ const SalesInvoice = ({ mode }) => {
 										</tfoot>
 									</table>
 								</div>
+
+								{/* Round Off Section */}
+								<div className='round__off__section'>
+									<div className='check__box__parent'>
+										<input type="checkbox"
+											onChange={(e) => setFormData({
+												...formData, autoRoundOff: e.target.checked
+											})}
+											checked={formData.autoRoundOff}
+										/>
+										<p>Auto Round Off</p>
+									</div>
+
+									{!formData.autoRoundOff && (
+										<div className='round__of__input__parent'>
+											<button
+												onClick={() => {
+													setFormData({ ...formData, roundOffType: '1' })
+												}}
+												className={`roundoff__btn ${formData.roundOffType === "1" ? 'active' : ''}`}
+											>
+												Add <span>(+)</span>
+											</button>
+											<Icons.RUPES/>
+											<input type="text"
+												value={formData.roundOffAmount}
+												onChange={(e) => setFormData({ ...formData, roundOffAmount: e.target.value })}
+											/>
+											<button
+												onClick={() => {
+													setFormData({ ...formData, roundOffType: '0' })
+												}}
+												className={`roundoff__btn ${formData.roundOffType === "0" ? 'active' : ''}`}
+											>
+												Reduce <span>(-)</span>
+											</button>
+										</div>
+									)}
+								</div>
+
 								<p className='font-bold mt-4 mb-2'>Final Amount</p>
 								<input type="text" name="final_amount"
 									className='bg-gray-100 custom-disabled w-full'
 									disabled
-									value={calculateFinalAmount(additionalRows, formData, subTotal)}
+									value={formData.finalAmount}
 								/>
 							</div>
 						</div>

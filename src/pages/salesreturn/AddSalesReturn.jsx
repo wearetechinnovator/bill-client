@@ -17,7 +17,6 @@ import useFormHandle from '../../hooks/useFormHandle';
 
 
 
-document.title = "Sales Return";
 const SalesReturn = ({ mode }) => {
   const toast = useMyToaster();
   const { id } = useParams()

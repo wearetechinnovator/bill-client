@@ -16,7 +16,7 @@ const AddAccount = ({ mode }) => {
     const { id } = useParams();
     const [from, setForm] = useState({
         title: '', accountName: '', accountNumber: '', ifscCode: '', bankName: '', openingBalance: '',
-        type: '', details: '', holderName:''
+        type: '', details: '', holderName: ''
     })
     const navigate = useNavigate()
 
@@ -91,7 +91,7 @@ const AddAccount = ({ mode }) => {
     const clearData = (e) => {
         setForm({
             title: '', accountName: '', accountNumber: '', ifscCode: '',
-            bankName: '', openingBalance: '', type: '', holderName:''
+            bankName: '', openingBalance: '', type: '', holderName: ''
         })
     }
 
@@ -102,55 +102,75 @@ const AddAccount = ({ mode }) => {
                 <SideNav />
                 <div className='content__body'>
                     <div className='content__body__main bg-white '>
-                        <div className='flex justify-between gap-6  flex-col lg:flex-row'>
+                        <div className='flex justify-between flex-col lg:flex-row'>
                             <div className='w-full'>
                                 <div className='p-2'>
-                                    <p className='pb-1'>Title</p>
-                                    <input type='text' onChange={(e) => setForm({ ...from, title: e.target.value })} value={from.title} />
+                                    <p>Title</p>
+                                    <input type='text'
+                                        onChange={(e) => setForm({ ...from, title: e.target.value })}
+                                        value={from.title}
+                                    />
                                 </div>
                                 <div className='p-2'>
-                                    <p className='pb-1'>Account Holder Name (If Bank)</p>
-                                    <input type='text' onChange={(e) => setForm({ ...from, holderName: e.target.value })} value={from.holderName} />
+                                    <p>Account Holder Name (If Bank)</p>
+                                    <input type='text'
+                                        onChange={(e) => setForm({ ...from, holderName: e.target.value })}
+                                        value={from.holderName}
+                                    />
                                 </div>
                                 <div className='p-2'>
-                                    <p className='pb-1'>Account Number (If Bank)</p>
-                                    <input type="number" onChange={(e) => setForm({ ...from, accountNumber: e.target.value })} value={from.accountNumber} />
+                                    <p>Account Number (If Bank)</p>
+                                    <input type="number"
+                                        onChange={(e) => setForm({ ...from, accountNumber: e.target.value })}
+                                        value={from.accountNumber}
+                                    />
                                 </div>
                             </div>
                             <div className='w-full'>
                                 <div className='p-2'>
-                                    <p className='pb-1'>IFSC Code (If Bank)</p>
-                                    <input type='text' onChange={(e) => setForm({ ...from, ifscCode: e.target.value })} value={from.ifscCode} />
+                                    <p>IFSC Code (If Bank)</p>
+                                    <input type='text'
+                                        onChange={(e) => setForm({ ...from, ifscCode: e.target.value })}
+                                        value={from.ifscCode}
+                                    />
                                 </div>
                                 <div className='p-2'>
-                                    <p className='pb-1'>Bank Name (If Bank)</p>
-                                    <input type='text' onChange={(e) => setForm({ ...from, bankName: e.target.value })} value={from.bankName} />
+                                    <p>Bank Name (If Bank)</p>
+                                    <input type='text'
+                                        onChange={(e) => setForm({ ...from, bankName: e.target.value })}
+                                        value={from.bankName}
+                                    />
                                 </div>
                                 <div className='p-2'>
-                                    <p className='pb-1'>Opening Balance</p>
-                                    <input type="text" onChange={(e) => setForm({ ...from, openingBalance: e.target.value })} value={from.openingBalance} />
+                                    <p>Opening Balance</p>
+                                    <input type="text"
+                                        onChange={(e) => setForm({ ...from, openingBalance: e.target.value })}
+                                        value={from.openingBalance}
+                                    />
                                 </div>
                                 <div className='ml-2 pt-2 '>
-                                    <p className='pb-2'>Type</p>
-                                    <select onChange={(e) => setForm({ ...from, type: e.target.value })} value={from.type} >
-                                        <option value={""}>
-                                            --Select--
-                                        </option>
+                                    <p>Type</p>
+                                    <select
+                                        onChange={(e) => setForm({ ...from, type: e.target.value })}
+                                        value={from.type}
+                                    >
+                                        <option value={""}>Select</option>
                                         <option value="cash">Cash</option>
                                         <option value="bank">Bank</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
-                        <div className='flex justify-center pt-9 mb-6'>
+                        <div className='w-full flex justify-center gap-3 my-3 mt-5'>
                             <button
-                                className='p-2 flex rounded-sm bg-green-500 text-white items-center gap-2'
+                                className='add-bill-btn'
                                 onClick={saveData}>
                                 <FaRegCheckCircle />
                                 {mode ? "Update" : "Save"}
                             </button>
 
-                            <button className='p-2 flex rounded-sm ml-4 bg-blue-500 text-white items-center gap-2'
+                            <button
+                                className='reset-bill-btn'
                                 onClick={clearData}>
                                 <LuRefreshCcw />
                                 Reset

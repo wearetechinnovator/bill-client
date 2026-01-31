@@ -18,8 +18,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 
 
 
-// QuotationList page
-document.title = "Delivery Chalan";
+
 const DeliveryChalan = () => {
   const toast = useMyToaster();
   const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();

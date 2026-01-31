@@ -30,8 +30,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 
 
 
-// Proforma page
-document.title = "Purchase Order";
+
 const PO = () => {
   const toast = useMyToaster();
   const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -161,6 +160,7 @@ const PO = () => {
     }
   }
 
+
   const removeData = async (trash) => {
     if (selected.length === 0 || tableStatusData !== 'active') {
       return;
@@ -195,6 +195,7 @@ const PO = () => {
     }
   }
 
+  
   const restoreData = async () => {
     if (selected.length === 0 || tableStatusData !== "trash") {
       return;

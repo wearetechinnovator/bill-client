@@ -46,20 +46,22 @@ const useFormHandle = () => {
         const data = await getApiData("item");
         setItems([...data.data]);
 
-        let selectedItem = data.data.filter(i => i._id === value);
-        if (selectedItem.length >= 0) {
-            let item = [...ItemRows];
-            let currentUnit = [];
-            let taxId = selectedItem[0]?.category?.tax;
+        const selectedItem = data.data.find(i => i._id === value);
+        if (selectedItem) {
+            const item = [...ItemRows];
+            const currentUnit = [];
+            const taxId = selectedItem.category?.tax || selectedItem.tax;
             const getTax = tax.filter((t, _) => t._id === taxId)[0];
 
-            item[index].itemName = selectedItem[0]?.title;
-            item[index].itemId = selectedItem[0]?._id;
-            item[index].hsn = selectedItem[0]?.category?.hsn;
-            item[index].unit = selectedItem[0]?.unit;
-            item[index].selectedUnit = selectedItem[0]?.unit[0]?.unit
+            item[index].itemName = selectedItem.title;
+            item[index].hsn = selectedItem.category?.hsn || selectedItem.hsn;
+            // item[index].unit = selectedItem?.unit;
+            item[index].selectedUnit = selectedItem.unit[0]?.unit
+            item[index].price = selectedItem.salePrice;
             item[index].tax = getTax?.gst ?? 0.0;
-            selectedItem[0]?.unit.forEach((u, _) => {
+            item[index].itemId = selectedItem?._id;
+
+            selectedItem?.unit.forEach((u, _) => {
                 currentUnit.push(u.unit);
             })
             item[index].unit = [...currentUnit];
@@ -71,6 +73,7 @@ const useFormHandle = () => {
 
     // ===================================[Delete item and additional row] ==============================;
     const deleteItem = (which, ItemId, setItemRows, setFormData, setAdditionalRow) => {
+        // Item Row Delete
         if (which === 1) {
             setItemRows((prevItemRows) => {
                 const updatedItems = prevItemRows.filter((_, index) => index !== ItemId);
@@ -83,7 +86,9 @@ const useFormHandle = () => {
 
                 return updatedItems;
             });
-        } else {
+        }
+        // Additional Row Delete
+        else {
             setAdditionalRow((prevAdditionalRows) => {
                 const updatedAdditionalRows = prevAdditionalRows.filter((_, index) => index !== ItemId);
 
@@ -126,25 +131,40 @@ const useFormHandle = () => {
 
 
     //======================================= [Calculate Final Amount] ===================================='
-    const calculateFinalAmount = (additionalRows, formData, subTotal) => {
+    const calculateFinalAmount = (additionalRows, formData, subTotal, autoRoundOff = false, roundOffAmount = 0, roundOffType = '0') => {
         let totalParticular = 0;
         let total = 0;
 
         // Total additionla amount and store
         additionalRows.forEach((d, _) => {
             if (d.amount) {
-                totalParticular = totalParticular + parseFloat(d.amount);
+                totalParticular = totalParticular + Number(d.amount);
             }
         })
 
         if (formData.discountType === "no" || formData.discountType === "" || formData.discountType === "before") {
-            total = subTotal()('amount');
+            total = Number(subTotal()('amount'));
         }
         else if (formData.discountType === "after") {
             total = (subTotal()('amount') - formData.discountAmount).toFixed(2);
         }
 
-        return !isNaN(totalParticular) ? (parseFloat(totalParticular) + parseFloat(total)).toFixed(2) : total;
+        // return !isNaN(totalParticular) ? (totalParticular) + total).toFixed(2) : total;
+
+        if (autoRoundOff) {
+            return !isNaN(totalParticular) ? (totalParticular + total).toFixed(0) : total;
+        } else {
+            let final = !isNaN(totalParticular) ? (totalParticular + total).toFixed(2) : total;
+            if (roundOffAmount) {
+                if(roundOffAmount === ".") return;
+                
+                final = roundOffType === "0" ?
+                    Number(final) - Number(roundOffAmount) :
+                    Number(final) + Number(roundOffAmount);
+
+            }
+            return final
+        }
 
     }
 

@@ -18,8 +18,6 @@ import ConfirmModal from '../../components/ConfirmModal';
 
 
 
-// Proforma page
-document.title = "Sales Return";
 const SalesReturn = () => {
   const toast = useMyToaster();
   const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();

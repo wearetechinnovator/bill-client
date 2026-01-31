@@ -22,7 +22,6 @@ import useFormHandle from '../../hooks/useFormHandle';
 
 
 
-document.title = "Purchase Invoice";
 const PurchaseInvoice = ({ mode }) => {
   const toast = useMyToaster();
   const { id } = useParams()

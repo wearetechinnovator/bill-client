@@ -26,7 +26,7 @@ import SelectAccountModal from '../../components/SelectAccountModal';
 
 
 
-document.title = "Purchase Invoice";
+
 const PurchaseInvoice = ({ mode }) => {
 	const toast = useMyToaster();
 	const { id } = useParams()

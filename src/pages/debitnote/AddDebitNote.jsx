@@ -15,10 +15,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toggle } from '../../store/partyModalSlice';
 import { toggle as itemToggle } from '../../store/itemModalSlice';
 import swal from 'sweetalert';
-import { HiOutlineDocumentDuplicate } from 'react-icons/hi';
 import AddPartyModal from '../../components/AddPartyModal';
 import AddItemModal from '../../components/AddItemModal';
-import { MdCurrencyRupee, MdOutlineAdd } from "react-icons/md";
+import { MdCurrencyRupee } from "react-icons/md";
 import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
@@ -26,7 +25,7 @@ import SelectAccountModal from '../../components/SelectAccountModal';
 
 
 
-document.title = "Debit Note";
+
 const DebitNote = ({ mode }) => {
 	const toast = useMyToaster();
 	const { id } = useParams()

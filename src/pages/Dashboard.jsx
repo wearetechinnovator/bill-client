@@ -20,7 +20,6 @@ const data = [
   { name: "Group D", value: 200, fill: "#FF8042" }
 ];
 
-document.title = "Dashboard";
 const Dashboard = () => {
   const [accountBalanceData, setAccountBalanceData] = useState([])
   const [recentPurchase, setRecentPurchase] = useState([]);

@@ -580,6 +580,13 @@ select {
 .list__table tbody tr {
   border: 1px solid #efefef !important;
 }
+.list__table tbody tr td{
+  border: 1px solid #efefef !important;
+  @apply px-2;
+}
+.list__table thead tr th{
+  @apply px-2
+}
 
 .list__table__head tr th:first-child {
   @apply w-[50px]
@@ -674,7 +681,7 @@ input[type="checkbox"]:checked::before {
 }
 
 .party__data.active{
-  @apply border-blue-300;
+  @apply border-blue-300 bg-blue-50;
 }
 .party__data.active h6{
   @apply text-blue-400;
@@ -691,9 +698,9 @@ input[type="checkbox"]:checked::before {
   line-height: 20px !important;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
   color: gray;
-  font-size: 14px !important;
+  font-size: 13px !important;
 }
 
 .party__data h6 svg {
@@ -702,12 +709,11 @@ input[type="checkbox"]:checked::before {
 }
 
 .party__data p {
-  margin-left: 28px;
   margin-top: 7px;
   display: flex;
   align-items: center;
   gap: 2px;
-  font-size: 15px;
+  font-size: 17px;
 }
 
 .custom-disabled:disabled {
@@ -874,10 +880,20 @@ input[type="checkbox"]:checked::before {
 }
 
 .badge {
-  padding: 1px 5px;
-  border-radius: 10px;
-  font-size: 10px;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 11px;
   color: white;
+}
+/* px-2 text-white rounded-lg text-[11px] font-bold */
+.red-badge{
+  @apply bg-red-100 text-red-400;
+}
+.green-badge{
+  @apply bg-green-100 text-green-600;
+}
+.yellow-badge{
+  @apply bg-yellow-50 text-yellow-600;
 }
 
 .item__table {
@@ -1260,6 +1276,30 @@ input {
 .add_account__section .change__remove__btns div:last-child{
   @apply text-red-500
 }
+
+
+.round__off__section{
+  @apply flex justify-between items-center w-full mt-4 h-[25px];
+}
+.round__off__section .check__box__parent{
+  @apply flex items-center gap-1;
+}
+.roundoff__btn{
+  @apply flex items-center text-[10px] p-[3px] bg-gray-100;
+}
+.roundoff__btn.active{
+  @apply bg-blue-200 text-blue-700;
+}
+.round__of__input__parent{
+  @apply flex items-center text-sm border rounded;
+}
+.round__of__input__parent svg{
+  @apply ml-[2px] text-[13px];
+}
+.round__of__input__parent input{
+  @apply border-none rounded-none text-[13px] w-[60px];
+}
+
 
 /* =================== */
 /* Invoice bill print */

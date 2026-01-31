@@ -18,8 +18,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 
 
 
-// Proforma page
-document.title = "Credit Note";
+
 const CreditNote = () => {
   const toast = useMyToaster();
   const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();

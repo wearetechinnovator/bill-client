@@ -23,7 +23,7 @@ import useFormHandle from '../../hooks/useFormHandle';
 
 
 
-document.title = "Purchase Order";
+
 const PO = ({ mode }) => {
   const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
   const getItemModalState = useSelector((store) => store.itemModalSlice.show);

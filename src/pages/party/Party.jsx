@@ -16,10 +16,13 @@ import ConfirmModal from '../../components/ConfirmModal';
 
 
 
-document.title = "Party";
 const TOTAL_PARTY = 'total_party';
 const TOTAL_PAY = 'total_pay';
 const TOTAL_COLLECT = 'total_collect';
+const CUSTOMER = 'customer';
+const SUPPLIER = 'supplier';
+const BOTHPARTY = 'both';
+
 const Party = () => {
 	const token = Cookies.get("token");
 	const navigate = useNavigate();
@@ -32,12 +35,17 @@ const Party = () => {
 	const [selected, setSelected] = useState([]);
 	const [partyData, setPartyData] = useState([]);
 	const [tableStatusData, setTableStatusData] = useState('active');
+	const [partyBalance, setPartyBalance] = useState([]);
 	const exportData = useMemo(() => {
-		return partyData && partyData.map((p) => ({
-			"Name": p.name,
-			"Type": p.type,
-			"Opening Balance": p.openingBalance,
-		}));
+		return partyData && partyData.map((p) => {
+			const balance = partyBalance?.find((pb, _) => pb.partyId.toString() === p._id.toString());
+			return {
+				"Name": p.name,
+				"Mobile Number": p.contactNumber,
+				"Party Type": p.type,
+				"Balance": balance?.balance,
+			}
+		});
 	}, [partyData]);
 	const [loading, setLoading] = useState(true);
 	const [totalCollection, setTotalCollection] = useState(null);
@@ -47,7 +55,7 @@ const Party = () => {
 
 
 
-	// Get data;
+	// Get Party data;
 	useEffect(() => {
 		(async () => {
 			try {
@@ -67,57 +75,76 @@ const Party = () => {
 				const res = await req.json();
 
 				if (selectedTab === TOTAL_COLLECT) {
-					const filterData = res.data?.filter((d, _) => d.type === "customer");
-					setTotalData(filterData.length)
-					setPartyData([...filterData]);
+					const party = res.data?.reduce((acc, i) => {
+						const getBalance = partyBalance.find((pb, _) => pb.partyId === i._id);
+						if (getBalance.balance > 0 && i.type === CUSTOMER) {
+							acc.push(i);
+						}
+
+						return acc;
+					}, [])
+					setPartyData([...party]);
 				}
 				else if (selectedTab === TOTAL_PAY) {
-					const filterData = res.data?.filter((d, _) => d.type === "supplier");
-					setTotalData(filterData.length)
-					setPartyData([...filterData]);
-				} else {
+					const party = res.data?.reduce((acc, i) => {
+						const getBalance = partyBalance.find((pb, _) => pb.partyId === i._id);
+						if (getBalance.balance > 0 && i.type === SUPPLIER) {
+							acc.push(i);
+						}
+
+						return acc;
+					}, [])
+					setPartyData([...party]);
+				}
+				else {
 					setTotalData(res.totalData)
 					setPartyData([...res.data]);
 				}
 
 			} catch (error) {
 				console.log(error)
-			} finally {
-				setLoading(false);
 			}
 		})()
 	}, [tableStatusData, dataLimit, activePage, selectedTab]);
 
 
+	// Get Party Balance & [Set `Total Pay` and `Total Collect`]
 	useEffect(() => {
-		const getTotalCollectAndPay = async (whichType) => {
+		setLoading(true);
+		(async () => {
 			try {
-				const url = process.env.REACT_APP_API_URL + `/${whichType}/get`;
+				const url = process.env.REACT_APP_API_URL + `/party/get-party-balance`;
 				const req = await fetch(url, {
 					method: "POST",
 					headers: {
 						"Content-Type": 'application/json'
 					},
-					body: JSON.stringify({ token, totalPayment: true })
+					body: JSON.stringify({ token })
 				});
 				const res = await req.json();
-
 				if (req.status === 200) {
-					if (whichType === "paymentin") {
-						setTotalCollection(res.totalAmount);
-					} else {
-						setTotalPay(res.totalAmount);
-					}
+					setPartyBalance(res.data);
+
+					const { totalCollect, totalPayment } = res.data.reduce((acc, i) => {
+						if (i.type === CUSTOMER) {
+							acc.totalCollect += Number(i.balance);
+						}
+						else if (i.type === SUPPLIER) {
+							acc.totalPayment += Number(i.balance);
+						}
+						return acc;
+					}, { totalCollect: 0, totalPayment: 0 });
+
+					setTotalCollection((totalCollect).toFixed(2));
+					setTotalPay((totalPayment).toFixed(2));
 				}
 
-			} catch (error) {
-				return toast("Can't get total collection", 'error')
+			} catch (err) {
+				return toast("Party Balance not get", "error");
+			} finally {
+				setLoading(false);
 			}
-
-		}
-
-		getTotalCollectAndPay("paymentin");
-		getTotalCollectAndPay("paymentout");
+		})()
 	}, [])
 
 
@@ -251,7 +278,7 @@ const Party = () => {
 
 	return (
 		<>
-			<Nav title={"Party"} />
+			<Nav title={"Parties"} />
 			<main id='main' >
 				<SideNav />
 				<Tooltip id='partyTooltip' />
@@ -327,9 +354,6 @@ const Party = () => {
 								</div>
 							</div>
 						</div>
-
-						<div id='party'>
-						</div>
 					</div>
 					{
 						!loading ? partyData.length > 0 ? <div className='content__body__main'>
@@ -362,35 +386,44 @@ const Party = () => {
 								<table className='min-w-full bg-white' id='listOfPartys' ref={tableRef}>
 									<thead className='list__table__head'>
 										<tr>
-											<th className='py-2 px-4 w-[50px]'>
-												<input type='checkbox' onChange={selectAll} checked={partyData.length > 0 && selected.length === partyData.length} />
+											<th className='py-2 w-[50px]'>
+												<input
+													type='checkbox'
+													onChange={selectAll}
+													checked={partyData.length > 0 && selected.length === partyData.length}
+												/>
 											</th>
-											<td className='py-2 px-4'>Name</td>
-											<td className='py-2 px-4'>Phone</td>
-											<td className='py-2 px-4'>Type</td>
-											<td className='py-2 px-4'>Balance</td>
-											<td className='py-2 px-4 w-[100px]'>Action</td>
+											<th className='py-2' align='left'>Name</th>
+											<th className='py-2' align='left'>Mobile Number</th>
+											<th className='py-2' align='left'>Party Type</th>
+											<th className='py-2' align='left'>Balance</th>
+											<th className='py-2 w-[100px]'>Action</th>
 										</tr>
 									</thead>
 									<tbody>
 										{
 											partyData.map((data, i) => {
+												const balance = partyBalance?.find((p, _) => p.partyId.toString() === data._id.toString());
+
 												return <tr key={i} onClick={() => navigate("/admin/party/details/" + data._id)} className='cursor-pointer hover:bg-gray-100'>
-													<td className='py-2 px-4'>
+													<td className='py-2' align='center'>
 														<input type='checkbox'
 															onClick={(e) => e.stopPropagation()}
 															checked={selected.includes(data._id)}
 															onChange={() => handleCheckboxChange(data._id)}
 														/>
 													</td>
-													<td className='px-4'>{data.name}</td>
-													<td className='px-4'>{data.contactNumber}</td>
-													<td className='px-4'>
-														<span className='customer_badge'>
+													<td>{data.name}</td>
+													<td>{data.contactNumber}</td>
+													<td>
+														<span className='badge green-badge capitalize'>
 															{data.type}
 														</span>
 													</td>
-													<td className='px-4'>{data.openingBalance}</td>
+													<td className='px-4'>
+														<Icons.RUPES className='inline' />
+														{balance.balance}
+													</td>
 													<td className='px-4'>
 														<Whisper
 															onClick={(e) => e.stopPropagation()}
@@ -442,4 +475,3 @@ const Party = () => {
 }
 
 export default Party;
-

@@ -17,7 +17,7 @@ import useFormHandle from '../../hooks/useFormHandle';
 
 
 
-document.title = "Credit Note";
+
 const CreditNote = ({ mode }) => {
   const toast = useMyToaster();
   const { id } = useParams()

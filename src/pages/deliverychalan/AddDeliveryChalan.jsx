@@ -18,7 +18,7 @@ import SelectAccountModal from '../../components/SelectAccountModal';
 
 
 
-document.title = "Delivery Chalan";
+
 const DeliveryChalan = ({ mode }) => {
 	const toast = useMyToaster();
 	const { id } = useParams()

@@ -20,7 +20,6 @@ import SelectAccountModal from '../../components/SelectAccountModal';
 
 
 
-document.title = "Proforma";
 const Proforma = ({ mode }) => {
 	const toast = useMyToaster();
 	const { id } = useParams()

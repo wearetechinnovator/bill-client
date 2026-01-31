@@ -38,6 +38,7 @@ import { BiSolidCategoryAlt } from "react-icons/bi";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaRegEye } from "react-icons/fa";
 import { MdDownload } from "react-icons/md";
+import { IoArrowBack } from "react-icons/io5";
 
 
 
@@ -85,6 +86,7 @@ export const Icons = {
   CATEGORY: BiSolidCategoryAlt,
   SETTING: IoSettingsOutline,
   EYE: FaRegEye,
-  DOWNLOAD: MdDownload
+  DOWNLOAD: MdDownload,
+  BACK: IoArrowBack
 };
 
