@@ -45,7 +45,7 @@ const Quotation = ({ mode }) => {
 	const [formData, setFormData] = useState({
 		party: '', quotationNumber: '', estimateDate: new Date().toISOString().split('T')[0], validDate: '',
 		items: ItemRows, additionalCharge: additionalRows, note: '', terms: '', discountType: '',
-		discountAmount: '', discountPercentage: '', finalAmount: '', autoRoundOff: '', roundOffType: '0',
+		discountAmount: '', discountPercentage: '', finalAmount: '', autoRoundOff: false, roundOffType: '0',
 		roundOffAmount: ''
 	})
 
@@ -97,14 +97,13 @@ const Quotation = ({ mode }) => {
 			setFormData({
 				...formData, ...res.data,
 				estimateDate: res.data.estimateDate.split('T')[0],
-				validDate: res.data.validDate ? res.data.validDate.split('T')[0] : ''
+				validDate: res.data.validDate ? res.data.validDate.split('T')[0] : '',
 			});
 
 			setAdditionalRow([...res.data.additionalCharge])
 			setItemRows([...res.data.items]);
 			setAccountDetails(res.data.accountId || null);
-
-			if (res.data.discountType != "no") {
+			if (res.data.discountType && res.data.discountType != "no") {
 				setDiscountToggler(false);
 			}
 		} catch (error) {
@@ -483,7 +482,10 @@ const Quotation = ({ mode }) => {
 												<div className='flex flex-col gap-1 text-left'>
 													<MySelect2
 														model={"item"}
-														onType={(v) => onItemChange(v, index, tax, ItemRows, setItemRows, setItems)}
+														onType={(v) => {
+															if (v === ItemRows[index].itemId) return;
+															onItemChange(v, index, tax, ItemRows, setItemRows, setItems)
+														}}
 														value={ItemRows[index].itemId}
 													/>
 
@@ -686,7 +688,9 @@ const Quotation = ({ mode }) => {
 											/>
 										</td>
 										<td className='min-w-[180px]'>
-											<select name="discount_type" value={formData.discountType} onChange={changeDiscountType}>
+											<select name="discount_type" value={formData.discountType} onChange={(e) => {
+												changeDiscountType(e, ItemRows, formData, setFormData, setDiscountToggler, toast)
+											}}>
 												<option value="no">No Discount</option>
 												<option value="before">Before Tax</option>
 												<option value="after">After Tax</option>

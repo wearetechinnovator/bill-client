@@ -469,28 +469,28 @@ const AttendanceDetails = () => {
                                     </p>
 
                                     <div className='w-full flex items-center justify-between gap-3 mt-2'>
-                                        <div className='shadow w-full rounded p-2'>
-                                            <p>Present (P)</p>
+                                        <div className='shadow w-full rounded p-2 bg-[#E2FFED] border-[#4d4d4d] border'>
+                                            <p className='feat__card__text'>Present (P)</p>
                                             <span>{allTotalData.present}</span>
                                         </div>
-                                        <div className='shadow w-full rounded p-2'>
-                                            <p>Absent (A)</p>
+                                        <div className='shadow w-full rounded p-2 bg-[#FFFEEF] border-[#4d4d4d] border'>
+                                            <p className='feat__card__text'>Absent (A)</p>
                                             <span>{allTotalData.absent}</span>
                                         </div>
-                                        <div className='shadow w-full rounded p-2'>
-                                            <p>Half day (HD)</p>
+                                        <div className='shadow w-full rounded p-2 bg-[#FEF2FF] border-[#4d4d4d] border'>
+                                            <p className='feat__card__text'>Half day (HD)</p>
                                             <span>{allTotalData.halfDay}</span>
                                         </div>
-                                        <div className='shadow w-full rounded p-2'>
-                                            <p>Paid leave (PL)</p>
+                                        <div className='shadow w-full rounded p-2 bg-[#FFD9DA] border-[#4d4d4d] border'>
+                                            <p className='feat__card__text'>Paid leave (PL)</p>
                                             <span>{allTotalData.paidLeave}</span>
                                         </div>
-                                        <div className='shadow w-full rounded p-2'>
-                                            <p>Weekly off (WO)</p>
+                                        <div className='shadow w-full rounded p-2 bg-[#E3EAFF] border-[#4d4d4d] border'>
+                                            <p className='feat__card__text'>Weekly off (WO)</p>
                                             <span>{allTotalData.weeklyOff}</span>
                                         </div>
-                                        <div className='shadow w-full rounded p-2'>
-                                            <p>Over Time (OT)</p>
+                                        <div className='shadow w-full rounded p-2 bg-[#E0F8FF] border-[#4d4d4d] border'>
+                                            <p className='feat__card__text'>Over Time (OT)</p>
                                             <span>{allTotalData.overTime}</span>
                                         </div>
                                     </div>

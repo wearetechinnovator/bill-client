@@ -41,7 +41,7 @@ const SalesInvoice = ({ mode }) => {
 		party: '', salesInvoiceNumber: '', invoiceDate: new Date().toISOString().split('T')[0], DueDate: '',
 		items: ItemRows, additionalCharge: additionalRows, note: '', terms: '', discountType: '',
 		discountAmount: '', discountPercentage: '', paymentStatus: '0', paymentAccount: '', finalAmount: '',
-		paymentAmount: '', autoRoundOff: '', roundOffType: '0', roundOffAmount: ''
+		paymentAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: ''
 	})
 	const location = useLocation();
 	const fromWhichBill = location.state?.fromWhichBill || null;
@@ -126,17 +126,17 @@ const SalesInvoice = ({ mode }) => {
 				setAccountDetails(res.data.accountId || null);
 			}
 
-			if (res.data.discountType != "no") {
+			if (res.data.discountType && res.data.discountType != "no") {
 				setDiscountToggler(false);
 			}
 		} catch (error) {
-			console.log(error)
 			toast("Data not get something went wrong", 'error')
 		}
 	}
 	useEffect(() => {
-		if (!id) return;
-		get();
+		if (id) {
+			get();
+		}
 	}, [id])
 
 
@@ -263,9 +263,9 @@ const SalesInvoice = ({ mode }) => {
 	// Calculate Final Amount;
 	useEffect(() => {
 		const finalAmount = calculateFinalAmount(
-			additionalRows, formData, subTotal, 
+			additionalRows, formData, subTotal,
 			formData.autoRoundOff,
-			formData.roundOffAmount, 
+			formData.roundOffAmount,
 			formData.roundOffType
 		);
 		setFormData((prevData) => ({
@@ -534,7 +534,10 @@ const SalesInvoice = ({ mode }) => {
 												<div className='flex flex-col gap-1'>
 													<MySelect2
 														model={"item"}
-														onType={(v) => onItemChange(v, index, tax, ItemRows, setItemRows, setItems)}
+														onType={(v) => {
+															if (v === ItemRows[index].itemId) return;
+															onItemChange(v, index, tax, ItemRows, setItemRows, setItems)
+														}}
 														value={ItemRows[index].itemId}
 													/>
 													<input type='text' className='input-style' placeholder='Description'
@@ -993,7 +996,7 @@ const SalesInvoice = ({ mode }) => {
 											>
 												Add <span>(+)</span>
 											</button>
-											<Icons.RUPES/>
+											<Icons.RUPES />
 											<input type="text"
 												value={formData.roundOffAmount}
 												onChange={(e) => setFormData({ ...formData, roundOffAmount: e.target.value })}

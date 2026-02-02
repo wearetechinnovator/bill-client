@@ -63,6 +63,7 @@ const StaffAttendance = () => {
 
 
 
+
     // Get data;
     useEffect(() => {
         const get = async () => {
@@ -439,12 +440,12 @@ const StaffAttendance = () => {
                                     />
                                 </div>
                                 <button
-									onClick={() => {
-										if (selected.length === 0 || tableStatusData !== 'active') return;
-										setOpenConfirm(true);
-									}}
+                                    onClick={() => {
+                                        if (selected.length === 0 || tableStatusData !== 'active') return;
+                                        setOpenConfirm(true);
+                                    }}
                                     className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-50'} border `}>
-                                    <MdDeleteOutline className='text-md' />
+                                    <MdDeleteOutline className='text-[16px]' />
                                     Delete
                                 </button>
                                 <button
@@ -496,28 +497,28 @@ const StaffAttendance = () => {
                         !loading ? data.length > 0 ? <div className='content__body__main'>
                             <div className='flex flex-col-reverse justify-between items-end'>
                                 <div className='w-full flex items-center justify-between gap-3 mt-4'>
-                                    <div className='shadow w-full rounded p-2'>
-                                        <p>Present (P)</p>
+                                    <div className='shadow w-full rounded p-2 bg-[#E2FFED] border-[#4d4d4d] border'>
+                                        <p className='feat__card__text'>Present (P)</p>
                                         <span>{allTotalData.present}</span>
                                     </div>
-                                    <div className='shadow w-full rounded p-2'>
-                                        <p>Absent (A)</p>
+                                    <div className='shadow w-full rounded p-2 bg-[#FFFEEF] border-[#4d4d4d] border'>
+                                        <p className='feat__card__text'>Absent (A)</p>
                                         <span>{allTotalData.absent}</span>
                                     </div>
-                                    <div className='shadow w-full rounded p-2'>
-                                        <p>Half day (HD)</p>
+                                    <div className='shadow w-full rounded p-2 bg-[#FEF2FF] border-[#4d4d4d] border'>
+                                        <p className='feat__card__text'>Half day (HD)</p>
                                         <span>{allTotalData.halfDay}</span>
                                     </div>
-                                    <div className='shadow w-full rounded p-2'>
-                                        <p>Paid leave (PL)</p>
+                                    <div className='shadow w-full rounded p-2 bg-[#FFD9DA] border-[#4d4d4d] border'>
+                                        <p className='feat__card__text'>Paid leave (PL)</p>
                                         <span>{allTotalData.paidLeave}</span>
                                     </div>
-                                    <div className='shadow w-full rounded p-2'>
-                                        <p>Weekly off (WO)</p>
+                                    <div className='shadow w-full rounded p-2 bg-[#E3EAFF] border-[#4d4d4d] border'>
+                                        <p className='feat__card__text'>Weekly off (WO)</p>
                                         <span>{allTotalData.weeklyOff}</span>
                                     </div>
-                                    <div className='shadow w-full rounded p-2'>
-                                        <p>Over Time (OT)</p>
+                                    <div className='shadow w-full rounded p-2 bg-[#E0F8FF] border-[#4d4d4d] border'>
+                                        <p className='feat__card__text'>Over Time (OT)</p>
                                         <span>{allTotalData.overTime}</span>
                                     </div>
                                 </div>
@@ -555,13 +556,16 @@ const StaffAttendance = () => {
                                 <table className='min-w-full bg-white' id='staffTable' ref={tableRef}>
                                     <thead className='list__table__head'>
                                         <tr>
-                                            <th className='py-2 px-4 border-b w-[10px]'>
-                                                <input type='checkbox' onChange={selectAll} checked={data.length > 0 && selected.length === data.length} />
+                                            <th className='py-2' align='center'>
+                                                <input type='checkbox'
+                                                    onChange={selectAll}
+                                                    checked={data.length > 0 && selected.length === data.length}
+                                                />
                                             </th>
-                                            <td className='py-2 px-4 border-b w-[30%]'>STAFF NAME</td>
-                                            <td className='py-2 px-4 border-b w-[30%]'>MOBILE NUMBER</td>
-                                            <td className='py-2 px-4 border-b w-[25%]'>ATTENDANCE</td>
-                                            <td className='py-2 px-4 border-b' align='center'>ACTION</td>
+                                            <td>STAFF NAME</td>
+                                            <td>MOBILE NUMBER</td>
+                                            <td>ATTENDANCE</td>
+                                            <td align='center'>ACTION</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -571,15 +575,15 @@ const StaffAttendance = () => {
                                                 const userAttendance = userAttendanceData?.attendance;
 
                                                 return <tr key={data._id}>
-                                                    <td className='py-2 px-4 border-b'>
+                                                    <td className='py-2' align='center'>
                                                         <input type='checkbox'
                                                             checked={selected.includes(data._id)}
                                                             onChange={() => handleCheckboxChange(data._id)}
                                                         />
                                                     </td>
-                                                    <td className='px-4 border-b'>{data.staffName}</td>
-                                                    <td className='px-4 border-b'>{data.mobileNumber}</td>
-                                                    <td className='px-4 border-b'>
+                                                    <td>{data.staffName}</td>
+                                                    <td>{data.mobileNumber}</td>
+                                                    <td>
                                                         <div className='flex gap-2 items-center'>
                                                             <div
                                                                 onClick={() => handleAttendance(data, "1")}
@@ -692,7 +696,7 @@ const StaffAttendance = () => {
                                                             }
                                                         </div>
                                                     </td>
-                                                    <td className='' align='center'>
+                                                    <td align='center'>
                                                         <div className='flex items-center justify-center gap-2'>
                                                             <div
                                                                 onClick={() => navigate(`/admin/staff-attendance/details/${data._id}`)}

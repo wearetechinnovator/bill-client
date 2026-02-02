@@ -274,7 +274,7 @@ const DeliveryChalan = () => {
             setOpenConfirm(false);
           }}
         />
-        
+
         <div className='content__body'>
           {/* top section */}
           <div className={`add_new_compnent ${filterToggle ? 'h-[265px]' : 'h-[45px]'} `}>
@@ -415,19 +415,19 @@ const DeliveryChalan = () => {
                 <table className='min-w-full bg-white' id='listQuotation' ref={tableRef}>
                   <thead className='list__table__head'>
                     <tr>
-                      <th className='py-2 px-4 border-b'>
+                      <th className='py-2'>
                         <input type='checkbox' onChange={selectAll} checked={billData.length > 0 && selected.length === billData.length} />
                       </th>
-                      <th className='py-2 px-4 border-b cursor-pointer'>
-                        <div className='flex items-center justify-center' onClick={sortByDate}>
+                      <th className='cursor-pointer'>
+                        <div className='flex items-center justify-start' onClick={sortByDate}>
                           Date {ascending ? <Icons.DROPDOWN /> : <Icons.DROPUP />}
                         </div>
                       </th>
-                      <th className='py-2 px-4 border-b'>Delivery Chalan Number</th>
-                      <th className='py-2 px-4 border-b'>Party Name</th>
-                      <th className='py-2 px-4 border-b'>Valid To</th>
-                      <th className='py-2 px-4 border-b'>Status</th>
-                      <th className='py-2 px-4 border-b'>Action</th>
+                      <th align='left'>Delivery Chalan Number</th>
+                      <th align='left'>Party Name</th>
+                      <th align='left'>Valid To</th>
+                      <th align='left'>Status</th>
+                      <th align='center'>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -435,29 +435,30 @@ const DeliveryChalan = () => {
                       billData.map((data, i) => {
                         return <tr key={i}
                           onClick={() => navigate(`/admin/bill/details/deliverychalan/${data._id}`)}>
-                          <td className='py-2 px-4 border-b max-w-[10px]'>
+                          <td className='py-2' align='center'>
                             <input type='checkbox'
                               checked={selected.includes(data._id)}
                               onChange={() => handleCheckboxChange(data._id)}
                               onClick={(e) => e.stopPropagation()}
                             />
                           </td>
-                          <td className='px-4 border-b' align='center'>
-                            {new Date(data.chalanDate).toLocaleDateString()}
-                          </td>
-                          <td className='px-4 border-b' align='center'>{data.chalanNumber}</td>
-                          <td className='px-4 border-b' align='center'>{data.party.name}</td>
-                          <td className='px-4 border-b' align='center'>
+                          <td> {new Date(data.chalanDate).toLocaleDateString()} </td>
+                          <td>{data.chalanNumber}</td>
+                          <td>{data.party.name}</td>
+                          <td>
                             {new Date(data.validDate).toLocaleDateString()}
                           </td>
-                          <td className='px-4 border-b max-w-[20px]' align='center'>
+                          <td>
                             {
-                              data.validDate ? <span className={`${data.validDate ? 'bg-green-500' : ''} px-2 text-white rounded-lg text-[12px] font-bold`}>
-                                {new Date(Date.parse(new Date().toLocaleDateString())).toISOString() > new Date(Date.parse(data.validDate)).toISOString() ? "Expired" : "Valid"}
+                              data.validDate ? <span className={`${data.validDate ? 'green-badge' : 'red-badge'} badge`}>
+                                {
+                                  new Date(Date.parse(new Date().toLocaleDateString())).toISOString() >
+                                    new Date(Date.parse(data.validDate)).toISOString() ?
+                                    "Expired" : "Valid"
+                                }
                               </span>
                                 : "--"
                             }
-
                           </td>
 
                           <td className='px-4 text-center'>

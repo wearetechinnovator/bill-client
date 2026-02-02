@@ -48,7 +48,8 @@ const DebitNote = ({ mode }) => {
 	const [formData, setFormData] = useState({
 		party: '', debitNoteNumber: '', debitNoteDate: new Date().toISOString().split('T')[0],
 		purchaseInvoice: '', items: ItemRows, additionalCharge: additionalRows, note: '', terms: '',
-		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: ''
+		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '',
+		autoRoundOff: false, roundOffType: '0', roundOffAmount: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -109,7 +110,7 @@ const DebitNote = ({ mode }) => {
 					setItemRows([...res.data.items]);
 					setAccountDetails(res.data.accountId || null);
 
-					if (res.data.discountType != "no") {
+					if (res.data.discountType && res.data.discountType != "no") {
 						setDiscountToggler(false);
 					}
 				} catch (error) {
@@ -191,7 +192,6 @@ const DebitNote = ({ mode }) => {
 	// useEffect(() => {
 	//   setFormData({ ...formData, debitNoteNumber: getBillPrefix });
 	// }, [getBillPrefix])
-
 
 
 	// When `discount type is before` and apply discount this useEffect run;
@@ -295,13 +295,19 @@ const DebitNote = ({ mode }) => {
 	}, [ItemRows, perPrice, perTax, perDiscount, perQun])
 
 
+	// Calculate Final Amount;
 	useEffect(() => {
-		const finalAmount = calculateFinalAmount(additionalRows, formData, subTotal);
+		const finalAmount = calculateFinalAmount(
+			additionalRows, formData, subTotal,
+			formData.autoRoundOff,
+			formData.roundOffAmount,
+			formData.roundOffType
+		);
 		setFormData((prevData) => ({
 			...prevData,
 			finalAmount
 		}));
-	}, [ItemRows, additionalRows]);
+	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType]);
 
 
 	const onDiscountAmountChange = (e) => {
@@ -525,7 +531,10 @@ const DebitNote = ({ mode }) => {
 												<div className='flex flex-col gap-2'>
 													<MySelect2
 														model={"item"}
-														onType={(v) => onItemChange(v, index, tax, ItemRows, setItemRows, setItems)}
+														onType={(v) => {
+															if (v === ItemRows[index].itemId) return;
+															onItemChange(v, index, tax, ItemRows, setItemRows, setItems)
+														}}
 														value={ItemRows[index].itemId}
 													/>
 													<input type='text' className='input-style' placeholder='Description'
@@ -917,11 +926,50 @@ const DebitNote = ({ mode }) => {
 										</tfoot>
 									</table>
 								</div>
+								{/* Round Off Section */}
+								<div className='round__off__section'>
+									<div className='check__box__parent'>
+										<input type="checkbox"
+											onChange={(e) => setFormData({
+												...formData, autoRoundOff: e.target.checked
+											})}
+											checked={formData.autoRoundOff}
+										/>
+										<p>Auto Round Off</p>
+									</div>
+
+									{!formData.autoRoundOff && (
+										<div className='round__of__input__parent'>
+											<button
+												onClick={() => {
+													setFormData({ ...formData, roundOffType: '1' })
+												}}
+												className={`roundoff__btn ${formData.roundOffType === "1" ? 'active' : ''}`}
+											>
+												Add <span>(+)</span>
+											</button>
+											<Icons.RUPES />
+											<input type="text"
+												value={formData.roundOffAmount}
+												onChange={(e) => setFormData({ ...formData, roundOffAmount: e.target.value })}
+											/>
+											<button
+												onClick={() => {
+													setFormData({ ...formData, roundOffType: '0' })
+												}}
+												className={`roundoff__btn ${formData.roundOffType === "0" ? 'active' : ''}`}
+											>
+												Reduce <span>(-)</span>
+											</button>
+										</div>
+									)}
+								</div>
+
 								<p className='font-bold mt-4 mb-2'>Final Amount</p>
 								<input type="text" name="final_amount"
-									value={calculateFinalAmount(additionalRows, formData, subTotal)}
 									className='bg-gray-100 custom-disabled w-full'
 									disabled
+									value={formData.finalAmount}
 								/>
 							</div>
 						</div>
@@ -930,11 +978,11 @@ const DebitNote = ({ mode }) => {
 							<button
 								onClick={saveBill}
 								className='add-bill-btn'>
-								<FaRegCheckCircle />
+								<Icons.CHECK />
 								{!mode || mode === "convert" ? "Save" : "Update"}
 							</button>
 							<button className='reset-bill-btn' onClick={clearForm}>
-								<BiReset />
+								<Icons.RESET />
 								Reset
 							</button>
 						</div>

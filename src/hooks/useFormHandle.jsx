@@ -115,6 +115,7 @@ const useFormHandle = () => {
 
             }
 
+
             setFormData({ ...formData, discountType: e.target.value });
             setDiscountToggler(false);
         } else {
@@ -154,10 +155,10 @@ const useFormHandle = () => {
         if (autoRoundOff) {
             return !isNaN(totalParticular) ? (totalParticular + total).toFixed(0) : total;
         } else {
-            let final = !isNaN(totalParticular) ? (totalParticular + total).toFixed(2) : total;
+            let final = !isNaN(totalParticular) ? Number(totalParticular + total) : total;
             if (roundOffAmount) {
-                if(roundOffAmount === ".") return;
-                
+                if (roundOffAmount === ".") return;
+
                 final = roundOffType === "0" ?
                     Number(final) - Number(roundOffAmount) :
                     Number(final) + Number(roundOffAmount);
@@ -198,7 +199,6 @@ const useFormHandle = () => {
     }
 
     const calculatePerTaxAmount = (index, ItemRows) => {
-        console.log(ItemRows)
         const tax = ItemRows[index].tax / 100;
         const qun = ItemRows[index].qun;
         const price = ItemRows[index].price;
@@ -206,17 +206,17 @@ const useFormHandle = () => {
         const amount = ((qun * price) - disAmount);
         const taxamount = (amount * tax).toFixed(2);
 
-        return taxamount;
+        return Number(taxamount);
     }
 
 
     const calculatePerAmount = (index, ItemRows) => {
-        const qun = ItemRows[index].qun;
-        const price = ItemRows[index].price;
-        const disAmount = ItemRows[index].discountPerAmount;
-        const totalPerAmount = parseFloat((qun * price) - disAmount) + parseFloat(calculatePerTaxAmount(index, ItemRows));
+        const qun = Number(ItemRows[index].qun);
+        const price = Number(ItemRows[index].price);
+        const disAmount = Number(ItemRows[index].discountPerAmount);
+        const totalPerAmount = (qun * price) - disAmount + calculatePerTaxAmount(index, ItemRows);
 
-        return (totalPerAmount).toFixed(2);
+        return Number((totalPerAmount).toFixed(2));
     }
 
 

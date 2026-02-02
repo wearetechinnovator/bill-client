@@ -39,9 +39,9 @@ const DeliveryChalan = ({ mode }) => {
 	const [ItemRows, setItemRows] = useState([itemRowSet]);
 	const [additionalRows, setAdditionalRow] = useState([additionalRowSet]); //{ additionalRowsItem: 1 }
 	const [formData, setFormData] = useState({
-		party: '', chalanNumber: '', chalanDate: new Date().toISOString().split('T')[0], validDate: '', items: ItemRows,
-		additionalCharge: additionalRows, note: '', terms: '',
-		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: ''
+		party: '', chalanNumber: '', chalanDate: new Date().toISOString().split('T')[0], validDate: '',
+		items: ItemRows, additionalCharge: additionalRows, note: '', terms: '', discountType: '', discountAmount: '',
+		discountPercentage: '', finalAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -223,13 +223,19 @@ const DeliveryChalan = ({ mode }) => {
 	}
 
 
+	// Calculation Final Amount;
 	useEffect(() => {
-		const finalAmount = calculateFinalAmount(additionalRows, formData, subTotal);
+		const finalAmount = calculateFinalAmount(
+			additionalRows, formData, subTotal,
+			formData.autoRoundOff,
+			formData.roundOffAmount,
+			formData.roundOffType
+		);
 		setFormData((prevData) => ({
 			...prevData,
 			finalAmount
 		}));
-	}, [ItemRows, additionalRows]);
+	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType]);
 
 
 	// Return Sub-Total
@@ -454,7 +460,10 @@ const DeliveryChalan = ({ mode }) => {
 												<div className='flex flex-col gap-2'>
 													<MySelect2
 														model={"item"}
-														onType={(v) => onItemChange(v, index, tax, ItemRows, setItemRows, setItems)}
+														onType={(v) => {
+															if (v === ItemRows[index].itemId) return;
+															onItemChange(v, index, tax, ItemRows, setItemRows, setItems)
+														}}
 														value={ItemRows[index].itemId}
 													/>
 													<input type='text' className='input-style' placeholder='Description'
@@ -846,12 +855,51 @@ const DeliveryChalan = ({ mode }) => {
 										</tfoot>
 									</table>
 								</div>
+								{/* Round Off Section */}
+								<div className='round__off__section'>
+									<div className='check__box__parent'>
+										<input type="checkbox"
+											onChange={(e) => setFormData({
+												...formData, autoRoundOff: e.target.checked
+											})}
+											checked={formData.autoRoundOff}
+										/>
+										<p>Auto Round Off</p>
+									</div>
+
+									{!formData.autoRoundOff && (
+										<div className='round__of__input__parent'>
+											<button
+												onClick={() => {
+													setFormData({ ...formData, roundOffType: '1' })
+												}}
+												className={`roundoff__btn ${formData.roundOffType === "1" ? 'active' : ''}`}
+											>
+												Add <span>(+)</span>
+											</button>
+											<Icons.RUPES />
+											<input type="text"
+												value={formData.roundOffAmount}
+												onChange={(e) => setFormData({ ...formData, roundOffAmount: e.target.value })}
+											/>
+											<button
+												onClick={() => {
+													setFormData({ ...formData, roundOffType: '0' })
+												}}
+												className={`roundoff__btn ${formData.roundOffType === "0" ? 'active' : ''}`}
+											>
+												Reduce <span>(-)</span>
+											</button>
+										</div>
+									)}
+								</div>
+
 								<p className='font-bold mt-4 mb-2'>Final Amount</p>
 								<input type="text"
 									name="final_amount"
 									className='bg-gray-100 custom-disabled w-full'
 									disabled
-									value={calculateFinalAmount(additionalRows, formData, subTotal)}
+									value={formData.finalAmount}
 								/>
 							</div>
 						</div>

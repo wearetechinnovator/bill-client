@@ -1299,6 +1299,9 @@ input {
 .round__of__input__parent input{
   @apply border-none rounded-none text-[13px] w-[60px];
 }
+.feat__card__text{
+  @apply text-[#333333] font-[700] text-[14px];
+}
 
 
 /* =================== */

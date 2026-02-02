@@ -474,19 +474,23 @@ const PurchaseInvoice = () => {
 									<thead className='list__table__head'>
 										<tr>
 											<th className='py-2 px-4 border-b'>
-												<input type='checkbox' onChange={selectAll} checked={billData.length > 0 && selected.length === billData.length} />
+												<input
+													type='checkbox'
+													onChange={selectAll}
+													checked={billData.length > 0 && selected.length === billData.length}
+												/>
 											</th>
-											<th className='py-2 px-4 border-b cursor-pointer' onClick={sortByDate}>
-												<div className='flex items-center justify-center'>
+											<th className='cursor-pointer' onClick={sortByDate}>
+												<div className='flex items-center justify-start'>
 													Date {ascending ? <MdOutlineArrowDropDown /> : <RiArrowDropUpFill />}
 												</div>
 											</th>
-											<th className='py-2 px-4 border-b'>Purchase Invoice Number</th>
-											<th className='py-2 px-4 border-b'>Original Invoice Number</th>
-											<th className='py-2 px-4 border-b'>Party Name</th>
-											<th className='py-2 px-4 border-b'>Due Date</th>
-											<th className='py-2 px-4 border-b'>Status</th>
-											<th className='py-2 px-4 border-b'>Action</th>
+											<th align='left'>Purchase Invoice Number</th>
+											<th align='left'>Original Invoice Number</th>
+											<th align='left'>Party Name</th>
+											<th align='left'>Due Date</th>
+											<th align='left'>Status</th>
+											<th align='center'>Action</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -494,20 +498,20 @@ const PurchaseInvoice = () => {
 											billData.map((data, i) => {
 												return <tr key={i}
 													onClick={() => navigate(`/admin/bill/details/purchaseinvoice/${data._id}`)}>
-													<td className='py-2 px-4 border-b max-w-[10px]'>
+													<td className='py-2 px-4  max-w-[10px]' align='center'>
 														<input type='checkbox'
 															checked={selected.includes(data._id)}
 															onChange={() => handleCheckboxChange(data._id)}
 															onClick={(e) => e.stopPropagation()}
 														/>
 													</td>
-													<td className='px-4 border-b' align='center'>{new Date(data.invoiceDate).toLocaleDateString()}</td>
-													<td className='px-4 border-b' align='center'>{data.purchaseInvoiceNumber}</td>
-													<td className='px-4 border-b' align='center'>{data.originalInvoiceNumber}</td>
-													<td className='px-4 border-b' align='center'>{data.party.name}</td>
-													<td className='px-4 border-b' align='center'>{new Date(data.validDate).toLocaleDateString()}</td>
-													<td className='px-4 border-b max-w-[150px]' align='center'>
-														<span className={`${data.paymentStatus === "1" ? 'bg-green-500' : 'bg-red-500'} px-2 text-white rounded-lg text-[11px] font-bold`}>
+													<td>{new Date(data.invoiceDate).toLocaleDateString()}</td>
+													<td>{data.purchaseInvoiceNumber}</td>
+													<td>{data.originalInvoiceNumber}</td>
+													<td>{data.party.name}</td>
+													<td>{new Date(data.validDate).toLocaleDateString()}</td>
+													<td>
+														<span className={`${data.paymentStatus === "1" ? 'green-badge' : 'red-badge'} badge`}>
 															{data.paymentStatus === "1" ? "Paid" : "Not Paid"}
 														</span>
 													</td>
