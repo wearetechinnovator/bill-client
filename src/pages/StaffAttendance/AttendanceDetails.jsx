@@ -13,7 +13,6 @@ import { Popover, Whisper } from 'rsuite';
 
 
 
-document.title="Staff Attendance"
 const AttendanceDetails = () => {
     const userDetails = useSelector((store) => store.userDetail); //get use details from store
     const toast = useMyToaster();

@@ -19,6 +19,7 @@ import SelectAccountModal from '../../components/SelectAccountModal';
 
 
 const SalesInvoice = ({ mode }) => {
+	const token = Cookies.get("token");
 	const toast = useMyToaster();
 	const { id } = useParams()
 	const getBillPrefix = useBillPrefix("invoice");
@@ -81,7 +82,8 @@ const SalesInvoice = ({ mode }) => {
 
 
 
-	// Get bill data for edit and convert mode
+	// Get bill data for edit and CONVERT mode
+	// =======================================
 	const get = async () => {
 		try {
 			let url;
@@ -95,14 +97,13 @@ const SalesInvoice = ({ mode }) => {
 				url = `${process.env.REACT_APP_API_URL}${"/quotation/get"}`
 			}
 
-			const cookie = Cookies.get("token");
-
+			
 			const req = await fetch(url, {
 				method: "POST",
 				headers: {
 					"Content-Type": 'application/json'
 				},
-				body: JSON.stringify({ token: cookie, id: id })
+				body: JSON.stringify({ token, id: id })
 			})
 			const res = await req.json();
 			const removeProformaNumber = { ...res.data };
@@ -318,7 +319,7 @@ const SalesInvoice = ({ mode }) => {
 	}
 
 
-	// *Save bill
+	// Save bill
 	const saveBill = async () => {
 		if (!formData.party) {
 			return toast("Please select party", "error");
@@ -350,7 +351,6 @@ const SalesInvoice = ({ mode }) => {
 
 		try {
 			const url = process.env.REACT_APP_API_URL + "/salesinvoice/add";
-			const token = Cookies.get("token");
 
 			const req = await fetch(url, {
 				method: "POST",
@@ -373,8 +373,9 @@ const SalesInvoice = ({ mode }) => {
 
 			clearForm();
 
-			// if this is converted by proforma then delete the proforma
-			// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+			// if this is converted by proforma then delete the Proforma or Quotation
+			// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 			if (mode === "convert" && fromWhichBill === "proforma") {
 				try {
 					await fetch(process.env.REACT_APP_API_URL + "/proforma/delete", {
@@ -418,7 +419,7 @@ const SalesInvoice = ({ mode }) => {
 	}
 
 
-	// *Clear form values;
+	// Clear form values;
 	const clearForm = () => {
 		setItemRows([itemRowSet]);
 		setAdditionalRow([additionalRowSet])

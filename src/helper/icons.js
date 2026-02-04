@@ -1,4 +1,4 @@
-import { LuSearch } from "react-icons/lu";
+import { LuRefreshCcw, LuSearch } from "react-icons/lu";
 import { IoIosAdd, IoMdMore } from 'react-icons/io';
 import { MdFilterList } from "react-icons/md";
 import { MdDeleteOutline } from "react-icons/md";
@@ -45,7 +45,7 @@ import { IoArrowBack } from "react-icons/io5";
 
 
 export const Icons = {
-  RESET: HiOutlineRefresh,
+  RESET: LuRefreshCcw,
   SEARCH: LuSearch,
   ADD: IoIosAdd,
   EDIT: FaRegEdit,

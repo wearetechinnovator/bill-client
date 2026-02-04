@@ -848,11 +848,11 @@ const PurchaseInvoice = ({ mode }) => {
 							<button
 								onClick={saveBill}
 								className='add-bill-btn'>
-								<FaRegCheckCircle />
+								<Icons.CHECK />
 								{!mode || mode === "convert" ? "Save" : "Update"}
 							</button>
 							<button className='reset-bill-btn' onClick={clearForm}>
-								<BiReset />
+								<Icons.RESET />
 								Reset
 							</button>
 						</div>

@@ -377,7 +377,7 @@ const Party = () => {
 									className={`party__data ${selectedTab === TOTAL_COLLECT ? 'active' : ''}`}
 								>
 									<h6><Icons.TREDING_UP />Total Amount To Collect</h6>
-									<p><Icons.RUPES /> {totalCollection}</p>
+									<p><Icons.RUPES />{totalCollection}</p>
 								</div>
 							</div>
 

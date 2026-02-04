@@ -492,7 +492,11 @@ const Proforma = () => {
 																		className='table__list__action__icon'
 																		onClick={(e) => {
 																			e.stopPropagation();
-																			navigate(`/admin/sales-invoice/convert/add/${data._id}`)
+																			navigate(`/admin/sales-invoice/convert/add/${data._id}`, {
+                                                                                state: {
+                                                                                    fromWhichBill: 'proforma'
+                                                                                }
+                                                                            })
 																		}}
 																	>
 																		<Icons.CONVERT className='text-[14px]' />

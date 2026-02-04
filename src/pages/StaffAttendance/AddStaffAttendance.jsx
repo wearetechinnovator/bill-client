@@ -224,11 +224,11 @@ const AddStaffAttendance = ({ mode }) => {
                         </div>
 
                         <div className='flex gap-4 justify-center mt-5'>
-                            <button onClick={saveData} className='flex items-center rounded-sm bg-green-500 text-white p-2 gap-1'>
+                            <button onClick={saveData} className='add-bill-btn'>
                                 <Icons.CHECK />
                                 {mode ? "Update" : "Save"}
                             </button>
-                            <button onClick={resetData} className='flex items-center rounded-sm bg-blue-500 text-white p-2 gap-1'>
+                            <button onClick={resetData} className='reset-bill-btn'>
                                 <Icons.RESET />
                                 Reset
                             </button>

@@ -501,9 +501,9 @@ const Quotation = () => {
                                                         <span className={`
                                                                 badge ${data.billStatus === ACTIVE ?
                                                                 'green-badge' : data.billStatus === EXPIRE ?
-                                                                    'yellow-badge' : 'red-badge'}
+                                                                    'red-badge' : 'yellow-badge'}
                                                             `}>
-                                                            {data.billStatus}
+                                                            {data.billStatus === CONVERT ? "converted" : data.billStatus}
                                                         </span>
                                                     </td>
                                                     <td className='px-4 text-center'>
@@ -577,7 +577,6 @@ const Quotation = () => {
                                 </table>
                                 <div className='paginate__parent'>
                                     <p>Showing {billData.length} of {totalData} entries</p>
-                                    {/* ----- Paginatin ----- */}
                                     <Pagination
                                         activePage={activePage}
                                         totalData={totalData}

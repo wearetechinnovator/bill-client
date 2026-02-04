@@ -431,7 +431,7 @@ const Invoice = () => {
 										<div className='flex w-full border-b'>
 											<div className='p-3 flex items-center gap-5 border-r' style={{ width: "60%" }}>
 												<div>
-													<img src={companyDetails?.invoiceLogo} style={{ height: "100px", width: '200px' }} />
+													<img src={companyDetails?.invoiceLogo} style={{ height: "100px", width: '100px' }} />
 												</div>
 												<div className='flex flex-col gap-1' style={{ fontSize: '12px' }}>
 													<p className='text-blue-700 font-bold' style={{ fontSize: '12px' }}>
@@ -475,13 +475,13 @@ const Invoice = () => {
 										<table className='w-full border item__table' style={{ fontSize: '12px' }}>
 											<thead className='bg-gray-100'>
 												<tr>
-													<td align='center' valign='center' className='p-2' width={"5%"}>SL.NO.</td>
+													<td align='center' valign='center' className='p-2' width={"5%"}>SL.NO</td>
 													<td align='center' width={"49%"}>ITEM</td>
 													<td align='center' width={"7%"}>HSN/SAC</td>
 													<td align='center' width={"7%"}>QTY.</td>
 													<td align='center' width={"7%"}>RATE</td>
 													<td align='center' width={"8%"}>DISCOUNT</td>
-													<td align='center' width={"7%"}>TAX</td>
+													<td align='center' width={"8%"}>TAX</td>
 													<td align='center' width={"10%"}>AMOUNT</td>
 												</tr>
 											</thead>
@@ -520,9 +520,9 @@ const Invoice = () => {
 													<td colSpan={3} align='right'>TOTAL</td>
 													<td>{billDetails.qun}</td>
 													<td></td>
-													<td>INR. {billDetails.discount}</td>
-													<td>INR. {billDetails.taxAmount}</td>
-													<td>INR. {billDetails.amount}</td>
+													<td><Icons.RUPES className='inline'/>{billDetails.discount}</td>
+													<td><Icons.RUPES className='inline'/>{billDetails.taxAmount}</td>
+													<td><Icons.RUPES className='inline'/>{billDetails.amount}</td>
 												</tr>
 												{billData?.roundOffAmount && <tr className='font-bold bg-[#F3F4F6]'>
 													<td colSpan={7} align='right' className='italic'>Round Off</td>
@@ -576,7 +576,7 @@ const Invoice = () => {
 
 									<div className='border w-full mt-2'>
 										<div className='w-full border-b'>
-											<p className='p-1' style={{ fontSize: '12px' }}>
+											<p className='p-1 capitalize' style={{ fontSize: '12px' }}>
 												<p className='font-bold '>Total Amount (in words) : </p>
 												{/* five hundred and fifty four Rupees .six Paise */}
 												{totalAmountInText}

@@ -6,6 +6,7 @@ import { LuRefreshCcw } from "react-icons/lu";
 import useMyToaster from '../../hooks/useMyToaster';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { Icons } from '../../helper/icons';
 
 
 
@@ -38,7 +39,7 @@ const UnitAdd = ({ mode }) => {
         }
     }, [mode])
 
-    const savebutton = async (e) => {
+    const saveData = async (e) => {
         if (form.title === "") {
             return toast("fill the blank", "error")
         }
@@ -74,7 +75,7 @@ const UnitAdd = ({ mode }) => {
     }
 
 
-    const fromvalueclear = (e) => {
+    const clearData = (e) => {
         setForm({
             title: '',
         })
@@ -95,15 +96,17 @@ const UnitAdd = ({ mode }) => {
                                 </div>
                             </div>
                         </div>
-                        <div className='flex justify-center pt-9 mb-6'>
-                            <div className='flex rounded-sm bg-green-500 text-white'>
-                                <FaRegCheckCircle className='mt-3 ml-2' />
-                                <button className='p-2' onClick={savebutton}>{mode ? "Update" : 'Save'}</button>
-                            </div>
-                            <div className='flex rounded-sm ml-4 bg-blue-500 text-white'>
-                                <LuRefreshCcw className='mt-3 ml-2' />
-                                <button className='p-2' onClick={fromvalueclear}>Reset</button>
-                            </div>
+                        <div className='w-full flex justify-center gap-3 my-3 mt-5'>
+                            <button
+                                onClick={saveData}
+                                className='add-bill-btn'>
+                                <Icons.CHECK />
+                                {!mode ? "Save" : "Update"}
+                            </button>
+                            <button className='reset-bill-btn' onClick={clearData}>
+                                <Icons.RESET />
+                                Reset
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -7,6 +7,7 @@ import { LuRefreshCcw } from "react-icons/lu";
 import useMyToaster from '../../hooks/useMyToaster';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { Icons } from '../../helper/icons';
 
 
 
@@ -39,10 +40,10 @@ const TaxAdd = ({ mode }) => {
         }
     }, [mode])
 
-    const savebutton = async (e) => {
+    const saveData = async (e) => {
         if (form.title === "") {
             return toast("Please enter title", "error")
-        }else if (form.gst === "") {
+        } else if (form.gst === "") {
             return toast("Please enter GST", "error")
         }
 
@@ -65,10 +66,10 @@ const TaxAdd = ({ mode }) => {
                 setForm({ title: '', details: '', gst: '0', cess: '0' });
             }
 
-            
+
             toast(!mode ? "Tax create success" : "Tax update success", 'success');
             navigate("/admin/tax");
-            return 
+            return
 
 
         } catch (error) {
@@ -77,7 +78,7 @@ const TaxAdd = ({ mode }) => {
 
     }
 
-    const fromvalueclear = (e) => {
+    const clearData = (e) => {
         setForm({
             title: '',
         })
@@ -108,15 +109,17 @@ const TaxAdd = ({ mode }) => {
                                 </div>
                             </div>
                         </div>
-                        <div className='flex justify-center pt-9 mb-6'>
-                            <div className='flex rounded-sm bg-green-500 text-white'>
-                                <FaRegCheckCircle className='mt-3 ml-2' />
-                                <button className='p-2' onClick={savebutton}>{mode ? "Update" : "Save"}</button>
-                            </div>
-                            <div className='flex rounded-sm ml-4 bg-blue-500 text-white'>
-                                <LuRefreshCcw className='mt-3 ml-2' />
-                                <button className='p-2' onClick={fromvalueclear}>Reset</button>
-                            </div>
+                        <div className='w-full flex justify-center gap-3 my-3 mt-5'>
+                            <button
+                                onClick={saveData}
+                                className='add-bill-btn'>
+                                <Icons.CHECK />
+                                {!mode ? "Save" : "Update"}
+                            </button>
+                            <button className='reset-bill-btn' onClick={clearData}>
+                                <Icons.RESET />
+                                Reset
+                            </button>
                         </div>
                     </div>
                 </div>

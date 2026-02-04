@@ -40,8 +40,8 @@ const Item = ({ mode }) => {
         stockStr += `${stockValues[i]} ${stockKeys[i]} `;
       }
       return {
-        Title: data.title,
-        HSN: data.category?.hsn || data.hsn || "--",
+        "Name": data.title,
+        "HSN": data.category?.hsn || data.hsn || "--",
         "Sale Price": data.salePrice,
         "STOCK": stockStr
       }
@@ -175,7 +175,7 @@ const Item = ({ mode }) => {
     }
   }
 
-  
+
   const restoreData = async () => {
     if (selected.length === 0 || tableStatusData !== "trash") {
       return;
@@ -308,11 +308,11 @@ const Item = ({ mode }) => {
                           onChange={selectAll}
                           checked={itemData.length > 0 && selected.length === itemData.length} />
                       </th>
-                      <td className='py-2 px-4 border-b '>Name</td>
-                      <th className='py-2 px-4 border-b '>HSN</th>
-                      <th className='py-2 px-4 border-b '>Sale Price</th>
-                      <th className='py-2 px-4 border-b '>STOCK</th>
-                      <th className='py-2 px-4 border-b w-[100px]'>Action</th>
+                      <th align='left'>Name</th>
+                      <th align='left'>HSN</th>
+                      <th align='left'>Sale Price</th>
+                      <th align='left'>STOCK</th>
+                      <th className='w-[100px]'>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -328,26 +328,24 @@ const Item = ({ mode }) => {
                         }
 
                         return <tr key={i} onClick={() => navigate("/admin/item/details/" + data._id)} className='cursor-pointer hover:bg-gray-100'>
-                          <td className='py-2 px-4 border-b max-w-[10px]'>
+                          <td className='py-2 max-w-[10px]' align='center'>
                             <input type='checkbox'
                               checked={selected.includes(data._id)}
                               onClick={(e) => e.stopPropagation()}
                               onChange={() => handleCheckboxChange(data._id)} />
                           </td>
-                          <td className='px-4 border-b'>
+                          <td>
                             {data.title}
                             {
                               data.category &&
-                              <span className="text-[10px] bg-gray-100 rounded w-fit px-[2px] border ms-[5px]">{data.category?.title}</span>
+                              <span className="text-[10px] bg-gray-100 rounded w-fit px-[2px] border ms-[5px]">
+                                {data.category?.title}
+                              </span>
                             }
                           </td>
-                          <td className='px-4 border-b' align='center'>{data.category?.hsn || data.hsn || "--"}</td>
-                          <td className='px-4 border-b' align='center'>{data.salePrice || 0.00}</td>
-                          <td className='px-4 border-b' align='center'>
-                            <div className='flex items-center justify-center gap-2'>
-                              {stockStr}
-                            </div>
-                          </td>
+                          <td>{data.category?.hsn || data.hsn || "--"}</td>
+                          <td>{data.salePrice || 0.00}</td>
+                          <td>{stockStr}</td>
 
                           <td className='px-4 text-center'>
                             <Whisper
