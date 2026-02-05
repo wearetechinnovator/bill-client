@@ -5,8 +5,6 @@ import SideNav from '../../components/SideNav';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdCurrencyRupee } from "react-icons/md";
 import { MdOutlinePlaylistAdd } from "react-icons/md";
-import { FaRegCheckCircle } from "react-icons/fa";
-import { BiReset } from "react-icons/bi";
 import useMyToaster from '../../hooks/useMyToaster';
 import useApi from '../../hooks/useApi';
 import useBillPrefix from '../../hooks/useBillPrefix';
@@ -19,6 +17,8 @@ import AddItemModal from '../../components/AddItemModal';
 import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
+import { Constants } from '../../helper/constants';
+
 
 
 
@@ -44,9 +44,10 @@ const PurchaseInvoice = ({ mode }) => {
 	const [additionalRows, setAdditionalRow] = useState([additionalRowSet]); //{ additionalRowsItem: 1 }
 	const [formData, setFormData] = useState({
 		party: '', purchaseInvoiceNumber: '', originalInvoiceNumber: '', invoiceDate: new Date().toISOString().split('T')[0],
-		validDate: '', items: ItemRows, additionalCharge: additionalRows, note: '', terms: '',
-		discountType: '', discountAmount: '', discountPercentage: '', paymentStatus: '0', finalAmount: '',
-		autoRoundOff: false, roundOffType: '0', roundOffAmount: ''
+		validDate: '', items: ItemRows, additionalCharge: additionalRows, note: '', terms: '', discountType: '',
+		discountAmount: '', discountPercentage: '', paymentStatus: false, paymentType: Constants.CASH,
+		paymentAccount: '', paymentAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: '',
+		finalAmount: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -117,8 +118,7 @@ const PurchaseInvoice = ({ mode }) => {
 						setDiscountToggler(false);
 					}
 				} catch (error) {
-					console.log(error);
-					toast("Something went wrong for get data", 'error')
+					return toast("Something went wrong for get data", 'error')
 				}
 			}
 
@@ -708,34 +708,6 @@ const PurchaseInvoice = ({ mode }) => {
 										value={formData.terms}
 									/>
 								</div>
-								<div>
-									<p>Payment Status:</p>
-									<select name="" id=""
-										onChange={(e) => {
-											setFormData({ ...formData, paymentStatus: e.target.value })
-										}}
-										value={formData.paymentStatus}
-									>
-										<option value="0">Not Paid</option>
-										<option value="1">Paid</option>
-									</select>
-								</div>
-								<div>
-									<p>Select Account:</p>
-									<select
-										onChange={(e) => {
-											setFormData({ ...formData, paymentAccount: e.target.value })
-										}}
-										value={formData.paymentAccount}
-									>
-										<option value="">--Select Account--</option>
-										{
-											account.map((a, _) => {
-												return <option value={a._id} key={_}>{a.title}</option>
-											})
-										}
-									</select>
-								</div>
 							</div>
 							<div className='w-full'>
 								<div className='uppercase font-bold border border-dashed p-2 rounded'>
@@ -796,7 +768,8 @@ const PurchaseInvoice = ({ mode }) => {
 										</tfoot>
 									</table>
 								</div>
-								{/* Round Off Section */}
+
+								{/*======================[Round Off Section]============= */}
 								<div className='round__off__section'>
 									<div className='check__box__parent'>
 										<input type="checkbox"
@@ -833,6 +806,72 @@ const PurchaseInvoice = ({ mode }) => {
 											</button>
 										</div>
 									)}
+								</div>
+
+								{/* ======================[Payment Section]===================== */}
+								<div className='bill___payment__section'>
+									<div className='label__checkbox'>
+										<label htmlFor="fullPayment">Mark as full paid</label>
+										<input type="checkbox"
+											id='fullPayment'
+											onChange={(e) => {
+												const checked = e.target.checked;
+
+												setFormData(prev => ({
+													...prev,
+													paymentStatus: checked,
+													paymentAmount: checked ? prev.finalAmount : ''
+												}));
+											}}
+											checked={formData.paymentStatus}
+										/>
+									</div>
+									<div className='amount__input'>
+										<p>Amount Paid</p>
+										<div className='amount__and__select'>
+											<Icons.RUPES />
+											<input type="text"
+												disabled={formData.paymentStatus}
+												onChange={(e) => {
+													setFormData({ ...formData, paymentAmount: e.target.value })
+												}}
+												value={formData.paymentAmount}
+											/>
+											<select
+												onChange={(e) => {
+													setFormData({ ...formData, paymentType: e.target.value })
+												}}
+												value={formData.paymentType}
+											>
+												<option value={Constants.CASH}>Cash</option>
+												<option value={Constants.UPI}>UPI</option>
+												<option value={Constants.CARD}>Card</option>
+												<option value={Constants.NETBENKING}>Netbenking</option>
+												<option value={Constants.BANK}>Bank</option>
+												<option value={Constants.CHEQUE}>Cheque</option>
+											</select>
+										</div>
+									</div>
+									{
+										formData.paymentType !== Constants.CASH && (
+											<div className='payment__from'>
+												<p>Payment Made From</p>
+												<select
+													onChange={(e) => {
+														setFormData({ ...formData, paymentAccount: e.target.value })
+													}}
+													value={formData.paymentAccount}
+												>
+													<option value="">Select</option>
+													{
+														account.map((a, _) => {
+															return <option value={a._id} key={_}>{a.title}</option>
+														})
+													}
+												</select>
+											</div>
+										)
+									}
 								</div>
 
 								<p className='font-bold mt-4 mb-2'>Final Amount</p>

@@ -485,8 +485,8 @@ const PurchaseInvoice = () => {
 													Date {ascending ? <MdOutlineArrowDropDown /> : <RiArrowDropUpFill />}
 												</div>
 											</th>
-											<th align='left'>Purchase Invoice Number</th>
-											<th align='left'>Original Invoice Number</th>
+											<th align='left' width={"15%"}>Purchase Invoice Number</th>
+											<th align='left' width={"15%"}>Original Invoice Number</th>
 											<th align='left'>Party Name</th>
 											<th align='left'>Due Date</th>
 											<th align='left'>Status</th>
@@ -512,7 +512,7 @@ const PurchaseInvoice = () => {
 													<td>{new Date(data.validDate).toLocaleDateString()}</td>
 													<td>
 														<span className={`${data.paymentStatus === "1" ? 'green-badge' : 'red-badge'} badge`}>
-															{data.paymentStatus === "1" ? "Paid" : "Not Paid"}
+															{data.paymentStatus === "1" ? "Paid" : "Unpaid"}
 														</span>
 													</td>
 
@@ -525,9 +525,7 @@ const PurchaseInvoice = () => {
 																	className='table__list__action__icon'
 																	onClick={(e) => {
 																		e.stopPropagation();
-																		if (data.paymentStatus === "0") {
-																			navigate(`/admin/purchase-invoice/edit/${data._id}`)
-																		}
+																		navigate(`/admin/purchase-invoice/edit/${data._id}`)
 																	}}
 																>
 																	<FaRegEdit className='text-[16px]' />

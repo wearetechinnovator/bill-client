@@ -1299,9 +1299,50 @@ input {
 .round__of__input__parent input{
   @apply border-none rounded-none text-[13px] w-[60px];
 }
+
+
 .feat__card__text{
   @apply text-[#333333] font-[700] text-[14px];
 }
+
+/* Payment Section in Bill */
+/* ======================= */
+.bill___payment__section{
+  @apply flex justify-center items-end flex-col w-full mt-5 pt-3 pb-4 border-t border-b;
+}
+.bill___payment__section .label__checkbox{
+  @apply flex items-center gap-2;
+}
+.bill___payment__section .amount__input{
+  @apply w-full flex justify-between items-center overflow-hidden;
+}
+.bill___payment__section .amount__and__select input, .bill___payment__section .amount__and__select select{
+  @apply border-none rounded-none;
+}
+.bill___payment__section .amount__and__select select{
+  @apply w-[140px]
+}
+.bill___payment__section .amount__and__select input{
+  @apply bg-slate-50 text-right rounded-tr rounded-br ;
+  line-height: normal !important;
+}
+.bill___payment__section .amount__and__select svg{
+  @apply text-[20px] bg-slate-50 ml-1 rounded-none
+}
+.bill___payment__section .amount__and__select{
+  @apply mt-2 flex items-center border rounded w-[250px]
+}
+.bill___payment__section .payment__from{
+   @apply w-full mt-2 flex items-center  justify-between;
+}
+.bill___payment__section .payment__from select{
+  @apply w-[250px]
+}
+
+
+
+
+
 
 
 /* =================== */

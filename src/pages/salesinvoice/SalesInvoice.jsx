@@ -14,11 +14,9 @@ import AddNew from '../../components/AddNew';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
+import { Constants } from '../../helper/constants';
 
 
-const TOTAL_SALE = 'total_sale';
-const PAID = 'paid';
-const UNPAID = 'unpaid';
 const SalesInvoice = () => {
 	const toast = useMyToaster();
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -51,7 +49,7 @@ const SalesInvoice = () => {
 	const [totalPaymentIn, setTotalPaymentIn] = useState(0);
 	const [totalDuePayment, setTotalDuePayment] = useState(0);
 	const [openConfirm, setOpenConfirm] = useState(false);
-	const [selectedTab, setSelectedTab] = useState(TOTAL_SALE);
+	const [selectedTab, setSelectedTab] = useState(Constants.TOTAL_SALE);
 
 
 
@@ -79,19 +77,24 @@ const SalesInvoice = () => {
 				setTotalSaleAmount(totalAmount.toFixed(2));
 
 				// Total Unpaid
-				const totalUnpaid = res.data.reduce((acc, i) => acc += i.dueAmount, 0);
-				setTotalDuePayment(totalUnpaid.toFixed(2))
+				const totalPaid = res.data.reduce((acc, i) => {
+					if (i.paymentAmount) {
+						acc += i.paymentAmount;
+					}
+					return acc;
+				}, 0);
+				setTotalPaymentIn(totalPaid.toFixed(2))
 
-				// Total Paid
-				setTotalPaymentIn((totalAmount - totalUnpaid).toFixed(2))
+				// Total UnPaid
+				setTotalDuePayment((totalAmount - totalPaid).toFixed(2))
 
 
-				if (selectedTab === PAID) {
-					const unpaidInv = res.data.filter(d => d.paymentStatus === "1");
+				if (selectedTab === Constants.PAID) {
+					const unpaidInv = res.data.filter(d => d.paymentAmount);
 					setBillData(unpaidInv);
 				}
-				else if (selectedTab === UNPAID) {
-					const paidInv = res.data.filter(d => d.paymentStatus !== "1");
+				else if (selectedTab === Constants.UNPAID) {
+					const paidInv = res.data.filter(d => !d.paymentAmount || d.paymentAmount < d.finalAmount);
 					setBillData(paidInv);
 				}
 				else {
@@ -488,22 +491,22 @@ const SalesInvoice = () => {
 						!loading ? billData.length > 0 ? <div className='content__body__main'>
 							<div className='flex flex-col md:flex-row justify-between items-center mb-5 gap-8'>
 								<div
-									onClick={() => setSelectedTab(TOTAL_SALE)}
-									className={`party__data ${selectedTab === TOTAL_SALE ? 'active' : ''}`}
+									onClick={() => setSelectedTab(Constants.TOTAL_SALE)}
+									className={`party__data ${selectedTab === Constants.TOTAL_SALE ? 'active' : ''}`}
 								>
 									<h6><Icons.INVOICE /> Total Sale</h6>
 									<p><Icons.RUPES />{totalSaleAmount}</p>
 								</div>
 								<div
-									onClick={() => setSelectedTab(PAID)}
-									className={`party__data ${selectedTab === PAID ? 'active' : ''}`}
+									onClick={() => setSelectedTab(Constants.PAID)}
+									className={`party__data ${selectedTab === Constants.PAID ? 'active' : ''}`}
 								>
 									<h6><Icons.TREDING_UP />Paid</h6>
 									<p><Icons.RUPES />{totalPaymentIn}</p>
 								</div>
 								<div
-									onClick={() => setSelectedTab(UNPAID)}
-									className={`party__data ${selectedTab === UNPAID ? 'active' : ''}`}
+									onClick={() => setSelectedTab(Constants.UNPAID)}
+									className={`party__data ${selectedTab === Constants.UNPAID ? 'active' : ''}`}
 								>
 									<h6><Icons.TREDING_DOWN />Unpaid</h6>
 									<p><Icons.RUPES /> {totalDuePayment} </p>
@@ -536,6 +539,17 @@ const SalesInvoice = () => {
 									<tbody>
 										{
 											billData.map((data, i) => {
+												let paymentStatus = Constants.UNPAID;
+												const paymentAmount = Number(data.paymentAmount) || 0;
+
+												if (data.finalAmount === paymentAmount) {
+													paymentStatus = Constants.PAID;
+												}
+												else if (paymentAmount > 0 && paymentAmount < data.finalAmount) {
+													paymentStatus = Constants.PARTIAL_PAID;
+												}
+
+
 												return <tr key={i}
 													onClick={() => navigate(`/admin/bill/details/salesinvoice/${data._id}`)}>
 													<td className='py-2 max-w-[10px]' align='center'>
@@ -552,16 +566,17 @@ const SalesInvoice = () => {
 														{data.DueDate ? new Date(data.DueDate).toLocaleDateString() : "--"}
 													</td>
 													<td align='left'>
-														<span className={`${data.paymentStatus === "1" ? 'green-badge' : data.paymentStatus === "2" ? 'yellow-badge' : 'red-badge'} badge`}>
-															{data.paymentStatus === "1" ? "Paid" : data.paymentStatus === "2" ? "Partial Paid" : "Unpaid"}
+														<span className={`${paymentStatus === Constants.PAID ? 'green-badge' : paymentStatus === Constants.PARTIAL_PAID ? 'yellow-badge' : 'red-badge'} badge capitalize`}>
+															{paymentStatus}
 														</span>
 													</td>
 													<td align='left'>
 														<Icons.RUPES className='inline' /> {data.finalAmount}
 														{
-															Number(data.dueAmount || 0) !== 0 && (
+															paymentStatus !== Constants.PAID && (
 																<p className='text-[12px] py-1'>
-																	(<Icons.RUPES className='inline text-[10px]' /> {data.dueAmount} unpaid)
+																	<Icons.RUPES className='inline text-[10px]' />
+																	{data.finalAmount - paymentAmount} unpaid
 																</p>
 															)
 														}
@@ -575,7 +590,7 @@ const SalesInvoice = () => {
 																	className='table__list__action__icon'
 																	onClick={(e) => {
 																		e.stopPropagation();
-																		if (data.paymentStatus === "0") { navigate(`/admin/sales-invoice/edit/${data._id}`) }
+																		navigate(`/admin/sales-invoice/edit/${data._id}`)
 																	}}
 																>
 																	<Icons.EDIT className='text-[16px]' />

@@ -1,11 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { SelectPicker, DatePicker, Button } from 'rsuite';
+import { SelectPicker, Button } from 'rsuite';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlinePlaylistAdd } from "react-icons/md";
-import { FaRegCheckCircle } from "react-icons/fa";
-import { BiReset } from "react-icons/bi";
 import useMyToaster from '../../hooks/useMyToaster';
 import useApi from '../../hooks/useApi';
 import useBillPrefix from '../../hooks/useBillPrefix';
@@ -22,6 +20,7 @@ import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
+import { Constants } from '../../helper/constants';
 
 
 
@@ -49,7 +48,8 @@ const PurchaseInvoice = ({ mode }) => {
 	const [formData, setFormData] = useState({
 		party: '', purchaseReturnNumber: '', returnDate: new Date().toISOString().split('T')[0],
 		items: ItemRows, additionalCharge: additionalRows, note: '', terms: '', discountType: '',
-		discountAmount: '', discountPercentage: '', finalAmount: '',
+		discountAmount: '', discountPercentage: '', finalAmount: '', paymentStatus: false,
+		paymentType: Constants.CASH, paymentAccount: '', paymentAmount: '',
 		autoRoundOff: false, roundOffType: '0', roundOffAmount: ''
 	})
 
@@ -71,6 +71,8 @@ const PurchaseInvoice = ({ mode }) => {
 	const [tax, setTax] = useState([]);
 	// Store party
 	const [party, setParty] = useState([]);
+	// Account
+	const [account, setAccount] = useState([])
 
 
 	// store label and value pair for dropdown
@@ -130,15 +132,8 @@ const PurchaseInvoice = ({ mode }) => {
 		const apiData = async () => {
 			{
 				const data = await getApiData("item");
-				setItems([...data.data]);
-
 				const newItemData = data.data.map(d => ({ label: d.title, value: d.title }));
 				setItemData(newItemData);
-			}
-			{
-				const data = await getApiData("unit");
-				const unit = data.data.map(d => ({ label: d.title, value: d.title }));
-				setUnit([...unit]);
 			}
 			{
 				const data = await getApiData("tax");
@@ -151,6 +146,10 @@ const PurchaseInvoice = ({ mode }) => {
 				const party = data.data.map(d => ({ label: d.name, value: d._id }));
 				setParty([...party]);
 			}
+			{
+				const data = await getApiData("account")
+				setAccount([...data.data])
+			}
 		}
 
 		apiData();
@@ -162,7 +161,6 @@ const PurchaseInvoice = ({ mode }) => {
 	// useEffect(() => {
 	//   setFormData({ ...formData, purchaseReturnNumber: getBillPrefix });
 	// }, [getBillPrefix])
-
 
 
 	// When `discount type is before` and apply discount this useEffect run;
@@ -897,6 +895,72 @@ const PurchaseInvoice = ({ mode }) => {
 										</div>
 									)}
 								</div>
+								{/* ======================[Payment Section]===================== */}
+								<div className='bill___payment__section'>
+									<div className='label__checkbox'>
+										<label htmlFor="fullPayment">Mark as full paid</label>
+										<input type="checkbox"
+											id='fullPayment'
+											onChange={(e) => {
+												const checked = e.target.checked;
+
+												setFormData(prev => ({
+													...prev,
+													paymentStatus: checked,
+													paymentAmount: checked ? prev.finalAmount : ''
+												}));
+											}}
+											checked={formData.paymentStatus}
+										/>
+									</div>
+									<div className='amount__input'>
+										<p>Amount Paid</p>
+										<div className='amount__and__select'>
+											<Icons.RUPES />
+											<input type="text"
+												disabled={formData.paymentStatus}
+												onChange={(e) => {
+													setFormData({ ...formData, paymentAmount: e.target.value })
+												}}
+												value={formData.paymentAmount}
+											/>
+											<select
+												onChange={(e) => {
+													setFormData({ ...formData, paymentType: e.target.value })
+												}}
+												value={formData.paymentType}
+											>
+												<option value={Constants.CASH}>Cash</option>
+												<option value={Constants.UPI}>UPI</option>
+												<option value={Constants.CARD}>Card</option>
+												<option value={Constants.NETBENKING}>Netbenking</option>
+												<option value={Constants.BANK}>Bank</option>
+												<option value={Constants.CHEQUE}>Cheque</option>
+											</select>
+										</div>
+									</div>
+									{
+										formData.paymentType !== Constants.CASH && (
+											<div className='payment__from'>
+												<p>Payment Made From</p>
+												<select
+													onChange={(e) => {
+														setFormData({ ...formData, paymentAccount: e.target.value })
+													}}
+													value={formData.paymentAccount}
+												>
+													<option value="">Select</option>
+													{
+														account.map((a, _) => {
+															return <option value={a._id} key={_}>{a.title}</option>
+														})
+													}
+												</select>
+											</div>
+										)
+									}
+								</div>
+
 								<p className='font-bold mt-4 mb-2'>Final Amount</p>
 								<input type="text" name="final_amount"
 									value={formData.finalAmount}
@@ -910,11 +974,11 @@ const PurchaseInvoice = ({ mode }) => {
 							<button
 								onClick={saveBill}
 								className='add-bill-btn'>
-								<FaRegCheckCircle />
+								<Icons.CHECK />
 								{!mode || mode === "convert" ? "Save" : "Update"}
 							</button>
 							<button className='reset-bill-btn' onClick={clearForm}>
-								<BiReset />
+								<Icons.RESET />
 								Reset
 							</button>
 						</div>

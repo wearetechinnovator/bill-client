@@ -14,6 +14,7 @@ import AddItemModal from '../../components/AddItemModal';
 import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
+import { Constants } from '../../helper/constants';
 
 
 
@@ -39,8 +40,9 @@ const SalesReturn = ({ mode }) => {
 	const [formData, setFormData] = useState({
 		party: '', salesReturnNumber: '', returnDate: new Date().toISOString().split('T')[0],
 		items: ItemRows, additionalCharge: additionalRows, note: '', terms: '', discountType: '',
-		discountAmount: '', discountPercentage: '', finalAmount: '', autoRoundOff: false, roundOffType: '0',
-		roundOffAmount: ''
+		discountAmount: '', discountPercentage: '', finalAmount: '', paymentStatus: false,
+		paymentType: Constants.CASH, paymentAccount: '', paymentAmount: '', autoRoundOff: false,
+		roundOffType: '0', roundOffAmount: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -59,6 +61,8 @@ const SalesReturn = ({ mode }) => {
 	const [tax, setTax] = useState([]);
 	// Store party
 	const [party, setParty] = useState([]);
+	// Account
+	const [account, setAccount] = useState([])
 
 
 	// store label and value pair for dropdown
@@ -143,6 +147,10 @@ const SalesReturn = ({ mode }) => {
 				const party = data.data.map(d => ({ label: d.name, value: d._id }));
 				setParty([...party]);
 			}
+			{
+				const data = await getApiData("account")
+				setAccount([...data.data])
+			}
 		}
 
 		apiData();
@@ -209,7 +217,7 @@ const SalesReturn = ({ mode }) => {
 		return taxamount;
 	}
 
-	
+
 	const calculatePerAmount = (index) => {
 		const qun = ItemRows[index].qun;
 		const price = ItemRows[index].price;
@@ -793,7 +801,8 @@ const SalesReturn = ({ mode }) => {
 										</tfoot>
 									</table>
 								</div>
-								{/* Round Off Section */}
+
+								{/* =====================[Round Off Section]=================== */}
 								<div className='round__off__section'>
 									<div className='check__box__parent'>
 										<input type="checkbox"
@@ -831,8 +840,76 @@ const SalesReturn = ({ mode }) => {
 										</div>
 									)}
 								</div>
+
+								{/* ======================[Payment Section]===================== */}
+								<div className='bill___payment__section'>
+									<div className='label__checkbox'>
+										<label htmlFor="fullPayment">Mark as full paid</label>
+										<input type="checkbox"
+											id='fullPayment'
+											onChange={(e) => {
+												const checked = e.target.checked;
+
+												setFormData(prev => ({
+													...prev,
+													paymentStatus: checked,
+													paymentAmount: checked ? prev.finalAmount : ''
+												}));
+											}}
+											checked={formData.paymentStatus}
+										/>
+									</div>
+									<div className='amount__input'>
+										<p>Amount Paid</p>
+										<div className='amount__and__select'>
+											<Icons.RUPES />
+											<input type="text"
+												disabled={formData.paymentStatus}
+												onChange={(e) => {
+													setFormData({ ...formData, paymentAmount: e.target.value })
+												}}
+												value={formData.paymentAmount}
+											/>
+											<select
+												onChange={(e) => {
+													setFormData({ ...formData, paymentType: e.target.value })
+												}}
+												value={formData.paymentType}
+											>
+												<option value={Constants.CASH}>Cash</option>
+												<option value={Constants.UPI}>UPI</option>
+												<option value={Constants.CARD}>Card</option>
+												<option value={Constants.NETBENKING}>Netbenking</option>
+												<option value={Constants.BANK}>Bank</option>
+												<option value={Constants.CHEQUE}>Cheque</option>
+											</select>
+										</div>
+									</div>
+									{
+										formData.paymentType !== Constants.CASH && (
+											<div className='payment__from'>
+												<p>Payment Made From</p>
+												<select
+													onChange={(e) => {
+														setFormData({ ...formData, paymentAccount: e.target.value })
+													}}
+													value={formData.paymentAccount}
+												>
+													<option value="">Select</option>
+													{
+														account.map((a, _) => {
+															return <option value={a._id} key={_}>{a.title}</option>
+														})
+													}
+												</select>
+											</div>
+										)
+									}
+								</div>
+
 								<p className='font-bold mt-4 mb-2'>Final Amount</p>
-								<input type="text" name="final_amount"
+								<input type="text"
+									name="final_amount"
 									value={formData.finalAmount}
 									className='bg-gray-100 custom-disabled w-full'
 									disabled

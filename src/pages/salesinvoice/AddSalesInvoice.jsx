@@ -14,6 +14,7 @@ import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
+import { Constants } from '../../helper/constants';
 
 
 
@@ -41,8 +42,9 @@ const SalesInvoice = ({ mode }) => {
 	const [formData, setFormData] = useState({
 		party: '', salesInvoiceNumber: '', invoiceDate: new Date().toISOString().split('T')[0], DueDate: '',
 		items: ItemRows, additionalCharge: additionalRows, note: '', terms: '', discountType: '',
-		discountAmount: '', discountPercentage: '', paymentStatus: '0', paymentAccount: '', finalAmount: '',
-		paymentAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: ''
+		discountAmount: '', discountPercentage: '', paymentStatus: false, paymentType: Constants.CASH,
+		paymentAccount: '', paymentAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: '',
+		finalAmount: ''
 	})
 	const location = useLocation();
 	const fromWhichBill = location.state?.fromWhichBill || null;
@@ -97,7 +99,7 @@ const SalesInvoice = ({ mode }) => {
 				url = `${process.env.REACT_APP_API_URL}${"/quotation/get"}`
 			}
 
-			
+
 			const req = await fetch(url, {
 				method: "POST",
 				headers: {
@@ -819,7 +821,8 @@ const SalesInvoice = ({ mode }) => {
 										value={formData.terms}
 									/>
 								</div>
-								{/* Add Bank Account */}
+
+								{/* ===========================[Add Bank Account]=================== */}
 								<div className='add_account__section'>
 									{
 										accountDetails === null && (
@@ -870,50 +873,6 @@ const SalesInvoice = ({ mode }) => {
 										)
 									}
 								</div>
-
-								<div>
-									<p>Payment Status:</p>
-									<select
-										onChange={(e) => {
-											setFormData({ ...formData, paymentStatus: e.target.value })
-										}}
-										value={formData.paymentStatus}
-									>
-										<option value="0">Not Paid</option>
-										<option value="1">Full Paid</option>
-										<option value="2">Partial Paid</option>
-									</select>
-								</div>
-								{
-									formData.paymentStatus === "1" || formData.paymentStatus === "2" ?
-										<div className='flex items-center gap-2'>
-											<div className='w-full'>
-												<p>Amount:</p>
-												<input type="text"
-													onChange={(e) => setFormData({ ...formData, paymentAmount: e.target.value })}
-													value={formData.paymentAmount}
-												/>
-											</div>
-
-											<div className='w-full'>
-												<p>Select Account:</p>
-												<select
-													onChange={(e) => {
-														setFormData({ ...formData, paymentAccount: e.target.value })
-													}}
-													value={formData.paymentAccount}
-												>
-													<option value="">--Select Account--</option>
-													{
-														account.map((a, _) => {
-															return <option value={a._id} key={_}>{a.title}</option>
-														})
-													}
-												</select>
-											</div>
-										</div>
-										: null
-								}
 							</div>
 							<div className='w-full'>
 								<div className='uppercase font-bold border border-dashed p-2 rounded'>
@@ -975,7 +934,7 @@ const SalesInvoice = ({ mode }) => {
 									</table>
 								</div>
 
-								{/* Round Off Section */}
+								{/* =====================[Round Off Section]=================== */}
 								<div className='round__off__section'>
 									<div className='check__box__parent'>
 										<input type="checkbox"
@@ -1012,6 +971,72 @@ const SalesInvoice = ({ mode }) => {
 											</button>
 										</div>
 									)}
+								</div>
+
+								{/* ======================[Payment Section]===================== */}
+								<div className='bill___payment__section'>
+									<div className='label__checkbox'>
+										<label htmlFor="fullPayment">Mark as full paid</label>
+										<input type="checkbox"
+											id='fullPayment'
+											onChange={(e) => {
+												const checked = e.target.checked;
+
+												setFormData(prev => ({
+													...prev,
+													paymentStatus: checked,
+													paymentAmount: checked ? prev.finalAmount : ''
+												}));
+											}}
+											checked={formData.paymentStatus}
+										/>
+									</div>
+									<div className='amount__input'>
+										<p>Amount Paid</p>
+										<div className='amount__and__select'>
+											<Icons.RUPES />
+											<input type="text"
+												disabled={formData.paymentStatus}
+												onChange={(e) => {
+													setFormData({ ...formData, paymentAmount: e.target.value })
+												}}
+												value={formData.paymentAmount}
+											/>
+											<select
+												onChange={(e) => {
+													setFormData({ ...formData, paymentType: e.target.value })
+												}}
+												value={formData.paymentType}
+											>
+												<option value={Constants.CASH}>Cash</option>
+												<option value={Constants.UPI}>UPI</option>
+												<option value={Constants.CARD}>Card</option>
+												<option value={Constants.NETBENKING}>Netbenking</option>
+												<option value={Constants.BANK}>Bank</option>
+												<option value={Constants.CHEQUE}>Cheque</option>
+											</select>
+										</div>
+									</div>
+									{
+										formData.paymentType !== Constants.CASH && (
+											<div className='payment__from'>
+												<p>Payment Made From</p>
+												<select
+													onChange={(e) => {
+														setFormData({ ...formData, paymentAccount: e.target.value })
+													}}
+													value={formData.paymentAccount}
+												>
+													<option value="">Select</option>
+													{
+														account.map((a, _) => {
+															return <option value={a._id} key={_}>{a.title}</option>
+														})
+													}
+												</select>
+											</div>
+										)
+									}
 								</div>
 
 								<p className='font-bold mt-4 mb-2'>Final Amount</p>
