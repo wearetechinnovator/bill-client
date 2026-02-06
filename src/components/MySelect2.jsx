@@ -11,6 +11,7 @@ import { PartyComponent } from '../pages/party/AddParty';
 import { AddItemComponent } from '../pages/Items/ItemAdd';
 import { CategoryComponent } from '../pages/Item/CategoryAdd';
 import { toggle } from '../store/partyModalSlice';
+import { Constants } from '../helper/constants';
 
 
 
@@ -89,7 +90,6 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
           search: true,
           searchText: v
         };
-        if (model === "party") payload.partyType = partyType;
 
         const req = await fetch(url, {
           method: "POST",
@@ -266,7 +266,6 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
     </>
   )
 }
-
 
 
 export default MySelect2;

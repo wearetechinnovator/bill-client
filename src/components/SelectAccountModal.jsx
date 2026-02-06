@@ -34,6 +34,7 @@ const SelectAccountModal = ({ openModal, openStatus, getAccountDetails }) => {
                 if (req.status !== 200) {
                     return toast(res.err, 'error');
                 }
+                console.log("modal", res.data)
                 setAccounts(res.data);
 
             } catch (err) {
@@ -57,7 +58,6 @@ const SelectAccountModal = ({ openModal, openStatus, getAccountDetails }) => {
             <Modal.Body>
                 {
                     accounts?.map((account, i) => {
-                        if (account.type !== 'bank') return null;
                         return (
                             <label key={i} className={`flex items-center justify-between text-xs border py-2 cursor-pointer mb-1 p-2 rounded ${activeBox === i ? 'border-blue-300 bg-blue-50' : 'border-gray-200'}`}
                                 onClick={() => {
@@ -66,7 +66,7 @@ const SelectAccountModal = ({ openModal, openStatus, getAccountDetails }) => {
                                 }}
                             >
                                 <div className='w-full'>
-                                    <p>{account.bankName}</p>
+                                    <p>{account.accountName}</p>
                                     <p className='text-gray-500'>Acc No: {account.accountNumber}</p>
                                 </div>
                                 <div className='flex items-center w-full justify-end'>

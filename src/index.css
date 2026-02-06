@@ -55,9 +55,9 @@
   padding: 10px;
   border-radius: 5px;
   box-shadow: 0px 0px 5px lightgrey;
-  /* border:1px solid #E5E7EB; */
   font-size: 13px !important;
   background-color: white;
+  @apply border border-slate-300;
 }
 
 /* .content__body__main:hover{
@@ -1341,8 +1341,36 @@ input {
 
 
 
-
-
+.payment__satelment{
+  @apply w-full overflow-x-auto rounded-md;
+}
+.payment__satel__table{
+  @apply min-w-full;
+}
+.payment__satel__table tr td{
+  @apply border px-2;
+}
+.payment__satel__table thead{
+  @apply bg-[#F6F7FB]
+}
+.satelment__search__area{
+  @apply w-full flex flex-col md:flex-row justify-between items-center pt-1 pb-3;
+}
+.satelment__search__area p{
+  @apply font-bold text-[15px]
+}
+.satelment__search__area div{
+  @apply flex items-center border rounded px-2 py-1;
+}
+.satelment__search__area div:focus-within {
+  border: 1px solid #003E32;
+}
+.satelment__search__area div svg{
+  @apply text-[16px]
+}
+.satelment__search__area input{
+  @apply border-none
+}
 
 
 /* =================== */

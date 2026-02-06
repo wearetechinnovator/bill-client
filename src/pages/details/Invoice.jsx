@@ -21,7 +21,7 @@ import { Icons } from '../../helper/icons';
 import { AddPaymentOutComponent } from '../paymentout/AddPayment';
 import { AddPaymentInComponent } from '../paymentin/AddPayment';
 import Loading from '../../components/Loading';
-
+import QRCode from "qrcode";
 
 
 
@@ -49,6 +49,7 @@ const Invoice = () => {
 	const [billNumber, setBillNumber] = useState('');
 	const [billDate, setBillDate] = useState('');
 	const [accountDetails, setAccountDetails] = useState(null);
+	const [qr, setQr] = useState("");
 
 
 
@@ -128,6 +129,14 @@ const Invoice = () => {
 							|| res.data?.chalanDate
 						);
 						setAccountDetails(res.data.accountId || null);
+
+						// Genareate QRCode;
+						if(res.data.accountId && res.data.accountId?.upiId){
+							const account = res.data.accountId;
+							const upiLink = `upi://pay?pa=${account.upiId}&pn=${account.accountHolderName}&am=${res.data.finalAmount}&cu=INR`;
+							console.log(upiLink);
+							QRCode.toDataURL(upiLink).then(setQr);
+						}
 					}
 					return res;
 				}
@@ -299,31 +308,6 @@ const Invoice = () => {
 			<Nav />
 			<main id='main'>
 				<SideNav />
-
-				{/* <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} >
-          <Drawer.Header>
-            <Drawer.Actions>
-              Make Payment
-            </Drawer.Actions>
-          </Drawer.Header>
-          <Drawer.Body>
-            {
-              urlRoute === "purchaseinvoice" && <AddPaymentOutComponent
-                partyId={billData?.party?._id}
-                invoiceNumber={billData?.purchaseInvoiceNumber}
-                due={billData?.dueAmount}
-              />
-            }
-
-            {
-              urlRoute === "salesinvoice" && <AddPaymentInComponent
-                partyId={billData?.party?._id}
-                invoiceNumber={billData?.purchaseInvoiceNumber}
-                due={billData?.dueAmount}
-              />
-            }
-          </Drawer.Body>
-        		</Drawer> */}
 				{/* Payment drawer close */}
 				<MailModal open={openModal} pdf={pdfData} email={billData?.party?.email} />
 
@@ -334,13 +318,6 @@ const Invoice = () => {
 							{/* Action buttons */}
 							<div className='flex items-center justify-between mb-5 bg-gray-50 p-2'>
 								<div id='invoiceBtn' className='flex gap-2 items-center'>
-									{/* {((urlRoute === "purchaseinvoice" || urlRoute === "salesinvoice") && billData?.dueAmount > 0) &&
-									<button
-										onClick={openPaymentSideBar}
-										className='bg-[#003E32] text-white rounded-[5px] px-2 py-[5px] gap-1'>
-										Make Payment
-									</button>
-									} */}
 									<button
 										onClick={() => {
 											swal({
@@ -520,9 +497,9 @@ const Invoice = () => {
 													<td colSpan={3} align='right'>TOTAL</td>
 													<td>{billDetails.qun}</td>
 													<td></td>
-													<td><Icons.RUPES className='inline'/>{billDetails.discount}</td>
-													<td><Icons.RUPES className='inline'/>{billDetails.taxAmount}</td>
-													<td><Icons.RUPES className='inline'/>{billDetails.amount}</td>
+													<td><Icons.RUPES className='inline' />{billDetails.discount}</td>
+													<td><Icons.RUPES className='inline' />{billDetails.taxAmount}</td>
+													<td><Icons.RUPES className='inline' />{billDetails.amount}</td>
 												</tr>
 												{billData?.roundOffAmount && <tr className='font-bold bg-[#F3F4F6]'>
 													<td colSpan={7} align='right' className='italic'>Round Off</td>
@@ -595,29 +572,33 @@ const Invoice = () => {
 																<p className='font-semibold' style={{ lineHeight: '11px' }}>Bank Name:</p>
 															</div>
 															<div style={{ width: "70%" }}>
-																<p style={{ lineHeight: '11px' }}>{accountDetails?.holderName}</p>
+																<p style={{ lineHeight: '11px' }}>{accountDetails?.accountHolderName}</p>
 																<p style={{ lineHeight: '11px' }}>{accountDetails?.ifscCode}</p>
 																<p style={{ lineHeight: '11px' }}>{accountDetails?.accountNumber}</p>
-																<p style={{ lineHeight: '11px' }}>{accountDetails?.bankName}</p>
+																<p style={{ lineHeight: '11px' }}>{accountDetails?.branchName}</p>
 															</div>
 														</div>
 													</div>
 												)
 											}
-											<div className='border-l w-full p-2'>
-												<p className='font-bold text-md'>Payment QR Code</p>
-												<div className='w-full flex items-center' style={{ fontSize: '12px' }}>
-													<div className='w-full'>
-														<p className='font-semibold' style={{ lineHeight: '11px' }}>UPI ID :</p>
-														<p className='font-semibold' style={{ lineHeight: '11px' }}>My@id</p>
+											{
+												accountDetails?.upiId && (
+													<div className='border-l w-full p-2'>
+														<p className='font-bold text-md'>Payment QR Code</p>
+														<div className='w-full flex items-center' style={{ fontSize: '12px' }}>
+															<div className='w-full'>
+																<p className='font-semibold' style={{ lineHeight: '11px' }}>UPI ID :</p>
+																<p className='font-semibold' style={{ lineHeight: '11px' }}>{accountDetails.upiId}</p>
+															</div>
+															<div className='w-full'>
+																<img
+																	style={{ height: '80px', float: 'right' }}
+																	src={qr} />
+															</div>
+														</div>
 													</div>
-													<div className='w-full'>
-														<img
-															style={{ height: '80px', float: 'right' }}
-															src="https://www.researchgate.net/profile/Hafiza-Abas/publication/288303807/figure/fig1/AS:311239419940864@1451216668048/An-example-of-QR-code.png" />
-													</div>
-												</div>
-											</div>
+												)
+											}
 										</div>
 										<div className='w-full flex'>
 											<div className='w-full p-2'>

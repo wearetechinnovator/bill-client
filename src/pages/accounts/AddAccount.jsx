@@ -37,7 +37,11 @@ const AddAccount = ({ mode }) => {
                     body: JSON.stringify({ token: cookie, id: id })
                 })
                 const res = await req.json();
-                setForm({ ...form, ...res.data });
+                setForm({
+                    ...form, ...res.data,
+                    reEnterAccountNumber: res.data.accountNumber,
+                    asOfDate: res.data.asOfDate.split("T")[0]
+                });
 
             }
 
@@ -49,7 +53,8 @@ const AddAccount = ({ mode }) => {
     const saveData = async (e) => {
         if (!form.isBankDetails && !form.accountName) {
             return toast("Account name can't be blank", "error")
-        } else {
+        }
+        else if (form.isBankDetails) {
             if (!form.accountName)
                 return toast("Account name can't be blank", "error");
             else if (!form.accountNumber)
@@ -62,7 +67,12 @@ const AddAccount = ({ mode }) => {
                 return toast("Branch name can't be blank", "error");
             else if (!form.accountHolderName)
                 return toast("Account holder name can't be blank", "error")
+
+            if (Number(form.accountNumber) !== Number(form.reEnterAccountNumber))
+                return toast("Re-entered account number does not match", "error");
         }
+
+
 
         try {
             const url = process.env.REACT_APP_API_URL + "/account/add";
@@ -189,9 +199,9 @@ const AddAccount = ({ mode }) => {
                                             <p>Re-Enter Bank Account Number <span className='required__text'>*</span></p>
                                             <input type='text'
                                                 onChange={(e) => setForm({
-                                                    ...form, accountNumber: checkNumber(e.target.value)
+                                                    ...form, reEnterAccountNumber: checkNumber(e.target.value)
                                                 })}
-                                                value={form.accountNumber}
+                                                value={form.reEnterAccountNumber}
                                             />
                                         </div>
                                         <div className='mt-2'>

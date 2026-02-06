@@ -9,4 +9,11 @@ export const Constants = {
     UNPAID: 'unpaid',
     PARTIAL_PAID: 'partial paid',
     TOTAL_SALE: 'total_sale',
+    CUSTOMER: 'customer',
+    PARTY: 'party',
+    PAY: 'pay',
+    COLLECT: 'collect',
+    CUSTOMER: 'customer',
+    SUPPLIER: 'supplier',
+    BOTHPARTY: 'both'
 }

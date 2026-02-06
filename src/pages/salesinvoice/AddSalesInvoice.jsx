@@ -478,8 +478,8 @@ const SalesInvoice = ({ mode }) => {
 							<div className='flex flex-col gap-2 w-full'>
 								<p className='text-xs'>Select Party <span className='required__text'>*</span></p>
 								<MySelect2
-									model={"party"}
-									partyType={"customer"}
+									model={Constants.PARTY}
+									partyType={Constants.CUSTOMER}
 									onType={(v) => {
 										setFormData({ ...formData, party: v })
 									}}
@@ -865,8 +865,8 @@ const SalesInvoice = ({ mode }) => {
 													<div>
 														<p>{accountDetails?.accountNumber}</p>
 														<p>{accountDetails?.ifscCode}</p>
-														<p>{accountDetails?.bankName}</p>
-														<p>{accountDetails?.holderName}</p>
+														<p>{accountDetails?.branchName}</p>
+														<p>{accountDetails?.accountHolderName}</p>
 													</div>
 												</div>
 											</div>

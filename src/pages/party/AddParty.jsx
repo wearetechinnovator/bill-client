@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
 import useMyToaster from '../../hooks/useMyToaster';
@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 import { useNavigate, useParams } from 'react-router-dom';
 import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
+import { Constants } from '../../helper/constants';
 
 
 
@@ -24,15 +25,12 @@ const AddParty = ({ mode }) => {
 }
 
 
-const CUSTOMER = 'customer';
-const SUPPLIER = 'supplier';
-const BOTHPARTY = 'both';
 const PartyComponent = ({ mode, save, getRes }) => {
 	const token = Cookies.get("token");
 	const { id } = useParams()
 	const toast = useMyToaster()
 	const [partyData, setPartyData] = useState({
-		name: "", type: CUSTOMER, contactNumber: "", billingAddress: "", shippingAddress: '',
+		name: "", type: Constants.CUSTOMER, contactNumber: "", billingAddress: "", shippingAddress: '',
 		pan: "", gst: "", openingBalance: "0", details: '', email: '',
 		partyCategory: '', creditPeriod: '', creditLimit: '', dob: '', partyCategory: ''
 	})
@@ -101,7 +99,7 @@ const PartyComponent = ({ mode, save, getRes }) => {
 				save(true);
 				return
 			} else {
-				return navigate("/admin/party")
+				return navigate("/admin/party");
 			}
 
 		} catch (error) {
@@ -113,7 +111,7 @@ const PartyComponent = ({ mode, save, getRes }) => {
 
 	const clear = () => {
 		setPartyData({
-			name: "", type: "customer", contactNumber: "", address: "",
+			name: "", type: Constants.CUSTOMER, contactNumber: "", address: "",
 			pan: "", gst: "", country: "", state: "", openingBalance: "0",
 			details: '', email: '', billingAddress: '', shippingAddress: '',
 			creditPeriod: '', creditLimit: '', dob: '', partyCategory: ''
@@ -147,9 +145,9 @@ const PartyComponent = ({ mode, save, getRes }) => {
 							onChange={(e) => setPartyData({ ...partyData, type: e.target.value })}
 							value={partyData.type}
 						>
-							<option value={CUSTOMER}>Customer</option>
-							<option value={SUPPLIER}>Supplier</option>
-							<option value={BOTHPARTY}>Both</option>
+							<option value={Constants.CUSTOMER}>Customer</option>
+							<option value={Constants.SUPPLIER}>Supplier</option>
+							<option value={Constants.BOTHPARTY}>Both</option>
 						</select>
 					</div>
 
@@ -231,8 +229,8 @@ const PartyComponent = ({ mode, save, getRes }) => {
 							<select
 								className='border-none bg-gray-50 rounded-l-none'
 							>
-								<option value="collect">To Collect</option>
-								<option value="party">To Party</option>
+								<option value={Constants.COLLECT}>To Collect</option>
+								<option value={Constants.PAY}>To Pay</option>
 							</select>
 						</div>
 					</div>

@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-// import MyBreadCrumb from '../../components/BreadCrumb';
 import { Popover, Whisper } from 'rsuite';
 import { useNavigate } from 'react-router-dom';
 import useExportTable from '../../hooks/useExportTable';
@@ -483,7 +482,6 @@ const CreditNote = () => {
 								</table>
 								<div className='paginate__parent'>
 									<p>Showing {billData.length} of {totalData} entries</p>
-									{/* ----- Paginatin ----- */}
 									<Pagination
 										activePage={activePage}
 										totalData={totalData}
