@@ -3,133 +3,192 @@ import { useSelector } from 'react-redux';
 import useApi from '../../hooks/useApi';
 import Cookies from 'js-cookie';
 import Pagination from '../../components/Pagination';
+import useMyToaster from '../../hooks/useMyToaster';
 
 
 
 const Ladger = ({ partyId }) => {
-  const companyData = useSelector((store) => store.userDetail);
-  const companyDetails = companyData?.companies?.filter((c, _) => c._id === companyData.activeCompany)
-  const [companyName, setCompanyName] = useState('');
-  const [partyData, setPartyData] = useState(null);
-  const { getApiData } = useApi()
-  const [ladgers, setLadgers] = useState([])
-  const [activePage, setActivePage] = useState(1);
-  const [dataLimit, setDataLimit] = useState(50);
-  const [totalData, setTotalData] = useState()
+	const toast = useMyToaster()
+	const token = Cookies.get("token");
+	const companyData = useSelector((store) => store.userDetail);
+	const companyDetails = companyData?.companies?.filter((c, _) => c._id === companyData.activeCompany)
+	const [companyName, setCompanyName] = useState('');
+	const [partyData, setPartyData] = useState(null);
+	const { getApiData } = useApi()
+	const [ladgers, setLadgers] = useState([])
+	const [activePage, setActivePage] = useState(1);
+	const [dataLimit, setDataLimit] = useState(50);
+	const [totalData, setTotalData] = useState();
+	const [partyBalance, setPartyBalance] = useState(0);
+	const voucherInv = {
+		sales: {
+			inv: "salesInvoiceNumber",
+			title: "Sales Invoice"
+		},
+
+		purchase: {
+			inv: "purchaseInvoiceNumber",
+			title: "Purchase Invoice"
+		},
+
+		credit_note: {
+			inv: "creditnote",
+			title: "Credit Note"
+		},
+
+		debit_note: {
+			inv: "debitNoteNumber",
+			title: "Debit Note"
+		},
+
+		purchase_return: {
+			inv: "purchaseReturnNumber",
+			title: "Purchase Return"
+		},
+
+		sales_return: {
+			inv: "salesReturnNumber",
+			title: "Sales Return"
+		},
+
+		pay_in: {
+			inv: "paymentInNumber",
+			title: "Payment In"
+		},
+
+		pay_out: {
+			inv: "paymentOutNumber",
+			title: "Payment Out"
+		}
+	};
 
 
-  useEffect(() => {
-    if (companyDetails && companyDetails?.length > 0) {
-      let name = companyDetails[0]?.name || '';
-      if (name.length > 20) {
-        name = name.slice(0, 20) + '...';
-      }
-      setCompanyName(name);
-    }
-  }, [companyDetails]);
+	// Get and setCompany Details;
+	useEffect(() => {
+		if (companyDetails && companyDetails?.length > 0) {
+			let name = companyDetails[0]?.name || '';
+			if (name.length > 20) {
+				name = name.slice(0, 20) + '...';
+			}
+			setCompanyName(name);
+		}
+	}, [companyDetails]);
 
 
-  useEffect(() => {
-    const get = async () => {
-      const partyData = await getApiData("party", partyId);
-      setPartyData(partyData.data);
-    }
-
-    get()
-  }, [])
-
-
-  // Get party ladger details;
-  useEffect(() => {
-    const get = async () => {
-      const url = process.env.REACT_APP_API_URL + `/party/ladger?page=${activePage}&limit=${dataLimit}`;
-      const token = Cookies.get("token");
-
-      const req = await fetch(url, {
-        method: 'POST',
-        headers: {
-          "Content-Type": 'application/json'
-        },
-        body: JSON.stringify({ partyId, token })
-      });
-      const res = await req.json();
-      setLadgers([...res.data]);
-      setTotalData(res.totalData)
-      console.log(res);
-
-    }
-
-    get()
-  }, [])
+	// Get Party data
+	useEffect(() => {
+		(async () => {
+			const partyData = await getApiData("party", partyId);
+			setPartyData(partyData.data);
+		})()
+	}, [])
 
 
-  return (
-    <div className='content__body__main'>
-      <div className='flex items-center justify-between'>
-        <div>
-          <p className='font-bold'>
-            {companyName}
-          </p>
-          <p className='text-xs text-gray-400'>Phone: {companyDetails && companyDetails[0]?.phone}</p>
-        </div>
+	// Get party ladger details;
+	useEffect(() => {
+		(async () => {
+			const url = process.env.REACT_APP_API_URL + `/ladger/get?page=${activePage}&limit=${dataLimit}`;
+			const token = Cookies.get("token");
 
-        <p className='font-bold text-gray-400'>Party Ladger</p>
-      </div>
-      <hr />
+			const req = await fetch(url, {
+				method: 'POST',
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify({ partyId, token })
+			});
+			const res = await req.json();
+			setLadgers([...res.data]);
+			setTotalData(res.totalData)
+		})()
+	}, [])
 
-      <div className='flex items-center justify-between'>
-        <div className='flex flex-col gap-2'>
-          <p className='text-xs text-gray-400'>To,</p>
-          <p className='font-bold text-xs'>{partyData?.name}</p>
-          <p className='text-xs text-gray-400'>Phone: {partyData?.contactNumber || "--"}</p>
-        </div>
-        <div className='w-[200px] h-[90px] rounded border p-2'>
-          <p className='text-xs text-gray-400 text-right border-b w-full pb-1'>Date - Date</p>
-          {/* <hr /> */}
-          <p className='text-xs text-gray-400 text-right'>Total Receivable</p>
-          <p className='font-bold text-right'>6000</p>
-        </div>
-      </div>
 
-      <div className='table__responsive mb-3'>
-        <table className='w-full border mt-5'>
-          <thead className='bg-gray-100'>
-            <tr>
-              <td className='p-2'>Date</td>
-              <td>Voucher</td>
-              <td>Transaction No.</td>
-              <td>Credit</td>
-              <td>Debit</td>
-              <td>Balance</td>
-            </tr>
-          </thead>
-          <tbody className='text-xs'>
-            {
-              ladgers.map((l, _) => {
-                return <tr className='border-b'>
-                  <td className='p-2'>{new Date(l.date).toLocaleDateString()}</td>
-                  <td>{l.voucher}</td>
-                  <td>{l.transactionNo}</td>
-                  <td>{l.credit}</td>
-                  <td>{l.debit}</td>
-                  <td>{l.balance}</td>
-                </tr>
-              })
-            }
-          </tbody>
-        </table>
-      </div>
-      {/* table end; */}
+	// Get Party balance
+	useEffect(() => {
+		(async () => {
+			const url = process.env.REACT_APP_API_URL + `/ladger/get-party-balance`;
+			const req = await fetch(url, {
+				method: 'POST',
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify({ partyId, token })
+			});
+			const res = await req.json();
+			if (req.status !== 200) {
+				return toast("Balance not get", 'error');
+			}
+			setPartyBalance(res.data[0].balance);
+		})()
+	}, [])
 
-      <Pagination
-        activePage={activePage}
-        dataLimit={dataLimit}
-        setActivePage={setActivePage}
-        totalData={totalData}
-      />
 
-    </div>
-  )
+	return (
+		<div className='content__body__main'>
+			<div className='flex items-center justify-between border-b pb-2'>
+				<div>
+					<p className='font-bold'> {companyName} </p>
+					<p className='text-xs text-gray-600'>
+						Phone: {companyDetails && companyDetails[0]?.phone}
+					</p>
+				</div>
+
+				<p className='font-bold text-gray-600'>Party Ladger</p>
+			</div>
+
+			<div className='flex items-center justify-between mt-2'>
+				<div className='flex flex-col gap-2'>
+					<p className='text-xs text-gray-600'>To,</p>
+					<p className='font-bold text-xs leading-[0px]'>{partyData?.name}</p>
+					<p className='text-xs text-gray-600'>Phone: {partyData?.contactNumber || "--"}</p>
+				</div>
+				<div className='w-[200px] h-[90px] rounded border p-2'>
+					<p className='text-xs text-gray-600 text-right border-b w-full pb-1'>Date - Date</p>
+					<p className='text-xs text-gray-600 text-right'>
+						Total {partyBalance < 0 ? 'Payable' : 'Receivable'}
+					</p>
+					<p className='font-bold text-right'>
+						{partyBalance < 0 ? Math.abs(partyBalance) : partyBalance}
+					</p>
+				</div>
+			</div>
+
+			<div className='table__responsive mb-3'>
+				<table className='w-full border mt-5'>
+					<thead className='bg-[#F6F7FB]'>
+						<tr>
+							<td className='p-2'>Date</td>
+							<td>Voucher</td>
+							<td>Voucher No.</td>
+							<td>Credit</td>
+							<td>Debit</td>
+						</tr>
+					</thead>
+					<tbody className='text-xs'>
+						{
+							ladgers.map((l, _) => {
+								return <tr className='border-b'>
+									<td className='p-2'>{new Date(l.date).toLocaleDateString()}</td>
+									<td>{voucherInv[l.voucher].title}</td>
+									<td>{l['voucherId'][voucherInv[l.voucher].inv]}</td>
+									<td>{l.credit}</td>
+									<td>{l.debit}</td>
+								</tr>
+							})
+						}
+					</tbody>
+				</table>
+			</div>
+			{/* table end; */}
+			<Pagination
+				activePage={activePage}
+				dataLimit={dataLimit}
+				setActivePage={setActivePage}
+				totalData={totalData}
+			/>
+		</div>
+	)
 }
 
 export default Ladger;

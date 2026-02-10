@@ -576,7 +576,7 @@ const SalesInvoice = () => {
 															paymentStatus !== Constants.PAID && (
 																<p className='text-[12px] py-1'>
 																	<Icons.RUPES className='inline text-[10px]' />
-																	{data.finalAmount - paymentAmount} unpaid
+																	{(data.finalAmount - paymentAmount).toFixed(2)} unpaid
 																</p>
 															)
 														}

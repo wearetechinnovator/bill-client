@@ -617,7 +617,9 @@ select {
 .table__list__action:hover {
   color: black;
 }
-
+.table__list__action__parent{
+  width: 120px;
+}
 .table__list__action__icon {
   width: 100%;
   display: flex;
@@ -834,7 +836,7 @@ input[type="checkbox"]:checked::before {
 }
 
 .party__details__header {
-  @apply flex items-center gap-4 mb-5 border-b border-gray-200;
+  @apply flex items-center gap-4 border-b border-gray-200;
 }
 
 .party__details__header button {

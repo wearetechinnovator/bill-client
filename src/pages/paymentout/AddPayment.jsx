@@ -17,7 +17,6 @@ import MySelect2 from '../../components/MySelect2';
 // --- PAYMENT OUT ---
 const AddPayment = ({ mode }) => {
   const { getApiData } = useApi();
-  const editorRef = useRef(null);
   const toast = useMyToaster();
   const { id } = useParams();
   const [formData, setFormData] = useState({
@@ -83,7 +82,6 @@ const AddPayment = ({ mode }) => {
           body: JSON.stringify({ token: cookie, id: id })
         })
         const res = await req.json();
-        console.log(res);
         setFormData({ ...formData, ...res.data });
 
       }

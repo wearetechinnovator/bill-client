@@ -8,7 +8,8 @@ import Cookies from 'js-cookie';
 import { useNavigate, useParams } from 'react-router-dom'
 import MySelect2 from '../../components/MySelect2'
 import { Icons } from '../../helper/icons'
-import { Constants } from '../../helper/constants'
+import { Constants } from '../../helper/constants';
+import { checkNumber } from '../../helper/validation'
 
 
 
@@ -22,7 +23,7 @@ const AddPayment = ({ mode }) => {
 	const currentDate = new Date().toISOString().split("T")[0]
 	const [formData, setFormData] = useState({
 		party: "", paymentInNumber: "", paymentInDate: currentDate, paymentMode: Constants.CASH,
-		account: "", amount: "", details: "", invoiceId: ''
+		account: "", amount: "", invoiceId: ''
 	})
 	const [dueAmount, setDueAmount] = useState(null);
 
@@ -36,20 +37,9 @@ const AddPayment = ({ mode }) => {
 	const [invoiceData, setInvoiceData] = useState([]);
 	let [checkedInv, setCheckedInv] = useState([]);
 	let [tempAmount, setTempAmount] = useState(0);
-
-
-
-	useEffect(() => {
-		if (formData.amount) {
-			let totalSelected = 0;
-			for (const item of checkedInv) {
-				totalSelected += item.finalAmount - (item.paymentAmount || 0);
-			}
-			// const remaining = parseInt(formData.amount, 10) - totalSelected;
-
-			setTempAmount(totalSelected);
-		}
-	}, [formData.amount, checkedInv]);
+	const [partyBalance, setPartyBalance] = useState(0);
+	// User jodi manualy amount clear kore tobe ata `true` hobe;
+	const [userSetAmount, setUserSetAmount] = useState(true);
 
 
 
@@ -122,6 +112,26 @@ const AddPayment = ({ mode }) => {
 	}, [])
 
 
+	// Get Party balance
+	useEffect(() => {
+		if (!formData.party) return;
+		(async () => {
+			const url = process.env.REACT_APP_API_URL + `/ladger/get-party-balance`;
+			const req = await fetch(url, {
+				method: 'POST',
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify({ partyId: formData.party, token })
+			});
+			const res = await req.json();
+			if (req.status !== 200) {
+				return toast("Balance not get", 'error');
+			}
+			setPartyBalance(res.data[0]?.balance);
+		})()
+	}, [formData.party])
+
 
 	const savePayment = async () => {
 		if (formData.party === "")
@@ -149,7 +159,6 @@ const AddPayment = ({ mode }) => {
 				)
 			});
 			const res = await req.json();
-			console.log(res);
 			if (req.status !== 200 || res.err) {
 				return toast(res.err, 'error');
 			}
@@ -159,7 +168,6 @@ const AddPayment = ({ mode }) => {
 			}
 
 			clear();
-
 			toast('Payment add successfully', 'success');
 			navigate('/admin/payment-in');
 			return
@@ -170,10 +178,11 @@ const AddPayment = ({ mode }) => {
 
 	}
 
+
 	const clear = () => {
 		setFormData({
 			party: "", paymentInNumber: "", paymentInDate: "", paymentMode: "", account: "",
-			amount: "", details: "", invoiceId: ''
+			amount: "", invoiceId: ''
 		})
 	}
 
@@ -184,28 +193,29 @@ const AddPayment = ({ mode }) => {
 		const due = inv.finalAmount - (inv.paymentAmount || 0);
 
 		if (checked) {
-			if (tempAmount <= 0) {
-				toast("No amount left to allocate", "error");
-				e.preventDefault();
-				e.target.checked = false;
-				return;
+			if (userSetAmount) {
+				setFormData(pv => {
+					return {
+						...formData,
+						amount: Number(pv.amount) + due
+					}
+				})
 			}
-
-			const alloc = Math.min(tempAmount, due);
-
-			const updatedCheckedInv = [...checkedInv, { ...inv, allocated: alloc }];
-			setCheckedInv(updatedCheckedInv);
-			setTempAmount(tempAmount - alloc);
+			setCheckedInv([...checkedInv, inv])
 		}
 		else {
-			const existing = checkedInv.find((d) => d._id === inv._id);
-			const updatedCheckedInv = checkedInv.filter((d) => d._id !== inv._id);
-
-			if (existing) {
-				setTempAmount(tempAmount + existing.allocated);
+			if (userSetAmount) {
+				setFormData(pv => {
+					return {
+						...formData,
+						amount: Number(pv.amount) - due
+					}
+				})
 			}
 
-			setCheckedInv(updatedCheckedInv);
+			const filterdInv = checkedInv.filter(cInv => cInv._id !== inv._id);
+			setCheckedInv(filterdInv);
+
 		}
 	};
 
@@ -260,8 +270,14 @@ const AddPayment = ({ mode }) => {
 									<input type='text'
 										value={formData.amount}
 										onChange={
-											checkedInv.length > 0 ? null :
-												(e) => setFormData({ ...formData, amount: e.target.value })
+											(e) => {
+												setFormData({ ...formData, amount: checkNumber(e.target.value) });
+												if (checkNumber(e.target.value).trim() === "") {
+													setUserSetAmount(true)
+												} else {
+													setUserSetAmount(false)
+												}
+											}
 										}
 									/>
 								</div>
@@ -271,7 +287,7 @@ const AddPayment = ({ mode }) => {
 							<div className='flex flex-col gap-2'>
 								<div className='w-full flex flex-col md:flex-row gap-4'>
 									<div className='w-full'>
-										<p className='mb-1'>Payment in Date</p>
+										<p className='mb-[3px]'>Payment in Date</p>
 										<input type="date"
 											onChange={(e) => {
 												setFormData({ ...formData, paymentInDate: e.target.value })
@@ -292,9 +308,11 @@ const AddPayment = ({ mode }) => {
 								</div>
 								<div className='w-full flex flex-col md:flex-row gap-4'>
 									<div className='w-full'>
-										<p className='mb-1'>Payment Mode</p>
+										<p className='mb-[2px]'>Payment Mode</p>
 										<select value={formData.paymentMode}
-											onChange={(e) => setFormData({ ...formData, paymentMode: e.target.value })}
+											onChange={(e) => setFormData({
+												...formData, paymentMode: e.target.value
+											})}
 										>
 											<option value={Constants.CASH}>Cash</option>
 											<option value={Constants.UPI}>UPI</option>
@@ -302,13 +320,18 @@ const AddPayment = ({ mode }) => {
 											<option value={Constants.NETBENKING}>Netbenking</option>
 											<option value={Constants.BANK}>Bank</option>
 											<option value={Constants.CHEQUE}>Cheque</option>
-											<option value={'balance'}>Current Balance</option>
+											{partyBalance < 0 && (
+												<option value={'balance'}>
+													Current Balance: {Math.abs(partyBalance)}
+												</option>
+											)}
+
 										</select>
 									</div>
 									{
 										(formData.paymentMode !== Constants.CASH) && (
 											<div className='w-full'>
-												<p className='mb-1'>Account</p>
+												<p className='mb-[2px]'>Account</p>
 												<SelectPicker className='w-full'
 													data={account}
 													onChange={(v) => setFormData({ ...formData, account: v })}

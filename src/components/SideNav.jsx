@@ -200,39 +200,6 @@ const SideNav = () => {
   const [openSubmenus, setOpenSubmenus] = useState([]);
 
 
-
-  /** if user have not any company so visible only company creation page */
-  // =====================================================================
-  // useEffect(() => {
-  //   let valid = true;
-
-  //   if (userData.companies && userData.companies.length < 1) {
-  //     valid = false;
-  //   } else {
-  //     valid = true;
-  //   }
-
-  //   setLinks(prevLinks =>
-  //     Object.fromEntries(
-  //       Object.entries(prevLinks).map(([category, items]) => [
-  //         category,
-  //         items.map(item => ({
-  //           ...item,
-  //           link: !valid ? "/admin/company" : item.link,
-  //           submenu: item.submenu
-  //             ? item.submenu.map(sub => ({
-  //               ...sub,
-  //               link: !valid ? "/admin/company" : sub.link,
-  //             }))
-  //             : null,
-  //         })),
-  //       ])
-  //     )
-  //   );
-  // }, [userData])
-
-
-
   const toggleSubmenu = (name) => {
     setOpenSubmenus((pv) => {
       if (pv.includes(name)) {

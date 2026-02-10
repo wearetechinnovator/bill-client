@@ -131,7 +131,7 @@ const Invoice = () => {
 						setAccountDetails(res.data.accountId || null);
 
 						// Genareate QRCode;
-						if(res.data.accountId && res.data.accountId?.upiId){
+						if (res.data.accountId && res.data.accountId?.upiId) {
 							const account = res.data.accountId;
 							const upiLink = `upi://pay?pa=${account.upiId}&pn=${account.accountHolderName}&am=${res.data.finalAmount}&cu=INR`;
 							console.log(upiLink);
@@ -503,11 +503,23 @@ const Invoice = () => {
 												</tr>
 												{billData?.roundOffAmount && <tr className='font-bold bg-[#F3F4F6]'>
 													<td colSpan={7} align='right' className='italic'>Round Off</td>
-													<td>{billData?.roundOffAmount}</td>
+													<td><Icons.RUPES className='inline' />
+														{
+															billData.roundOffType === "0" ?
+																"-" + billData?.roundOffAmount :
+																billData?.roundOffAmount
+														}
+													</td>
 												</tr>}
 												{billData?.roundOffAmount && <tr className='font-bold bg-[#F3F4F6]'>
 													<td colSpan={7} align='right' className='font-semibold'>SUB TOTAL</td>
-													<td>{billDetails.amount - billData?.roundOffAmount}</td>
+													<td><Icons.RUPES className='inline' />
+														{
+															billData.roundOffType === "0" ?
+																(Number(billDetails.amount) - Number(billData?.roundOffAmount)) :
+																Number(billDetails.amount) + Number(billData?.roundOffAmount)
+														}
+													</td>
 												</tr>}
 											</tfoot>
 										</table>

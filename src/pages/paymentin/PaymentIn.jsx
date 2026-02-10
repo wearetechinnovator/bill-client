@@ -57,7 +57,6 @@ const PaymentIn = () => {
                     })
                 });
                 const res = await req.json();
-                console.log(res)
                 setTotalData(res.totalData)
                 setBillData([...res.data]);
                 setLoading(false);
@@ -138,6 +137,7 @@ const PaymentIn = () => {
         }
     }
 
+
     const removeData = async (trash) => {
         if (selected.length === 0 || tableStatusData !== 'active') {
             return;
@@ -171,6 +171,7 @@ const PaymentIn = () => {
             toast("Something went wrong", "error")
         }
     }
+
 
     const restoreData = async () => {
         if (selected.length === 0 || tableStatusData !== "trash") {
@@ -289,9 +290,6 @@ const PaymentIn = () => {
                                 </div>
                             </div>
                         </div>
-
-                        <div id='proformaInvoice'>
-                        </div>
                     </div>
 
                     {
@@ -302,47 +300,60 @@ const PaymentIn = () => {
                                 <table className='min-w-full bg-white' id='listQuotation' ref={tableRef}>
                                     <thead className='list__table__head'>
                                         <tr>
-                                            <th className='py-2 px-4 border-b'>
-                                                <input type='checkbox' onChange={selectAll} checked={billData.length > 0 && selected.length === billData.length} />
+                                            <th className='py-2'>
+                                                <input type='checkbox'
+                                                    onChange={selectAll}
+                                                    checked={billData.length > 0 && selected.length === billData.length}
+                                                />
                                             </th>
-                                            <th className='py-2 px-4 border-b cursor-pointer' onClick={sortByDate}>
-                                                <div className='flex items-center justify-center'>
+                                            <th className='py-2 cursor-pointer' onClick={sortByDate}>
+                                                <div className='flex items-center justify-start'>
                                                     Date {ascending ? <Icons.DROPDOWN /> : <Icons.DROPUP />}
                                                 </div>
                                             </th>
-                                            <th className='py-2 px-4 border-b'>Payment In Number</th>
-                                            <th className='py-2 px-4 border-b'>Party Name</th>
-                                            <th className='py-2 px-4 border-b'>Amount</th>
-                                            <th className='py-2 px-4 border-b'>Action</th>
+                                            <th align='left'>Payment In Number</th>
+                                            <th align='left'>Party Name</th>
+                                            <th align='left'>Amount</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {
                                             billData.map((data, i) => {
                                                 return <tr key={i}>
-                                                    <td className='py-2 px-4 border-b max-w-[10px]'>
+                                                    <td className='py-2 px-4 border-b max-w-[10px]' align='center'>
                                                         <input type='checkbox'
-                                                            checked={selected.includes(data._id)}
-                                                            onChange={() => handleCheckboxChange(data._id)}
                                                             onClick={(e) => e.stopPropagation()}
+                                                            onChange={() => handleCheckboxChange(data._id)}
+                                                            checked={selected.includes(data._id)}
                                                         />
                                                     </td>
-                                                    <td className='px-4 border-b' align='center'>{new Date(data.paymentInDate).toLocaleDateString()}</td>
-                                                    <td className='px-4 border-b' align='center'>{data.paymentInNumber}</td>
-                                                    <td className='px-4 border-b' align='center'>{data.party.name}</td>
-                                                    <td className='px-4 border-b' align='center'>{data.amount}</td>
+                                                    <td>{new Date(data.paymentInDate).toLocaleDateString()}</td>
+                                                    <td>{data.paymentInNumber}</td>
+                                                    <td>{data.party.name}</td>
+                                                    <td>{data.amount}</td>
 
                                                     <td className='px-4 text-center'>
                                                         <Whisper
                                                             placement='leftStart'
                                                             trigger={"click"}
-                                                            speaker={<Popover full>
+                                                            speaker={
+                                                            <Popover full  className='table__list__action__parent'>
                                                                 <div
                                                                     className='table__list__action__icon'
                                                                     onClick={() => navigate(`/admin/payment-in/edit/${data._id}`)}
                                                                 >
                                                                     <Icons.EDIT className='text-[16px]' />
                                                                     Edit
+                                                                </div>
+                                                                <div
+                                                                    className='table__list__action__icon'
+                                                                    onClick={() => {
+                                                                        setOpenConfirm(true)
+                                                                    }}
+                                                                >
+                                                                    <Icons.DELETE className='text-[16px]' />
+                                                                    Delete
                                                                 </div>
                                                             </Popover>}
                                                         >
@@ -358,7 +369,6 @@ const PaymentIn = () => {
                                 </table>
                                 <div className='paginate__parent'>
                                     <p>Showing {billData.length} of {totalData} entries</p>
-                                    {/* ----- Paginatin ----- */}
                                     <Pagination
                                         activePage={activePage}
                                         totalData={totalData}
