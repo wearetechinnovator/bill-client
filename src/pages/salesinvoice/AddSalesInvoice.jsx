@@ -84,6 +84,7 @@ const SalesInvoice = ({ mode }) => {
 
 
 
+
 	// Get bill data for edit and CONVERT mode
 	// =======================================
 	const get = async () => {
@@ -127,6 +128,12 @@ const SalesInvoice = ({ mode }) => {
 				setAdditionalRow([...res.data.additionalCharge]);
 				setItemRows([...res.data.items]);
 				setAccountDetails(res.data.accountId || null);
+
+
+				// Check Payment Status if Unpaid then process otherwise don't edit page;
+				if (res.data.paymentAmount > 0 && res.data.paymentAmount <= res.data.finalAmount) {
+					navigate(-1);
+				}
 			}
 
 			if (res.data.discountType && res.data.discountType != "no") {

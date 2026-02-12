@@ -270,7 +270,6 @@ const Invoice = () => {
 		setDrawerOpen(true);
 	}
 
-
 	// Download Bill
 	const downloadBill = async (filename = "invoice") => {
 		try {
@@ -298,6 +297,41 @@ const Invoice = () => {
 			setDownloadLoading(false);
 			return toast("Invoice not download", 'error');
 		}
+
+	}
+
+
+	// Print Bill;
+	const printBill = () => {
+		function applyPrintStyle() {
+			const style = document.createElement("style");
+			style.innerHTML = `
+				@media print {
+					body {
+						margin: 0;
+					}
+
+					body * {
+						visibility: hidden;
+					}
+
+					#mainBill, #mainBill * {
+						visibility: visible;
+					}
+
+					#mainBill {
+						position: absolute;
+						left: 0;
+						top: 0;
+						border: none;
+					}
+				}
+			`;
+			document.head.appendChild(style);
+		}
+
+		applyPrintStyle();
+		window.print();
 
 	}
 
@@ -385,9 +419,7 @@ const Invoice = () => {
 									</Whisper>
 
 									<button
-										onClick={() => {
-											window.print();
-										}}
+										onClick={printBill}
 										title='Print Bill'
 										className='bg-[#003E32] text-white rounded-[5px] flex justify-center items-center px-2 py-[5px]'>
 										<Icons.PRINTER className="text-white text-[15px] mr-1" />

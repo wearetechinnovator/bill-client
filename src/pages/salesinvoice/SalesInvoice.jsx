@@ -590,7 +590,11 @@ const SalesInvoice = () => {
 																	className='table__list__action__icon'
 																	onClick={(e) => {
 																		e.stopPropagation();
-																		navigate(`/admin/sales-invoice/edit/${data._id}`)
+																		if (paymentStatus === Constants.UNPAID) {
+																			navigate(`/admin/sales-invoice/edit/${data._id}`)
+																		}else{
+																			return toast("This voucher can't be edited, because it's linked to another entry", "error")
+																		}
 																	}}
 																>
 																	<Icons.EDIT className='text-[16px]' />

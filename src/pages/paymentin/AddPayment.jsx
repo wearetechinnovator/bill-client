@@ -25,28 +25,27 @@ const AddPayment = ({ mode }) => {
 		party: "", paymentInNumber: "", paymentInDate: currentDate, paymentMode: Constants.CASH,
 		account: "", amount: "", invoiceId: ''
 	})
-	const [dueAmount, setDueAmount] = useState(null);
+	let [checkedInv, setCheckedInv] = useState([]);
 
 	// Store party
 	const [party, setParty] = useState([]);
 	// Store account
 	const [account, setAccount] = useState([]);
-	// Store invoice number
-	const [invoice, setInvoice] = useState([]);
 	// invoice data
 	const [invoiceData, setInvoiceData] = useState([]);
-	let [checkedInv, setCheckedInv] = useState([]);
-	let [tempAmount, setTempAmount] = useState(0);
 	const [partyBalance, setPartyBalance] = useState(0);
 	// User jodi manualy amount clear kore tobe ata `true` hobe;
 	const [userSetAmount, setUserSetAmount] = useState(true);
+	const [leftAmount, setLeftAmount] = useState(0);
+	//inv id and Receive Amount; {inv_id: '', amount: ''}
+	const [amountRece, setAmountRece] = useState([]);
 
 
 
 
 	// Get invoice
 	useEffect(() => {
-		const getInvoice = async () => {
+		(async () => {
 			try {
 				const url = process.env.REACT_APP_API_URL + "/salesinvoice/get";
 
@@ -58,21 +57,17 @@ const AddPayment = ({ mode }) => {
 					body: JSON.stringify({ token, invoice: true, party: formData.party })
 				})
 				const res = await req.json();
-				const inv = res.data.map((inv) => ({
-					value: inv.salesInvoiceNumber, label: inv.salesInvoiceNumber,
-					due: inv.dueAmount
-				}));
 
-				setInvoiceData([...res.data]);
-				setInvoice([...inv])
+				setInvoiceData(prev => {
+					const filtered = res.data.filter(d => !prev.some(p => p._id === d._id));
+					return [...prev, ...filtered];
+				});
 
 			} catch (error) {
 				console.log(error);
 				return toast("Something went wrong", "error");
 			}
-		}
-
-		getInvoice();
+		})()
 
 	}, [formData.party])
 
@@ -80,16 +75,28 @@ const AddPayment = ({ mode }) => {
 	// Get data for update mode
 	useEffect(() => {
 		if (mode) {
-			const get = async () => {
+			(async () => {
 				const res = await getApiData("paymentin", id);
-				console.log(res)
 				setFormData({
 					...formData, ...res.data,
 					paymentInDate: res.data.paymentInDate.split("T")[0]
 				});
-			}
 
-			get();
+				// Set Sattlement invoice in main invoice;
+				setInvoiceData([...invoiceData, ...res.data.sattleInvoice]);
+
+				// Set checkedInv;
+				setCheckedInv([...res.data.sattleInvoice]);
+				setUserSetAmount(false);
+
+				const amoutReceData = res.data.sattleInvoice.reduce((acc, i)=>{
+					acc.push({inv_id: i._id, amount: i.receiveAmount})
+					return acc;
+				}, [])
+				setAmountRece(amoutReceData);
+				// setLeftAmount(res.data.amount);
+
+			})()
 		}
 	}, [mode])
 
@@ -191,6 +198,7 @@ const AddPayment = ({ mode }) => {
 	const handleSettlement = (e, inv) => {
 		const { checked } = e.target;
 		const due = inv.finalAmount - (inv.paymentAmount || 0);
+		if (!formData.amount) return toast("No amount for sattle invoice", "error");
 
 		if (checked) {
 			if (userSetAmount) {
@@ -201,7 +209,20 @@ const AddPayment = ({ mode }) => {
 					}
 				})
 			}
-			setCheckedInv([...checkedInv, inv])
+			if (leftAmount <= 0 && !userSetAmount) {
+				return toast("No amount left to sattle another invoice", "error");
+			};
+			let left = Number(leftAmount) - due;
+			const receiveAmount = left > 0 ? due : leftAmount;
+
+			inv['receiveAmount'] = receiveAmount;
+			setCheckedInv([...checkedInv, inv]);
+
+			// Add Receive Amount
+			setAmountRece((p) => {
+				return [...p, { inv_id: inv._id, amount: receiveAmount }];
+			})
+			setLeftAmount(left);
 		}
 		else {
 			if (userSetAmount) {
@@ -216,6 +237,13 @@ const AddPayment = ({ mode }) => {
 			const filterdInv = checkedInv.filter(cInv => cInv._id !== inv._id);
 			setCheckedInv(filterdInv);
 
+			let left = Number(leftAmount) + Number(inv.receiveAmount);
+			console.log(left)
+			setLeftAmount(left);
+			// Remove Receive Amount
+			setAmountRece((p) => {
+				return p.filter(f => f.inv_id !== inv._id);
+			})
 		}
 	};
 
@@ -245,7 +273,7 @@ const AddPayment = ({ mode }) => {
 
 	return (
 		<>
-			<Nav title={"Add Payment In"} />
+			<Nav title={mode ? "Update Payment In" : "Add Payment In"} />
 			<main id='main'>
 				<SideNav />
 				<div className='content__body'>
@@ -272,6 +300,8 @@ const AddPayment = ({ mode }) => {
 										onChange={
 											(e) => {
 												setFormData({ ...formData, amount: checkNumber(e.target.value) });
+												setLeftAmount(e.target.value);
+
 												if (checkNumber(e.target.value).trim() === "") {
 													setUserSetAmount(true)
 												} else {
@@ -367,11 +397,13 @@ const AddPayment = ({ mode }) => {
 										<td className='font-medium w-[10%]'>Invoice Number</td>
 										<td className='font-medium w-[10%]'>Invoice Amount</td>
 										<td className='font-medium w-[10%]'>Pending Amount</td>
+										<td className='font-medium w-[10%]'>Amount Received</td>
 									</tr>
 								</thead>
 								<tbody>
 									{
 										invoiceData.length > 0 ? invoiceData.map((inv, i) => {
+											const receiveAmount = amountRece?.find(rece => rece.inv_id === inv._id);
 
 											return (
 												<tr key={i} className='border-gray-300'>
@@ -379,6 +411,7 @@ const AddPayment = ({ mode }) => {
 														<input
 															type="checkbox"
 															onChange={(e) => handleSettlement(e, inv)}
+															checked={checkedInv.includes(inv)}
 														/>
 													</td>
 													<td>{inv.invoiceDate.split("T")[0]}</td>
@@ -391,10 +424,15 @@ const AddPayment = ({ mode }) => {
 														<Icons.RUPES className='inline' />
 														{inv.finalAmount - inv.paymentAmount}
 													</td>
+
+													<td>
+														<Icons.RUPES className='inline' />
+														{receiveAmount?.amount || 0}
+													</td>
 												</tr>
 											)
 										}) : <tr className='text-center'>
-											<td colSpan={5} className='py-5 text-gray-500'>
+											<td colSpan={6} className='py-5 text-gray-500'>
 												No Invoice found
 											</td>
 										</tr>

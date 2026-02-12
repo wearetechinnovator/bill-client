@@ -1373,30 +1373,3 @@ input {
 .satelment__search__area input{
   @apply border-none
 }
-
-
-/* =================== */
-/* Invoice bill print */
-/* =================== */
-@media print {
-  body {
-    margin: 0;
-  }
-
-  body * {
-    visibility: hidden;
-  }
-
-  #mainBill,
-  #mainBill * {
-    visibility: visible;
-  }
-
-  #mainBill {
-    position: absolute;
-    left: 0;
-    top: 0;
-    /* width: 100%; */
-    border: none;
-  }
-}

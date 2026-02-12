@@ -119,7 +119,7 @@ const Ladger = ({ partyId }) => {
 			if (req.status !== 200) {
 				return toast("Balance not get", 'error');
 			}
-			setPartyBalance(res.data[0].balance);
+			setPartyBalance(res.data[0]?.balance);
 		})()
 	}, [])
 
@@ -155,7 +155,7 @@ const Ladger = ({ partyId }) => {
 			</div>
 
 			<div className='table__responsive mb-3'>
-				<table className='w-full border mt-5'>
+				<table className='w-full border mt-2'>
 					<thead className='bg-[#F6F7FB]'>
 						<tr>
 							<td className='p-2'>Date</td>
