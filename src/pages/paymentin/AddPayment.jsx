@@ -237,8 +237,9 @@ const AddPayment = ({ mode }) => {
 			const filterdInv = checkedInv.filter(cInv => cInv._id !== inv._id);
 			setCheckedInv(filterdInv);
 
-			let left = Number(leftAmount) + Number(inv.receiveAmount);
-			console.log(left)
+			let left = Number(leftAmount || 0) + Number(inv.receiveAmount);
+			console.log("left", leftAmount, "receive_amount", inv.receiveAmount);
+			// console.log("left_amount", leftAmount);
 			setLeftAmount(left);
 			// Remove Receive Amount
 			setAmountRece((p) => {
@@ -411,7 +412,7 @@ const AddPayment = ({ mode }) => {
 														<input
 															type="checkbox"
 															onChange={(e) => handleSettlement(e, inv)}
-															checked={checkedInv.includes(inv)}
+															checked={checkedInv.some(c => c._id === inv._id)}
 														/>
 													</td>
 													<td>{inv.invoiceDate.split("T")[0]}</td>

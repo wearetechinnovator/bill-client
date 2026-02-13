@@ -14,6 +14,10 @@
   font-style: normal;
 }
 
+::selection {
+  background-color: #003628;
+  color: white;
+}
 
 ::-webkit-scrollbar {
   width: 5px;
@@ -580,11 +584,13 @@ select {
 .list__table tbody tr {
   border: 1px solid #efefef !important;
 }
-.list__table tbody tr td{
+
+.list__table tbody tr td {
   border: 1px solid #efefef !important;
   @apply px-2;
 }
-.list__table thead tr th{
+
+.list__table thead tr th {
   @apply px-2
 }
 
@@ -617,9 +623,11 @@ select {
 .table__list__action:hover {
   color: black;
 }
-.table__list__action__parent{
+
+.table__list__action__parent {
   width: 120px;
 }
+
 .table__list__action__icon {
   width: 100%;
   display: flex;
@@ -682,15 +690,18 @@ input[type="checkbox"]:checked::before {
   opacity: 1;
 }
 
-.party__data.active{
+.party__data.active {
   @apply border-blue-300 bg-blue-50;
 }
-.party__data.active h6{
+
+.party__data.active h6 {
   @apply text-blue-400;
 }
-.party__data.active h6 svg{
+
+.party__data.active h6 svg {
   @apply text-blue-400;
 }
+
 .party__data {
   @apply border w-full p-[9px] rounded-md bg-white cursor-pointer;
 }
@@ -887,14 +898,17 @@ input[type="checkbox"]:checked::before {
   font-size: 11px;
   color: white;
 }
+
 /* px-2 text-white rounded-lg text-[11px] font-bold */
-.red-badge{
+.red-badge {
   @apply bg-red-100 text-red-400;
 }
-.green-badge{
+
+.green-badge {
   @apply bg-green-100 text-green-600;
 }
-.yellow-badge{
+
+.yellow-badge {
   @apply bg-yellow-50 text-yellow-600;
 }
 
@@ -1252,124 +1266,154 @@ input {
   @apply w-full bg-gray-50 border-gray-200 p-2 rounded;
 }
 
-.add_account__section .add__button{
+.add_account__section .add__button {
   @apply border-blue-400 border bg-blue-50 rounded px-1 py-[2px] text-blue-500
 }
 
-.add_account__section .account__details__body{
+.add_account__section .account__details__body {
   @apply flex items-center gap-10 text-xs;
 }
-.add_account__section .acc__details__text{
+
+.add_account__section .acc__details__text {
   @apply text-gray-500
 }
-.add_account__section  .account__details__top__bar{
+
+.add_account__section .account__details__top__bar {
   @apply flex justify-between items-center mb-4;
 }
-.add_account__section  .account__details__top__bar .details__title{
+
+.add_account__section .account__details__top__bar .details__title {
   @apply font-semibold text-[13px];
 }
-.add_account__section .change__remove__btns{
+
+.add_account__section .change__remove__btns {
   @apply flex items-center gap-4;
 }
 
-.add_account__section .change__remove__btns div{
+.add_account__section .change__remove__btns div {
   @apply text-blue-500 cursor-pointer hover:underline
 }
-.add_account__section .change__remove__btns div:last-child{
+
+.add_account__section .change__remove__btns div:last-child {
   @apply text-red-500
 }
 
 
-.round__off__section{
+.round__off__section {
   @apply flex justify-between items-center w-full mt-4 h-[25px];
 }
-.round__off__section .check__box__parent{
+
+.round__off__section .check__box__parent {
   @apply flex items-center gap-1;
 }
-.roundoff__btn{
+
+.roundoff__btn {
   @apply flex items-center text-[10px] p-[3px] bg-gray-100;
 }
-.roundoff__btn.active{
+
+.roundoff__btn.active {
   @apply bg-blue-200 text-blue-700;
 }
-.round__of__input__parent{
+
+.round__of__input__parent {
   @apply flex items-center text-sm border rounded;
 }
-.round__of__input__parent svg{
+
+.round__of__input__parent svg {
   @apply ml-[2px] text-[13px];
 }
-.round__of__input__parent input{
+
+.round__of__input__parent input {
   @apply border-none rounded-none text-[13px] w-[60px];
 }
 
 
-.feat__card__text{
+.feat__card__text {
   @apply text-[#333333] font-[700] text-[14px];
 }
 
 /* Payment Section in Bill */
 /* ======================= */
-.bill___payment__section{
+.bill___payment__section {
   @apply flex justify-center items-end flex-col w-full mt-5 pt-3 pb-4 border-t border-b;
 }
-.bill___payment__section .label__checkbox{
+
+.bill___payment__section .label__checkbox {
   @apply flex items-center gap-2;
 }
-.bill___payment__section .amount__input{
+
+.bill___payment__section .amount__input {
   @apply w-full flex justify-between items-center overflow-hidden;
 }
-.bill___payment__section .amount__and__select input, .bill___payment__section .amount__and__select select{
+
+.bill___payment__section .amount__and__select input,
+.bill___payment__section .amount__and__select select {
   @apply border-none rounded-none;
 }
-.bill___payment__section .amount__and__select select{
+
+.bill___payment__section .amount__and__select select {
   @apply w-[140px]
 }
-.bill___payment__section .amount__and__select input{
-  @apply bg-slate-50 text-right rounded-tr rounded-br ;
+
+.bill___payment__section .amount__and__select input {
+  @apply bg-slate-50 text-right rounded-tr rounded-br;
   line-height: normal !important;
 }
-.bill___payment__section .amount__and__select svg{
+
+.bill___payment__section .amount__and__select svg {
   @apply text-[20px] bg-slate-50 ml-1 rounded-none
 }
-.bill___payment__section .amount__and__select{
+
+.bill___payment__section .amount__and__select {
   @apply mt-2 flex items-center border rounded w-[250px]
 }
-.bill___payment__section .payment__from{
-   @apply w-full mt-2 flex items-center  justify-between;
+
+.bill___payment__section .payment__from {
+  @apply w-full mt-2 flex items-center justify-between;
 }
-.bill___payment__section .payment__from select{
+
+.bill___payment__section .payment__from select {
   @apply w-[250px]
 }
 
 
 
-.payment__satelment{
+.payment__satelment {
   @apply w-full overflow-x-auto rounded-md;
 }
-.payment__satel__table{
+
+.payment__satel__table {
   @apply min-w-full;
 }
-.payment__satel__table tr td{
+
+.payment__satel__table tr td {
   @apply border px-2;
 }
-.payment__satel__table thead{
+
+.payment__satel__table thead {
   @apply bg-[#F6F7FB]
 }
-.satelment__search__area{
+
+.satelment__search__area {
   @apply w-full flex flex-col md:flex-row justify-between items-center pt-1 pb-3;
 }
-.satelment__search__area p{
+
+.satelment__search__area p {
   @apply font-bold text-[15px]
 }
-.satelment__search__area div{
+
+.satelment__search__area div {
   @apply flex items-center border rounded px-2 py-1;
 }
+
 .satelment__search__area div:focus-within {
   border: 1px solid #003E32;
 }
-.satelment__search__area div svg{
+
+.satelment__search__area div svg {
   @apply text-[16px]
 }
-.satelment__search__area input{
+
+.satelment__search__area input {
   @apply border-none
 }
