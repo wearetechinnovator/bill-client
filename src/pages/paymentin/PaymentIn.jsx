@@ -346,7 +346,7 @@ const PaymentIn = () => {
                                                                     <Icons.EDIT className='text-[16px]' />
                                                                     Edit
                                                                 </div>
-                                                                <div
+                                                                {/* <div
                                                                     className='table__list__action__icon'
                                                                     onClick={() => {
                                                                         setOpenConfirm(true)
@@ -354,7 +354,7 @@ const PaymentIn = () => {
                                                                 >
                                                                     <Icons.DELETE className='text-[16px]' />
                                                                     Delete
-                                                                </div>
+                                                                </div> */}
                                                             </Popover>}
                                                         >
                                                             <div className='table__list__action' >

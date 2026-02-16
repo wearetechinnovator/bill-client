@@ -221,7 +221,7 @@ const PaymentOut = () => {
 
   return (
     <>
-      <Nav title={"Payment out"} />
+      <Nav title={"Payment Out"} />
       <main id='main'>
         <SideNav />
         <Tooltip id='payOutTooltip' />

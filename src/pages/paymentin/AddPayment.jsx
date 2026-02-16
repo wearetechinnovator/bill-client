@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react'
-import Nav from '../../components/Nav'
-import SideNav from '../../components/SideNav'
-import { SelectPicker } from 'rsuite'
-import useApi from '../../hooks/useApi'
-import useMyToaster from '../../hooks/useMyToaster'
+import { useEffect, useState } from 'react';
+import Nav from '../../components/Nav';
+import SideNav from '../../components/SideNav';
+import { SelectPicker } from 'rsuite';
+import useApi from '../../hooks/useApi';
+import useMyToaster from '../../hooks/useMyToaster';
 import Cookies from 'js-cookie';
-import { useNavigate, useParams } from 'react-router-dom'
-import MySelect2 from '../../components/MySelect2'
-import { Icons } from '../../helper/icons'
+import { useNavigate, useParams } from 'react-router-dom';
+import MySelect2 from '../../components/MySelect2';
+import { Icons } from '../../helper/icons';
 import { Constants } from '../../helper/constants';
-import { checkNumber } from '../../helper/validation'
+import { checkNumber } from '../../helper/validation';
 
 
 
@@ -48,7 +48,6 @@ const AddPayment = ({ mode }) => {
 		(async () => {
 			try {
 				const url = process.env.REACT_APP_API_URL + "/salesinvoice/get";
-
 				const req = await fetch(url, {
 					method: "POST",
 					headers: {
@@ -89,8 +88,8 @@ const AddPayment = ({ mode }) => {
 				setCheckedInv([...res.data.sattleInvoice]);
 				setUserSetAmount(false);
 
-				const amoutReceData = res.data.sattleInvoice.reduce((acc, i)=>{
-					acc.push({inv_id: i._id, amount: i.receiveAmount})
+				const amoutReceData = res.data.sattleInvoice.reduce((acc, i) => {
+					acc.push({ inv_id: i._id, amount: i.receiveAmount })
 					return acc;
 				}, [])
 				setAmountRece(amoutReceData);
@@ -196,55 +195,52 @@ const AddPayment = ({ mode }) => {
 
 	// On check satelment;
 	const handleSettlement = (e, inv) => {
+
 		const { checked } = e.target;
 		const due = inv.finalAmount - (inv.paymentAmount || 0);
+
 		if (!formData.amount) return toast("No amount for sattle invoice", "error");
 
 		if (checked) {
-			if (userSetAmount) {
-				setFormData(pv => {
-					return {
-						...formData,
-						amount: Number(pv.amount) + due
-					}
-				})
-			}
-			if (leftAmount <= 0 && !userSetAmount) {
+
+			let currentLeft = Number(leftAmount);
+
+			const usableAmount = userSetAmount ? due : Math.min(due, currentLeft);
+
+			if (!userSetAmount && usableAmount <= 0) {
 				return toast("No amount left to sattle another invoice", "error");
-			};
-			let left = Number(leftAmount) - due;
-			const receiveAmount = left > 0 ? due : leftAmount;
+			}
 
-			inv['receiveAmount'] = receiveAmount;
-			setCheckedInv([...checkedInv, inv]);
+			if (userSetAmount) {
+				setFormData(pv => ({
+					...pv,
+					amount: Number(pv.amount) + usableAmount
+				}));
+			}
 
-			// Add Receive Amount
-			setAmountRece((p) => {
-				return [...p, { inv_id: inv._id, amount: receiveAmount }];
-			})
-			setLeftAmount(left);
+			inv.receiveAmount = usableAmount;
+
+			setCheckedInv(p => [...p, inv]);
+
+			setAmountRece(p => [...p, { inv_id: inv._id, amount: usableAmount }]);
+
+			setLeftAmount(p => Number(p) - usableAmount);
+
 		}
 		else {
+
 			if (userSetAmount) {
-				setFormData(pv => {
-					return {
-						...formData,
-						amount: Number(pv.amount) - due
-					}
-				})
+				setFormData(pv => ({
+					...pv,
+					amount: Number(pv.amount) - Number(inv.receiveAmount || 0)
+				}));
 			}
 
-			const filterdInv = checkedInv.filter(cInv => cInv._id !== inv._id);
-			setCheckedInv(filterdInv);
+			setCheckedInv(p => p.filter(cInv => cInv._id !== inv._id));
 
-			let left = Number(leftAmount || 0) + Number(inv.receiveAmount);
-			console.log("left", leftAmount, "receive_amount", inv.receiveAmount);
-			// console.log("left_amount", leftAmount);
-			setLeftAmount(left);
-			// Remove Receive Amount
-			setAmountRece((p) => {
-				return p.filter(f => f.inv_id !== inv._id);
-			})
+			setAmountRece(p => p.filter(f => f.inv_id !== inv._id));
+
+			setLeftAmount(p => Number(p) + Number(inv.receiveAmount || 0));
 		}
 	};
 
@@ -268,7 +264,6 @@ const AddPayment = ({ mode }) => {
 			}
 		});
 	}
-
 
 
 
@@ -302,6 +297,10 @@ const AddPayment = ({ mode }) => {
 											(e) => {
 												setFormData({ ...formData, amount: checkNumber(e.target.value) });
 												setLeftAmount(e.target.value);
+												if (mode) {
+													setCheckedInv([]);
+													setAmountRece([]);
+												};
 
 												if (checkNumber(e.target.value).trim() === "") {
 													setUserSetAmount(true)

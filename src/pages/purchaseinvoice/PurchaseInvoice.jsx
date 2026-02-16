@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-// import MyBreadCrumb from '../../components/BreadCrumb';
 import { Popover, Whisper } from 'rsuite';
 import { BiPrinter } from "react-icons/bi";
 import { FaRegCopy, FaRegEdit } from "react-icons/fa";
@@ -14,7 +13,6 @@ import useExportTable from '../../hooks/useExportTable';
 import useMyToaster from '../../hooks/useMyToaster';
 import Cookies from 'js-cookie';
 import downloadPdf from '../../helper/downloadPdf';
-import { GrFormNext, GrFormPrevious } from 'react-icons/gr';
 import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
 import AddNew from '../../components/AddNew';
@@ -26,6 +24,8 @@ import { FiMoreHorizontal } from 'react-icons/fi';
 import { RiArrowDropUpFill } from "react-icons/ri";
 import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
+import { Constants } from '../../helper/constants';
+import { Icons } from '../../helper/icons';
 
 
 
@@ -105,7 +105,6 @@ const PurchaseInvoice = () => {
 
 
 	const searchTable = (e) => {
-
 		const value = e.target.value.toLowerCase();
 		const rows = document.querySelectorAll('.list__table tbody tr');
 
@@ -271,7 +270,6 @@ const PurchaseInvoice = () => {
 			gst: "", billDate: ''
 		})
 	}
-
 
 
 	return (
@@ -490,12 +488,23 @@ const PurchaseInvoice = () => {
 											<th align='left'>Party Name</th>
 											<th align='left'>Due Date</th>
 											<th align='left'>Status</th>
+											<th align='left'>Amount</th>
 											<th align='center'>Action</th>
 										</tr>
 									</thead>
 									<tbody>
 										{
 											billData.map((data, i) => {
+												let paymentStatus = Constants.UNPAID;
+												const paymentAmount = Number(data.paymentAmount) || 0;
+
+												if (data.finalAmount === paymentAmount) {
+													paymentStatus = Constants.PAID;
+												}
+												else if (paymentAmount > 0 && paymentAmount < data.finalAmount) {
+													paymentStatus = Constants.PARTIAL_PAID;
+												}
+
 												return <tr key={i}
 													onClick={() => navigate(`/admin/bill/details/purchaseinvoice/${data._id}`)}>
 													<td className='py-2 px-4  max-w-[10px]' align='center'>
@@ -510,10 +519,21 @@ const PurchaseInvoice = () => {
 													<td>{data.originalInvoiceNumber}</td>
 													<td>{data.party.name}</td>
 													<td>{new Date(data.validDate).toLocaleDateString()}</td>
-													<td>
-														<span className={`${data.paymentStatus === "1" ? 'green-badge' : 'red-badge'} badge`}>
-															{data.paymentStatus === "1" ? "Paid" : "Unpaid"}
+													<td align='left'>
+														<span className={`${paymentStatus === Constants.PAID ? 'green-badge' : paymentStatus === Constants.PARTIAL_PAID ? 'yellow-badge' : 'red-badge'} badge capitalize`}>
+															{paymentStatus}
 														</span>
+													</td>
+													<td align='left'>
+														<Icons.RUPES className='inline' /> {data.finalAmount}
+														{
+															paymentStatus !== Constants.PAID && (
+																<p className='text-[12px] py-1'>
+																	<Icons.RUPES className='inline text-[10px]' />
+																	{(data.finalAmount - paymentAmount).toFixed(2)} unpaid
+																</p>
+															)
+														}
 													</td>
 
 													<td className='px-4 text-center'>

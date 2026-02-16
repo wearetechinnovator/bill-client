@@ -26,7 +26,6 @@ import QRCode from "qrcode";
 
 
 
-document.title = "Invoice";
 const Invoice = () => {
 	const navigate = useNavigate();
 	const { id, bill } = useParams();
@@ -116,6 +115,7 @@ const Invoice = () => {
 					});
 					const res = await req.json();
 					if (req.status === 200) {
+						console.log(res.data);
 						setBillData(res.data)
 						setBillNumber(res.data?.quotationNumber || res.data?.proformaNumber || res.data?.poNumber ||
 							res.data?.purchaseInvoiceNumber || res.data?.purchaseReturnNumber || res.data?.debitNoteNumber
@@ -427,10 +427,14 @@ const Invoice = () => {
 									</button>
 								</div>
 
-								<button className='payment__button'>
-									<Icons.RUPES className='inline' />
-									Record Payment In
-								</button>
+								{
+									Number(billData?.paymentAmount || 0) < billData?.finalAmount && (
+										<button className='payment__button'>
+											<Icons.RUPES className='inline' />
+											Record Payment In
+										</button>
+									)
+								}
 							</div>
 
 							<div id='mainBill' className='border border-black p-4'>
