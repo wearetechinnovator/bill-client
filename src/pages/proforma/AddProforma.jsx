@@ -776,17 +776,17 @@ const Proforma = ({ mode }) => {
 							<div className='flex flex-col w-full gap-3'>
 								<div>
 									<p>Note: </p>
-									<input type="text"
+									<textarea
 										onChange={(e) => setFormData({ ...formData, note: e.target.value })}
 										value={formData.note}
-									/>
+									></textarea>
 								</div>
 								<div>
 									<p>Terms:</p>
-									<input type="text"
+									<textarea
 										onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
 										value={formData.terms}
-									/>
+									></textarea>
 								</div>
 
 								{/* Add Bank Account */}

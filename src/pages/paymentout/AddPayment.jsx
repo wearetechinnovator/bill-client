@@ -40,7 +40,22 @@ const AddPayment = ({ mode }) => {
 	const [amountRece, setAmountRece] = useState([]);
 
 
-
+	//Set Paymentout number;
+	useEffect(() => {
+		if (mode) return;
+		(async () => {
+			const url = process.env.REACT_APP_API_URL + "/paymentout/get";
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({ token })
+			});
+			const res = await req.json();
+			setFormData(p => ({ ...p, paymentOutNumber: res.totalData + 1 }));
+		})();
+	}, [])
 
 	// Get invoice
 	useEffect(() => {
@@ -78,6 +93,7 @@ const AddPayment = ({ mode }) => {
 					...formData, ...res.data,
 					paymentOutDate: res.data.paymentOutDate.split("T")[0]
 				});
+				console.log(res);
 
 				// Set Sattlement invoice in main invoice;
 				setInvoiceData([...invoiceData, ...res.data.sattleInvoice]);
@@ -123,6 +139,8 @@ const AddPayment = ({ mode }) => {
 			return toast("Please enter a payment number", "error");
 		else if (formData.paymentOutDate === "")
 			return toast("Please select a payment date", "error");
+		else if (formData.amount === "")
+			return toast("Please enter payment amount", "error");
 		else if (formData.paymentMode === "")
 			return toast("Please select a payment mode", "error");
 		else if (formData.paymentMode !== Constants.CASH && formData.account === "")

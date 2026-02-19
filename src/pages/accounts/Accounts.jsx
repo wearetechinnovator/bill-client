@@ -4,7 +4,6 @@ import SideNav from '../../components/SideNav';
 import { Popover, Whisper } from 'rsuite';
 import { BiPrinter } from "react-icons/bi";
 import { FaRegCopy, FaRegEdit } from "react-icons/fa";
-import { MdFilterList } from "react-icons/md";
 import { FaRegFilePdf } from "react-icons/fa";
 import { FaRegFileExcel } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
@@ -15,16 +14,18 @@ import Cookies from 'js-cookie';
 import downloadPdf from '../../helper/downloadPdf';
 import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
-import { IoIosAdd, IoMdInformationCircleOutline, IoMdMore } from 'react-icons/io';
+import { IoIosAdd, IoMdMore } from 'react-icons/io';
 import AddNew from '../../components/AddNew';
 import { FiMoreHorizontal } from 'react-icons/fi';
 import ConfirmModal from '../../components/ConfirmModal';
 import Pagination from '../../components/Pagination';
+import { Icons } from '../../helper/icons';
 
 
 
 
 const Account = () => {
+	const token = Cookies.get("token")
 	const toast = useMyToaster();
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
 	const [activePage, setActivePage] = useState(1);
@@ -44,6 +45,31 @@ const Account = () => {
 	}, [billData]);
 	const [loading, setLoading] = useState(true);
 	const [openConfirm, setOpenConfirm] = useState(false);
+	const [balanceAmount, setBalanceAmount] = useState({});
+
+
+
+
+	// Get Balance
+	useEffect(() => {
+		(async () => {
+			try {
+				const url = process.env.REACT_APP_API_URL + `/account/get-balance`;
+				const req = await fetch(url, {
+					method: "POST",
+					headers: {
+						"Content-Type": 'application/json'
+					},
+					body: JSON.stringify({ token })
+				});
+				const res = await req.json();
+				setBalanceAmount(res);
+
+			} catch (error) {
+				return toast("Balance not get", "error");
+			}
+		})()
+	}, [])
 
 
 	// Get data;
@@ -64,7 +90,6 @@ const Account = () => {
 					body: JSON.stringify(data)
 				});
 				const res = await req.json();
-				console.log(res)
 				setTotalData(res.totalData)
 				setBillData([...res.data]);
 
@@ -147,7 +172,7 @@ const Account = () => {
 				headers: {
 					"Content-Type": "application/json"
 				},
-				body: JSON.stringify({ ids: selected, trash: trash })
+				body: JSON.stringify({ ids: selected })
 			});
 			const res = await req.json();
 
@@ -308,6 +333,15 @@ const Account = () => {
 										</tr>
 									</thead>
 									<tbody>
+										<tr>
+											<td className='py-2' align='center'>#</td>
+											<td>Cash</td>
+											<td>Cash Account</td>
+											<td>
+												<Icons.RUPES className='inline' />
+												{Number(balanceAmount?.cash).toFixed(2)}
+											</td>
+										</tr>
 										{
 											billData.map((data, i) => {
 												return <tr key={i}>
@@ -319,7 +353,10 @@ const Account = () => {
 													</td>
 													<td align='left'>{data.accountName}</td>
 													<td align='left'>{data.accountHolderName || '--'}</td>
-													<td align='left'>{data.openingBalance || '--'}</td>
+													<td align='left'>
+														<Icons.RUPES className='inline' />
+														{Number(balanceAmount?.[data._id]).toFixed(2)}
+													</td>
 													<td>
 														<Whisper
 															placement='leftStart'
@@ -331,13 +368,6 @@ const Account = () => {
 																>
 																	<FaRegEdit className='text-[16px]' />
 																	Edit
-																</div>
-																<div
-																	className='table__list__action__icon'
-																	onClick={() => navigate(`/admin/bill/details/${data._id}`)}
-																>
-																	<IoMdInformationCircleOutline className='text-[16px]' />
-																	Details
 																</div>
 															</Popover>}
 														>

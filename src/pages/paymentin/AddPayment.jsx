@@ -27,8 +27,6 @@ const AddPayment = ({ mode }) => {
 	})
 	let [checkedInv, setCheckedInv] = useState([]);
 
-	// Store party
-	const [party, setParty] = useState([]);
 	// Store account
 	const [account, setAccount] = useState([]);
 	// invoice data
@@ -42,6 +40,22 @@ const AddPayment = ({ mode }) => {
 
 
 
+	//Set Paymentin number;
+	useEffect(() => {
+		if(mode) return;
+		(async () => {
+			const url = process.env.REACT_APP_API_URL + "/paymentin/get";
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({ token })
+			});
+			const res = await req.json();
+			setFormData(p => ({ ...p, paymentInNumber: res.totalData + 1 }))
+		})();
+	}, [])
 
 	// Get invoice
 	useEffect(() => {
@@ -100,20 +114,12 @@ const AddPayment = ({ mode }) => {
 	}, [mode])
 
 
-	// Get Pary and Account, Account dropDown create here
-	// ==================================================
+	// Account dropDown create here
 	useEffect(() => {
 		(async () => {
-			{
-				const data = await getApiData("party");
-				const party = data.data.map(d => ({ label: d.name, value: d._id }));
-				setParty([...party]);
-			}
-			{
-				const data = await getApiData("account");
-				const account = data.data.map(d => ({ label: d.accountName, value: d._id }));
-				setAccount([...account])
-			}
+			const data = await getApiData("account");
+			const account = data.data.map(d => ({ label: d.accountName, value: d._id }));
+			setAccount([...account])
 		})()
 	}, [])
 
@@ -146,6 +152,8 @@ const AddPayment = ({ mode }) => {
 			return toast("Please enter a payment number", "error");
 		else if (formData.paymentInDate === "")
 			return toast("Please select a payment date", "error");
+		else if (formData.amount === "")
+			return toast("Please enter payment amount", "error");
 		else if (formData.paymentMode === "")
 			return toast("Please select a payment mode", "error");
 		else if (formData.paymentMode !== Constants.CASH && formData.account === "")

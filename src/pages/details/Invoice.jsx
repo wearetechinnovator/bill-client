@@ -22,6 +22,8 @@ import { AddPaymentOutComponent } from '../paymentout/AddPayment';
 import { AddPaymentInComponent } from '../paymentin/AddPayment';
 import Loading from '../../components/Loading';
 import QRCode from "qrcode";
+import PaymentInModal from '../../components/PaymentInModal';
+import PaymentOutModal from '../../components/PaymentOutModal';
 
 
 
@@ -49,6 +51,7 @@ const Invoice = () => {
 	const [billDate, setBillDate] = useState('');
 	const [accountDetails, setAccountDetails] = useState(null);
 	const [qr, setQr] = useState("");
+	const [paymentModal, setPaymentModal] = useState(false);
 
 
 
@@ -115,7 +118,6 @@ const Invoice = () => {
 					});
 					const res = await req.json();
 					if (req.status === 200) {
-						console.log(res.data);
 						setBillData(res.data)
 						setBillNumber(res.data?.quotationNumber || res.data?.proformaNumber || res.data?.poNumber ||
 							res.data?.purchaseInvoiceNumber || res.data?.purchaseReturnNumber || res.data?.debitNoteNumber
@@ -134,7 +136,6 @@ const Invoice = () => {
 						if (res.data.accountId && res.data.accountId?.upiId) {
 							const account = res.data.accountId;
 							const upiLink = `upi://pay?pa=${account.upiId}&pn=${account.accountHolderName}&am=${res.data.finalAmount}&cu=INR`;
-							console.log(upiLink);
 							QRCode.toDataURL(upiLink).then(setQr);
 						}
 					}
@@ -342,8 +343,35 @@ const Invoice = () => {
 			<Nav />
 			<main id='main'>
 				<SideNav />
-				{/* Payment drawer close */}
-				<MailModal open={openModal} pdf={pdfData} email={billData?.party?.email} />
+				{
+					bill === "salesinvoice" && (
+						<PaymentInModal
+							invoice={billData}
+							openModal={paymentModal}
+							openStatus={() => {
+								setPaymentModal(false);
+							}}
+						/>
+					)
+				}
+
+				{
+					bill === "purchaseinvoice" && (
+						<PaymentOutModal
+							invoice={billData}
+							openModal={paymentModal}
+							openStatus={() => {
+								setPaymentModal(false);
+							}}
+						/>
+					)
+				}
+
+				<MailModal
+					open={openModal}
+					pdf={pdfData}
+					email={billData?.party?.email}
+				/>
 
 				<div className="content__body">
 					<div className='content__body__main w-[100%] min-h-[100vh] bg-gray-100 flex justify-center'>
@@ -428,10 +456,12 @@ const Invoice = () => {
 								</div>
 
 								{
-									Number(billData?.paymentAmount || 0) < billData?.finalAmount && (
-										<button className='payment__button'>
+									Number(billData?.paymentAmount || 0) < billData?.finalAmount && (bill === "salesinvoice" || bill === "purchaseinvoice") && (
+										<button className='payment__button' onClick={() => setPaymentModal(true)}>
 											<Icons.RUPES className='inline' />
-											Record Payment In
+											{
+												bill === "purchaseinvoice" ? "Record Payment Out" : bill === "salesinvoice" ? "Record Payment In" : ""
+											}
 										</button>
 									)
 								}
@@ -650,12 +680,12 @@ const Invoice = () => {
 										</div>
 										<div className='w-full flex'>
 											<div className='w-full p-2'>
-												<p className='font-semibold text-md'>Note:</p>
-												<p>{billData?.note}</p>
+												<p className='font-semibold text-md'>Notes:</p>
+												<p className='text-xs text-gray-500'>{billData?.note}</p>
 												<br />
 
-												<p className='font-semibold text-md'>Terms:</p>
-												<p>{billData?.terms}</p>
+												<p className='font-semibold text-md'>Terms & Conditions:</p>
+												<p className='text-xs text-gray-500'>{billData?.terms}</p>
 											</div>
 											<div className='border-l w-full text-center p-2'>
 												<img src={companyDetails?.signature} alt="signature" className='mx-auto' style={{ height: '30px' }} />

@@ -40,7 +40,7 @@ const AddAccount = ({ mode }) => {
                 setForm({
                     ...form, ...res.data,
                     reEnterAccountNumber: res.data.accountNumber,
-                    asOfDate: res.data.asOfDate.split("T")[0]
+                    asOfDate: res.data.asOfDate?.split("T")[0]
                 });
 
             }
