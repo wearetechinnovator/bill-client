@@ -40,6 +40,26 @@
 }
 
 
+.loader {
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: conic-gradient(rgba(59, 130, 246, 0) 0deg,
+      rgba(59, 130, 246, 0.1) 40deg,
+      rgba(59, 130, 246, 0.3) 80deg,
+      rgba(59, 130, 246, 0.6) 160deg,
+      rgba(59, 130, 246, 1) 300deg);
+  animation: spin 0.9s linear infinite;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black 0);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 
 #main {
   min-width: 100%;

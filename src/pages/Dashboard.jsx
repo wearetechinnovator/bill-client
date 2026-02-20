@@ -30,8 +30,6 @@ const Dashboard = () => {
 	const [accountBalanceData, setAccountBalanceData] = useState([])
 	const [recentPurchase, setRecentPurchase] = useState([]);
 	const [recentSales, setRecentSales] = useState([]);
-	const [totalCollect, setTotalCollect] = useState(null);
-	const [totalPay, setTotalPay] = useState(null);
 	const [cashFlowData, setCashFlowData] = useState([]);
 	const COLORS = [
 		"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
@@ -49,7 +47,10 @@ const Dashboard = () => {
 	const [balanceAmount, setBalanceAmount] = useState({});
 	const [cashInAmount, setCashInAmount] = useState(0);
 	const [cashOutAmount, setCashOutAmount] = useState(0);
-	const [totalParty, setTotalParty] = useState(0);
+	const [totalSaleAmount, setTotalSaleAmount] = useState(0);
+	const [totalPurchaseAmount, setTotalPurchaseAmount] = useState(0);
+	const [totalCollect, setTotalCollect] = useState(null);
+	const [totalPay, setTotalPay] = useState(null);
 
 
 
@@ -78,9 +79,9 @@ const Dashboard = () => {
 		}
 	}
 
-	const getTotalParties = async () => {
+	const getTotalSaleAmount = async () => {
 		try {
-			const url = process.env.REACT_APP_API_URL + `/party/get`;
+			const url = process.env.REACT_APP_API_URL + `/salesinvoice/get-total-sale-amount`;
 			const req = await fetch(url, {
 				method: "POST",
 				headers: {
@@ -90,16 +91,87 @@ const Dashboard = () => {
 			});
 			const res = await req.json();
 			if (req.status !== 200) return toast(res.err, "error");
-			setTotalParty(res.totalData)
+			setTotalSaleAmount(res[0].totalAmount)
 		} catch (err) {
 			return toast("Something went wrong", "error")
 		}
 	}
+
+	const getTotalPurchaseAmount = async () => {
+		try {
+			const url = process.env.REACT_APP_API_URL + `/purchaseinvoice/get-total-purchase-amount`;
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify({ token })
+			});
+			const res = await req.json();
+			if (req.status !== 200) return toast(res.err, "error");
+			setTotalPurchaseAmount(res[0].totalAmount)
+		} catch (err) {
+			return toast("Something went wrong", "error")
+		}
+	}
+
+	const getTotalCollect = async () => {
+		try {
+			const url = process.env.REACT_APP_API_URL + `/salesinvoice/get-total-collect`;
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify({ token: Cookies.get('token') })
+			});
+			const res = await req.json();
+			if (req.status === 200) {
+				if (res.length > 0) {
+					setTotalCollect(res[0].totalAmount)
+				} else {
+					setTotalCollect(0)
+				}
+			}
+
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
+	const getTotalPay = async () => {
+		try {
+			const url = process.env.REACT_APP_API_URL + `/purchaseinvoice/get-total-pay`;
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify({ token: Cookies.get('token') })
+			});
+			const res = await req.json();
+
+			if (req.status === 200) {
+				if (res.length > 0) {
+					setTotalPay(res[0].totalAmount)
+				} else {
+					setTotalPay(0)
+				}
+			}
+
+		} catch (error) {
+			console.log(error)
+		}
+	}
+	
 	useEffect(() => {
 		(async () => {
 			setInsightLoading(true);
 			await getCashInAndCashOut();
-			await getTotalParties();
+			await getTotalSaleAmount();
+			await getTotalPurchaseAmount();
+			await getTotalCollect();
+			await getTotalPay();
 			setInsightLoading(false);
 		})()
 	}, [])
@@ -202,60 +274,6 @@ const Dashboard = () => {
 		})()
 	}, [balanceAmount])
 
-	// Get Total Pay;
-	useEffect(() => {
-		(async () => {
-			try {
-				const url = process.env.REACT_APP_API_URL + `/purchaseinvoice/get-total-pay`;
-				const req = await fetch(url, {
-					method: "POST",
-					headers: {
-						"Content-Type": 'application/json'
-					},
-					body: JSON.stringify({ token: Cookies.get('token') })
-				});
-				const res = await req.json();
-
-				if (req.status === 200) {
-					if (res.length > 0) {
-						setTotalPay(res[0].totalAmount)
-					} else {
-						setTotalPay(0)
-					}
-				}
-
-			} catch (error) {
-				console.log(error)
-			}
-		})()
-	}, [])
-
-	// Get Total Collect;
-	useEffect(() => {
-		(async () => {
-			try {
-				const url = process.env.REACT_APP_API_URL + `/salesinvoice/get-total-collect`;
-				const req = await fetch(url, {
-					method: "POST",
-					headers: {
-						"Content-Type": 'application/json'
-					},
-					body: JSON.stringify({ token: Cookies.get('token') })
-				});
-				const res = await req.json();
-				if (req.status === 200) {
-					if (res.length > 0) {
-						setTotalCollect(res[0].totalAmount)
-					} else {
-						setTotalCollect(0)
-					}
-				}
-
-			} catch (error) {
-				console.log(error)
-			}
-		})()
-	}, [])
 
 	// Get Recent Purchase Invoice
 	useEffect(() => {
@@ -331,7 +349,7 @@ const Dashboard = () => {
 												<div className="flex content-between">
 													<div className="interaction-left-box w-[85%]">
 														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Cash In</h2>
-														<p className="text-[#000] text-[14px] text-[#333333]">
+														<p className="text-[14px] text-[#333333]">
 															<Icons.RUPES className="inline" />{cashInAmount}
 														</p>
 													</div>
@@ -344,7 +362,7 @@ const Dashboard = () => {
 												<div className="flex content-between">
 													<div className="interaction-left-box w-[85%]">
 														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Cash Out</h2>
-														<p className="text-[#000] text-[14px] text-[#333333]">
+														<p className=" text-[14px] text-[#333333]">
 															<Icons.RUPES className="inline" />{cashOutAmount}
 														</p>
 													</div>
@@ -356,8 +374,10 @@ const Dashboard = () => {
 											<div className="bg-[#E9E9E9] rounded-[10px] p-4 border shadow">
 												<div className="flex content-between">
 													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Customers</h2>
-														<p className="text-[#000] text-[14px] text-[#333333]">{totalParty}</p>
+														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">To Collect</h2>
+														<p className="text-[14px] text-[#333333]">
+															<Icons.RUPES className="inline" />{totalCollect}
+														</p>
 													</div>
 													<div className="interaction-right-box text-end w-[15%]">
 														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
@@ -367,8 +387,10 @@ const Dashboard = () => {
 											<div className="bg-[#E3FFFA] rounded-[10px] p-4 border shadow">
 												<div className="flex content-between">
 													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Products Sold</h2>
-														<p className="text-[#000] text-[14px] text-[#333333]">1,250$</p>
+														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">To Pay</h2>
+														<p className="text-[14px] text-[#333333]">
+															<Icons.RUPES className="inline" />{totalPay}
+														</p>
 													</div>
 													<div className="interaction-right-box text-end w-[15%]">
 														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
@@ -379,7 +401,9 @@ const Dashboard = () => {
 												<div className="flex content-between">
 													<div className="interaction-left-box w-[85%]">
 														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Sales</h2>
-														<p className="text-[#000] text-[14px] text-[#333333]">1,250$</p>
+														<p className="text-[14px] text-[#333333]">
+															<Icons.RUPES className="inline" />{totalSaleAmount}
+														</p>
 													</div>
 													<div className="interaction-right-box text-end w-[15%]">
 														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
@@ -390,7 +414,9 @@ const Dashboard = () => {
 												<div className="flex content-between">
 													<div className="interaction-left-box w-[85%]">
 														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Purchase</h2>
-														<p className="text-[#000] text-[14px] text-[#333333]">1,250$</p>
+														<p className="text-[14px] text-[#333333]">
+															<Icons.RUPES className="inline" />{totalPurchaseAmount}
+														</p>
 													</div>
 													<div className="interaction-right-box text-end w-[15%]">
 														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
@@ -401,7 +427,7 @@ const Dashboard = () => {
 												<div className="flex content-between">
 													<div className="interaction-left-box w-[85%]">
 														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Expenses</h2>
-														<p className="text-[#000] text-[14px] text-[#333333]">1,250$</p>
+														<p className="text-[14px] text-[#333333]">1,250$</p>
 													</div>
 													<div className="interaction-right-box text-end w-[15%]">
 														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
@@ -412,7 +438,7 @@ const Dashboard = () => {
 												<div className="flex content-between">
 													<div className="interaction-left-box w-[85%]">
 														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Income</h2>
-														<p className="text-[#000] text-[14px] text-[#333333]">1,250$</p>
+														<p className="text-[14px] text-[#333333]">1,250$</p>
 													</div>
 													<div className="interaction-right-box text-end w-[15%]">
 														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>

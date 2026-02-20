@@ -58,7 +58,6 @@ const SalesInvoice = () => {
 		try {
 			const data = {
 				token: Cookies.get("token"),
-				trash: tableStatusData === "trash" ? true : false,
 				all: tableStatusData === "all" ? true : false
 			}
 			const url = process.env.REACT_APP_API_URL + `/salesinvoice/get?page=${activePage}&limit=${dataLimit}`;

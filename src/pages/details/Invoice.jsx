@@ -533,7 +533,10 @@ const Invoice = () => {
 													billData && billData.items.map((data, index) => {
 														return <tr key={index}>
 															<td valign='top' align='center' className='p-2 border'>{index + 1}</td>
-															<td valign='top' align='left'>{data.itemName}</td>
+															<td valign='top' align='left'>
+																{data.itemName}
+																{data.description && <p className='text-gray-500 text-[10px] mt-1'>{data.description}</p>}
+															</td>
 															<td valign='top' align='right'>{data.hsn}</td>
 															<td valign='top' align='right'>{data.qun} <sub>{data.selectedUnit}</sub></td>
 															<td valign='top' align='right'>{data.price}</td>
@@ -559,7 +562,7 @@ const Invoice = () => {
 												}
 											</tbody>
 											<tfoot className='w-full'>
-												<tr className='font-bold bg-[#F3F4F6]'>
+												<tr className='font-bold' style={{background:"#F3F4F6"}}>
 													<td colSpan={3} align='right'>TOTAL</td>
 													<td>{billDetails.qun}</td>
 													<td></td>
@@ -567,7 +570,7 @@ const Invoice = () => {
 													<td><Icons.RUPES className='inline' />{billDetails.taxAmount}</td>
 													<td><Icons.RUPES className='inline' />{billDetails.amount}</td>
 												</tr>
-												{billData?.roundOffAmount && <tr className='font-bold bg-[#F3F4F6]'>
+												{billData?.roundOffAmount && <tr className='font-semibold' style={{background:"#F3F4F6"}}>
 													<td colSpan={7} align='right' className='italic'>Round Off</td>
 													<td><Icons.RUPES className='inline' />
 														{
@@ -577,16 +580,29 @@ const Invoice = () => {
 														}
 													</td>
 												</tr>}
-												{billData?.roundOffAmount && <tr className='font-bold bg-[#F3F4F6]'>
-													<td colSpan={7} align='right' className='font-semibold'>SUB TOTAL</td>
-													<td><Icons.RUPES className='inline' />
-														{
-															billData.roundOffType === "0" ?
-																(Number(billDetails.amount) - Number(billData?.roundOffAmount)) :
-																Number(billDetails.amount) + Number(billData?.roundOffAmount)
-														}
+												{billData?.roundOffAmount && (
+													<tr className='font-semibold' style={{background:"#F3F4F6"}}>
+														<td colSpan={7} align='right'>SUB TOTAL</td>
+														<td><Icons.RUPES className='inline' />
+															{
+																billData.roundOffType === "0" ?
+																	(Number(billDetails.amount) - Number(billData?.roundOffAmount)) :
+																	Number(billDetails.amount) + Number(billData?.roundOffAmount)
+															}
+														</td>
+													</tr>
+												)}
+												<tr className='font-semibold' style={{background:"#F3F4F6"}}>
+													<td colSpan={7} align='right'>Received Amount</td>
+													<td><Icons.RUPES className='inline' />{billData?.paymentAmount || "0.00"}</td>
+												</tr>
+												<tr className='font-semibold' style={{background:"#F3F4F6"}}>
+													<td colSpan={7} align='right'>Balance Due</td>
+													<td>
+														<Icons.RUPES className='inline' />
+														{((Number(billData?.finalAmount) - Number(billData?.paymentAmount)) || 0).toFixed(2)}
 													</td>
-												</tr>}
+												</tr>
 											</tfoot>
 										</table>
 									</div>
