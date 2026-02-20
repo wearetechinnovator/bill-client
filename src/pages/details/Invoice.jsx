@@ -396,11 +396,11 @@ const Invoice = () => {
 													}
 												});
 										}}
-										title='Duplicate'
+										title='Clone Invoice'
 										className='bg-[#003E32] text-white rounded-[5px] flex justify-center items-center px-2 py-[5px] gap-1'
 									>
 										<Icons.COPY />
-										Duplicate
+										Clone
 									</button>
 
 									<button
@@ -452,6 +452,14 @@ const Invoice = () => {
 										className='bg-[#003E32] text-white rounded-[5px] flex justify-center items-center px-2 py-[5px]'>
 										<Icons.PRINTER className="text-white text-[15px] mr-1" />
 										Print
+									</button>
+									<button
+										title='Edit Bill'
+										onClick={()=>navigate(`/admin/${route}/edit/${id}`)}
+										className='bg-[#003E32] text-white rounded-[5px] flex justify-center items-center px-2 py-[5px]'
+									>
+										<Icons.EDIT className="text-white text-[15px] mr-1" />
+										Edit
 									</button>
 								</div>
 
@@ -562,7 +570,7 @@ const Invoice = () => {
 												}
 											</tbody>
 											<tfoot className='w-full'>
-												<tr className='font-bold' style={{background:"#F3F4F6"}}>
+												<tr className='font-bold' style={{ background: "#F3F4F6" }}>
 													<td colSpan={3} align='right'>TOTAL</td>
 													<td>{billDetails.qun}</td>
 													<td></td>
@@ -570,7 +578,7 @@ const Invoice = () => {
 													<td><Icons.RUPES className='inline' />{billDetails.taxAmount}</td>
 													<td><Icons.RUPES className='inline' />{billDetails.amount}</td>
 												</tr>
-												{billData?.roundOffAmount && <tr className='font-semibold' style={{background:"#F3F4F6"}}>
+												{billData?.roundOffAmount && <tr className='font-semibold' style={{ background: "#F3F4F6" }}>
 													<td colSpan={7} align='right' className='italic'>Round Off</td>
 													<td><Icons.RUPES className='inline' />
 														{
@@ -581,7 +589,7 @@ const Invoice = () => {
 													</td>
 												</tr>}
 												{billData?.roundOffAmount && (
-													<tr className='font-semibold' style={{background:"#F3F4F6"}}>
+													<tr className='font-semibold' style={{ background: "#F3F4F6" }}>
 														<td colSpan={7} align='right'>SUB TOTAL</td>
 														<td><Icons.RUPES className='inline' />
 															{
@@ -592,11 +600,11 @@ const Invoice = () => {
 														</td>
 													</tr>
 												)}
-												<tr className='font-semibold' style={{background:"#F3F4F6"}}>
+												<tr className='font-semibold' style={{ background: "#F3F4F6" }}>
 													<td colSpan={7} align='right'>Received Amount</td>
 													<td><Icons.RUPES className='inline' />{billData?.paymentAmount || "0.00"}</td>
 												</tr>
-												<tr className='font-semibold' style={{background:"#F3F4F6"}}>
+												<tr className='font-semibold' style={{ background: "#F3F4F6" }}>
 													<td colSpan={7} align='right'>Balance Due</td>
 													<td>
 														<Icons.RUPES className='inline' />

@@ -1,205 +1,211 @@
 import React, { useEffect, useState } from 'react'
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-import { SelectPicker, DatePicker, Button } from 'rsuite';
-import { FaRegCheckCircle } from "react-icons/fa";
-import { LuRefreshCcw } from "react-icons/lu";
-import { IoMdArrowRoundBack } from "react-icons/io";
+import { SelectPicker } from 'rsuite';
 import useMyToaster from '../../hooks/useMyToaster';
 import useApi from '../../hooks/useApi';
 import Cookies from 'js-cookie';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Icons } from '../../helper/icons';
+import { Constants } from '../../helper/constants';
+import { checkNumber } from '../../helper/validation';
+
 
 
 const TransactionAdd = ({ mode }) => {
-  const { getApiData } = useApi();
-  const [inputval, setInputval] = useState({
-    transactionType: '', purpose: '', transactionNumber: '', transactionDate: '',
-    paymentMode: '', account: '', amount: '', note: ''
-  })
-  // Store account
-  const [account, setAccount] = useState([]);
-  const toast = useMyToaster();
-  const { id } = useParams();
-  const navigate = useNavigate();
+	const toast = useMyToaster();
+	const { id } = useParams();
+	const navigate = useNavigate();
+	const token = Cookies.get("token");
+	const { getApiData } = useApi();
+	const currentDate = new Date().toISOString().split("T")[0];
+	const [formData, setFormData] = useState({
+		transactionType: '', purpose: '', transactionNumber: '', transactionDate: currentDate,
+		paymentMode: Constants.CASH, account: '', amount: '', note: ''
+	})
+	// Store account
+	const [account, setAccount] = useState([]);
 
 
 
-  useEffect(() => {
-    if (mode) {
-      const get = async () => {
-        const url = process.env.REACT_APP_API_URL + "/other-transaction/get";
-        const cookie = Cookies.get("token");
-
-        const req = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": 'application/json'
-          },
-          body: JSON.stringify({ token: cookie, id: id })
-        })
-        const res = await req.json();
-        console.log(res)
-        setInputval({ ...inputval, ...res.data });
-      }
-
-      get();
-    }
-  }, [mode])
+	useEffect(() => {
+		if (mode) {
+			(async () => {
+				const url = process.env.REACT_APP_API_URL + "/other-transaction/get";
+				const req = await fetch(url, {
+					method: "POST",
+					headers: {
+						"Content-Type": 'application/json'
+					},
+					body: JSON.stringify({ token, id: id })
+				})
+				const res = await req.json();
+				setFormData({ ...formData, ...res.data });
+			})()
+		}
+	}, [mode])
 
 
-  useEffect(() => {
-    const apiData = async () => {
-      {
-        const data = await getApiData("account");
-        const account = data.data.map(d => ({ label: d.title, value: d._id }));
-        setAccount([...account])
-      }
-    }
+	// Get account data for select option
+	useEffect(() => {
+		const apiData = async () => {
+			{
+				const data = await getApiData("account");
+				const account = data.data.map(d => ({ label: d.accountName, value: d._id }));
+				setAccount([...account])
+			}
+		}
 
-    apiData();
-  }, [])
-
-
-  const saveTransaction = async (e) => {
-    if (inputval.transactionType === "" || inputval.purpose === "" || inputval.transactionNumber === "" ||
-      inputval.transactionDate === "" || inputval.paymentMode === "" || inputval.account === "" || inputval.amount === "") {
-      return toast("fill the blank", "error");
-    }
-
-    try {
-      const url = process.env.REACT_APP_API_URL + "/other-transaction/add";
-      const token = Cookies.get("token");
-
-      const req = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(!mode ? { ...inputval, token } : { ...inputval, token, update: true, id: id })
-      })
-      const res = await req.json();
-      if (req.status !== 200 || res.err) {
-        return toast(res.err, 'error');
-      }
-
-      if (mode) {
-        return toast('Transaction update successfully', 'success');
-      }
-
-      clearForm();
-      
-      toast('Transaction add successfully', 'success');
-      navigate("/admin/other-transaction")
-      return 
+		apiData();
+	}, [])
 
 
-    } catch (error) {
-      console.log(error);
-      return toast('Something went wrong', 'error')
-    }
+	const saveTransaction = async (e) => {
+		if (formData.transactionType === "" || formData.purpose === "" || formData.transactionNumber === "" ||
+			formData.transactionDate === "" || formData.paymentMode === "" || formData.account === "" || formData.amount === "") {
+			return toast("fill the required fields", "error");
+		}
 
-  }
+		try {
+			const url = process.env.REACT_APP_API_URL + "/other-transaction/add";
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(!mode ?
+					{ ...formData, token } :
+					{ ...formData, token, update: true, id: id }
+				)
+			})
+			const res = await req.json();
+			if (req.status !== 200 || res.err) {
+				return toast(res.err, 'error');
+			}
 
-  const clearForm = () => {
-    setInputval({
-      transactionType: '', purpose: '', transactionNumber: '', transactionDate: '',
-      paymentMode: '', account: '', amount: '', note: ''
-    })
-  }
+			if (mode) {
+				return toast('Transaction update successfully', 'success');
+			}
+
+			clearForm();
+
+			toast('Transaction add successfully', 'success');
+			navigate("/admin/other-transaction")
+			return;
+		} catch (error) {
+			return toast('Something went wrong', 'error')
+		}
+
+	}
+
+	const clearForm = () => {
+		setFormData({
+			transactionType: '', purpose: '', transactionNumber: '', transactionDate: '',
+			paymentMode: '', account: '', amount: '', note: ''
+		})
+	}
 
 
 
-  return (
-    <>
-      <Nav title={mode ? "Edit transations" : "Add transations"} />
-      <main id="main">
-        <SideNav />
-        <div className='content__body '>
-          <div className='content__body__main bg-white' >
-            <div className='flex justify-between gap-4 flex-col lg:flex-row'>
-              <div className='w-full'>
-                <div>
-                  <p className='ml-1 mb-1'> Select Transaction Type</p>
-                  <select
-                    onChange={(e) => {
-                      setInputval({ ...inputval, transactionType: e.target.value })
-                    }}
-                    value={inputval.transactionType}
-                  >
-                    <option value="">--Select Type--</option>
-                    <option value="income">Income</option>
-                    <option value="expense">Expense</option>
-                  </select>
-                </div>
-                <div>
-                  <p className='ml-1 mb-1 mt-2'>Purpose</p>
-                  <input type='text' onChange={(e) => setInputval({ ...inputval, purpose: e.target.value })}
-                    value={inputval.purpose} />
-                </div>
-                <div>
-                  <p className='ml-1 mb-1 mt-2'>Transaction Number</p>
-                  <input type='number' onChange={(e) => setInputval({ ...inputval, transactionNumber: e.target.value })}
-                    value={inputval.transactionNumber} />
-                </div>
-                <div>
-                  <p className='ml-1 mb-1 mt-2'>Transaction Date</p>
-                  <input type='date' onChange={(e) => setInputval({ ...inputval, transactionDate: e.target.value })}
-                    value={inputval.transactionDate} />
-                </div>
-              </div>
-              <div className='w-full'>
-                <div>
-                  <p className='ml-1 mb-1'>Payment Mode</p>
-                  <select
-                    onChange={(e) => {
-                      setInputval({ ...inputval, paymentMode: e.target.value })
-                    }}
-                    value={inputval.paymentMode}
-                  >
-                    <option value="">--Select Type--</option>
-                    <option value="cash">Cash</option>
-                    <option value="bank">Bank</option>
-                    <option value="cheque">Cheque</option>
-                  </select>
-                </div>
-                <div >
-                  <p className='ml-1 mb-1 mt-2'>Account</p>
-                  <SelectPicker className='w-full'
-                    onChange={(v) => setInputval({ ...inputval, account: v })}
-                    data={account}
-                    value={inputval.account}
-                  />
-                </div>
-                <div>
-                  <p className='ml-1 mb-1 mt-2'>Amount</p>
-                  <input type='number' onChange={(e) =>
-                    setInputval({ ...inputval, amount: e.target.value })}
-                    value={inputval.amount} />
-                </div>
-                <div>
-                  <p className='ml-1 mb-1 mt-2'>Note/Remark</p>
-                  <input type='text' onChange={(e) =>
-                    setInputval({ ...inputval, note: e.target.value })}
-                    value={inputval.note} />
-                </div>
-              </div>
-            </div>
-            <div className='flex justify-center pt-9 mb-6'>
-              <div className='flex rounded-sm bg-green-500 text-white'>
-                <FaRegCheckCircle className='mt-3 ml-2' />
-                <button className='p-2' onClick={saveTransaction}>{mode ? "Update" : "Save"}</button>
-              </div>
-              <div className='flex rounded-sm ml-4 bg-blue-500 text-white'>
-                <LuRefreshCcw className='mt-3 ml-2' />
-                <button className='p-2' onClick={clearForm}>Reset</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    </>
-  )
+	return (
+		<>
+			<Nav title={mode ? "Edit Transactions" : "Add Transactions"} />
+			<main id="main">
+				<SideNav />
+				<div className='content__body '>
+					<div className='content__body__main bg-white' >
+						<div className='flex justify-between gap-4 flex-col lg:flex-row'>
+							<div className='w-full'>
+								<div>
+									<p> Select Transaction Type</p>
+									<select
+										onChange={(e) => {
+											setFormData({ ...formData, transactionType: e.target.value })
+										}}
+										value={formData.transactionType}
+									>
+										<option value="">Select</option>
+										<option value="income">Income</option>
+										<option value="expense">Expense</option>
+									</select>
+								</div>
+								<div>
+									<p className='mt-2'>Purpose</p>
+									<input type='text' onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+										value={formData.purpose} />
+								</div>
+								<div>
+									<p className='mt-2'>Transaction Number</p>
+									<input type='text' onChange={(e) => setFormData({ ...formData, transactionNumber: e.target.value })}
+										value={formData.transactionNumber} />
+								</div>
+								<div>
+									<p className='mt-2'>Transaction Date</p>
+									<input type='date' onChange={(e) => setFormData({ ...formData, transactionDate: e.target.value })}
+										value={formData.transactionDate} />
+								</div>
+							</div>
+							<div className='w-full'>
+								<div className='w-full flex items-center gap-2'>
+									<div className='w-full'>
+										<p className='ml-1'>Payment Mode</p>
+										<select
+											onChange={(e) => {
+												setFormData({ ...formData, paymentMode: e.target.value })
+											}}
+											value={formData.paymentMode}
+										>
+											<option value={Constants.CASH}>Cash</option>
+											<option value={Constants.UPI}>UPI</option>
+											<option value={Constants.CARD}>Card</option>
+											<option value={Constants.NETBENKING}>Netbenking</option>
+											<option value={Constants.BANK}>Bank</option>
+											<option value={Constants.CHEQUE}>Cheque</option>
+										</select>
+									</div>
+									{
+										formData.paymentMode !== Constants.CASH && (
+											<div className='w-full'>
+												<p>Account</p>
+												<SelectPicker className='w-full'
+													onChange={(v) => setFormData({ ...formData, account: v })}
+													data={account}
+													value={formData.account}
+												/>
+											</div>
+										)
+									}
+								</div>
+								<div>
+									<p className='mt-2'>Amount</p>
+									<input type='text' onChange={(e) =>
+										setFormData({ ...formData, amount: checkNumber(e.target.value) })}
+										value={formData.amount} />
+								</div>
+								<div>
+									<p className='mt-2'>Note</p>
+									<textarea onChange={(e) =>
+										setFormData({ ...formData, note: e.target.value })}
+										value={formData.note}
+									></textarea>
+								</div>
+							</div>
+						</div>
+						<div className='w-full flex justify-center gap-3 my-1 mt-5'>
+							<button className='add-bill-btn' onClick={saveTransaction}>
+								<Icons.CHECK />
+								{mode ? "Update" : "Save"}
+							</button>
+							<button className='reset-bill-btn' onClick={clearForm}>
+								<Icons.RESET />
+								Reset
+							</button>
+						</div>
+					</div>
+				</div>
+			</main>
+		</>
+	)
 }
 
 export default TransactionAdd

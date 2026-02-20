@@ -154,8 +154,6 @@ const SalesInvoice = ({ mode }) => {
 	useEffect(() => {
 		if ((getBillPrefix && mode === "convert") || (getBillPrefix && !mode)) {
 			setFormData(prev => ({ ...prev, salesInvoiceNumber: getBillPrefix[0] + getBillPrefix[1] }));
-			console.log("getBillPrefix", getBillPrefix)
-
 		}
 		else if (getBillPrefix && mode === "edit") {
 			get();
@@ -329,7 +327,7 @@ const SalesInvoice = ({ mode }) => {
 
 
 	// Save bill
-	const saveBill = async () => {
+	const saveBill = async ({ isNew = false }) => {
 		if (!formData.party) {
 			return toast("Please select party", "error");
 		} else if (!formData.salesInvoiceNumber) {
@@ -412,16 +410,20 @@ const SalesInvoice = ({ mode }) => {
 					})
 
 				} catch (error) {
-					console.log(error);
 					return toast('Quotation status not change', 'error')
 				}
 			}
 
 			toast('Invoice add successfully', 'success');
+			if (isNew) {
+				clearForm();
+				setFormData(prev => ({ ...prev, salesInvoiceNumber: getBillPrefix[0] + getBillPrefix[1] }));
+				return;
+			}
+
 			navigate('/admin/sales-invoice')
-			return
+			return;
 		} catch (error) {
-			console.log(error);
 			return toast('Something went wrong', 'error')
 		}
 
@@ -1055,21 +1057,31 @@ const SalesInvoice = ({ mode }) => {
 							</div>
 						</div>
 
-						<div className='w-full flex justify-center gap-3 my-3 mt-5'>
-							<button
-								onClick={saveBill}
-								className='add-bill-btn'>
-								<Icons.CHECK />
-								{!mode || mode === "convert" ? "Save" : "Update"}
-							</button>
-							<button className='reset-bill-btn' onClick={clearForm}>
-								<Icons.RESET />
-								Reset
-							</button>
-						</div>
-
 					</div>
 					{/* Content Body Main Close */}
+					<div className='form-btn-bar'>
+						<button
+							onClick={() => saveBill({ isNew: false })}
+							className='add-bill-btn'>
+							<Icons.CHECK />
+							{!mode || mode === "convert" ? "Save" : "Update"}
+						</button>
+						{
+							!mode && (
+								<button
+									onClick={() => saveBill({ isNew: true })}
+									className='add-bill-btn'
+								>
+									<Icons.CHECK />
+									Save and New
+								</button>
+							)
+						}
+						<button className='reset-bill-btn' onClick={clearForm}>
+							<Icons.RESET />
+							Reset
+						</button>
+					</div>
 				</div>
 				{/* Content Body Close */}
 			</main>

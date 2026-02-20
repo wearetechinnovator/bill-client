@@ -63,7 +63,7 @@ const Login = () => {
 	}
 
 	return (
-		<main className='login__main'>
+		<main className='login__main glow-shape'>
 			<img src={Logo} alt="Logo.png" className='mb-5' />
 			<div className="login__box flex flex-col" id="loginBox">
 				<h1 className='text-center text-[25px] mb-8 mt-4'>Sign In</h1>

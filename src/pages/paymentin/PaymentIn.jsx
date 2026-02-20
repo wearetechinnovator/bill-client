@@ -338,7 +338,7 @@ const PaymentIn = () => {
                                                             placement='leftStart'
                                                             trigger={"click"}
                                                             speaker={
-                                                            <Popover full  className='table__list__action__parent'>
+                                                            <Popover full className='table__list__action__parent'>
                                                                 <div
                                                                     className='table__list__action__icon'
                                                                     onClick={() => navigate(`/admin/payment-in/edit/${data._id}`)}

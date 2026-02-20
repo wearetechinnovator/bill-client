@@ -72,6 +72,7 @@
   width: 100%;
   background: linear-gradient(90deg, rgba(230, 236, 223, 1) 56%, rgba(237, 244, 251, 1) 86%);
   padding: 10px;
+  padding-bottom: 0px;
   overflow-y: auto;
 }
 
@@ -361,14 +362,19 @@ select {
   place-items: center;
 }
 
+.form-btn-bar {
+  @apply w-full px-2 py-2 rounded-t mt-1 bg-white sticky bottom-0 left-0 right-0 border-t flex items-center justify-start gap-2 text-sm ;
+  box-shadow: 0px -2px 5px rgb(0 0 0 / 0.1);
+}
+
 .add-bill-btn {
-  @apply bg-green-500 hover:bg-green-400 text-white rounded w-[75px];
-  @apply flex items-center justify-center gap-1 py-2;
+  @apply bg-green-500 hover:bg-green-400 text-white rounded min-w-[75px] px-2;
+  @apply flex items-center justify-center gap-1 py-2 text-xs;
 }
 
 .reset-bill-btn {
   @apply bg-blue-800 hover:bg-blue-700 text-white;
-  @apply rounded w-[70px] flex items-center justify-center gap-1 py-2;
+  @apply rounded w-[70px] flex items-center justify-center gap-1 py-2 text-xs;
 }
 
 #invoice tr td {

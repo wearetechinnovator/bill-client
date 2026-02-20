@@ -338,15 +338,6 @@ const SalesInvoice = () => {
 								</div>
 								<button
 									onClick={() => {
-										setSummaryToggle(!summaryToggle)
-										setFilterToggle(false)
-									}}
-									className={`${summaryToggle ? 'bg-gray-200' : 'bg-gray-100'} border`}>
-									<CiViewList className='text-xl' />
-									Summary
-								</button>
-								<button
-									onClick={() => {
 										setFilterToggle(!filterToggle);
 										setSummaryToggle(false);
 									}}
@@ -397,29 +388,6 @@ const SalesInvoice = () => {
 								</div>
 							</div>
 						</div>
-
-						{
-							summaryToggle && <div id='summaryToggle'>
-								<hr />
-								<table className='w-full'>
-									<tr className='text-center'>
-										<td>Total Transactions</td>
-										<td>Total CGST</td>
-										<td>Total SGST</td>
-										<td>Total Taxable</td>
-										<td>Total Value</td>
-									</tr>
-									<tr className='text-center'>
-										<td className='pt-4 font-bold'>1</td>
-										<td className='font-bold'>Rs. 0.00</td>
-										<td className='font-bold'>Rs. 0.00</td>
-										<td className='font-bold'>Rs. 0.00</td>
-										<td className='font-bold'>Rs. 4,500.00</td>
-									</tr>
-								</table>
-							</div>
-						}
-
 						{
 							filterToggle && (
 								<div id='filterToggle'>
@@ -584,7 +552,7 @@ const SalesInvoice = () => {
 														<Whisper
 															placement='leftStart'
 															trigger={"click"}
-															speaker={<Popover full>
+															speaker={<Popover full className='table__list__action__parent'>
 																<div
 																	className='table__list__action__icon'
 																	onClick={(e) => {
@@ -603,11 +571,11 @@ const SalesInvoice = () => {
 																	className='table__list__action__icon'
 																	onClick={(e) => {
 																		e.stopPropagation();
-																		navigate(`/admin/bill/details/salesinvoice/${data._id}`)
+																		navigate(`/admin/sales-invoice/add/${data._id}`)
 																	}}
 																>
-																	<Icons.INFO_DETAILS className='text-[16px]' />
-																	Details
+																	<Icons.COPY className='text-[16px]' />
+																	Clone
 																</div>
 															</Popover>}
 														>
