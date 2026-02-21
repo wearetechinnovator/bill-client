@@ -5,13 +5,10 @@ import { MdEditSquare, MdUploadFile } from "react-icons/md";
 import { LuFileX2 } from "react-icons/lu";
 import { countryList, statesAndUTs } from '../helper/data';
 import { FaAddressBook, FaRegCheckCircle } from 'react-icons/fa';
-import { BiReset } from 'react-icons/bi';
 import { useEffect, useState } from 'react';
 import checkfile from '../helper/checkfile'
 import useMyToaster from '../hooks/useMyToaster';
 import Cookies from 'js-cookie'
-import TabView from '../components/TabView';
-import { RiDeleteBin6Line } from "react-icons/ri";
 import AddPartyModal from '../components/AddPartyModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggle } from '../store/partyModalSlice';

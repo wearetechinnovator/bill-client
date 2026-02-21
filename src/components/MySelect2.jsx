@@ -66,11 +66,6 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 		if (value) {
 			get(value);
 		}
-
-		// if (model === "item") {
-		//   setSearchText(value);
-		//   setSelectedValue(value);
-		// }
 	}, [value])
 
 

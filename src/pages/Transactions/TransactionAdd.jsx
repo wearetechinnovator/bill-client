@@ -9,6 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Icons } from '../../helper/icons';
 import { Constants } from '../../helper/constants';
 import { checkNumber } from '../../helper/validation';
+import TransactionCategoryManageModal from '../../components/TransactionCategoryManageModal';
 
 
 
@@ -112,6 +113,7 @@ const TransactionAdd = ({ mode }) => {
 			<Nav title={mode ? "Edit Transactions" : "Add Transactions"} />
 			<main id="main">
 				<SideNav />
+				<TransactionCategoryManageModal/>
 				<div className='content__body '>
 					<div className='content__body__main bg-white' >
 						<div className='flex justify-between gap-4 flex-col lg:flex-row'>
@@ -129,10 +131,17 @@ const TransactionAdd = ({ mode }) => {
 										<option value="expense">Expense</option>
 									</select>
 								</div>
-								<div>
-									<p className='mt-2'>Purpose</p>
-									<input type='text' onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-										value={formData.purpose} />
+								<div className='w-full'>
+									<div className='flex items-center justify-between'>
+										<p className='mt-2'>Category</p>
+										<p className='text-[11px] text-white cursor-pointer bg-blue-400 px-1 rounded'>
+											Add/Manage Category
+										</p>
+									</div>
+									<input type='text'
+										onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+										value={formData.purpose}
+									/>
 								</div>
 								<div>
 									<p className='mt-2'>Transaction Number</p>

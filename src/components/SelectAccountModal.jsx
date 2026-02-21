@@ -53,7 +53,7 @@ const SelectAccountModal = ({ openModal, openStatus, getAccountDetails }) => {
             <Modal.Header className='border-b pb-2'>
                 <Modal.Title>
                 </Modal.Title>
-                <p>Select Account</p>
+                <p className='font-bold'>Select Account</p>
             </Modal.Header>
             <Modal.Body>
                 {
