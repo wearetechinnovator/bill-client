@@ -22,10 +22,13 @@ const TransactionAdd = ({ mode }) => {
 	const currentDate = new Date().toISOString().split("T")[0];
 	const [formData, setFormData] = useState({
 		transactionType: '', purpose: '', transactionNumber: '', transactionDate: currentDate,
-		paymentMode: Constants.CASH, account: '', amount: '', note: ''
+		paymentMode: Constants.CASH, account: '', amount: '', note: '', category: ''
 	})
 	// Store account
 	const [account, setAccount] = useState([]);
+	const [categoryModal, setCategoryModal] = useState(false);
+	const [categoryData, setCategoryData] = useState([]);
+
 
 
 
@@ -55,10 +58,15 @@ const TransactionAdd = ({ mode }) => {
 				const account = data.data.map(d => ({ label: d.accountName, value: d._id }));
 				setAccount([...account])
 			}
+			{
+				const data = await getApiData("transaction-category");
+				const category = data.data.map(d => ({ label: d.categoryName, value: d._id }));
+				setCategoryData([...category])
+			}
 		}
 
 		apiData();
-	}, [])
+	}, [categoryModal])
 
 
 	const saveTransaction = async (e) => {
@@ -99,6 +107,7 @@ const TransactionAdd = ({ mode }) => {
 
 	}
 
+
 	const clearForm = () => {
 		setFormData({
 			transactionType: '', purpose: '', transactionNumber: '', transactionDate: '',
@@ -107,13 +116,15 @@ const TransactionAdd = ({ mode }) => {
 	}
 
 
-
 	return (
 		<>
 			<Nav title={mode ? "Edit Transactions" : "Add Transactions"} />
 			<main id="main">
 				<SideNav />
-				<TransactionCategoryManageModal/>
+				<TransactionCategoryManageModal
+					openModal={categoryModal}
+					openStatus={() => { setCategoryModal(false) }}
+				/>
 				<div className='content__body '>
 					<div className='content__body__main bg-white' >
 						<div className='flex justify-between gap-4 flex-col lg:flex-row'>
@@ -134,13 +145,17 @@ const TransactionAdd = ({ mode }) => {
 								<div className='w-full'>
 									<div className='flex items-center justify-between'>
 										<p className='mt-2'>Category</p>
-										<p className='text-[11px] text-white cursor-pointer bg-blue-400 px-1 rounded'>
+										<p className='text-[12px] text-white cursor-pointer bg-blue-400 px-1 rounded-sm'
+											onClick={() => setCategoryModal(true)}
+										>
 											Add/Manage Category
 										</p>
 									</div>
-									<input type='text'
-										onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-										value={formData.purpose}
+									<SelectPicker
+										className='w-full'
+										onChange={(v) => setFormData({ ...formData, category: v })}
+										data={categoryData}
+										value={formData.category}
 									/>
 								</div>
 								<div>

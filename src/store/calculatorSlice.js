@@ -7,7 +7,6 @@ const calculatorSlice = createSlice({
   },
   reducers: {
     calcToggle: (state, action) => {
-      console.log(action.payload)
       state.show = action.payload;
     },
  

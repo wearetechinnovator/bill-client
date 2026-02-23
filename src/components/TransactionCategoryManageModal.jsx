@@ -4,13 +4,20 @@ import useMyToaster from '../hooks/useMyToaster';
 import Cookies from 'js-cookie';
 import { Icons } from '../helper/icons';
 
-const TransactionCategoryManageModal = () => {
+
+const TransactionCategoryManageModal = ({ openModal, openStatus }) => {
     const token = Cookies.get('token');
     const toast = useMyToaster();
     const [formData, setFormData] = useState({ categoryName: '' });
+    const [open, setOpen] = useState(false);
     const [categoryData, setCategoryData] = useState([]);
+    const [editId, setEditId] = useState(null);
 
 
+    // Set modal open state based on prop
+    useEffect(() => {
+        setOpen(openModal);
+    }, [openModal])
 
 
     // Get Categories
@@ -48,12 +55,18 @@ const TransactionCategoryManageModal = () => {
 
         try {
             const URL = `${process.env.REACT_APP_API_URL}/transaction-category/add`;
+            let data = { token, categoryName: formData.categoryName };
+            if (editId) {
+                data.id = editId;
+                data.update = true;
+            }
+
             const req = await fetch(URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ token, categoryName: formData.categoryName })
+                body: JSON.stringify(data)
             })
             const res = await req.json();
 
@@ -61,7 +74,21 @@ const TransactionCategoryManageModal = () => {
                 return toast(res.err, 'error');
             }
 
-            setCategoryData(prev => [...prev, res]);
+            if (editId) {
+                setCategoryData(prev => prev.map(c => {
+                    if (c._id === editId) {
+                        return { ...c, categoryName: formData.categoryName };
+                    }
+                    return c;
+                }))
+                setEditId(null);
+                toast(res.msg, 'success');
+            } else {
+                setCategoryData(prev => [...prev, res]);
+                toast("Category added successfully", 'success');
+            }
+
+
             setFormData({ categoryName: '' });
 
         } catch (error) {
@@ -94,35 +121,12 @@ const TransactionCategoryManageModal = () => {
         }
     }
 
-    const editCategory = async (id) => {
-        try {
-            const URL = `${process.env.REACT_APP_API_URL}/transaction-category/add`;
-            const req = await fetch(URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    id, update: true,
-                    categoryName: formData.categoryName, token
-                })
-            })
-            const res = await req.json();
-            if (req.status !== 200) {
-                return toast(res.err, 'error');
-            }
-
-            setCategoryData(prev => prev.map(c => c._id === id ? res : c));
-            setFormData({ categoryName: '' });
-            return toast("Category updated successfully", 'success');
-
-        } catch (err) {
-            return toast("Something went wrong", "error");
-        }
-    }
 
     return (
-        <Modal open={true} onClose={() => { }} size='md' backdrop='static'>
+        <Modal size='md' backdrop='static' open={open} onClose={() => {
+            openStatus(false);
+            setOpen(false);
+        }}>
             <Modal.Header className='border-b pb-2'>
                 <Modal.Title>
                 </Modal.Title>
@@ -131,39 +135,45 @@ const TransactionCategoryManageModal = () => {
             <Modal.Body>
                 <div className='w-full bg-gray-50 rounded border p-2 sticky top-0'>
                     <input type="text"
-                        className='text-xs'
+                        className='text-sm py-2'
                         placeholder='Enter Category name'
                         onChange={(e) => setFormData({ categoryName: e.target.value })}
                         value={formData.categoryName}
                     />
                     <button
                         onClick={addCategory}
-                        className='text-xs px-2 py-1 rounded mt-2 bg-blue-400 text-white'
+                        className='text-xs px-2 py-1 rounded mt-1 bg-blue-400 text-white'
                     >
-                        Add Category
+                        {editId ? "Update" : "Add"} Category
                     </button>
                 </div>
 
 
-                <div className='w-full flex flex-col gap-2 mt-4'>
+                <div className='w-full flex flex-col mt-4'>
                     {
                         categoryData.map((c, i) => {
-                            return <div key={i} className='w-full flex items-center justify-between p-2 border-b'>
+                            return <div key={i} className='w-full flex items-center justify-between px-2 py-2 border-b hover:bg-gray-50'>
                                 <p className='text-sm'>{c.categoryName}</p>
                                 <div className='flex items-center gap-2'>
-                                    <button className='border hover:border-blue-400 text-[17px] p-1 rounded'>
+                                    <button
+                                        onClick={() => {
+                                            setFormData({ categoryName: c.categoryName });
+                                            setEditId(c._id);
+                                        }}
+                                        className='border hover:border-blue-400 text-[17px] p-1 rounded'
+                                    >
                                         <Icons.PENCIL className='text-blue-500' />
                                     </button>
                                     <button
                                         onClick={() => deleteCategory(c._id)}
-                                        className='border hover:border-red-400 text-[17px] p-1 rounded'>
+                                        className='border hover:border-red-400 text-[17px] p-1 rounded'
+                                    >
                                         <Icons.DELETE className=' text-red-500' />
                                     </button>
                                 </div>
                             </div>
                         })
                     }
-
                 </div>
             </Modal.Body>
         </Modal>

@@ -11,7 +11,6 @@ const userDetailSlice = createSlice({
 
     addCompany: (state, action) => {
       state.companies.push(action.payload);
-      console.log(state);
     }
   }
 })
