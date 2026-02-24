@@ -21,7 +21,7 @@ const TransactionAdd = ({ mode }) => {
 	const { getApiData } = useApi();
 	const currentDate = new Date().toISOString().split("T")[0];
 	const [formData, setFormData] = useState({
-		transactionType: '', purpose: '', transactionNumber: '', transactionDate: currentDate,
+		transactionType: '', transactionNumber: '', transactionDate: currentDate,
 		paymentMode: Constants.CASH, account: '', amount: '', note: '', category: ''
 	})
 	// Store account
@@ -30,6 +30,24 @@ const TransactionAdd = ({ mode }) => {
 	const [categoryData, setCategoryData] = useState([]);
 
 
+
+
+	//Set Transaction number;
+	useEffect(() => {
+		if (mode) return;
+		(async () => {
+			const url = process.env.REACT_APP_API_URL + "/other-transaction/get";
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({ token })
+			});
+			const res = await req.json();
+			setFormData(p => ({ ...p, transactionNumber: res.totalData + 1 }))
+		})();
+	}, [])
 
 
 	useEffect(() => {
@@ -70,13 +88,16 @@ const TransactionAdd = ({ mode }) => {
 
 
 	const saveTransaction = async (e) => {
-		if (formData.transactionType === "" || formData.purpose === "" || formData.transactionNumber === "" ||
-			formData.transactionDate === "" || formData.paymentMode === "" || formData.account === "" || formData.amount === "") {
+		if (formData.transactionType === "" || formData.transactionNumber === "" ||
+			formData.transactionDate === "" || formData.paymentMode === "" || formData.amount === "")
 			return toast("fill the required fields", "error");
-		}
+
+		if (formData.paymentMode !== Constants.CASH && formData.account === "")
+			return toast("Select the account", "error");
+
 
 		try {
-			const url = process.env.REACT_APP_API_URL + "/other-transaction/add";
+			const url = `${process.env.REACT_APP_API_URL}/other-transaction/add`;
 			const req = await fetch(url, {
 				method: "POST",
 				headers: {
@@ -110,8 +131,8 @@ const TransactionAdd = ({ mode }) => {
 
 	const clearForm = () => {
 		setFormData({
-			transactionType: '', purpose: '', transactionNumber: '', transactionDate: '',
-			paymentMode: '', account: '', amount: '', note: ''
+			transactionType: '', transactionNumber: '', transactionDate: '',
+			paymentMode: Constants.CASH, account: '', amount: '', note: '', category: ''
 		})
 	}
 
@@ -160,8 +181,10 @@ const TransactionAdd = ({ mode }) => {
 								</div>
 								<div>
 									<p className='mt-2'>Transaction Number</p>
-									<input type='text' onChange={(e) => setFormData({ ...formData, transactionNumber: e.target.value })}
-										value={formData.transactionNumber} />
+									<input type='text'
+										onChange={(e) => setFormData({ ...formData, transactionNumber: e.target.value })}
+										value={formData.transactionNumber}
+									/>
 								</div>
 								<div>
 									<p className='mt-2'>Transaction Date</p>

@@ -927,22 +927,20 @@ const Quotation = ({ mode }) => {
 								/>
 							</div>
 						</div>
-
-						<div className='w-full flex justify-center gap-3 my-3 mt-5'>
-							<button
-								onClick={saveBill}
-								className='add-bill-btn'>
-								<Icons.CHECK />
-								{!mode ? "Save" : "Update"}
-							</button>
-							<button className='reset-bill-btn' onClick={clearForm}>
-								<Icons.RESET />
-								Reset
-							</button>
-						</div>
-
 					</div>
 					{/* Content Body Main Close */}
+					<div className='form-btn-bar'>
+						<button
+							onClick={saveBill}
+							className='add-bill-btn'>
+							<Icons.CHECK />
+							{!mode ? "Save" : "Update"}
+						</button>
+						<button className='reset-bill-btn' onClick={clearForm}>
+							<Icons.RESET />
+							Reset
+						</button>
+					</div>
 				</div>
 				{/* Content Body Close */}
 			</main>

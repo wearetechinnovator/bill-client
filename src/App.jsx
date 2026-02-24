@@ -233,7 +233,7 @@ const App = () => {
         <Route path="/admin/staff-attendance/details/:id" element={<ProtectRoute><AttendanceDetails /></ProtectRoute>} />
         <Route path="/admin/staff-attendance/salary-slip" element={<ProtectRoute><SalarySlip /></ProtectRoute>} />
 
-        <Route path="*" element={< NotFound />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
 

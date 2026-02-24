@@ -8,7 +8,6 @@ import Cookies from 'js-cookie';
 import downloadPdf from '../../helper/downloadPdf';
 import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
-import { CiViewList } from 'react-icons/ci';
 import { Popover, Whisper } from 'rsuite';
 import AddNew from '../../components/AddNew';
 import { Icons } from '../../helper/icons';
@@ -591,7 +590,6 @@ const SalesInvoice = () => {
 								</table>
 								<div className='paginate__parent'>
 									<p>Showing {billData.length} of {totalData} entries</p>
-									{/* ----- Paginatin ----- */}
 									<Pagination
 										activePage={activePage}
 										totalData={totalData}

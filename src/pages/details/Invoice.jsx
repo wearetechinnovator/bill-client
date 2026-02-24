@@ -453,14 +453,19 @@ const Invoice = () => {
 										<Icons.PRINTER className="text-white text-[15px] mr-1" />
 										Print
 									</button>
-									<button
-										title='Edit Bill'
-										onClick={()=>navigate(`/admin/${route}/edit/${id}`)}
-										className='bg-[#003E32] text-white rounded-[5px] flex justify-center items-center px-2 py-[5px]'
-									>
-										<Icons.EDIT className="text-white text-[15px] mr-1" />
-										Edit
-									</button>
+
+									{
+										Number(billData?.paymentAmount || 0) <= 0 && (
+											<button
+												title='Edit Bill'
+												onClick={() => navigate(`/admin/${route}/edit/${id}`)}
+												className='bg-[#003E32] text-white rounded-[5px] flex justify-center items-center px-2 py-[5px]'
+											>
+												<Icons.EDIT className="text-white text-[15px] mr-1" />
+												Edit
+											</button>
+										)
+									}
 								</div>
 
 								{

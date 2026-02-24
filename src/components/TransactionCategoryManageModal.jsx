@@ -14,7 +14,7 @@ const TransactionCategoryManageModal = ({ openModal, openStatus }) => {
     const [editId, setEditId] = useState(null);
 
 
-    // Set modal open state based on prop
+    // Set modal open state based on prop;
     useEffect(() => {
         setOpen(openModal);
     }, [openModal])
@@ -126,6 +126,8 @@ const TransactionCategoryManageModal = ({ openModal, openStatus }) => {
         <Modal size='md' backdrop='static' open={open} onClose={() => {
             openStatus(false);
             setOpen(false);
+            setFormData({ categoryName: '' });
+            setEditId(null);
         }}>
             <Modal.Header className='border-b pb-2'>
                 <Modal.Title>
