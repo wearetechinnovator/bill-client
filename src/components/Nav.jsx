@@ -16,7 +16,7 @@ import { CiCalculator1 } from "react-icons/ci";
 import Calculator from './Calculator';
 import { calcToggle } from '../store/calculatorSlice';
 import Cookies from 'js-cookie';
-import { Icons } from '../helper/icons'
+import { Icons } from '../helper/icons';
 
 
 
@@ -150,6 +150,7 @@ const Nav = ({ title }) => {
                     </div>
                 </div>
             </nav>
+            
             {/* Company list modal */}
             <CompanyList getCompanyName={(n) => {
                 let name = n;

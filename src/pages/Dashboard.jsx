@@ -51,8 +51,12 @@ const Dashboard = () => {
 	const [totalPurchaseAmount, setTotalPurchaseAmount] = useState(0);
 	const [totalCollect, setTotalCollect] = useState(null);
 	const [totalPay, setTotalPay] = useState(null);
+	const [totalOtherExpense, setTotalOtherExpense] = useState(0);
+	const [totalOtherIncome, setTotalOtherIncome] = useState(0);
 
 
+
+	
 
 	// Get CashIn and CashOut;
 	const getCashInAndCashOut = async () => {
@@ -163,7 +167,29 @@ const Dashboard = () => {
 			console.log(error)
 		}
 	}
+
+	const getTotalIncomeExpense = async () => {
+		try {
+			const url = process.env.REACT_APP_API_URL + `/other-transaction/get-total-income-expense`;
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify({ token })
+			});
+			const res = await req.json();
+			if (req.status !== 200) return toast(res.err, "error");
+			console.log(res);
+			setTotalOtherIncome(res.totalIncome)
+			setTotalOtherExpense(res.totalExpense)
+		} catch (err) {
+			console.log(err);
+			return toast("Something went wrong", "error")
+		}
+	}
 	
+	// Dashboard Insights Function Calls;
 	useEffect(() => {
 		(async () => {
 			setInsightLoading(true);
@@ -172,6 +198,7 @@ const Dashboard = () => {
 			await getTotalPurchaseAmount();
 			await getTotalCollect();
 			await getTotalPay();
+			await getTotalIncomeExpense();
 			setInsightLoading(false);
 		})()
 	}, [])
@@ -426,8 +453,10 @@ const Dashboard = () => {
 											<div className="bg-[#FEF2FF] rounded-[10px] p-4 border shadow">
 												<div className="flex content-between">
 													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Expenses</h2>
-														<p className="text-[14px] text-[#333333]">1,250$</p>
+														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Other Expenses</h2>
+														<p className="text-[14px] text-[#333333]">
+															<Icons.RUPES className="inline" />{totalOtherExpense}
+														</p>
 													</div>
 													<div className="interaction-right-box text-end w-[15%]">
 														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
@@ -437,8 +466,10 @@ const Dashboard = () => {
 											<div className="bg-[#FFD9DA] rounded-[10px] p-4 border shadow">
 												<div className="flex content-between">
 													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Income</h2>
-														<p className="text-[14px] text-[#333333]">1,250$</p>
+														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Other Income</h2>
+														<p className="text-[14px] text-[#333333]">
+															<Icons.RUPES className="inline" />{totalOtherIncome}
+														</p>
 													</div>
 													<div className="interaction-right-box text-end w-[15%]">
 														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>

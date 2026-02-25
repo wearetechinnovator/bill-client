@@ -263,11 +263,11 @@ const Quotation = () => {
 
 
     const advaneFilter = async (filterUnit) => {
-        const filterData = await getAdvanceFilterData(
-            filterUnit, "quotation", activePage, dataLimit
-        );
-        setTotalData(filterData.totalData);
-        setBillData([...filterData.data])
+        // const filterData = await getAdvanceFilterData(
+        //     filterUnit, "quotation", activePage, dataLimit
+        // );
+        // setTotalData(filterData.totalData);
+        // setBillData([...filterData.data])
 
     }
 

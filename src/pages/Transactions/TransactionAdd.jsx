@@ -62,7 +62,10 @@ const TransactionAdd = ({ mode }) => {
 					body: JSON.stringify({ token, id: id })
 				})
 				const res = await req.json();
-				setFormData({ ...formData, ...res.data });
+				setFormData({
+					...formData, ...res.data,
+					transactionDate: res.data.transactionDate.split("T")[0]
+				});
 			})()
 		}
 	}, [mode])

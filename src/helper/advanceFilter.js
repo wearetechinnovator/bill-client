@@ -1,76 +1,73 @@
+import moment from 'moment';
+import { Constants } from './constants';
+
+
 /** 
  * @params filterUnit: today | previousday etc.
- * @params model: modelname, quotation | proforma etc.
  */
-
-
-import moment from 'moment';
-import Cookies from 'js-cookie';
-import toast from '../hooks/useMyToaster'
-
-
-export const getAdvanceFilterData = async (filterUnit, model, activePage, dataLimit) => {
+export const getAdvanceFilterData = async (filterUnit) => {
   let today = moment();
-  let singleDate;
   let fromDate;
   let toDate;
 
 
   switch (filterUnit) {
-    case 'today':
-      singleDate = today.format('YYYY-MM-DD');
+    case Constants.TODAY:
+      fromDate = today.format('YYYY-MM-DD');
+      toDate = today.format('YYYY-MM-DD');
       break;
 
-    case 'yesterday':
-      singleDate = today.clone().subtract(1, 'day').format('YYYY-MM-DD');
+    case Constants.YESTERDAY:
+      fromDate = today.clone().subtract(1, 'day').format('YYYY-MM-DD');
+      toDate = today.clone().subtract(1, 'day').format('YYYY-MM-DD');
       break;
 
-    case 'last7day':
+    case Constants.LAST7DAY:
       fromDate = today.clone().subtract(7, 'days').format('YYYY-MM-DD');
       toDate = today.format('YYYY-MM-DD');
       break;
 
-    case 'last30day':
+    case Constants.LAST30DAY:
       fromDate = today.clone().subtract(30, 'days').format('YYYY-MM-DD');
       toDate = today.format('YYYY-MM-DD');
       break;
 
-    case 'last365day':
+    case Constants.LAST365DAY:
       fromDate = today.clone().subtract(365, 'days').format('YYYY-MM-DD');
       toDate = today.format('YYYY-MM-DD');
       break;
 
-    case 'thisweek':
+    case Constants.THISWEEK:
       fromDate = today.clone().startOf('isoWeek').format('YYYY-MM-DD');  // Monday
       toDate = today.clone().endOf('isoWeek').format('YYYY-MM-DD');      // Sunday
       break;
 
-    case 'lastweek':
+    case Constants.LASTWEEK:
       fromDate = today.clone().subtract(1, 'week').startOf('isoWeek').format('YYYY-MM-DD');
       toDate = today.clone().subtract(1, 'week').endOf('isoWeek').format('YYYY-MM-DD');
       break;
 
-    case 'thismonth':
+    case Constants.THISMONTH:
       fromDate = today.clone().startOf('month').format('YYYY-MM-DD');
       toDate = today.clone().endOf('month').format('YYYY-MM-DD');
       break;
 
-    case 'prevmonth':
+    case Constants.PREVMONTH:
       fromDate = today.clone().subtract(1, 'month').startOf('month').format('YYYY-MM-DD');
       toDate = today.clone().subtract(1, 'month').endOf('month').format('YYYY-MM-DD');
       break;
 
-    case 'thisquarter':
+    case Constants.THISQUARTER:
       fromDate = today.clone().startOf('quarter').format('YYYY-MM-DD');
       toDate = today.clone().endOf('quarter').format('YYYY-MM-DD');
       break;
 
-    case 'lastquarter':
+    case Constants.LASTQUARTER:
       fromDate = today.clone().subtract(1, 'quarter').startOf('quarter').format('YYYY-MM-DD');
       toDate = today.clone().subtract(1, 'quarter').endOf('quarter').format('YYYY-MM-DD');
       break;
 
-    case 'currentfiscal': {
+    case Constants.CURRENTFISCAL: {
       const fiscalStartMonth = 3; // April
       if (today.month() < fiscalStartMonth) {
         fromDate = today.clone().subtract(1, 'year').month(fiscalStartMonth).startOf('month').format('YYYY-MM-DD');
@@ -82,7 +79,7 @@ export const getAdvanceFilterData = async (filterUnit, model, activePage, dataLi
       break;
     }
 
-    case 'lastfiscal': {
+    case Constants.LASTFISCAL: {
       const fiscalStartMonth = 3; // April
       if (today.month() < fiscalStartMonth) {
         fromDate = today.clone().subtract(2, 'year').month(fiscalStartMonth).startOf('month').format('YYYY-MM-DD');
@@ -98,30 +95,5 @@ export const getAdvanceFilterData = async (filterUnit, model, activePage, dataLi
       console.warn('Invalid filterUnit:', filterUnit);
   }
 
-
-  // Api call
-  try {
-    const url = process.env.REACT_APP_API_URL + `/${model}/filter?page=${activePage}&limit=${dataLimit}`;
-
-    const req = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({ token: Cookies.get("token"), fromDate, toDate, billDate: singleDate })
-    });
-    const res = await req.json();
-
-
-    return {
-      totalData: res?.totalData,
-      data: res?.data
-    }
-
-  } catch (error) {
-    console.log(error)
-    return toast("Something went wrong", 'error')
-  }
-
-
+  return { fromDate, toDate };
 }

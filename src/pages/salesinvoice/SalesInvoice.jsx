@@ -601,7 +601,7 @@ const SalesInvoice = () => {
 							</div>
 						</div>
 							: <AddNew title={"Sales Invoice"} link={"/admin/sales-invoice/add"} />
-							: <DataShimmer />
+							: <DataShimmer topBox={true}/>
 					}
 				</div>
 			</main>

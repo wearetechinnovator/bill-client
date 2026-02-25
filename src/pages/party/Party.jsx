@@ -454,7 +454,6 @@ const Party = () => {
 								</table>
 								<div className='paginate__parent'>
 									<p>Showing {partyData.length} of {totalData} entries</p>
-									{/* ----- Paginatin ----- */}
 									<Pagination
 										activePage={activePage}
 										totalData={totalData}
@@ -466,7 +465,7 @@ const Party = () => {
 							</div>
 						</div>
 							: <AddNew title={"Party"} link={"/admin/party/add"} />
-							: <DataShimmer />
+							: <DataShimmer topBox={true}/>
 					}
 				</div>
 			</main >

@@ -435,7 +435,8 @@ select {
   padding: 10px;
   border-radius: 5px;
   font-size: 13px !important;
-  background-color: rgba(235, 234, 234, 0.678);
+  background-color: rgb(247, 247, 247);
+  box-shadow: 0px 0px 5px rgb(196, 196, 196);
 }
 
 .shimmer__parent .animate {
@@ -483,7 +484,8 @@ select {
 }
 
 .add_new_compnent {
-  @apply mb-3 w-full bg-white rounded p-2 shadow-sm overflow-hidden transition-all;
+  @apply mb-2 w-full bg-white rounded p-2 shadow-sm overflow-hidden transition-all;
+  @apply border border-slate-300;
 }
 
 .add_new_compnent button {

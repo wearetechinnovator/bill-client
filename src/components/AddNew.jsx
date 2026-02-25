@@ -15,7 +15,7 @@ const AddNew = ({ title, link }) => {
   return (
     <div className='add_new_compnent'>
       <div className='w-full bg-white rounded shadow-sm p-4 grid place-items-center'>
-        <img src={noRecord} alt="" srcset="" />
+        <img src={noRecord} alt="" srcSet="" />
         <p className='mb-3 text-lg text-gray-400'>You don't have any {title}</p>
         <button 
           onClick={()=>{

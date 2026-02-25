@@ -18,8 +18,6 @@ import { GrFormNext } from "react-icons/gr";
 import { GrFormPrevious } from "react-icons/gr";
 import { FaRegCheckCircle } from 'react-icons/fa';
 import { CgPlayListAdd } from "react-icons/cg";
-import { SiConvertio } from "react-icons/si";
-import { HiOutlineRefresh } from "react-icons/hi";
 import { LuBriefcaseBusiness } from "react-icons/lu";
 import { TbFileInvoice } from "react-icons/tb";
 import { GoPencil } from "react-icons/go";
@@ -40,6 +38,10 @@ import { FaRegEye } from "react-icons/fa";
 import { MdDownload } from "react-icons/md";
 import { IoArrowBack } from "react-icons/io5";
 import { HiMiniEyeSlash } from "react-icons/hi2";
+import { IoIosArrowDown } from "react-icons/io";
+import { IoIosArrowForward } from "react-icons/io";
+
+
 
 
 
@@ -89,6 +91,8 @@ export const Icons = {
   EYE: FaRegEye,
   EYE_CLOSE: HiMiniEyeSlash,
   DOWNLOAD: MdDownload,
-  BACK: IoArrowBack
+  BACK: IoArrowBack,
+  MENU_DOWN_ARROW: IoIosArrowDown,
+  MENU_UP_ARROW: IoIosArrowForward,
 };
 

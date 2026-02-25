@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-import { Popover, Whisper } from 'rsuite';
+import { Popover, SelectPicker, Whisper } from 'rsuite';
 import { BiPrinter } from "react-icons/bi";
 import { FaRegCopy, FaRegEdit } from "react-icons/fa";
 import { MdFilterList } from "react-icons/md";
@@ -15,17 +15,21 @@ import downloadPdf from '../../helper/downloadPdf';
 import Cookies from 'js-cookie';
 import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
-import { IoIosAdd, IoMdMore } from 'react-icons/io';
+import { IoIosAdd } from 'react-icons/io';
 import AddNew from '../../components/AddNew';
 import { FiMoreHorizontal } from 'react-icons/fi';
 import Pagination from '../../components/Pagination';
-
+import { Icons } from '../../helper/icons';
+import useApi from '../../hooks/useApi';
+import { Constants } from '../../helper/constants';
+import { getAdvanceFilterData } from '../../helper/advanceFilter';
 
 
 
 
 const Transaction = () => {
     const token = Cookies.get("token");
+    const { getApiData } = useApi();
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
     const [activePage, setActivePage] = useState(1);
@@ -48,23 +52,50 @@ const Transaction = () => {
             Amount: amount
         }));
     }, [transactionData]);
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true);
+    const [allCategory, setAllCategory] = useState([]);
+    const [filterOpen, setFilterOpen] = useState(false);
+    const [filter, setFilter] = useState({
+        startDate: "", endDate: "", category: ""
+    })
+    const [applyFilter, setApplyFilter] = useState(false);
+    const [isCustomDate, setIsCustomDate] = useState(false);
 
 
-    // Get data;
+
+    // Get Transaction Categories;
+    useEffect(() => {
+        (async () => {
+            const data = await getApiData("transaction-category");
+            const category = data.data.map(d => ({ label: d.categoryName, value: d._id }));
+            setAllCategory([...category]);
+        })()
+    })
+
+    // Get data with Filter and without filter both;
     useEffect(() => {
         const getTransaction = async () => {
+            setLoading(true);
             try {
+                let data = {
+                    token,
+                    all: tableStatusData === "all" ? true : false,
+                }
+                if (applyFilter) {
+                    data = {
+                        ...data,
+                        startDate: filter.startDate,
+                        endDate: filter.endDate,
+                        category: filter.category
+                    }
+                }
                 const url = `${process.env.REACT_APP_API_URL}/other-transaction/get?page=${activePage}&limit=${dataLimit}`;
                 const req = await fetch(url, {
                     method: "POST",
                     headers: {
                         "Content-Type": 'application/json'
                     },
-                    body: JSON.stringify({
-                        token,
-                        all: tableStatusData === "all" ? true : false
-                    })
+                    body: JSON.stringify(data)
                 });
                 const res = await req.json();
                 if (req.status !== 200) {
@@ -75,13 +106,14 @@ const Transaction = () => {
                 setTransactionData([...res.data]);
 
             } catch (error) {
+                console.log(error)
                 return toast("Something went wrong", "error");
             } finally {
                 setLoading(false);
             }
         }
         getTransaction();
-    }, [tableStatusData, dataLimit, activePage])
+    }, [tableStatusData, dataLimit, activePage, applyFilter])
 
 
     const searchTable = (e) => {
@@ -103,6 +135,7 @@ const Transaction = () => {
             }
         });
     }
+
 
     const selectAll = (e) => {
         if (e.target.checked) {
@@ -176,6 +209,13 @@ const Transaction = () => {
     }
 
 
+    const resetFilter = () => {
+        setFilter({
+            startDate: "", endDate: "", category: ""
+        })
+        setApplyFilter(false);
+    }
+
     return (
         <>
             <Nav title={"Other Transaction"} />
@@ -183,7 +223,6 @@ const Transaction = () => {
                 <SideNav />
                 <Tooltip id='transactionTooltip' />
                 <div className='content__body'>
-
                     {/* top section */}
                     <div className={"add_new_compnent"}>
                         <div className='flex justify-between items-center'>
@@ -203,7 +242,9 @@ const Transaction = () => {
                                         className='p-[6px]'
                                     />
                                 </div>
-                                <button className='bg-gray-100 border'>
+                                <button
+                                    onClick={() => setFilterOpen(!filterOpen)}
+                                    className='bg-gray-100 border'>
                                     <MdFilterList className='text-xl' />
                                     Filter
                                 </button>
@@ -241,12 +282,99 @@ const Transaction = () => {
                                         </Popover>}
                                     >
                                         <div className='record__download' >
-                                            <IoMdMore />
+                                            <Icons.MORE />
                                         </div>
                                     </Whisper>
                                 </div>
                             </div>
                         </div>
+                        {
+                            filterOpen && (
+                                <div className='w-full flex flex-col transition-all'>
+                                    <div className='w-full flex items-center gap-4 mt-4'>
+                                        <div className='w-full'>
+                                            <label htmlFor="categorySelect">Category</label>
+                                            <SelectPicker
+                                                className='w-full'
+                                                onChange={(v) => setFilter({ ...filter, category: v })}
+                                                data={allCategory}
+                                                value={filter.category}
+                                            />
+                                        </div>
+                                        <div className='w-full'>
+                                            <label htmlFor="categorySelect">Search By</label>
+                                            <SelectPicker
+                                                searchable={false}
+                                                className='w-full'
+                                                menuMaxHeight={"250px"}
+                                                onChange={async (v) => {
+                                                    if (v === Constants.CUSTOM) {
+                                                        setIsCustomDate(true);
+                                                        return;
+                                                    }
+                                                    const { fromDate, toDate } = await getAdvanceFilterData(v);
+                                                    setFilter({ ...filter, startDate: fromDate, endDate: toDate })
+                                                    setIsCustomDate(false);
+                                                }}
+                                                data={[
+                                                    { label: "Today", value: Constants.TODAY },
+                                                    { label: "Yesterday", value: Constants.YESTERDAY },
+                                                    { label: "Last 7 Days", value: Constants.LAST7DAY },
+                                                    { label: "Last 30 Days", value: Constants.LAST30DAY },
+                                                    { label: "Last 365 Days", value: Constants.LAST365DAY },
+                                                    { label: "This Week", value: Constants.THISWEEK },
+                                                    { label: "Last Week", value: Constants.LASTWEEK },
+                                                    { label: "This Month", value: Constants.THISMONTH },
+                                                    { label: "Previous Month", value: Constants.PREVMONTH },
+                                                    { label: "This Quarter", value: Constants.THISQUARTER },
+                                                    { label: "Last Quarter", value: Constants.LASTQUARTER },
+                                                    { label: "Current Fiscal Year", value: Constants.CURRENTFISCAL },
+                                                    { label: "Last Fiscal Year", value: Constants.LASTFISCAL },
+                                                    { label: "Custom Date", value: Constants.CUSTOM }
+                                                ]}
+                                            />
+                                        </div>
+                                        {
+                                            isCustomDate && (
+                                                <>
+                                                    <div className='w-full'>
+                                                        <label htmlFor="startDate">Start Date</label>
+                                                        <input id='startDate'
+                                                            type="date"
+                                                            onChange={(e) => setFilter({ ...filter, startDate: e.target.value })}
+                                                            value={filter.startDate}
+                                                        />
+                                                    </div>
+                                                    <div className='w-full'>
+                                                        <label htmlFor="endDate">End Date</label>
+                                                        <input id='endDate'
+                                                            type="date"
+                                                            onChange={(e) => setFilter({ ...filter, endDate: e.target.value })}
+                                                            value={filter.endDate}
+                                                        />
+                                                    </div>
+                                                </>
+                                            )
+                                        }
+                                    </div>
+
+                                    <div className='w-full flex items-center justify-end gap-2 mt-4'>
+                                        <button
+                                            onClick={() => setApplyFilter(true)}
+                                            className='add-bill-btn'>
+                                            <Icons.SEARCH className='inline' />
+                                            Search
+                                        </button>
+                                        <button
+                                            onClick={resetFilter}
+                                            className='reset-bill-btn'>
+                                            <Icons.RESET className='inline' />
+                                            Reset
+                                        </button>
+                                    </div>
+                                </div>
+                            )
+                        }
                     </div>
                     {
                         !loading ? transactionData.length > 0 ? <div className='content__body__main'>
@@ -261,12 +389,12 @@ const Transaction = () => {
                                                     checked={selected.length === 10}
                                                 />
                                             </th>
-                                            <th align='left'>Date</th>
-                                            <th align='left'>Transaction Number</th>
+                                            <th align='left' className='w-40'>Date</th>
+                                            <th align='left' className='w-40'>Transaction Number</th>
                                             <th align='left'>Category</th>
                                             <th align='left'>Type</th>
                                             <th align='left'>Amount</th>
-                                            <th>Action</th>
+                                            <th className='w-20'>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -284,7 +412,10 @@ const Transaction = () => {
                                                             {data.transactionType}
                                                         </span>
                                                     </td>
-                                                    <td>{data.amount}</td>
+                                                    <td>
+                                                        <Icons.RUPES className='inline' />
+                                                        {Number(data.amount).toFixed(2)}
+                                                    </td>
                                                     <td className='px-4 text-center'>
                                                         <Whisper
                                                             placement='leftStart'
@@ -331,4 +462,4 @@ const Transaction = () => {
     )
 }
 
-export default Transaction
+export default Transaction;

@@ -575,7 +575,6 @@ const PurchaseInvoice = () => {
 								</table>
 								<div className='paginate__parent'>
 									<p>Showing {billData.length} of {totalData} entries</p>
-									{/* ----- Paginatin ----- */}
 									<Pagination
 										activePage={activePage}
 										totalData={totalData}
@@ -587,7 +586,7 @@ const PurchaseInvoice = () => {
 							</div>
 						</div>
 							: <AddNew title={"Purchase Invoice"} link={'/admin/purchase-invoice/add'} />
-							: <DataShimmer />
+							: <DataShimmer/>
 					}
 				</div>
 			</main>
