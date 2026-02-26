@@ -136,12 +136,12 @@ const links = {
     },
   ],
   "Office": [
-    {
-      name: 'Manage User',
-      icon: <FaUsers />,
-      link: '/admin/account',
-      submenu: null
-    },
+    // {
+    //   name: 'Manage User',
+    //   icon: <FaUsers />,
+    //   link: '/admin/account',
+    //   submenu: null
+    // },
     {
       name: 'Staff Attendance',
       icon: <Icons.PRESENT />,

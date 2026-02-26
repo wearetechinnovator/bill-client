@@ -58,7 +58,7 @@ const Transaction = () => {
     const [filter, setFilter] = useState({
         startDate: "", endDate: "", category: ""
     })
-    const [applyFilter, setApplyFilter] = useState(false);
+    const [applyFilter, setApplyFilter] = useState(null);
     const [isCustomDate, setIsCustomDate] = useState(false);
 
 
@@ -291,12 +291,16 @@ const Transaction = () => {
                         {
                             filterOpen && (
                                 <div className='w-full flex flex-col transition-all'>
-                                    <div className='w-full flex items-center gap-4 mt-4'>
+                                    <hr />
+                                    <div className='w-full flex items-center gap-4'>
                                         <div className='w-full'>
                                             <label htmlFor="categorySelect">Category</label>
                                             <SelectPicker
                                                 className='w-full'
-                                                onChange={(v) => setFilter({ ...filter, category: v })}
+                                                onChange={(v) => {
+                                                    setFilter({ ...filter, category: v });
+                                                    setApplyFilter(false);
+                                                }}
                                                 data={allCategory}
                                                 value={filter.category}
                                             />
@@ -315,6 +319,7 @@ const Transaction = () => {
                                                     const { fromDate, toDate } = await getAdvanceFilterData(v);
                                                     setFilter({ ...filter, startDate: fromDate, endDate: toDate })
                                                     setIsCustomDate(false);
+                                                    setApplyFilter(false);
                                                 }}
                                                 data={[
                                                     { label: "Today", value: Constants.TODAY },
@@ -358,7 +363,7 @@ const Transaction = () => {
                                         }
                                     </div>
 
-                                    <div className='w-full flex items-center justify-end gap-2 mt-4'>
+                                    <div className='w-full flex items-center justify-end gap-2 mt-4 pb-2'>
                                         <button
                                             onClick={() => setApplyFilter(true)}
                                             className='add-bill-btn'>

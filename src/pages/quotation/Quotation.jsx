@@ -1,14 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-// import MyBreadCrumb from '../../components/BreadCrumb';
-import { Popover, Whisper } from 'rsuite';
+import { Popover, SelectPicker, Whisper } from 'rsuite';
 import { useNavigate } from 'react-router-dom';
 import useExportTable from '../../hooks/useExportTable';
 import useMyToaster from '../../hooks/useMyToaster';
 import Cookies from 'js-cookie';
 import downloadPdf from '../../helper/downloadPdf';
-import { GrFormNext, GrFormPrevious } from 'react-icons/gr';
 import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
 import AddNew from '../../components/AddNew';
@@ -16,11 +14,9 @@ import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
+import { Constants } from '../../helper/constants';
 
 
-const ACTIVE = "active";
-const CONVERT = "convert";
-const EXPIRE = "expire";
 const Quotation = () => {
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -42,46 +38,56 @@ const Quotation = () => {
     }, [billData]);
     const [loading, setLoading] = useState(true);
     const [filterToggle, setFilterToggle] = useState(false);
-    const [filterData, setFilterData] = useState({
-        productName: "", fromDate: '', toDate: '', billNo: '', party: '',
-        gst: "", billDate: ''
+    const [filter, setFilter] = useState({
+        startDate: '', endDate: '', billNo: '', party: '',
     })
     const [ascending, setAscending] = useState(true);
-    const [advanceFilterMore, setAdvanceFilterMore] = useState(false);
     const [openConfirm, setOpenConfirm] = useState(false);
+    const [applyFilter, setApplyFilter] = useState(null);
+    const [isCustomDate, setIsCustomDate] = useState(false);
 
 
 
-    // Get data;
-    const getData = async () => {
-        try {
-            const data = {
-                token: Cookies.get("token"),
-                trash: tableStatusData === "trash" ? true : false,
-                all: tableStatusData === "all" ? true : false
-            }
-            const url = process.env.REACT_APP_API_URL + `/quotation/get?page=${activePage}&limit=${dataLimit}`;
-            const req = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            const res = await req.json();
-
-            setTotalData(res?.totalData)
-            setBillData([...res?.data])
-            setLoading(false);
-
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
+    // Get data with filter and without filter;
     useEffect(() => {
-        getData();
-    }, [tableStatusData, dataLimit, activePage])
+        (async () => {
+            try {
+                setLoading(true);
+                let data = {
+                    token: Cookies.get("token"),
+                    all: tableStatusData === "all" ? true : false
+                }
+                if (applyFilter) {
+                    data = {
+                        ...data,
+                        startDate: filter.startDate,
+                        endDate: filter.endDate,
+                        partyName: filter.party,
+                        billNo: filter.billNo,
+                    }
+                }
+                const url = `${process.env.REACT_APP_API_URL}/quotation/get?page=${activePage}&limit=${dataLimit}`;
+                const req = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const res = await req.json();
+
+                setTotalData(res?.totalData)
+                setBillData([...res?.data])
+
+
+            } catch (error) {
+                console.log(error)
+                return toast("Something went wrong", "error");
+            } finally {
+                setLoading(false);
+            }
+        })()
+    }, [tableStatusData, dataLimit, activePage, applyFilter])
 
 
     const sortByDate = () => {
@@ -96,7 +102,6 @@ const Quotation = () => {
 
 
     const searchTable = (e) => {
-
         const value = e.target.value.toLowerCase();
         const rows = document.querySelectorAll('.list__table tbody tr');
 
@@ -187,88 +192,11 @@ const Quotation = () => {
         }
     }
 
-    const restoreData = async () => {
-        if (selected.length === 0 || tableStatusData !== "trash") {
-            return;
-        }
-
-        const url = process.env.REACT_APP_API_URL + "/quotation/restore";
-        try {
-            const req = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ ids: selected })
-            });
-            const res = await req.json();
-
-            if (req.status !== 200 || res.err) {
-                return toast(res.err, 'error');
-            }
-
-            selected.forEach((id, _) => {
-                setBillData((prevData) => {
-                    return prevData.filter((data, _) => data._id !== id)
-                })
-            });
-            setSelected([]);
-            return toast(res.msg, 'success');
-
-        } catch (error) {
-            console.log(error)
-            toast("Something went wrong", "error")
-        }
-    }
-
-
-    const getFilterData = async () => {
-        if ([
-            filterData.billDate, filterData.party, filterData.billNo, filterData.fromDate,
-            filterData.toDate, filterData.gst, filterData.productName
-        ].every((field) => field === "" || !field)) {
-            return toast("Choose a filter option", 'error')
-        }
-
-        try {
-            const url = process.env.REACT_APP_API_URL + `/quotation/filter?page=${activePage}&limit=${dataLimit}`;
-
-            const req = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": 'application/json'
-                },
-                body: JSON.stringify({ token: Cookies.get("token"), ...filterData })
-            });
-            const res = await req.json();
-
-            console.log(res)
-            setTotalData(res?.totalData)
-            setBillData([...res?.data])
-
-        } catch (error) {
-            console.log(error)
-            return toast("Something went wrong", 'error')
-        }
-    }
-
-
     const clearFilterData = () => {
-        getData()
-        setFilterData({
-            productName: "", fromDate: '', toDate: '', billNo: '', party: '',
-            gst: "", billDate: ''
+        setFilter({
+            startDate: '', endDate: '', billNo: '', party: '',
         })
-    }
-
-
-    const advaneFilter = async (filterUnit) => {
-        // const filterData = await getAdvanceFilterData(
-        //     filterUnit, "quotation", activePage, dataLimit
-        // );
-        // setTotalData(filterData.totalData);
-        // setBillData([...filterData.data])
-
+        setApplyFilter(false);
     }
 
 
@@ -290,8 +218,7 @@ const Quotation = () => {
                 />
                 <div className='content__body'>
                     {/* top section */}
-                    <div
-                        className={`add_new_compnent ${filterToggle ? 'h-[265px]' : 'h-[45px]'}`}>
+                    <div className={`add_new_compnent`}>
                         <div className='flex justify-between items-center'>
                             <div className='flex flex-col'>
                                 <select value={dataLimit} onChange={(e) => setDataLimit(e.target.value)}>
@@ -362,104 +289,101 @@ const Quotation = () => {
                             </div>
                         </div>
 
-                        <div id='filterToggle'>
-                            <hr />
+                        {
+                            filterToggle && (
+                                <div>
+                                    <hr />
+                                    <div className='w-full flex items-center gap-4'>
+                                        <div className='w-full'>
+                                            <p>Invoice No</p>
+                                            <input type="text"
+                                                value={filter.billNo}
+                                                onChange={(e) => setFilter({ ...filter, billNo: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className='w-full'>
+                                            <p>Party Name</p>
+                                            <input type="text"
+                                                value={filter.party}
+                                                onChange={(e) => setFilter({ ...filter, party: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className='w-full'>
+                                            <label htmlFor="categorySelect">Search By</label>
+                                            <SelectPicker
+                                                searchable={false}
+                                                className='w-full'
+                                                menuMaxHeight={"250px"}
+                                                onChange={async (v) => {
+                                                    if (v === Constants.CUSTOM) {
+                                                        setIsCustomDate(true);
+                                                        return;
+                                                    }
+                                                    const { fromDate, toDate } = await getAdvanceFilterData(v);
+                                                    setFilter({ ...filter, startDate: fromDate, endDate: toDate })
+                                                    setIsCustomDate(false);
+                                                    setApplyFilter(false);
+                                                }}
+                                                data={[
+                                                    { label: "Today", value: Constants.TODAY },
+                                                    { label: "Yesterday", value: Constants.YESTERDAY },
+                                                    { label: "Last 7 Days", value: Constants.LAST7DAY },
+                                                    { label: "Last 30 Days", value: Constants.LAST30DAY },
+                                                    { label: "Last 365 Days", value: Constants.LAST365DAY },
+                                                    { label: "This Week", value: Constants.THISWEEK },
+                                                    { label: "Last Week", value: Constants.LASTWEEK },
+                                                    { label: "This Month", value: Constants.THISMONTH },
+                                                    { label: "Previous Month", value: Constants.PREVMONTH },
+                                                    { label: "This Quarter", value: Constants.THISQUARTER },
+                                                    { label: "Last Quarter", value: Constants.LASTQUARTER },
+                                                    { label: "Current Fiscal Year", value: Constants.CURRENTFISCAL },
+                                                    { label: "Last Fiscal Year", value: Constants.LASTFISCAL },
+                                                    { label: "Custom Date", value: Constants.CUSTOM }
+                                                ]}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className='w-full flex items-center gap-4 mt-4'>
+                                        {
+                                            isCustomDate && (
+                                                <>
+                                                    <div className='w-full'>
+                                                        <p>Start Date</p>
+                                                        <input type="date"
+                                                            value={filter.startDate}
+                                                            onChange={(e) => setFilter({ ...filter, startDate: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className='w-full'>
+                                                        <p>End Date</p>
+                                                        <input type="date"
+                                                            value={filter.endDate}
+                                                            onChange={(e) => setFilter({ ...filter, endDate: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className='w-full'></div>
+                                                </>
+                                            )
+                                        }
+                                    </div>
 
-                            <div className='grid gap-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1' id='filterBill'>
-                                <div>
-                                    <p>Item Name</p>
-                                    <input type="text"
-                                        value={filterData.productName}
-                                        onChange={(e) => setFilterData({ ...filterData, productName: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <p>Party</p>
-                                    <input type="text"
-                                        value={filterData.party}
-                                        onChange={(e) => setFilterData({ ...filterData, party: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <p>Bill No</p>
-                                    <input type="text"
-                                        value={filterData.billNo}
-                                        onChange={(e) => setFilterData({ ...filterData, billNo: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <p>Filter</p>
-                                    <Whisper
-                                        placement='bottom'
-                                        trigger={'click'}
-                                        onClose={() => setAdvanceFilterMore(false)}
-                                        speaker={<Popover>
-                                            <div className='advance__filter max-h-[200px] overflow-y-auto'>
-                                                <p onClick={() => advaneFilter('today')}>Today</p>
-                                                <p onClick={() => advaneFilter('yesterday')}>Yesterday</p>
-                                                <p onClick={() => advaneFilter('thisweek')}>This Week</p>
-                                                <p onClick={() => advaneFilter('lastweek')}>Last Week</p>
-                                                <p onClick={() => advaneFilter('last7day')}>Last 7 Days</p>
-                                                <p onClick={() => advaneFilter('thismonth')}>This Month</p>
-                                                <p onClick={() => advaneFilter('previousmonth')}>Previous Month</p>
-                                                <div className={`${advanceFilterMore ? 'block' : 'hidden'}`}>
-                                                    <p onClick={() => advaneFilter('last30day')}>Last 30 Day</p>
-                                                    <p onClick={() => advaneFilter('last365day')}>Last 365 Day</p>
-                                                    <p onClick={() => advaneFilter('thisquarter')}>This Quarter</p>
-                                                    <p onClick={() => advaneFilter('lastquarter')}>Last Quarter</p>
-                                                    <p onClick={() => advaneFilter('currentfiscal')}>Current Fiscal Year</p>
-                                                    <p onClick={() => advaneFilter('lastfiscal')}>Prev Fiscal Year</p>
-                                                </div>
-                                                <div className={`advance__filter__more`}
-                                                    onClick={() => setAdvanceFilterMore(!advanceFilterMore)}>
-                                                    Load {advanceFilterMore ? 'less' : 'more'}
-                                                </div>
-                                            </div>
-                                        </Popover>}>
-                                        <button className='advance__filter__btn'>
-                                            Advance Filter
+                                    <div className='w-full flex justify-end gap-2 mt-2 pb-2' id='filterBtnGrp'>
+                                        <button onClick={() => setApplyFilter(true)}>
+                                            <Icons.SEARCH />
+                                            Search
                                         </button>
-                                    </Whisper>
+                                        <button onClick={clearFilterData}>
+                                            {<Icons.RESET />}
+                                            Reset
+                                        </button>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p>From Date</p>
-                                    <input type="date"
-                                        value={filterData.fromDate}
-                                        onChange={(e) => setFilterData({ ...filterData, fromDate: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <p>To Date</p>
-                                    <input type="date"
-                                        value={filterData.toDate}
-                                        onChange={(e) => setFilterData({ ...filterData, toDate: e.target.value })}
-                                    />
-                                </div>
-                                {/* <div>
-                                <p>GSTIN</p>
-                                <input type="text"
-                                    value={filterData.gst}
-                                    onChange={(e) => setFilterData({ ...filterData, gst: e.target.value })}
-                                />
-                                </div> */}
-                            </div>
-
-                            <div className='w-full flex justify-end gap-2 mt-5' id='filterBtnGrp'>
-                                <button onClick={getFilterData}>
-                                    <Icons.SEARCH />
-                                    Search
-                                </button>
-                                <button onClick={clearFilterData}>
-                                    {<Icons.RESET />}
-                                    Reset
-                                </button>
-                            </div>
-                        </div>
+                            )
+                        }
                     </div>
 
                     {
                         !loading ? billData.length > 0 ? <div className='content__body__main'>
-                            {/* Table start */}
                             <div className='overflow-x-auto list__table'>
                                 <table className='min-w-full bg-white' id='listQuotation' ref={tableRef}>
                                     <thead className='list__table__head'>
@@ -484,7 +408,7 @@ const Quotation = () => {
                                     <tbody>
                                         {
                                             billData.map((data, i) => {
-                                                return <tr key={i}
+                                                return <tr key={data._id}
                                                     onClick={() => navigate(`/admin/bill/details/quotation/${data._id}`)}>
                                                     <td className='py-2 max-w-[10px]' align='center'>
                                                         <input type='checkbox'
@@ -493,17 +417,17 @@ const Quotation = () => {
                                                             onClick={(e) => e.stopPropagation()}
                                                         />
                                                     </td>
-                                                    <td align='left'>{new Date(data.estimateDate).toLocaleDateString()}</td>
+                                                    <td align='left'>{data.estimateDate.split("T")[0]}</td>
                                                     <td align='left'>{data.quotationNumber}</td>
                                                     <td align='left'>{data.party.name}</td>
-                                                    <td>{data.validDate ? new Date(data.validDate).toLocaleDateString() : '--'}</td>
+                                                    <td>{data.validDate ? data.validDate.split("T")[0] : '--'}</td>
                                                     <td align='left'>
                                                         <span className={`
-                                                                badge ${data.billStatus === ACTIVE ?
-                                                                'green-badge' : data.billStatus === EXPIRE ?
+                                                                badge ${data.billStatus === Constants.ACTIVE ?
+                                                                'green-badge' : data.billStatus === Constants.EXPIRE ?
                                                                     'red-badge' : 'yellow-badge'}
                                                             `}>
-                                                            {data.billStatus === CONVERT ? "converted" : data.billStatus}
+                                                            {data.billStatus === Constants.CONVERT ? "converted" : data.billStatus}
                                                         </span>
                                                     </td>
                                                     <td className='px-4 text-center'>
