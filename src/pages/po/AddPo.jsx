@@ -19,6 +19,7 @@ import AddItemModal from '../../components/AddItemModal';
 import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
+import Loading from '../../components/Loading';
 
 
 
@@ -30,7 +31,8 @@ const PO = ({ mode }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const toast = useMyToaster();
-    const { id } = useParams()
+    const { id } = useParams();
+    const [loading, setLoading] = useState(false);
     const getBillPrefix = useBillPrefix("po");
     const { getApiData } = useApi();
     const itemRowSet = {
@@ -312,6 +314,7 @@ const PO = ({ mode }) => {
         setItemRows([...ItemRows]);
 
         try {
+            setLoading(true);
             const url = process.env.REACT_APP_API_URL + "/po/add";
             const token = Cookies.get("token");
 
@@ -339,8 +342,9 @@ const PO = ({ mode }) => {
 
 
         } catch (error) {
-            console.log(error);
             return toast('Something went wrong', 'error')
+        } finally {
+            setLoading(false);
         }
 
     }
@@ -858,13 +862,13 @@ const PO = ({ mode }) => {
                                 />
                             </div>
                         </div>
-                    </div>
-                    {/* Content Body Main Close */}
+                    </div>{/* Content Body Main Close */}
+
                     <div className='form-btn-bar'>
                         <button
-                            onClick={saveBill}
+                            onClick={loading ? null : saveBill}
                             className='add-bill-btn'>
-                            <Icons.CHECK />
+                            {loading ? <Loading /> : <Icons.CHECK />}
                             {!mode ? "Save" : "Update"}
                         </button>
                         <button className='reset-bill-btn' onClick={clearForm}>
@@ -872,8 +876,7 @@ const PO = ({ mode }) => {
                             Reset
                         </button>
                     </div>
-                </div>
-                {/* Content Body Close */}
+                </div>{/* Content Body Close */}
             </main>
         </>
     )

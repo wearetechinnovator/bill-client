@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import { Constants } from '../../helper/constants';
+import Loading from '../../components/Loading';
 
 
 
@@ -35,7 +36,8 @@ const PartyComponent = ({ mode, save, getRes }) => {
 		partyCategory: '', creditPeriod: '', creditLimit: '', dob: '', partyCategory: ''
 	})
 	const navigate = useNavigate();
-	const [shipingCheck, setShipingCheck] = useState(true)
+	const [shipingCheck, setShipingCheck] = useState(true);
+	const [loading, setLoading] = useState(false);
 
 
 
@@ -68,6 +70,7 @@ const PartyComponent = ({ mode, save, getRes }) => {
 
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/party/add";
 			const token = Cookies.get("token");
 			const req = await fetch(url, {
@@ -104,6 +107,8 @@ const PartyComponent = ({ mode, save, getRes }) => {
 
 		} catch (error) {
 			return toast("Something went wrong", "error")
+		} finally {
+			setLoading(false);
 		}
 
 	}
@@ -281,9 +286,9 @@ const PartyComponent = ({ mode, save, getRes }) => {
 
 			<div className='w-full flex justify-center gap-3 my-3 mt-5'>
 				<button
-					onClick={saveParty}
+					onClick={loading ? null : saveParty}
 					className='add-bill-btn'>
-					<Icons.CHECK />
+					{loading ? <Loading /> : <Icons.CHECK />}
 					{!mode ? "Save" : "Update"}
 				</button>
 				<button

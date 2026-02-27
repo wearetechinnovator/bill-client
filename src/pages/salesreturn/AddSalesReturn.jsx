@@ -15,12 +15,14 @@ import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import { Constants } from '../../helper/constants';
+import Loading from '../../components/Loading';
 
 
 
 const SalesReturn = ({ mode }) => {
 	const toast = useMyToaster();
 	const { id } = useParams()
+    const [loading, setLoading] = useState(false);
 	const getBillPrefix = useBillPrefix("salesreturn");
 	const { getApiData } = useApi();
 	const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
@@ -318,9 +320,9 @@ const SalesReturn = ({ mode }) => {
 		setItemRows([...ItemRows]);
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/salesreturn/add";
 			const token = Cookies.get("token");
-
 			const req = await fetch(url, {
 				method: "POST",
 				headers: {
@@ -341,12 +343,12 @@ const SalesReturn = ({ mode }) => {
 
 			toast('Sales Return successfully', 'success');
 			navigate("/admin/sales-return");
-			return
-
+			return;
 
 		} catch (error) {
-			console.log(error);
 			return toast('Something went wrong', 'error')
+		}finally{
+			setLoading(false);
 		}
 
 	}
@@ -374,36 +376,6 @@ const SalesReturn = ({ mode }) => {
 				<AddItemModal open={getItemModalState} />
 				<div className='content__body'>
 					<div className='content__body__main bg-white' id='addQuotationTable'>
-						{/* <div className='top__btn__grp'>
-							<div className='add__btns'>
-								<button onClick={() => {
-									dispatch(toggle(!getPartyModalState))
-								}}><MdOutlineAdd /> Add Party</button>
-
-								<button onClick={() => {
-									dispatch(itemToggle(!getItemModalState))
-								}}><MdOutlineAdd /> Add Item</button>
-							</div>
-							<div className='extra__btns'>
-								{mode === "edit" && <button onClick={() => {
-									swal({
-										title: "Are you sure?",
-										icon: "warning",
-										buttons: true,
-									})
-										.then((cnv) => {
-											if (cnv) {
-												swal("Invoice successfully duplicate", {
-													icon: "success",
-												});
-												navigate(`/admin/sales-return/add/${id}`)
-											}
-										});
-								}}><Icons.COPY />Duplicate invoice</button>}
-								<button onClick={saveBill}><Icons.CHECK />{mode ? "Update" : "Save"}</button>
-							</div>
-						</div> */}
-
 						<div className='flex flex-col lg:flex-row items-center justify-around gap-4'>
 							<div className='flex flex-col gap-2 w-full lg:max-w-[450px]'>
 								<p className='text-xs'>Select Party <span className='required__text'>*</span></p>
@@ -920,9 +892,9 @@ const SalesReturn = ({ mode }) => {
 					{/* Content Body Main Close */}
 					<div className='form-btn-bar'>
 						<button
-							onClick={saveBill}
+							onClick={loading ? null : saveBill}
 							className='add-bill-btn'>
-							<Icons.CHECK />
+							{loading ? <Loading /> : <Icons.CHECK />}
 							{!mode ? "Save" : "Update"}
 						</button>
 						<button className='reset-bill-btn' onClick={clearForm}>

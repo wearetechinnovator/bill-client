@@ -10,12 +10,14 @@ import { Icons } from '../../helper/icons';
 import { Constants } from '../../helper/constants';
 import { checkNumber } from '../../helper/validation';
 import TransactionCategoryManageModal from '../../components/TransactionCategoryManageModal';
+import Loading from '../../components/Loading';
 
 
 
 const TransactionAdd = ({ mode }) => {
 	const toast = useMyToaster();
 	const { id } = useParams();
+	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
 	const token = Cookies.get("token");
 	const { getApiData } = useApi();
@@ -100,6 +102,7 @@ const TransactionAdd = ({ mode }) => {
 
 
 		try {
+			setLoading(true);
 			const url = `${process.env.REACT_APP_API_URL}/other-transaction/add`;
 			const req = await fetch(url, {
 				method: "POST",
@@ -125,8 +128,11 @@ const TransactionAdd = ({ mode }) => {
 			toast('Transaction add successfully', 'success');
 			navigate("/admin/other-transaction")
 			return;
+
 		} catch (error) {
 			return toast('Something went wrong', 'error')
+		} finally {
+			setLoading(false);
 		}
 
 	}
@@ -242,8 +248,10 @@ const TransactionAdd = ({ mode }) => {
 							</div>
 						</div>
 						<div className='w-full flex justify-center gap-3 my-1 mt-5'>
-							<button className='add-bill-btn' onClick={saveTransaction}>
-								<Icons.CHECK />
+							<button className='add-bill-btn'
+								onClick={loading ? null : saveTransaction}
+							>
+								{loading ? <Loading /> : <Icons.CHECK />}
 								{mode ? "Update" : "Save"}
 							</button>
 							<button className='reset-bill-btn' onClick={clearForm}>

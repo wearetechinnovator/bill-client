@@ -13,11 +13,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import AddPartyModal from '../../components/AddPartyModal';
 import { useDispatch, useSelector } from 'react-redux';
 import AddItemModal from '../../components/AddItemModal';
-import swal from 'sweetalert';
 import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
+import Loading from '../../components/Loading';
 
 
 
@@ -30,6 +30,7 @@ const Quotation = ({ mode }) => {
 	const getItemModalState = useSelector((store) => store.itemModalSlice.show);
 	const navigate = useNavigate();
 	const { id } = useParams()
+    const [loading, setLoading] = useState(false);
 	const getBillPrefix = useBillPrefix("quotation");
 	const { getApiData } = useApi();
 	const itemRowSet = {
@@ -317,6 +318,7 @@ const Quotation = ({ mode }) => {
 		setItemRows([...ItemRows]);
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/quotation/add";
 			const token = Cookies.get("token");
 
@@ -344,9 +346,11 @@ const Quotation = ({ mode }) => {
 			toast('Quotation add successfully', 'success');
 			navigate('/admin/quotation-estimate')
 			return
+			
 		} catch (error) {
-			console.log(error);
 			return toast('Something went wrong', 'error')
+		}finally{
+			setLoading(false);
 		}
 
 	}
@@ -931,9 +935,9 @@ const Quotation = ({ mode }) => {
 					{/* Content Body Main Close */}
 					<div className='form-btn-bar'>
 						<button
-							onClick={saveBill}
+							onClick={loading ? null : saveBill}
 							className='add-bill-btn'>
-							<Icons.CHECK />
+							{loading ? <Loading /> : <Icons.CHECK />}
 							{!mode ? "Save" : "Update"}
 						</button>
 						<button className='reset-bill-btn' onClick={clearForm}>

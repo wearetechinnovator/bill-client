@@ -7,6 +7,7 @@ import { SelectPicker } from 'rsuite';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { Icons } from '../../helper/icons';
+import Loading from '../../components/Loading';
 
 
 const CategoryAdd = ({ mode }) => {
@@ -25,15 +26,15 @@ const CategoryAdd = ({ mode }) => {
 
 const CategoryComponent = ({ mode, save }) => {
 	const accountvalidation = useMyToaster();
-	const editorRef = useRef(null);
 	const [form, setForm] = useState({ title: '', tax: '', hsn: '', type: '', details: "" })
 	const [taxData, setTaxData] = useState([]);
 	const { id } = useParams();
 	const toast = useMyToaster();
 	const navigate = useNavigate();
+	const [loading, setLoading] = useState(false);
 
 
-
+	// Get Data
 	useEffect(() => {
 		if (mode) {
 			const get = async () => {
@@ -55,6 +56,7 @@ const CategoryComponent = ({ mode, save }) => {
 		}
 	}, [mode])
 
+	// Get Tax
 	useEffect(() => {
 		const getTax = async () => {
 			const url = process.env.REACT_APP_API_URL + `/tax/get`;
@@ -68,7 +70,6 @@ const CategoryComponent = ({ mode, save }) => {
 			const res = await req.json();
 			const tempTaxData = res.data.map(({ _id, title }, _) => ({ label: title, value: _id }));
 			setTaxData([...tempTaxData]);
-			console.log(tempTaxData)
 		}
 
 		getTax();
@@ -86,6 +87,7 @@ const CategoryComponent = ({ mode, save }) => {
 		}
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/category/add";
 			const token = Cookies.get("token");
 			const req = await fetch(url, {
@@ -116,6 +118,8 @@ const CategoryComponent = ({ mode, save }) => {
 
 		} catch (error) {
 			return toast("Something went wrong", "error")
+		} finally {
+			setLoading(false);
 		}
 
 	}
@@ -160,35 +164,36 @@ const CategoryComponent = ({ mode, save }) => {
 
 				</div>
 				{/* <div className='mt-3 '>
-          <p className='ml-2 pb-2'>Details</p>
-          <Editor
-            onEditorChange={(v, editor) => {
-              setForm({ ...form, details: editor.getContent() })
-            }}
-            value={form.details}
-            apiKey='765rof3c4qgyk8u59xk0o3vvhvji0y156uwtbjgezhnbcct7'
-            onInit={(_evt, editor) => editorRef.current = editor}
-            init={{
-              height: 300,
-              menubar: false,
-              plugins: [
-                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-              ],
-              toolbar: 'undo redo | blocks | ' +
-                'bold italic forecolor | alignleft aligncenter ' +
-                'alignright alignjustify | bullist numlist outdent indent | ' +
-                'removeformat | help',
-              content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-            }}
-          />
-        </div> */}
+					<p className='ml-2 pb-2'>Details</p>
+					<Editor
+						onEditorChange={(v, editor) => {
+						setForm({ ...form, details: editor.getContent() })
+						}}
+						value={form.details}
+						apiKey='765rof3c4qgyk8u59xk0o3vvhvji0y156uwtbjgezhnbcct7'
+						onInit={(_evt, editor) => editorRef.current = editor}
+						init={{
+						height: 300,
+						menubar: false,
+						plugins: [
+							'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+							'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+							'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+						],
+						toolbar: 'undo redo | blocks | ' +
+							'bold italic forecolor | alignleft aligncenter ' +
+							'alignright alignjustify | bullist numlist outdent indent | ' +
+							'removeformat | help',
+						content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+						}}
+					/>
+				</div> */}
 				<div className='w-full flex justify-center gap-3 my-3 mt-5'>
 					<button
-						onClick={saveData}
-						className='add-bill-btn'>
-						<Icons.CHECK />
+						onClick={loading ? null : saveData}
+						className='add-bill-btn'
+					>
+						{loading ? <Loading /> : <Icons.CHECK />}
 						{!mode ? "Save" : "Update"}
 					</button>
 					<button className='reset-bill-btn' onClick={clearData}>

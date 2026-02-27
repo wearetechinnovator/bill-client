@@ -10,12 +10,14 @@ import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import { Constants } from '../../helper/constants';
 import { checkNumber } from '../../helper/validation';
+import Loading from '../../components/Loading';
 
 
 
 // --- PAYMENT OUT ---
 const AddPayment = ({ mode }) => {
 	const token = Cookies.get("token");
+	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
 	const { getApiData } = useApi();
 	const toast = useMyToaster();
@@ -148,6 +150,7 @@ const AddPayment = ({ mode }) => {
 
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/paymentout/add";
 			const req = await fetch(url, {
 				method: "POST",
@@ -175,6 +178,8 @@ const AddPayment = ({ mode }) => {
 
 		} catch (error) {
 			return toast('Something went wrong', 'error')
+		} finally {
+			setLoading(false);
 		}
 
 	}
@@ -429,14 +434,15 @@ const AddPayment = ({ mode }) => {
 
 						<div className='w-full flex justify-end gap-3 mt-3 py-1'>
 							<button
-								onClick={savePayment}
-								className='bg-green-500 hover:bg-green-400 save__and__reset__btns'>
-								<Icons.CHECK />
+								onClick={loading ? null : savePayment}
+								className='add-bill-btn'
+							>
+								{loading ? <Loading /> : <Icons.CHECK />}
 								{!mode ? "Save" : "Update"}
 							</button>
 							<button
 								onClick={clear}
-								className='bg-blue-800 hover:bg-blue-700 save__and__reset__btns'>
+								className='reset-bill-btn'>
 								<Icons.RESET />
 								Reset
 							</button>

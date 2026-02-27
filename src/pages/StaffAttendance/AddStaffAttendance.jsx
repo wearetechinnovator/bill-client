@@ -6,10 +6,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { Icons } from '../../helper/icons';
 import { Tooltip, Whisper } from 'rsuite';
+import Loading from '../../components/Loading';
 
 
 const AddStaffAttendance = ({ mode }) => {
     const toast = useMyToaster();
+    const [loading, setLoading] = useState(false);
     const [data, setData] = useState({
         staffName: "", mobileNumber: "", email: "", dob: "", joiningDate: "",
         salaryPayOutType: "", salary: "", salaryCycle: "", openingBalance: "",
@@ -53,6 +55,7 @@ const AddStaffAttendance = ({ mode }) => {
         }
 
         try {
+            setLoading(true);
             const url = process.env.REACT_APP_API_URL + "/staff/add";
             const token = Cookies.get("token");
             const req = await fetch(url, {
@@ -75,9 +78,10 @@ const AddStaffAttendance = ({ mode }) => {
             navigate('/admin/staff-attendance');
             return
 
-
         } catch (error) {
             return toast("Something went wrong", "error")
+        } finally {
+            setLoading(false);
         }
 
     }
@@ -224,8 +228,10 @@ const AddStaffAttendance = ({ mode }) => {
                         </div>
 
                         <div className='flex gap-4 justify-center mt-5'>
-                            <button onClick={saveData} className='add-bill-btn'>
-                                <Icons.CHECK />
+                            <button onClick={loading ? null : saveData}
+                                className='add-bill-btn'
+                            >
+                                {loading ? <Loading /> : <Icons.CHECK />}
                                 {mode ? "Update" : "Save"}
                             </button>
                             <button onClick={resetData} className='reset-bill-btn'>

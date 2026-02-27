@@ -15,6 +15,7 @@ import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
 import { Constants } from '../../helper/constants';
+import Loading from '../../components/Loading';
 
 
 
@@ -23,6 +24,7 @@ const SalesInvoice = ({ mode }) => {
 	const token = Cookies.get("token");
 	const toast = useMyToaster();
 	const { id } = useParams()
+    const [loading, setLoading] = useState(false);
 	const getBillPrefix = useBillPrefix("invoice");
 	const { getApiData } = useApi();
 	const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
@@ -357,8 +359,8 @@ const SalesInvoice = ({ mode }) => {
 		setItemRows([...ItemRows]);
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/salesinvoice/add";
-
 			const req = await fetch(url, {
 				method: "POST",
 				headers: {
@@ -425,6 +427,8 @@ const SalesInvoice = ({ mode }) => {
 			return;
 		} catch (error) {
 			return toast('Something went wrong', 'error')
+		}finally{
+			setLoading(false);
 		}
 
 	}
@@ -461,28 +465,6 @@ const SalesInvoice = ({ mode }) => {
 				/>
 				<div className='content__body'>
 					<div className='content__body__main bg-white' id='addQuotationTable'>
-
-						{/* <div className='top__btn__grp'>
-							<div className='extra__btns'>
-								{mode === "edit" && <button onClick={() => {
-									swal({
-										title: "Are you sure?",
-										icon: "warning",
-										buttons: true,
-									})
-										.then((cnv) => {
-											if (cnv) {
-												swal("Invoice successfully duplicate", {
-													icon: "success",
-												});
-												navigate(`/admin/sales-invoice/add/${id}`)
-											}
-										});
-								}}><Icons.COPY />Duplicate invoice</button>}
-								<button onClick={saveBill}><Icons.CHECK />{mode ? "Update" : "Save"}</button>
-							</div>
-						</div> */}
-
 						<div className='flex flex-col lg:flex-row items-center justify-around gap-4'>
 							<div className='flex flex-col gap-2 w-full'>
 								<p className='text-xs'>Select Party <span className='required__text'>*</span></p>
@@ -1061,18 +1043,18 @@ const SalesInvoice = ({ mode }) => {
 					{/* Content Body Main Close */}
 					<div className='form-btn-bar'>
 						<button
-							onClick={() => saveBill({ isNew: false })}
+							onClick={loading ? null : () => saveBill({ isNew: false })}
 							className='add-bill-btn'>
-							<Icons.CHECK />
+							{loading ? <Loading /> : <Icons.CHECK />}
 							{!mode || mode === "convert" ? "Save" : "Update"}
 						</button>
 						{
 							!mode && (
 								<button
-									onClick={() => saveBill({ isNew: true })}
+									onClick={loading ? null : () => saveBill({ isNew: true })}
 									className='add-bill-btn'
 								>
-									<Icons.CHECK />
+									{loading ? <Loading /> : <Icons.CHECK />}
 									Save and New
 								</button>
 							)

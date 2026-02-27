@@ -3,6 +3,7 @@ import { Modal } from 'rsuite';
 import useMyToaster from '../hooks/useMyToaster';
 import Cookies from 'js-cookie';
 import { Icons } from '../helper/icons';
+import Loading from './Loading';
 
 
 const TransactionCategoryManageModal = ({ openModal, openStatus }) => {
@@ -12,6 +13,7 @@ const TransactionCategoryManageModal = ({ openModal, openStatus }) => {
     const [open, setOpen] = useState(false);
     const [categoryData, setCategoryData] = useState([]);
     const [editId, setEditId] = useState(null);
+    const [loading, setLoading] = useState(false);
 
 
     // Set modal open state based on prop;
@@ -54,6 +56,7 @@ const TransactionCategoryManageModal = ({ openModal, openStatus }) => {
 
 
         try {
+            setLoading(true);
             const URL = `${process.env.REACT_APP_API_URL}/transaction-category/add`;
             let data = { token, categoryName: formData.categoryName };
             if (editId) {
@@ -88,11 +91,12 @@ const TransactionCategoryManageModal = ({ openModal, openStatus }) => {
                 toast("Category added successfully", 'success');
             }
 
-
             setFormData({ categoryName: '' });
 
         } catch (error) {
             return toast("Something went wrong", "error");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -143,9 +147,10 @@ const TransactionCategoryManageModal = ({ openModal, openStatus }) => {
                         value={formData.categoryName}
                     />
                     <button
-                        onClick={addCategory}
-                        className='text-xs px-2 py-1 rounded mt-1 bg-blue-400 text-white'
+                        onClick={loading ? null : addCategory}
+                        className='text-xs px-2 py-1 rounded mt-1 bg-blue-400 text-white flex items-center gap-1'
                     >
+                        {loading ? <Loading /> : <Icons.CHECK />}
                         {editId ? "Update" : "Add"} Category
                     </button>
                 </div>

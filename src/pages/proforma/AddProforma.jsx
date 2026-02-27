@@ -15,6 +15,7 @@ import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
+import Loading from '../../components/Loading';
 
 
 
@@ -23,6 +24,7 @@ import SelectAccountModal from '../../components/SelectAccountModal';
 const Proforma = ({ mode }) => {
 	const toast = useMyToaster();
 	const { id } = useParams()
+	const [loading, setLoading] = useState(false);
 	const getBillPrefix = useBillPrefix("proforma");
 	const { getApiData } = useApi();
 	const navigate = useNavigate();
@@ -326,6 +328,7 @@ const Proforma = ({ mode }) => {
 		setItemRows([...ItemRows]);
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/proforma/add";
 			const token = Cookies.get("token");
 
@@ -372,8 +375,11 @@ const Proforma = ({ mode }) => {
 			toast('Proforma add successfully', 'success');
 			navigate('/admin/proforma-invoice');
 			return;
+			
 		} catch (error) {
 			return toast('Something went wrong', 'error')
+		} finally {
+			setLoading(false);
 		}
 
 	}
@@ -946,13 +952,13 @@ const Proforma = ({ mode }) => {
 								/>
 							</div>
 						</div>
-					</div>
-					{/* Content Body Main Close */}
+					</div>{/* Content Body Main Close */}
+
 					<div className='form-btn-bar'>
 						<button
-							onClick={saveBill}
+							onClick={loading ? null : saveBill}
 							className='add-bill-btn'>
-							<Icons.CHECK />
+							{loading ? <Loading /> : <Icons.CHECK />}
 							{!mode ? "Save" : "Update"}
 						</button>
 						<button className='reset-bill-btn' onClick={clearForm}>
@@ -960,8 +966,7 @@ const Proforma = ({ mode }) => {
 							Reset
 						</button>
 					</div>
-				</div>
-				{/* Content Body Close */}
+				</div>{/* Content Body Close */}
 			</main>
 		</>
 	)

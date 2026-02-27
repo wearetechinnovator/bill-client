@@ -21,6 +21,7 @@ import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
 import { Constants } from '../../helper/constants';
+import Loading from '../../components/Loading';
 
 
 
@@ -28,7 +29,8 @@ import { Constants } from '../../helper/constants';
 
 const PurchaseInvoice = ({ mode }) => {
 	const toast = useMyToaster();
-	const { id } = useParams()
+	const { id } = useParams();
+	const [loading, setLoading] = useState(false);
 	const getBillPrefix = useBillPrefix("invoice");
 	const { getApiData } = useApi();
 	const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
@@ -291,13 +293,13 @@ const PurchaseInvoice = ({ mode }) => {
 
 	// *Save bill
 	const saveBill = async () => {
-		if (formData.party === "") {
+		if (formData.party === "")
 			return toast("Please select party", "error")
-		} else if (formData.purchaseReturnNumber === "") {
+		else if (formData.purchaseReturnNumber === "")
 			return toast("Please enter purchase return number", "error")
-		} else if (formData.returnDate === "") {
+		else if (formData.returnDate === "")
 			return toast("Please select return date", "error")
-		}
+
 
 		for (let row of ItemRows) {
 			if (row.itemName === "") {
@@ -319,6 +321,7 @@ const PurchaseInvoice = ({ mode }) => {
 		setItemRows([...ItemRows]);
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/purchasereturn/add";
 			const token = Cookies.get("token");
 
@@ -346,9 +349,11 @@ const PurchaseInvoice = ({ mode }) => {
 			toast('Purchase Return add successfully', 'success');
 			navigate("/admin/purchase-return")
 			return
+
 		} catch (error) {
-			console.log(error);
 			return toast('Something went wrong', 'error')
+		} finally {
+			setLoading(false);
 		}
 
 	}
@@ -969,13 +974,13 @@ const PurchaseInvoice = ({ mode }) => {
 								/>
 							</div>
 						</div>
-					</div>
-					{/* Content Body Main Close */}
+					</div>{/* Content Body Main Close */}
+
 					<div className='form-btn-bar'>
 						<button
-							onClick={saveBill}
+							onClick={loading ? null : saveBill}
 							className='add-bill-btn'>
-							<Icons.CHECK />
+							{loading ? <Loading /> : <Icons.CHECK />}
 							{!mode || mode === "convert" ? "Save" : "Update"}
 						</button>
 						<button className='reset-bill-btn' onClick={clearForm}>
@@ -983,8 +988,7 @@ const PurchaseInvoice = ({ mode }) => {
 							Reset
 						</button>
 					</div>
-				</div>
-				{/* Content Body Close */}
+				</div>{/* Content Body Close */}
 			</main>
 		</>
 	)

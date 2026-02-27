@@ -285,7 +285,6 @@ const Proforma = () => {
 								</div>
 							</div>
 						</div>
-
 						{
 							filterToggle && (
 								<div>

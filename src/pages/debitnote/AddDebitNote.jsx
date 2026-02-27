@@ -4,17 +4,12 @@ import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlinePlaylistAdd } from "react-icons/md";
-import { FaRegCheckCircle } from "react-icons/fa";
-import { BiReset } from "react-icons/bi";
 import useMyToaster from '../../hooks/useMyToaster';
 import useApi from '../../hooks/useApi';
 import useBillPrefix from '../../hooks/useBillPrefix';
 import Cookies from 'js-cookie';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggle } from '../../store/partyModalSlice';
-import { toggle as itemToggle } from '../../store/itemModalSlice';
-import swal from 'sweetalert';
 import AddPartyModal from '../../components/AddPartyModal';
 import AddItemModal from '../../components/AddItemModal';
 import { MdCurrencyRupee } from "react-icons/md";
@@ -22,13 +17,15 @@ import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
+import Loading from '../../components/Loading';
 
 
 
 
 const DebitNote = ({ mode }) => {
 	const toast = useMyToaster();
-	const { id } = useParams()
+	const { id } = useParams();
+	const [loading, setLoading] = useState(false);
 	const getBillPrefix = useBillPrefix("invoice");
 	const { getApiData } = useApi();
 	const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
@@ -188,12 +185,6 @@ const DebitNote = ({ mode }) => {
 	}, [])
 
 
-	//set Invoice number
-	// useEffect(() => {
-	//   setFormData({ ...formData, debitNoteNumber: getBillPrefix });
-	// }, [getBillPrefix])
-
-
 	// When `discount type is before` and apply discount this useEffect run;
 	useEffect(() => {
 		if (formData.discountType === "before" && ItemRows.length > 0) {
@@ -350,6 +341,7 @@ const DebitNote = ({ mode }) => {
 		setItemRows([...ItemRows]);
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/debitnote/add";
 			const token = Cookies.get("token");
 
@@ -380,8 +372,9 @@ const DebitNote = ({ mode }) => {
 
 
 		} catch (error) {
-			console.log(error);
 			return toast('Something went wrong', 'error')
+		} finally {
+			setLoading(false);
 		}
 
 	}
@@ -973,13 +966,13 @@ const DebitNote = ({ mode }) => {
 								/>
 							</div>
 						</div>
-					</div>
-					{/* Content Body Main Close */}
+					</div>{/* Content Body Main Close */}
+
 					<div className='form-btn-bar'>
 						<button
-							onClick={saveBill}
+							onClick={loading ? null : saveBill}
 							className='add-bill-btn'>
-							<Icons.CHECK />
+							{loading ? <Loading /> : <Icons.CHECK />}
 							{!mode || mode === "convert" ? "Save" : "Update"}
 						</button>
 						<button className='reset-bill-btn' onClick={clearForm}>
@@ -987,8 +980,7 @@ const DebitNote = ({ mode }) => {
 							Reset
 						</button>
 					</div>
-				</div>
-				{/* Content Body Close */}
+				</div>{/* Content Body Close */}
 			</main>
 		</>
 	)

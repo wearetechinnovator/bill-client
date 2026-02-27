@@ -7,6 +7,7 @@ import useMyToaster from '../../hooks/useMyToaster';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { Icons } from '../../helper/icons';
+import Loading from '../../components/Loading';
 
 
 
@@ -16,6 +17,7 @@ const UnitAdd = ({ mode }) => {
     const [form, setForm] = useState({ title: '', details: '' });
     const { id } = useParams();
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
 
     useEffect(() => {
@@ -45,6 +47,7 @@ const UnitAdd = ({ mode }) => {
         }
 
         try {
+            setLoading(true);
             const url = process.env.REACT_APP_API_URL + "/unit/add";
             const token = Cookies.get("token");
             const req = await fetch(url, {
@@ -67,9 +70,10 @@ const UnitAdd = ({ mode }) => {
             navigate('/admin/unit');
             return
 
-
         } catch (error) {
             return toast("Something went wrong", "error")
+        } finally {
+            setLoading(false);
         }
 
     }
@@ -98,9 +102,10 @@ const UnitAdd = ({ mode }) => {
                         </div>
                         <div className='w-full flex justify-center gap-3 my-3 mt-5'>
                             <button
-                                onClick={saveData}
-                                className='add-bill-btn'>
-                                <Icons.CHECK />
+                                onClick={loading ? null : saveData}
+                                className='add-bill-btn'
+                            >
+                                {loading ? <Loading /> : <Icons.CHECK />}
                                 {!mode ? "Save" : "Update"}
                             </button>
                             <button className='reset-bill-btn' onClick={clearData}>

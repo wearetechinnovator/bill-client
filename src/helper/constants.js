@@ -30,4 +30,6 @@ export const Constants = {
     CURRENTFISCAL: 'currentfiscal',
     LASTFISCAL: 'lastfiscal',
     CUSTOM: 'custom',
+    GOODS: 'goods',
+    SERVICE: 'service'
 }

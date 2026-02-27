@@ -14,13 +14,15 @@ import AddItemModal from '../../components/AddItemModal';
 import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
+import Loading from '../../components/Loading';
 
 
 
 
 const CreditNote = ({ mode }) => {
 	const toast = useMyToaster();
-	const { id } = useParams()
+	const { id } = useParams();
+	const [loading, setLoading] = useState(false);
 	const getBillPrefix = useBillPrefix("creditnote");
 	const { getApiData } = useApi();
 	const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
@@ -64,8 +66,6 @@ const CreditNote = ({ mode }) => {
 	// Sales Invoices for Credit Note;
 	const [salesInvoice, setSalesInvoice] = useState([]);
 
-
-
 	// store label and value pair for dropdown
 	const [itemData, setItemData] = useState([])
 	const [taxData, setTaxData] = useState([]);
@@ -75,6 +75,9 @@ const CreditNote = ({ mode }) => {
 		onItemChange, addItem, deleteItem, changeDiscountType,
 		calculateFinalAmount
 	} = useFormHandle();
+
+
+
 
 
 	// Get data for update mode
@@ -345,6 +348,7 @@ const CreditNote = ({ mode }) => {
 		setItemRows([...ItemRows]);
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/creditnote/add";
 			const token = Cookies.get("token");
 
@@ -353,7 +357,9 @@ const CreditNote = ({ mode }) => {
 				headers: {
 					"Content-Type": "application/json"
 				},
-				body: JSON.stringify(!mode || mode !== "edit" ? { ...formData, token } : { ...formData, token, update: true, id: id })
+				body: JSON.stringify(!mode || mode !== "edit" ?
+					{ ...formData, token } :
+					{ ...formData, token, update: true, id: id })
 			})
 			const res = await req.json();
 			if (req.status !== 200 || res.err) {
@@ -368,12 +374,12 @@ const CreditNote = ({ mode }) => {
 
 			toast('Credit Note add successfully', 'success');
 			navigate('/admin/credit-note');
-			return
-
+			return;
 
 		} catch (error) {
-			console.log(error);
 			return toast('Something went wrong', 'error')
+		} finally {
+			setLoading(false);
 		}
 
 	}
@@ -907,13 +913,13 @@ const CreditNote = ({ mode }) => {
 								/>
 							</div>
 						</div>
-					</div>
-					{/* Content Body Main Close */}
+					</div>{/* Content Body Main Close */}
+					
 					<div className='form-btn-bar'>
 						<button
-							onClick={saveBill}
+							onClick={loading ? null : saveBill}
 							className='add-bill-btn'>
-							<Icons.CHECK />
+							{loading ? <Loading /> : <Icons.CHECK />}
 							{!mode || mode === "convert" ? "Save" : "Update"}
 						</button>
 						<button className='reset-bill-btn' onClick={clearForm}>
@@ -921,8 +927,7 @@ const CreditNote = ({ mode }) => {
 							Reset
 						</button>
 					</div>
-				</div>
-				{/* Content Body Close */}
+				</div>{/* Content Body Close */}
 			</main>
 		</>
 	)

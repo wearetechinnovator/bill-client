@@ -8,6 +8,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useApi from '../../hooks/useApi';
 import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
+import { Constants } from '../../helper/constants';
+import Loading from '../../components/Loading'
 
 
 
@@ -29,7 +31,7 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 	const toast = useMyToaster();
 	const { getApiData } = useApi()
 	const [form, setForm] = useState({
-		title: '', type: 'goods', salePrice: '', category: '', details: '', hsn: '', tax: '',
+		title: '', type: Constants.GOODS, salePrice: '', category: '', details: '', hsn: '', tax: '',
 		purchasePrice: '', purchaseTaxType: '1', saleTaxType: '1', itemCode: '' //Barcode Number
 	})
 	const { id } = useParams();
@@ -42,6 +44,7 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 	}
 	const [unitRow, setUnitRow] = useState([unitRowSet]);
 	const navigate = useNavigate();
+	const [loading, setLoading] = useState(false);
 
 
 
@@ -107,6 +110,7 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 		}
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/item/add";
 			const token = Cookies.get("token");
 			const req = await fetch(url, {
@@ -141,8 +145,9 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 			}
 
 		} catch (error) {
-			console.log(error);
 			return toast("Something went wrong", "error")
+		} finally {
+			setLoading(false);
 		}
 
 	}
@@ -150,19 +155,12 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 
 	const clearData = () => {
 		setForm({
-			title: '', type: '', salePrice: '', category: '', details: '', hsn: ''
+			title: '', type: Constants.GOODS, salePrice: '', category: '', details: '', hsn: '', tax: '',
+			purchasePrice: '', purchaseTaxType: '1', saleTaxType: '1', itemCode: '' //Barcode Number
 		})
 		setUnitRow([unitRowSet]);
 	}
 
-
-	const categoryChange = (v) => {
-		fullCategory.forEach((c, _) => {
-			if (c._id === v) {
-				setForm({ ...form, hsn: c.hsn, category: v, tax: c.tax._id })
-			}
-		})
-	}
 
 	return (
 		<div className='content__body__main bg-white'>
@@ -172,7 +170,8 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 						<p className='mb-1'>Item Name <span className='required__text'>*</span></p>
 						<input type='text'
 							onChange={(e) => setForm({ ...form, title: e.target.value })}
-							value={form.title} />
+							value={form.title}
+						/>
 					</div>
 
 					<div className='w-full flex-col md:flex-row flex items-center gap-2 mt-3'>
@@ -184,8 +183,9 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 						</div>
 						<div className='w-full mt-[20px]'>
 							<select
-								value="1"
-								onChange={(e) => setForm({ ...form, saleTaxType: e.target.value })}>
+								value={form.saleTaxType}
+								onChange={(e) => setForm({ ...form, saleTaxType: e.target.value })}
+							>
 								<option value={"1"}>With Tax</option>
 								<option value={"0"}>Without Tax</option>
 							</select>
@@ -208,8 +208,8 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 							<p className='mb-1 ml-1'>Item Type</p>
 							<select onChange={(e) => setForm({ ...form, type: e.target.value })} value={form.type}>
 								<option value={""}>Select</option>
-								<option value={"goods"}>Goods</option>
-								<option value={"service"}>Service</option>
+								<option value={Constants.GOODS}>Goods</option>
+								<option value={Constants.SERVICE}>Service</option>
 							</select>
 						</div>
 						<div className='w-full'>
@@ -234,7 +234,7 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 						</div>
 						<div className='w-full mt-[28px]'>
 							<select
-								value="1"
+								value={form.purchaseTaxType}
 								onChange={(e) => setForm({ ...form, purchaseTaxType: e.target.value })}>
 								<option value={"1"}>With Tax</option>
 								<option value={"0"}>Without Tax</option>
@@ -320,6 +320,7 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 										<Icons.DELETE
 											className='cursor-pointer text-[16px]'
 											onClick={() => {
+												if (i === 0) return;
 												if (unitRow.length === 1) return;
 												const newUnitRow = [...unitRow];
 												newUnitRow.splice(i, 1);
@@ -337,7 +338,7 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 								<button
 									className='w-full p-[5px] font-bold bg-gray-200 text-gray-800 flex justify-center items-center active:bg-gray-300 rounded'
 									onClick={() => setUnitRow([...unitRow, unitRowSet])}>
-									<Icons.ADD_LIST />  Add
+									<Icons.ADD_LIST /> Add
 								</button>
 							</td>
 						</tr>
@@ -345,11 +346,11 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 				</table>
 			</div>
 			<div className='flex gap-4 justify-center mt-3'>
-				<button onClick={saveData} className='add-bill-btn'>
-					<Icons.CHECK />
+				<button onClick={loading ? null : saveData} className='add-bill-btn'>
+					{loading ? <Loading /> : <Icons.CHECK />}
 					{mode ? "Update" : "Save"}
 				</button>
-				<button className='reset-bill-btn' onClick={clearData}>
+				<button onClick={clearData} className='reset-bill-btn'>
 					<Icons.RESET />
 					Reset
 				</button>

@@ -15,13 +15,15 @@ import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
+import Loading from '../../components/Loading';
 
 
 
 
 const DeliveryChalan = ({ mode }) => {
 	const toast = useMyToaster();
-	const { id } = useParams()
+	const { id } = useParams();
+	const [loading, setLoading] = useState(false);
 	const getBillPrefix = useBillPrefix("deliverychalan");
 	const { getApiData } = useApi();
 	const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
@@ -309,6 +311,7 @@ const DeliveryChalan = ({ mode }) => {
 		setItemRows([...ItemRows]);
 
 		try {
+			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/deliverychalan/add";
 			const token = Cookies.get("token");
 
@@ -336,9 +339,11 @@ const DeliveryChalan = ({ mode }) => {
 			toast('Delivery chalan add successfully', 'success');
 			navigate("/admin/delivery-chalan");
 			return;
+
 		} catch (error) {
-			console.log(error);
 			return toast('Something went wrong', 'error')
+		} finally {
+			setLoading(false);
 		}
 
 	}
@@ -903,13 +908,14 @@ const DeliveryChalan = ({ mode }) => {
 								/>
 							</div>
 						</div>
-					</div>
-					{/* Content Body Main Close */}
+					</div>{/* Content Body Main Close */}
+
 					<div className='form-btn-bar'>
 						<button
-							onClick={saveBill}
-							className='add-bill-btn'>
-							<Icons.CHECK />
+							onClick={loading ? null : saveBill}
+							className='add-bill-btn'
+						>
+							{loading ? <Loading /> : <Icons.CHECK />}
 							{!mode ? "Save" : "Update"}
 						</button>
 						<button className='reset-bill-btn' onClick={clearForm}>
@@ -917,8 +923,7 @@ const DeliveryChalan = ({ mode }) => {
 							Reset
 						</button>
 					</div>
-				</div>
-				{/* Content Body Close */}
+				</div>{/* Content Body Close */}
 			</main>
 		</>
 	)
