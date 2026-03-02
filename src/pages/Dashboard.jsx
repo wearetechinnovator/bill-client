@@ -75,10 +75,11 @@ const Dashboard = () => {
 				}).then(res => res.json()),
 			]);
 
-			setCashInAmount(cashIn[0].totalCashIn);
-			setCashOutAmount(cashOut[0].totalCashOut)
+			setCashInAmount(cashIn[0]?.totalCashIn || 0);
+			setCashOutAmount(cashOut[0]?.totalCashOut || 0)
 
 		} catch (err) {
+			console.log(err);
 			return toast("Something went wrong", "error")
 		}
 	}
@@ -95,8 +96,9 @@ const Dashboard = () => {
 			});
 			const res = await req.json();
 			if (req.status !== 200) return toast(res.err, "error");
-			setTotalSaleAmount(res[0].totalAmount)
+			setTotalSaleAmount(res[0]?.totalAmount || 0)
 		} catch (err) {
+			console.log(err);
 			return toast("Something went wrong", "error")
 		}
 	}
@@ -113,8 +115,9 @@ const Dashboard = () => {
 			});
 			const res = await req.json();
 			if (req.status !== 200) return toast(res.err, "error");
-			setTotalPurchaseAmount(res[0].totalAmount)
+			setTotalPurchaseAmount(res[0]?.totalAmount || 0)
 		} catch (err) {
+			console.log(err);
 			return toast("Something went wrong", "error")
 		}
 	}
