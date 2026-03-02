@@ -11,7 +11,6 @@ import useExportTable from '../../hooks/useExportTable';
 import downloadPdf from '../../helper/downloadPdf';
 import Cookies from 'js-cookie';
 import useMyToaster from '../../hooks/useMyToaster';
-import { GrFormNext, GrFormPrevious } from 'react-icons/gr';
 import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
 import { IoIosAdd, IoMdMore } from 'react-icons/io';
@@ -45,11 +44,10 @@ const Tax = ({ mode }) => {
 
 	// Get data;
 	useEffect(() => {
-		const getParty = async () => {
+		const get = async () => {
 			try {
 				const data = {
 					token: Cookies.get("token"),
-					trash: tableStatusData === "trash" ? true : false,
 					all: tableStatusData === "all" ? true : false
 				}
 				const url = process.env.REACT_APP_API_URL + `/tax/get?page=${activePage}&limit=${dataLimit}`;
@@ -69,7 +67,7 @@ const Tax = ({ mode }) => {
 				console.log(error)
 			}
 		}
-		getParty();
+		get();
 	}, [tableStatusData, dataLimit, activePage])
 
 	const searchTable = (e) => {
@@ -217,9 +215,7 @@ const Tax = ({ mode }) => {
 				<div className='content__body'>
 					{/* top section */}
 					<div
-						className={`mb-5 w-full bg-white rounded p-4 shadow-sm add_new_compnent overflow-hidden
-            transition-all
-          `}>
+						className="add_new_compnent">
 						<div className='flex justify-between items-center'>
 							<div className='flex flex-col'>
 								<select value={dataLimit} onChange={(e) => setDataLimit(e.target.value)}>
@@ -280,20 +276,18 @@ const Tax = ({ mode }) => {
 								</div>
 							</div>
 						</div>
-
-						<div id='itemFilter'>
-						</div>
 					</div>
 					{
 						!loading ? taxData.length > 0 ? <div className='content__body__main'>
-
-							{/* Table start */}
 							<div className='overflow-x-auto list__table'>
 								<table className='min-w-full bg-white' id='listOfTax' ref={tableRef}>
 									<thead className='list__table__head'>
 										<tr>
 											<th className='py-2 px-4 border-b w-[50px]'>
-												<input type='checkbox' onChange={selectAll} checked={taxData.length > 0 && selected.length === taxData.length} />
+												<input type='checkbox'
+													onChange={selectAll}
+													checked={taxData.length > 0 && selected.length === taxData.length}
+												/>
 											</th>
 											<th className='py-2 px-4 border-b' >Title</th>
 											<th className='py-2 px-4 border-b w-[70px]'>Action</th>
@@ -303,8 +297,11 @@ const Tax = ({ mode }) => {
 										{
 											taxData.map((data, i) => {
 												return <tr key={i}>
-													<td className='py-2 px-4 border-b max-w-[10px]'>
-														<input type='checkbox' checked={selected.includes(data._id)} onChange={() => handleCheckboxChange(data._id)} />
+													<td className='py-2 px-4 border-b max-w-[10px]' align='center'>
+														<input type='checkbox'
+															checked={selected.includes(data._id)}
+															onChange={() => handleCheckboxChange(data._id)}
+														/>
 													</td>
 													<td className='px-4 border-b' align='center'>{data.title}</td>
 

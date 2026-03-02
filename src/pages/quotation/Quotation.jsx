@@ -398,7 +398,7 @@ const Quotation = () => {
                                                     Date {ascending ? <Icons.DROPDOWN /> : <Icons.DROPUP />}
                                                 </div>
                                             </th>
-                                            <th align='left'>Quotation / Estimate Number</th>
+                                            <th align='left' className='w-[18%]'>Quotation / Estimate Number</th>
                                             <th align='left'>Party Name</th>
                                             <th align='left'>Valid To</th>
                                             <th align='left'>Status</th>

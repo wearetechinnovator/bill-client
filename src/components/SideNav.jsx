@@ -10,19 +10,43 @@ import { Icons } from '../helper/icons.js'
 
 const salesPath = [
   "/admin/quotation-estimate",
+  "/admin/quotation-estimate/add",
+  "/admin/quotation-estimate/edit",
   "/admin/proforma-invoice",
+  "/admin/proforma-invoice/add",
+  "/admin/proforma-invoice/edit",
   "/admin/sales-invoice",
+  "/admin/sales-invoice/add",
+  "/admin/sales-invoice/edit",
   "/admin/sales-return",
+  "/admin/sales-return/add",
+  "/admin/sales-return/edit",
   "/admin/payment-in",
+  "/admin/payment-in/add",
+  "/admin/payment-in/edit",
   "/admin/credit-note",
+  "/admin/credit-note/add",
+  "/admin/credit-note/edit",
   "/admin/delivery-chalan",
+  "/admin/delivery-chalan/add",
+  "/admin/delivery-chalan/edit",
 ];
 const purshasePath = [
   "/admin/purchase-order",
+  "/admin/purchase-order/add",
+  "/admin/purchase-order/edit",
   "/admin/purchase-invoice",
+  "/admin/purchase-invoice/add",
+  "/admin/purchase-invoice/edit",
   "/admin/purchase-return",
+  "/admin/purchase-return/add",
+  "/admin/purchase-return/edit",
   "/admin/payment-out",
+  "/admin/payment-out/add",
+  "/admin/payment-out/edit",
   "/admin/debit-note",
+  "/admin/debit-note/add",
+  "/admin/debit-note/edit",
 ]
 const links = {
   "main": [

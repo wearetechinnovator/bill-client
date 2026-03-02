@@ -175,7 +175,7 @@ const PartyComponent = ({ mode, save, getRes }) => {
 					</div>
 
 					<div>
-						<p className='mb-1'>Billing Address</p>
+						<p className='mb-1'>Billing Address <span className='required__text'>*</span></p>
 						<textarea rows={3}
 							className='resize-none'
 							value={partyData.billingAddress}

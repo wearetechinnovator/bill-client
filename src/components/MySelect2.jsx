@@ -227,7 +227,6 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 								>
 									{(d.title || d.name) || d}
 								</li>
-
 							})
 						}
 					</ul>

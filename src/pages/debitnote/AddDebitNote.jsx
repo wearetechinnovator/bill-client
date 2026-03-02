@@ -385,7 +385,7 @@ const DebitNote = ({ mode }) => {
 		setItemRows([itemRowSet]);
 		setAdditionalRow([additionalRowSet])
 		setFormData({
-			party: '', debitNoteNumber: getBillPrefix, debitNoteDate: '', items: ItemRows,
+			party: '', debitNoteNumber: '', debitNoteDate: '', items: ItemRows,
 			additionalCharge: additionalRows, note: '', terms: '',
 			discountType: '', discountAmount: '', discountPercentage: ''
 		});
@@ -412,35 +412,9 @@ const DebitNote = ({ mode }) => {
 				<div className='content__body'>
 					<div className='content__body__main bg-white' id='addQuotationTable'>
 
-						{/* <div className='top__btn__grp'>
-							<div className='extra__btns'>
-								{mode === "edit" && <button onClick={() => {
-									swal({
-										title: "Are you sure?",
-										icon: "warning",
-										buttons: true,
-									})
-										.then((cnv) => {
-											if (cnv) {
-												swal("Invoice successfully duplicate", {
-													icon: "success",
-												});
-												navigate(`/admin/debit-note/add/${id}`)
-											}
-										});
-								}}><Icons.COPY />Duplicate invoice</button>}
-								<button onClick={saveBill}><Icons.CHECK />{mode ? "Update" : "Save"}</button>
-							</div>
-						</div> */}
-
 						<div className='flex flex-col lg:flex-row items-center justify-around gap-4'>
 							<div className='flex flex-col gap-2 w-full lg:max-w-[450px]'>
 								<p className='text-xs'>Select Party <span className='required__text'>*</span></p>
-								{/* <SelectPicker
-                  onChange={(data) => setFormData({ ...formData, party: data })}
-                  data={party}
-                  value={formData.party?._id}
-                /> */}
 								<MySelect2
 									model={"party"}
 									partyType={"supplier"}
@@ -459,7 +433,7 @@ const DebitNote = ({ mode }) => {
 											value: inv.purchaseInvoiceNumber
 										}
 									})}
-
+									searchable={false}
 									onChange={(v) => {
 										if (!v) {
 											setItemRows([itemRowSet]);

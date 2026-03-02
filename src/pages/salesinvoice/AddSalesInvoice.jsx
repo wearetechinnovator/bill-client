@@ -527,7 +527,7 @@ const SalesInvoice = ({ mode }) => {
 											<td>
 												<div className='flex flex-col gap-1'>
 													<MySelect2
-														model={"item"}
+														model={Constants.ITEM}
 														onType={(v) => {
 															if (v === ItemRows[index].itemId) return;
 															onItemChange(v, index, tax, ItemRows, setItemRows, setItems)
@@ -1048,7 +1048,7 @@ const SalesInvoice = ({ mode }) => {
 							{loading ? <Loading /> : <Icons.CHECK />}
 							{!mode || mode === "convert" ? "Save" : "Update"}
 						</button>
-						{
+						{/* {
 							!mode && (
 								<button
 									onClick={loading ? null : () => saveBill({ isNew: true })}
@@ -1058,7 +1058,7 @@ const SalesInvoice = ({ mode }) => {
 									Save and New
 								</button>
 							)
-						}
+						} */}
 						<button className='reset-bill-btn' onClick={clearForm}>
 							<Icons.RESET />
 							Reset

@@ -11,6 +11,7 @@ export const Constants = {
     TOTAL_SALE: 'total_sale',
     CUSTOMER: 'customer',
     PARTY: 'party',
+    ITEM: 'item',
     PAY: 'pay',
     COLLECT: 'collect',
     CUSTOMER: 'customer',
