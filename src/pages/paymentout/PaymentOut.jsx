@@ -24,6 +24,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import { Icons } from '../../helper/icons';
+import PrintPaymentOutModal from '../../components/PrintPaymentOutModal';
 
 
 
@@ -57,6 +58,9 @@ const PaymentOut = () => {
 	})
 	const [applyFilter, setApplyFilter] = useState(null);
 	const [isCustomDate, setIsCustomDate] = useState(false);
+	const [printModalOpen, setPrintModalOpen] = useState(false);
+	const [printPaymentId, setPrintPaymentId] = useState(null);
+
 
 
 	// Get data;
@@ -217,6 +221,14 @@ const PaymentOut = () => {
 			<main id='main'>
 				<SideNav />
 				<Tooltip id='payOutTooltip' />
+				<PrintPaymentOutModal
+					paymentId={printPaymentId}
+					open={printModalOpen}
+					onClose={() => {
+						setPrintModalOpen(false);
+						setPrintPaymentId(null);
+					}}
+				/>
 				<ConfirmModal
 					openConfirm={openConfirm}
 					openStatus={(status) => { setOpenConfirm(status) }}
@@ -442,6 +454,16 @@ const PaymentOut = () => {
 																>
 																	<FaRegEdit className='text-[16px]' />
 																	Edit
+																</div>
+																<div
+																	className='table__list__action__icon'
+																	onClick={() => {
+																		setPrintPaymentId(data._id);
+																		setPrintModalOpen(true);
+																	}}
+																>
+																	<Icons.PRINTER className='text-[16px]' />
+																	Print Bill
 																</div>
 															</Popover>}
 														>

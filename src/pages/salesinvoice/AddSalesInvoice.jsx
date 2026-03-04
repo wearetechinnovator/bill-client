@@ -24,7 +24,7 @@ const SalesInvoice = ({ mode }) => {
 	const token = Cookies.get("token");
 	const toast = useMyToaster();
 	const { id } = useParams()
-    const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const getBillPrefix = useBillPrefix("invoice");
 	const { getApiData } = useApi();
 	const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
@@ -282,7 +282,7 @@ const SalesInvoice = ({ mode }) => {
 			...prevData,
 			finalAmount
 		}));
-	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType]);
+	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType, formData.discountAmount, formData.discountType]);
 
 
 
@@ -427,7 +427,7 @@ const SalesInvoice = ({ mode }) => {
 			return;
 		} catch (error) {
 			return toast('Something went wrong', 'error')
-		}finally{
+		} finally {
 			setLoading(false);
 		}
 

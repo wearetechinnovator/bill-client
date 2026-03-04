@@ -16,6 +16,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 import Pagination from '../../components/Pagination';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
+import PrintPaymentInModal from '../../components/PrintPaymentInModal';
 
 
 
@@ -47,6 +48,8 @@ const PaymentIn = () => {
     })
     const [applyFilter, setApplyFilter] = useState(null);
     const [isCustomDate, setIsCustomDate] = useState(false);
+    const [printModalOpen, setPrintModalOpen] = useState(false);
+    const [printPaymentId, setPrintPaymentId] = useState(null);
 
 
 
@@ -68,7 +71,7 @@ const PaymentIn = () => {
                     billNo: filter.billNo,
                 }
             }
-            
+
             try {
                 const url = process.env.REACT_APP_API_URL + `/paymentin/get?page=${activePage}&limit=${dataLimit}`;
                 const req = await fetch(url, {
@@ -196,12 +199,12 @@ const PaymentIn = () => {
     }
 
 
-   const clearFilterData = () => {
-		setFilter({
-			startDate: '', endDate: '', billNo: '', party: '',
-		})
-		setApplyFilter(false);
-	}
+    const clearFilterData = () => {
+        setFilter({
+            startDate: '', endDate: '', billNo: '', party: '',
+        })
+        setApplyFilter(false);
+    }
 
 
     return (
@@ -210,6 +213,14 @@ const PaymentIn = () => {
             <main id='main'>
                 <SideNav />
                 <Tooltip id='payInTooltip' />
+                <PrintPaymentInModal
+                    paymentId={printPaymentId}
+                    open={printModalOpen}
+                    onClose={() => {
+                        setPrintModalOpen(false);
+                        setPrintPaymentId(null);
+                    }}
+                />
                 <ConfirmModal
                     openConfirm={openConfirm}
                     openStatus={(status) => { setOpenConfirm(status) }}
@@ -435,15 +446,17 @@ const PaymentIn = () => {
                                                                         <Icons.EDIT className='text-[16px]' />
                                                                         Edit
                                                                     </div>
-                                                                    {/* <div
-                                                                    className='table__list__action__icon'
-                                                                    onClick={() => {
-                                                                        setOpenConfirm(true)
-                                                                    }}
-                                                                >
-                                                                    <Icons.DELETE className='text-[16px]' />
-                                                                    Delete
-                                                                </div> */}
+                                                                    
+                                                                    <div
+                                                                        className='table__list__action__icon'
+                                                                        onClick={() => {
+                                                                            setPrintPaymentId(data._id);
+                                                                            setPrintModalOpen(true);
+                                                                        }}
+                                                                    >
+                                                                        <Icons.PRINTER className='text-[16px]' />
+                                                                        Print Bill
+                                                                    </div>
                                                                 </Popover>}
                                                         >
                                                             <div className='table__list__action' >

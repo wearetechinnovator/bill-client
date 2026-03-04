@@ -136,7 +136,7 @@ const AddPayment = ({ mode }) => {
 				headers: {
 					"Content-Type": 'application/json'
 				},
-				body: JSON.stringify({ partyId: formData.party, token })
+				body: JSON.stringify({ partyId: formData.party._id ?? formData.party, token })
 			});
 			const res = await req.json();
 			if (req.status !== 200) {

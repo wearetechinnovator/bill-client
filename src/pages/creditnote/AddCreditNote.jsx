@@ -269,7 +269,7 @@ const CreditNote = ({ mode }) => {
 			...prevData,
 			finalAmount
 		}));
-	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType]);
+	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType, formData.discountAmount, formData.discountType]);
 
 
 	// Return Sub-Total

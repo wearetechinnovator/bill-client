@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { SelectPicker, DatePicker, Button } from 'rsuite';
+import { SelectPicker, Button } from 'rsuite';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
 import useMyToaster from '../../hooks/useMyToaster';
@@ -8,7 +8,6 @@ import useBillPrefix from '../../hooks/useBillPrefix';
 import Cookies from 'js-cookie';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import swal from 'sweetalert';
 import AddPartyModal from '../../components/AddPartyModal';
 import AddItemModal from '../../components/AddItemModal';
 import MySelect2 from '../../components/MySelect2';
@@ -237,7 +236,7 @@ const DeliveryChalan = ({ mode }) => {
 			...prevData,
 			finalAmount
 		}));
-	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType]);
+	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType, formData.discountAmount, formData.discountType]);
 
 
 	// Return Sub-Total

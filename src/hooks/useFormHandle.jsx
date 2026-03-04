@@ -147,7 +147,7 @@ const useFormHandle = () => {
             total = Number(subTotal()('amount'));
         }
         else if (formData.discountType === "after") {
-            total = (subTotal()('amount') - formData.discountAmount).toFixed(2);
+            total = Number((subTotal()('amount') - formData.discountAmount).toFixed(2));
         }
 
         // return !isNaN(totalParticular) ? (totalParticular) + total).toFixed(2) : total;
