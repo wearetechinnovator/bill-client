@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import AddPartyModal from './AddPartyModal';
 import { FaArrowRight } from "react-icons/fa6";
 import { Drawer } from 'rsuite';
-import { PartyComponent } from '../pages/party/AddParty';
+import { PartyComponent } from '../pages/Party/AddParty';
 import { AddItemComponent } from '../pages/Items/ItemAdd';
 import { CategoryComponent } from '../pages/Item/CategoryAdd';
 import { toggle } from '../store/partyModalSlice';

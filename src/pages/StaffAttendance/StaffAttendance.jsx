@@ -13,7 +13,6 @@ import useExportTable from '../../hooks/useExportTable';
 import useMyToaster from '../../hooks/useMyToaster';
 import Cookies from 'js-cookie';
 import downloadPdf from '../../helper/downloadPdf';
-import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
 import { IoIosAdd, IoMdMore } from 'react-icons/io';
 import AddNew from '../../components/AddNew';
@@ -21,16 +20,18 @@ import { Icons } from '../../helper/icons';
 import AttendanceSettingModal from '../../components/AttendanceSettingModal';
 import AttendanceOverTime from '../../components/AttendanceOverTimeModal';
 import ConfirmModal from '../../components/ConfirmModal';
+import AttendanceShimmer from '../../components/AttendanceShimmer';
+import { Constants } from '../../helper/constants';
 
 
 
-document.title = "Staff Attendance"
+
 const StaffAttendance = () => {
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
     const [activePage, setActivePage] = useState(1);
     const [dataLimit, setDataLimit] = useState(10);
-    const [totalData, setTotalData] = useState()
+    const [totalData, setTotalData] = useState();
     const [selected, setSelected] = useState([]);
     const navigate = useNavigate();
     const [data, setdata] = useState([]);
@@ -68,9 +69,9 @@ const StaffAttendance = () => {
     useEffect(() => {
         const get = async () => {
             try {
+                setLoading(true);
                 const data = {
                     token: Cookies.get("token"),
-                    trash: tableStatusData === "trash" ? true : false,
                     all: tableStatusData === "all" ? true : false
                 }
                 const url = process.env.REACT_APP_API_URL + `/staff/get?page=${activePage}&limit=${dataLimit}`;
@@ -395,7 +396,7 @@ const StaffAttendance = () => {
                 staffData={currentStaffData}
                 attendanceData={attendanceDataForModal}
                 sendData={(d) => {
-                    let allSheetData = [...attendanceSheet]
+                    let allSheetData = [...attendanceSheet];
 
                     let getStaffAttendanceSheet = allSheetData.find((a, _) => a.staffId === d.staffId);
                     allSheetData = allSheetData.filter((a, _) => a.staffId !== d.staffId);
@@ -497,27 +498,27 @@ const StaffAttendance = () => {
                         !loading ? data.length > 0 ? <div className='content__body__main'>
                             <div className='flex flex-col-reverse justify-between items-end'>
                                 <div className='w-full flex items-center justify-between gap-3 mt-4'>
-                                    <div className='shadow w-full rounded p-2 bg-[#E2FFED] border-[#4d4d4d] border'>
+                                    <div className='bg-[#E2FFED] top__details__card'>
                                         <p className='feat__card__text'>Present (P)</p>
                                         <span>{allTotalData.present}</span>
                                     </div>
-                                    <div className='shadow w-full rounded p-2 bg-[#FFFEEF] border-[#4d4d4d] border'>
+                                    <div className='bg-[#FFFEEF] top__details__card'>
                                         <p className='feat__card__text'>Absent (A)</p>
                                         <span>{allTotalData.absent}</span>
                                     </div>
-                                    <div className='shadow w-full rounded p-2 bg-[#FEF2FF] border-[#4d4d4d] border'>
+                                    <div className='bg-[#FEF2FF] top__details__card'>
                                         <p className='feat__card__text'>Half day (HD)</p>
                                         <span>{allTotalData.halfDay}</span>
                                     </div>
-                                    <div className='shadow w-full rounded p-2 bg-[#FFD9DA] border-[#4d4d4d] border'>
+                                    <div className='bg-[#FFD9DA] top__details__card'>
                                         <p className='feat__card__text'>Paid leave (PL)</p>
                                         <span>{allTotalData.paidLeave}</span>
                                     </div>
-                                    <div className='shadow w-full rounded p-2 bg-[#E3EAFF] border-[#4d4d4d] border'>
+                                    <div className='bg-[#E3EAFF] top__details__card'>
                                         <p className='feat__card__text'>Weekly off (WO)</p>
                                         <span>{allTotalData.weeklyOff}</span>
                                     </div>
-                                    <div className='shadow w-full rounded p-2 bg-[#E0F8FF] border-[#4d4d4d] border'>
+                                    <div className='bg-[#E0F8FF] top__details__card'>
                                         <p className='feat__card__text'>Over Time (OT)</p>
                                         <span>{allTotalData.overTime}</span>
                                     </div>
@@ -606,13 +607,13 @@ const StaffAttendance = () => {
                                                                             speaker={<Popover full>
                                                                                 <div
                                                                                     className='table__list__action__icon'
-                                                                                    onClick={() => handleAttendance(data, "0", "paid-leave")}
+                                                                                    onClick={() => handleAttendance(data, "0", Constants.PAID_LEAVE)}
                                                                                 >
                                                                                     Paid Leave
                                                                                 </div>
                                                                                 <div
                                                                                     className='table__list__action__icon'
-                                                                                    onClick={() => handleAttendance(data, "0", "week-off")}
+                                                                                    onClick={() => handleAttendance(data, "0", Constants.WEEK_OFF)}
                                                                                 >
                                                                                     Week Off
                                                                                 </div>
@@ -623,13 +624,13 @@ const StaffAttendance = () => {
                                                                             </div>
                                                                         </Whisper>
 
-                                                                        {userAttendanceData.attendanceType === "paid-leave" && (
+                                                                        {userAttendanceData.attendanceType === Constants.PAID_LEAVE && (
                                                                             <div className={`attendance__chip__btn red`}>
                                                                                 PL
                                                                             </div>
                                                                         )}
 
-                                                                        {userAttendanceData.attendanceType === "week-off" && (
+                                                                        {userAttendanceData.attendanceType === Constants.WEEK_OFF && (
                                                                             <div className={`attendance__chip__btn green`}>
                                                                                 WO
                                                                             </div>
@@ -647,7 +648,7 @@ const StaffAttendance = () => {
                                                                                 <div
                                                                                     className='table__list__action__icon'
                                                                                     onClick={async () => {
-                                                                                        await handleAttendance(data, "1", "half-day")
+                                                                                        await handleAttendance(data, "1", Constants.HALF_DAY)
                                                                                     }}
                                                                                 >
                                                                                     Half Day
@@ -655,7 +656,7 @@ const StaffAttendance = () => {
                                                                                 <div
                                                                                     className='table__list__action__icon'
                                                                                     onClick={async () => {
-                                                                                        await handleAttendance(data, "1", "over-time");
+                                                                                        await handleAttendance(data, "1", Constants.OVER_TIME);
                                                                                         setOverTimeModal(true);
 
                                                                                         //Modal a data deyar jonno rakha holo
@@ -672,13 +673,13 @@ const StaffAttendance = () => {
                                                                             </div>
                                                                         </Whisper>
 
-                                                                        {userAttendanceData.attendanceType === "half-day" && (
+                                                                        {userAttendanceData.attendanceType === Constants.HALF_DAY && (
                                                                             <div className={`attendance__chip__btn yellow`}>
                                                                                 HD
                                                                             </div>
                                                                         )}
 
-                                                                        {userAttendanceData.attendanceType === "over-time" && (
+                                                                        {userAttendanceData.attendanceType === Constants.OVER_TIME && (
                                                                             <div
                                                                                 onClick={() => {
                                                                                     setOverTimeModal(true);
@@ -729,7 +730,7 @@ const StaffAttendance = () => {
                             </div>
                         </div>
                             : <AddNew title={"Staff"} link={"/admin/staff-attendance/add"} />
-                            : <DataShimmer />
+                            : <AttendanceShimmer/>
                     }
                 </div>
             </main>

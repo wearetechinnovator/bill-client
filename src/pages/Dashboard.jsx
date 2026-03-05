@@ -117,7 +117,6 @@ const Dashboard = () => {
 			if (req.status !== 200) return toast(res.err, "error");
 			setTotalPurchaseAmount(res[0]?.totalAmount || 0)
 		} catch (err) {
-			console.log(err);
 			return toast("Something went wrong", "error")
 		}
 	}

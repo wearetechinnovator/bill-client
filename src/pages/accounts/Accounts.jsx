@@ -334,13 +334,14 @@ const Account = () => {
 									</thead>
 									<tbody>
 										<tr>
-											<td className='py-2' align='center'>#</td>
+											<td className='py-2' align='center'><Icons.RUPES/></td>
 											<td>Cash</td>
 											<td>Cash Account</td>
 											<td>
 												<Icons.RUPES className='inline' />
 												{Number(balanceAmount?.cash).toFixed(2)}
 											</td>
+											<td></td>
 										</tr>
 										{
 											billData.map((data, i) => {

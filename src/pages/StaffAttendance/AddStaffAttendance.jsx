@@ -7,10 +7,12 @@ import Cookies from 'js-cookie';
 import { Icons } from '../../helper/icons';
 import { Tooltip, Whisper } from 'rsuite';
 import Loading from '../../components/Loading';
+import { checkNumber } from '../../helper/validation'
 
 
 const AddStaffAttendance = ({ mode }) => {
     const toast = useMyToaster();
+    const token = Cookies.get("token");
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState({
         staffName: "", mobileNumber: "", email: "", dob: "", joiningDate: "",
@@ -50,14 +52,19 @@ const AddStaffAttendance = ({ mode }) => {
 
 
     const saveData = async (e) => {
-        if (!data.staffName || !data.mobileNumber || !data.salary || !data.joiningDate) {
-            return toast("fill the required fields", "error")
-        }
+        if (!data.staffName)
+            return toast("staff name is required", "error");
+        else if (!data.mobileNumber)
+            return toast("Mobile number is required", "error");
+        else if (!data.salary)
+            return toast("Salary is required", "error");
+        else if (!data.joiningDate)
+            return toast("Joining date is required", "error");
+
 
         try {
             setLoading(true);
             const url = process.env.REACT_APP_API_URL + "/staff/add";
-            const token = Cookies.get("token");
             const req = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -76,7 +83,7 @@ const AddStaffAttendance = ({ mode }) => {
 
             toast(!mode ? "Staff create success" : "Staff update success", 'success');
             navigate('/admin/staff-attendance');
-            return
+            return;
 
         } catch (error) {
             return toast("Something went wrong", "error")
@@ -101,7 +108,7 @@ const AddStaffAttendance = ({ mode }) => {
             <main id='main'>
                 <SideNav />
                 <div className='content__body'>
-                    <div className='content__body__main bg-white '>
+                    <div className='content__body__main'>
                         <div className='w-full flex flex-col'>
                             <div className='w-full flex flex-col lg:flex-row'>
                                 <div className='w-full p-2'>
@@ -169,7 +176,7 @@ const AddStaffAttendance = ({ mode }) => {
                                         <span className='required__text'>*</span>
                                     </p>
                                     <input type='text'
-                                        onChange={(e) => setData({ ...data, salary: e.target.value })}
+                                        onChange={(e) => setData({ ...data, salary: checkNumber(e.target.value) })}
                                         value={data.salary}
                                     />
                                 </div>

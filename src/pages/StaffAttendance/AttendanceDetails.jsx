@@ -9,7 +9,10 @@ import AttendanceOverTime from '../../components/AttendanceOverTimeModal';
 import html2pdf from "html2pdf.js";
 import SalarySlip from './SalarySlip';
 import { useSelector } from 'react-redux';
-import { Popover, Whisper } from 'rsuite';
+import { Popover, SelectPicker, Whisper } from 'rsuite';
+import { Constants } from '../../helper/constants';
+import { getAdvanceFilterData } from '../../helper/advanceFilter';
+import StaffPaymentModal from '../../components/StaffPaymentModal';
 
 
 
@@ -38,6 +41,12 @@ const AttendanceDetails = () => {
     const [salarySlipAttendance, setSalarySlipAttendance] = useState({
         present: 0, absent: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0, overTime: 0
     })
+    const [applyFilter, setApplyFilter] = useState(null);
+    const [isCustomDate, setIsCustomDate] = useState(false);
+    const [filter, setFilter] = useState({
+        startDate: '', endDate: '', billNo: '', party: '',
+    })
+    const [paymentModal, setPaymentModal] = useState(false);
 
 
 
@@ -368,10 +377,16 @@ const AttendanceDetails = () => {
 
                 }}
             />
+            <StaffPaymentModal
+                openModal={paymentModal}
+                openStatus={() => {
+                    setPaymentModal(false);
+                }}
+            />
             <main id='main'>
                 <SideNav />
                 <div className='content__body'>
-                    <div className='content__body__main flex items-center justify-between'>
+                    <div className='content__body__main flex items-center justify-between mb-2'>
                         <div className='tab'>
                             <button
                                 className={`tab__btn ${tab === 0 ? 'active__tab__btn' : ''}`}
@@ -400,8 +415,11 @@ const AttendanceDetails = () => {
                         </div>
 
                         <div className='flex items-center gap-2'>
-                            <button className='bg-blue-500 text-white px-2 py-1 rounded border-blue-600 border'>
-                                <Icons.RUPES className='inline ml-1'/>
+                            <button
+                                onClick={() => setPaymentModal(true)}
+                                className='bg-blue-500 text-white px-2 py-1 rounded border-blue-600 border'
+                            >
+                                <Icons.RUPES className='inline ml-1' />
                                 Make Payment
                             </button>
                             <div className='relative'>
@@ -458,7 +476,9 @@ const AttendanceDetails = () => {
                         </div>
                     </div>
 
-                    <div className='content__body__main mt-3'>
+                    <div className='content__body__main mb-2'>
+                        {/* =========================[Attendance Tab]===================== */}
+                        {/* ============================================================= */}
                         {
                             tab === 0 && (
                                 <div className='w-full'>
@@ -468,27 +488,27 @@ const AttendanceDetails = () => {
                                     </p>
 
                                     <div className='w-full flex items-center justify-between gap-3 mt-2'>
-                                        <div className='shadow w-full rounded p-2 bg-[#E2FFED] border-[#4d4d4d] border'>
+                                        <div className='bg-[#E2FFED] top__details__card'>
                                             <p className='feat__card__text'>Present (P)</p>
                                             <span>{allTotalData.present}</span>
                                         </div>
-                                        <div className='shadow w-full rounded p-2 bg-[#FFFEEF] border-[#4d4d4d] border'>
+                                        <div className='bg-[#FFFEEF] top__details__card'>
                                             <p className='feat__card__text'>Absent (A)</p>
                                             <span>{allTotalData.absent}</span>
                                         </div>
-                                        <div className='shadow w-full rounded p-2 bg-[#FEF2FF] border-[#4d4d4d] border'>
+                                        <div className='bg-[#FEF2FF] top__details__card'>
                                             <p className='feat__card__text'>Half day (HD)</p>
                                             <span>{allTotalData.halfDay}</span>
                                         </div>
-                                        <div className='shadow w-full rounded p-2 bg-[#FFD9DA] border-[#4d4d4d] border'>
+                                        <div className='bg-[#FFD9DA] top__details__card'>
                                             <p className='feat__card__text'>Paid leave (PL)</p>
                                             <span>{allTotalData.paidLeave}</span>
                                         </div>
-                                        <div className='shadow w-full rounded p-2 bg-[#E3EAFF] border-[#4d4d4d] border'>
+                                        <div className='bg-[#E3EAFF] top__details__card'>
                                             <p className='feat__card__text'>Weekly off (WO)</p>
                                             <span>{allTotalData.weeklyOff}</span>
                                         </div>
-                                        <div className='shadow w-full rounded p-2 bg-[#E0F8FF] border-[#4d4d4d] border'>
+                                        <div className='bg-[#E0F8FF] top__details__card'>
                                             <p className='feat__card__text'>Over Time (OT)</p>
                                             <span>{allTotalData.overTime}</span>
                                         </div>
@@ -622,6 +642,8 @@ const AttendanceDetails = () => {
                             )
                         }
 
+                        {/* =======================[Staff Details Tab]===================*/}
+                        {/* ============================================================= */}
                         {
                             tab === 1 && (
                                 <div className='user__details__tab'>
@@ -671,6 +693,105 @@ const AttendanceDetails = () => {
                                                 </span>
                                             }
                                         </div>
+                                    </div>
+                                </div>
+                            )
+                        }
+
+                        {/* =======================[Transaction Tab]===================== */}
+                        {/* ============================================================= */}
+                        {
+                            tab === 3 && (
+                                <div className="">
+                                    <div className='w-full flex items-center gap-4'>
+                                        <div className='w-[200px]'>
+                                            <p>Search By</p>
+                                            <SelectPicker
+                                                searchable={false}
+                                                className='w-full'
+                                                menuMaxHeight={"250px"}
+                                                onChange={async (v) => {
+                                                    if (v === Constants.CUSTOM) {
+                                                        setIsCustomDate(true);
+                                                        return;
+                                                    }
+                                                    const { fromDate, toDate } = await getAdvanceFilterData(v);
+                                                    setFilter({ ...filter, startDate: fromDate, endDate: toDate })
+                                                    setIsCustomDate(false);
+                                                    setApplyFilter(false);
+                                                }}
+                                                data={[
+                                                    { label: "Today", value: Constants.TODAY },
+                                                    { label: "Yesterday", value: Constants.YESTERDAY },
+                                                    { label: "Last 7 Days", value: Constants.LAST7DAY },
+                                                    { label: "Last 30 Days", value: Constants.LAST30DAY },
+                                                    { label: "Last 365 Days", value: Constants.LAST365DAY },
+                                                    { label: "This Week", value: Constants.THISWEEK },
+                                                    { label: "Last Week", value: Constants.LASTWEEK },
+                                                    { label: "This Month", value: Constants.THISMONTH },
+                                                    { label: "Previous Month", value: Constants.PREVMONTH },
+                                                    { label: "This Quarter", value: Constants.THISQUARTER },
+                                                    { label: "Last Quarter", value: Constants.LASTQUARTER },
+                                                    { label: "Current Fiscal Year", value: Constants.CURRENTFISCAL },
+                                                    { label: "Last Fiscal Year", value: Constants.LASTFISCAL },
+                                                    { label: "Custom Date", value: Constants.CUSTOM }
+                                                ]}
+                                            />
+                                        </div>
+                                        {
+                                            isCustomDate && (
+                                                <>
+                                                    <div className='w-[200px]'>
+                                                        <p>Start Date</p>
+                                                        <input type="date"
+                                                            value={filter.startDate}
+                                                            onChange={(e) => setFilter({ ...filter, startDate: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className='w-[200px]'>
+                                                        <p>End Date</p>
+                                                        <input type="date"
+                                                            value={filter.endDate}
+                                                            onChange={(e) => setFilter({ ...filter, endDate: e.target.value })}
+                                                        />
+                                                    </div>
+                                                </>
+                                            )
+                                        }
+                                        <div className='w-[200px]'>
+                                            <p>Types</p>
+                                            <SelectPicker
+                                                searchable={false}
+                                                className='w-full'
+                                                data={[
+                                                    { label: "Salary", value: "salary" },
+                                                    { label: "Bonus", value: "bonus" },
+                                                    { label: "Advance Payment", value: "advance_payment" }
+                                                ]}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className='overflow-x-auto list__table mt-5'>
+                                        <table className='min-w-full'>
+                                            <thead className='list__table__head without__checkbox'>
+                                                <tr>
+                                                    <th align='left' className='py-2'>Date of Payment</th>
+                                                    <th align='left' className='w-[200px]'>Payment Type</th>
+                                                    <th align='left' className='w-[200px]'>Amount</th>
+                                                    <th align='left'>Remarks</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td className='py-2'>2026-03-05</td>
+                                                    <td>Salary</td>
+                                                    <td>₹2,000</td>
+                                                    <td>test test</td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             )

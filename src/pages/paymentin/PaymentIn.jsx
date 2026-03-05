@@ -34,7 +34,7 @@ const PaymentIn = () => {
     const [tableStatusData, setTableStatusData] = useState('active');
     const exportData = useMemo(() => {
         return billData && billData.map(({ paymentInDate, paymentInNumber, party }) => ({
-            "Payment In Date": paymentInDate,
+            "Payment In Date": paymentInDate.split("T")[0],
             "Payment In Number": paymentInNumber,
             "Party": party.name,
         }));

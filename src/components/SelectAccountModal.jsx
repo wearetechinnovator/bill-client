@@ -6,7 +6,6 @@ import Cookies from 'js-cookie';
 const SelectAccountModal = ({ openModal, openStatus, getAccountDetails }) => {
     const token = Cookies.get('token');
     const toast = useMyToaster();
-    const [activeBox, setActiveBox] = useState(null);
     const [open, setOpen] = useState(false);
     const [accounts, setAccounts] = useState([]);
     const [selectedAccount, setSelectedAccount] = useState(null);
@@ -34,7 +33,6 @@ const SelectAccountModal = ({ openModal, openStatus, getAccountDetails }) => {
                 if (req.status !== 200) {
                     return toast(res.err, 'error');
                 }
-                console.log("modal", res.data)
                 setAccounts(res.data);
 
             } catch (err) {
@@ -48,7 +46,6 @@ const SelectAccountModal = ({ openModal, openStatus, getAccountDetails }) => {
         <Modal size='sm' backdrop='static' open={open} onClose={() => {
             openStatus(false);
             setOpen(false);
-            setActiveBox(null);
         }}>
             <Modal.Header className='border-b pb-2'>
                 <Modal.Title>
@@ -59,9 +56,8 @@ const SelectAccountModal = ({ openModal, openStatus, getAccountDetails }) => {
                 {
                     accounts?.map((account, i) => {
                         return (
-                            <label key={i} className={`flex items-center justify-between text-xs border py-2 cursor-pointer mb-1 p-2 rounded ${activeBox === i ? 'border-blue-300 bg-blue-50' : 'border-gray-200'}`}
+                            <label key={i} className={`flex items-center justify-between text-xs border py-2 cursor-pointer mb-1 p-2 rounded ${selectedAccount?._id === account._id ? 'border-blue-300 bg-blue-50' : 'border-gray-200'}`}
                                 onClick={() => {
-                                    setActiveBox(i);
                                     setSelectedAccount(account);
                                 }}
                             >
@@ -74,7 +70,7 @@ const SelectAccountModal = ({ openModal, openStatus, getAccountDetails }) => {
                                         <p className='text-right'>₹{account.openingBalance || 0.00}</p>
                                         <p className='text-gray-500'>IFSC: {account.ifscCode}</p>
                                     </div>
-                                    <input type="radio" name='bank' id={`account-${i}`} />
+                                    <input type="radio" name='bank' id={`account-${i}`} defaultChecked={selectedAccount?._id === account._id ? true : false} />
                                 </div>
                             </label>
                         )
@@ -82,14 +78,14 @@ const SelectAccountModal = ({ openModal, openStatus, getAccountDetails }) => {
                 }
             </Modal.Body>
             <Modal.Footer>
-                <button 
-                onClick={()=>{
-                    getAccountDetails(selectedAccount);
-                    setOpen(false);
-                    openStatus(false);
-                    setActiveBox(null);
-                }}
-                className='float-end bg-blue-600 text-white rounded w-[120px] py-1 uppercase text-xs'>
+                <button
+                    onClick={() => {
+                        getAccountDetails(selectedAccount);
+                        setOpen(false);
+                        openStatus(false);
+                    }}
+                    className='float-end bg-blue-600 text-white rounded w-[120px] py-1 uppercase text-xs'
+                >
                     Save
                 </button>
             </Modal.Footer>

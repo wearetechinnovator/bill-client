@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { SelectPicker, DatePicker, Button } from 'rsuite';
+import { SelectPicker, Button } from 'rsuite';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
 import useMyToaster from '../../hooks/useMyToaster';
@@ -16,6 +16,7 @@ import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
 import { Constants } from '../../helper/constants';
 import Loading from '../../components/Loading';
+import { checkNumber } from '../../helper/validation'
 
 
 
@@ -449,7 +450,7 @@ const SalesInvoice = ({ mode }) => {
 
 	return (
 		<>
-			<Nav title={mode == "edit" ? "Update Sales Invoice" : "Add Sales Invoice"} />
+			<Nav title={mode == Constants.EDIT ? "Update Sales Invoice" : "Add Sales Invoice"} />
 			<main id='main'>
 				<SideNav />
 				<AddPartyModal open={getPartyModalState} />
@@ -558,7 +559,7 @@ const SalesInvoice = ({ mode }) => {
 												<input type='text' className='input-style'
 													onChange={(e) => {
 														let item = [...ItemRows];
-														item[index].qun = e.target.value;
+														item[index].qun = checkNumber(e.target.value);
 														setItemRows(item);
 														setPerQun(e.target.value);
 														if (formData.discountType !== "before") {
@@ -590,7 +591,7 @@ const SalesInvoice = ({ mode }) => {
 													<input type='text' className='input-style'
 														onChange={(e) => {
 															let item = [...ItemRows];
-															item[index].price = e.target.value;
+															item[index].price = checkNumber(e.target.value);
 															setItemRows(item);
 															setPerPrice(e.target.value);
 															if (formData.discountType !== "before") {
@@ -896,7 +897,7 @@ const SalesInvoice = ({ mode }) => {
 															<input type="text"
 																onChange={(e) => {
 																	let item = [...additionalRows];
-																	item[index].amount = e.target.value;
+																	item[index].amount = checkNumber(e.target.value);
 																	setAdditionalRow(item);
 																}}
 																value={additionalRows[index].amount}
@@ -950,7 +951,9 @@ const SalesInvoice = ({ mode }) => {
 											<Icons.RUPES />
 											<input type="text"
 												value={formData.roundOffAmount}
-												onChange={(e) => setFormData({ ...formData, roundOffAmount: e.target.value })}
+												onChange={(e) => setFormData({
+													...formData, roundOffAmount: checkNumber(e.target.value)
+												})}
 											/>
 											<button
 												onClick={() => {

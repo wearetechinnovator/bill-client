@@ -32,5 +32,10 @@ export const Constants = {
     LASTFISCAL: 'lastfiscal',
     CUSTOM: 'custom',
     GOODS: 'goods',
-    SERVICE: 'service'
+    SERVICE: 'service',
+    EDIT: 'edit',
+    PAID_LEAVE: 'paid-leave',
+    WEEK_OFF: 'week-off',
+    HALF_DAY: 'half-day',
+    OVER_TIME: 'over-time',
 }

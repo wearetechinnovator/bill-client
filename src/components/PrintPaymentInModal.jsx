@@ -265,7 +265,7 @@ const PrintPaymentInModal = ({ paymentId, open, onClose }) => {
                                                         <img src={companyDetails.signature} alt="signature" className='ml-auto' style={{ height: '30px' }} />
                                                     )
                                                 }
-                                                <p className='mt-2' style={{ fontSize: '10px' }}>Authorised Signatory For</p>
+                                                <p className='mt-12' style={{ fontSize: '10px' }}>Authorised Signatory For</p>
                                                 <p style={{ fontSize: '10px' }}>{companyDetails.name}</p>
                                             </div>
                                         </div>

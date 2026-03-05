@@ -1,3 +1,4 @@
+
 function checkNumber(n) {
     if (/^\d*\.?\d*$/.test(n)) {
         return n;

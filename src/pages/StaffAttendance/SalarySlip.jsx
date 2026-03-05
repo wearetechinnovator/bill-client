@@ -1,4 +1,4 @@
-import { useRef, forwardRef, useEffect, useState } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 
 
 
@@ -169,4 +169,4 @@ const SalarySlip = forwardRef(({ staffData, salaryAttendance, userDetails }, ref
     )
 })
 
-export default SalarySlip
+export default SalarySlip;
