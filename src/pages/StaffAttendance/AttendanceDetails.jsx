@@ -13,13 +13,14 @@ import { Popover, SelectPicker, Whisper } from 'rsuite';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import StaffPaymentModal from '../../components/StaffPaymentModal';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
 const AttendanceDetails = () => {
     const userDetails = useSelector((store) => store.userDetail); //get use details from store
     const toast = useMyToaster();
-    const { id } = useParams();
+    const { id } = useParams(); //Staff id;
     const [staffData, setStaffData] = useState({})
     const token = Cookies.get("token");
     const attendanceDateRef = useRef(null);
@@ -41,12 +42,14 @@ const AttendanceDetails = () => {
     const [salarySlipAttendance, setSalarySlipAttendance] = useState({
         present: 0, absent: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0, overTime: 0
     })
-    const [applyFilter, setApplyFilter] = useState(null);
     const [isCustomDate, setIsCustomDate] = useState(false);
     const [filter, setFilter] = useState({
-        startDate: '', endDate: '', billNo: '', party: '',
+        startDate: '', endDate: '', paymentType: ''
     })
     const [paymentModal, setPaymentModal] = useState(false);
+    const [staffTransaction, setStaffTransaction] = useState([]);
+    const [editTransactionId, setEditTransactionId] = useState(null);
+    const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -348,6 +351,73 @@ const AttendanceDetails = () => {
     }
 
 
+    // Get and Set Staff Transaction Data;
+    useEffect(() => {
+        if (tab === 3) {
+            (async () => {
+                try {
+                    const URL = `${process.env.REACT_APP_API_URL}/staff-payment/get`;
+                    const req = await fetch(URL, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            token, staffId: id,
+                            startDate: filter.startDate,
+                            endDate: filter.endDate,
+                            paymentType: filter.paymentType
+                        })
+                    })
+                    const res = await req.json();
+                    if (req.status !== 200) {
+                        return toast(res.err, 'error');
+                    }
+
+                    setStaffTransaction(res.data)
+
+                } catch (err) {
+                    return toast("Transaction Data not get", "error");
+                }
+            })()
+        }
+    }, [tab, filter])
+
+
+    // Delete Staff Transaction;
+    const deleteStaffTransaction = async (id) => {
+        if (!id) {
+            return;
+        }
+        const URL = process.env.REACT_APP_API_URL + "/staff-payment/delete";
+        try {
+            const req = await fetch(URL, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ ids: [id] })
+            });
+            const res = await req.json();
+
+            if (req.status !== 200 || res.err) {
+                return toast(res.err, 'error');
+            }
+
+            setStaffTransaction((pv) => {
+                const filterData = pv.filter((d, _) => d._id !== id);
+                return filterData;
+            })
+            return toast(res.msg, 'success');
+
+        } catch (error) {
+            toast("Something went wrong", "error")
+        }
+    }
+
+
+
+
     return (
         <>
             <Nav title={"Staff Attendance Details"} />
@@ -381,6 +451,16 @@ const AttendanceDetails = () => {
                 openModal={paymentModal}
                 openStatus={() => {
                     setPaymentModal(false);
+                }}
+                paymentId={editTransactionId}
+            />
+            <ConfirmModal
+                openConfirm={openConfirm}
+                openStatus={(status) => { setOpenConfirm(status) }}
+                title={"Are you sure you want to delete this Transaction?"}
+                fun={() => {
+                    deleteStaffTransaction(editTransactionId);
+                    setOpenConfirm(false);
                 }}
             />
             <main id='main'>
@@ -417,7 +497,7 @@ const AttendanceDetails = () => {
                         <div className='flex items-center gap-2'>
                             <button
                                 onClick={() => setPaymentModal(true)}
-                                className='bg-blue-500 text-white px-2 py-1 rounded border-blue-600 border'
+                                className='bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded border-blue-600 border'
                             >
                                 <Icons.RUPES className='inline ml-1' />
                                 Make Payment
@@ -442,37 +522,6 @@ const AttendanceDetails = () => {
                                     />
                                 </button>
                             </div>
-
-                            <div className='bg-gray-50 h-[30px] border rounded p-1 flex items-center gap-2 w-[125px] justify-center'>
-                                <button onClick={(e) => dateChanger("prev")}>
-                                    <Icons.PREV_PAGE_ARROW />
-                                </button>
-                                <div className="relative w-[150px] text-center">
-                                    <input
-                                        type="month"
-                                        ref={attendanceDateRef}
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                        onChange={(e) => {
-                                            if (!e.target.value) return;
-
-                                            setAttendanceDatePickervalue(e.target.value)
-                                            setAttendancePickerLabel(
-                                                new Date(e.target.value).toString().split(" ")[1] + " " + new Date(e.target.value).toString().split(" ")[3]
-                                            )
-                                        }}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => attendanceDateRef.current.showPicker()}
-                                        className="relative z-10"
-                                    >
-                                        {attendancePickerLabel || "Select Month"}
-                                    </button>
-                                </div>
-                                <button onClick={() => dateChanger("next")} >
-                                    <Icons.NEXT_PAGE_ARROW />
-                                </button>
-                            </div>
                         </div>
                     </div>
 
@@ -482,10 +531,42 @@ const AttendanceDetails = () => {
                         {
                             tab === 0 && (
                                 <div className='w-full'>
-                                    <p className='text-[15px] font-semibold '>
-                                        <Icons.USER className='text-xs inline mr-1' />
-                                        {staffData.staffName}
-                                    </p>
+                                    <div className='w-full flex items-center justify-between mb-4'>
+                                        <p className='text-[15px] font-semibold '>
+                                            <Icons.USER className='text-xs inline mr-1' />
+                                            {staffData.staffName}
+                                        </p>
+                                        <div className='bg-gray-50 h-[30px] border rounded p-1 flex items-center gap-2 w-[125px] justify-center'>
+                                            <button onClick={(e) => dateChanger("prev")}>
+                                                <Icons.PREV_PAGE_ARROW />
+                                            </button>
+                                            <div className="relative w-[150px] text-center">
+                                                <input
+                                                    type="month"
+                                                    ref={attendanceDateRef}
+                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                    onChange={(e) => {
+                                                        if (!e.target.value) return;
+
+                                                        setAttendanceDatePickervalue(e.target.value)
+                                                        setAttendancePickerLabel(
+                                                            new Date(e.target.value).toString().split(" ")[1] + " " + new Date(e.target.value).toString().split(" ")[3]
+                                                        )
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => attendanceDateRef.current.showPicker()}
+                                                    className="relative z-10"
+                                                >
+                                                    {attendancePickerLabel || "Select Month"}
+                                                </button>
+                                            </div>
+                                            <button onClick={() => dateChanger("next")} >
+                                                <Icons.NEXT_PAGE_ARROW />
+                                            </button>
+                                        </div>
+                                    </div>
 
                                     <div className='w-full flex items-center justify-between gap-3 mt-2'>
                                         <div className='bg-[#E2FFED] top__details__card'>
@@ -718,7 +799,6 @@ const AttendanceDetails = () => {
                                                     const { fromDate, toDate } = await getAdvanceFilterData(v);
                                                     setFilter({ ...filter, startDate: fromDate, endDate: toDate })
                                                     setIsCustomDate(false);
-                                                    setApplyFilter(false);
                                                 }}
                                                 data={[
                                                     { label: "Today", value: Constants.TODAY },
@@ -768,6 +848,8 @@ const AttendanceDetails = () => {
                                                     { label: "Bonus", value: "bonus" },
                                                     { label: "Advance Payment", value: "advance_payment" }
                                                 ]}
+                                                onChange={(v) => setFilter({ ...filter, paymentType: v })}
+                                                value={filter.paymentType}
                                             />
                                         </div>
                                     </div>
@@ -783,13 +865,59 @@ const AttendanceDetails = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td className='py-2'>2026-03-05</td>
-                                                    <td>Salary</td>
-                                                    <td>₹2,000</td>
-                                                    <td>test test</td>
-                                                    <td></td>
-                                                </tr>
+                                                {
+                                                    staffTransaction.length > 0 && staffTransaction.map((st, i) => {
+                                                        return (
+                                                            <tr key={i}>
+                                                                <td className='py-2'>{st.paymentDate.split("T")[0]}</td>
+                                                                <td className='capitalize'>{st.paymentType}</td>
+                                                                <td><Icons.RUPES className='inline' />{st.paymentAmount}</td>
+                                                                <td>{st.paymentRemark || "--"}</td>
+                                                                <td>
+                                                                    <Whisper
+                                                                        placement='leftStart'
+                                                                        trigger={"click"}
+                                                                        speaker={<Popover full className='table__list__action__parent'>
+                                                                            <div className='table__list__action__icon'
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    setEditTransactionId(st._id);
+                                                                                    setPaymentModal(true);
+                                                                                }}
+                                                                            >
+                                                                                <Icons.EDIT className='text-[16px]' />
+                                                                                Edit
+                                                                            </div>
+                                                                            <div className='table__list__action__icon'
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    setEditTransactionId(st._id)
+                                                                                    setOpenConfirm(true);
+                                                                                }}
+                                                                            >
+                                                                                <Icons.DELETE className='text-[16px]' />
+                                                                                Delete
+                                                                            </div>
+                                                                        </Popover>}
+                                                                    >
+                                                                        <div className='table__list__action' onClick={(e) => e.stopPropagation()}>
+                                                                            <Icons.HORIZONTAL_MORE />
+                                                                        </div>
+                                                                    </Whisper>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    })
+                                                }
+                                                {
+                                                    staffTransaction.length === 0 && (
+                                                        <tr>
+                                                            <td colSpan={5} align='center' className='py-2 font-semibold text-[16px] uppercase'>
+                                                                No Payment Available.
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                }
                                             </tbody>
                                         </table>
                                     </div>

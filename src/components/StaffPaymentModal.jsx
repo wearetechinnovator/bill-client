@@ -1,23 +1,30 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Modal, SelectPicker } from 'rsuite';
 import useMyToaster from '../hooks/useMyToaster';
 import Cookies from 'js-cookie';
 import { Icons } from '../helper/icons';
 import { Constants } from '../helper/constants';
 import useApi from '../hooks/useApi';
-import { checkNumber } from '../helper/validation'
+import { checkNumber } from '../helper/validation';
+import Loading from '../components/Loading';
 
-const StaffPaymentModal = ({ openModal, openStatus }) => {
+
+
+
+const StaffPaymentModal = ({ openModal, openStatus, paymentId }) => {
     const token = Cookies.get('token');
     const { getApiData } = useApi();
+    const { id } = useParams();
     const toast = useMyToaster();
     const [open, setOpen] = useState(false);
     const currentDate = new Date().toISOString().split("T")[0];
     const [formData, setFormData] = useState({
-        paymentType: '', transactionNumber: '', date: currentDate,
-        paymentMode: Constants.CASH, account: '', amount: '', remark: ''
+        paymentType: '', paymentDate: currentDate, paymentMode: Constants.CASH,
+        paymentAccount: '', paymentAmount: '', paymentRemark: ''
     })
     const [account, setAccount] = useState([]);
+    const [loading, setLoading] = useState(false);
 
 
 
@@ -40,43 +47,89 @@ const StaffPaymentModal = ({ openModal, openStatus }) => {
         apiData();
     }, [])
 
+
     const savePayment = async () => {
         if (!formData.paymentType)
             return toast("Payment type is required", "error");
-        else if (!formData.date)
+        else if (!formData.paymentDate)
             return toast("Date is required", "error");
-        else if (!formData.amount)
+        else if (!formData.paymentAmount)
             return toast("Amount is required", "error");
-        else if (formData.paymentMode === Constants.CASH && !formData.account)
+        else if (formData.paymentMode !== Constants.CASH && !formData.paymentAccount)
             return toast("Please select account", "error");
 
+        try {
+            setLoading(true);
+            const URL = `${process.env.REACT_APP_API_URL}/staff-payment/add`;
+            let data = { token, staffId: id, ...formData };
+            if (paymentId) {
+                data.update = true;
+                data.id = paymentId;
+            }
 
+            const req = await fetch(URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            const res = await req.json();
+            if (req.status !== 200) {
+                return toast(res.err, 'error');
+            }
+
+            !paymentId && clearData();
+            return toast("Payment successfully save", "success");
+
+        } catch (err) {
+            return toast("Something went wrong", 'error');
+        } finally {
+            setLoading(false);
+        }
 
     }
 
 
-    // Get Accounts from API
+    // Get Staff Payment Data using paymentId
     useEffect(() => {
+        if (!paymentId) return;
+
         (async () => {
             try {
-                const URL = `${process.env.REACT_APP_API_URL}/account/get`;
+                const URL = `${process.env.REACT_APP_API_URL}/staff-payment/get`;
                 const req = await fetch(URL, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ token, all: true })
+                    body: JSON.stringify({
+                        token, id: paymentId,
+                    })
                 })
                 const res = await req.json();
                 if (req.status !== 200) {
                     return toast(res.err, 'error');
                 }
 
+                setFormData({
+                    ...res.data,
+                    paymentDate: res.data.paymentDate.split("T")[0]
+                })
+
             } catch (err) {
-                return toast("Error fetching accounts", 'error');
+                return toast("Error fetching staff Payment", 'error');
             }
         })()
-    }, [])
+    }, [paymentId])
+
+
+    const clearData = () => {
+        setFormData({
+            paymentType: '', paymentDate: currentDate, paymentMode: Constants.CASH,
+            paymentAccount: '', paymentAmount: '', paymentRemark: ''
+        })
+    }
 
 
     return (
@@ -108,8 +161,8 @@ const StaffPaymentModal = ({ openModal, openStatus }) => {
                     <div className='w-full'>
                         <p>Date <span className='required__text'>*</span></p>
                         <input type="date"
-                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                            value={formData.date}
+                            onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
+                            value={formData.paymentDate}
                         />
                     </div>
                 </div>
@@ -121,10 +174,9 @@ const StaffPaymentModal = ({ openModal, openStatus }) => {
                             <input type="text"
                                 className='border-none'
                                 onChange={(e) => {
-                                    if (!checkNumber(e.target.value)) return;
-                                    setFormData({ ...formData, amount: e.target.value })
+                                    setFormData({ ...formData, paymentAmount: checkNumber(e.target.value) })
                                 }}
-                                value={formData.amount}
+                                value={formData.paymentAmount}
                             />
                             <select
                                 className='border-none rounded-none bg-gray-50'
@@ -147,9 +199,9 @@ const StaffPaymentModal = ({ openModal, openStatus }) => {
                             <div className='w-[50%]'>
                                 <p>Account</p>
                                 <SelectPicker className='w-full'
-                                    onChange={(v) => setFormData({ ...formData, account: v })}
+                                    onChange={(v) => setFormData({ ...formData, paymentAccount: v })}
                                     data={account}
-                                    value={formData.account}
+                                    value={formData.paymentAccount}
                                 />
                             </div>
                         )
@@ -159,31 +211,39 @@ const StaffPaymentModal = ({ openModal, openStatus }) => {
                     <p>Remark(Optional)</p>
                     <textarea
                         placeholder='Enter Remarks'
-                        onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
-                        value={formData.remark}
+                        onChange={(e) => setFormData({ ...formData, paymentRemark: e.target.value })}
+                        value={formData.paymentRemark}
                     ></textarea>
                 </div>
                 <div className='bg-yellow-50 p-2 rounded mt-4'>
                     <strong>Note: </strong>
-                    <span className='text-[11px]'>An expense under the category Employee Salary & Advance will automatically be created for this payment</span>
+                    <span className='text-[11px]'>An expense under the category 'Employee Salary & Advance' will automatically be created for this payment</span>
                 </div>
             </Modal.Body>
             <Modal.Footer>
                 <button
+                    onClick={() => {
+                        setOpen(false);
+                        openStatus(false);
+                    }}
+                    className="border bg-gray-50 rounded w-[120px] p-1 text-xs mr-2"
+                >
+                    Close
+                </button>
+                <button
                     onClick={async () => {
                         await savePayment();
-                        // setOpen(false);
-                        // openStatus(false);
+                        
                     }}
                     disabled={
-                        !formData.paymentType || !formData.amount || !formData.date
+                        !formData.paymentType || !formData.paymentAmount || !formData.paymentDate
                     }
                     className={`
-                        float-end text-white rounded w-[120px] py-1 uppercase text-xs
-                        ${!formData.paymentType || !formData.amount || !formData.date ? 'bg-blue-200' : 'bg-blue-600'}
+                        float-end text-white rounded w-[120px] py-1 uppercase text-xs flex items-center justify-center gap-2
+                        ${!formData.paymentType || !formData.paymentAmount || !formData.paymentDate ? 'bg-blue-200' : 'bg-[#003e32] '}
                     `}
                 >
-                    Save
+                    {loading && <Loading />} Save
                 </button>
             </Modal.Footer>
         </Modal>

@@ -20,7 +20,6 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
 
     useEffect(() => {
         setModelOpen(open);
-        console.log(attendanceData);
 
         if(attendanceData){
             setOverTimeType(attendanceData.overTimeType);
@@ -84,7 +83,7 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
 
     return (
         <div>
-            <Modal open={modelOpen} size={'xs'} onClose={() => {
+            <Modal open={modelOpen} backdrop='static' size={'xs'} onClose={() => {
                 setModelOpen(false);
                 closeModal(false);
             }}>

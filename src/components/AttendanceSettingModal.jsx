@@ -69,7 +69,7 @@ const AttendanceSettingModal = ({ open, closeModal }) => {
 
     return (
         <div>
-            <Modal open={modelOpen} size={'xs'} onClose={() => {
+            <Modal open={modelOpen} backdrop='static' size={'xs'} onClose={() => {
                 setModelOpen(false);
                 closeModal(false);
             }}>
