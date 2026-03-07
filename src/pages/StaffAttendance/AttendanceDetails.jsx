@@ -381,7 +381,7 @@ const AttendanceDetails = () => {
                 }
             })()
         }
-    }, [tab, filter])
+    }, [tab, filter, paymentModal])
 
 
     // Delete Staff Transaction;
