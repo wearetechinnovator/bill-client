@@ -301,13 +301,14 @@ const StaffAttendance = () => {
 
     // Attendance Debounce Logic here;
     useEffect(() => {
+        console.log('rr')
         if (attendanceSaveTimer.current) {
             clearTimeout(attendanceSaveTimer.current);
         }
 
         const timestamp = Number(localStorage.getItem("attendance_timestamp"));
         if (!timestamp) {
-            return
+            return;
         };
 
         const elapsed = Date.now() - timestamp;
@@ -323,6 +324,7 @@ const StaffAttendance = () => {
 
             (async () => {
                 try {
+                    console.log("attendanceSheet");
                     const URL = `${process.env.REACT_APP_API_URL}/attendance/add`;
                     const token = Cookies.get("token");
                     const req = await fetch(URL, {
@@ -383,6 +385,18 @@ const StaffAttendance = () => {
     }
 
 
+    const removeAttendanceStatus = async (staffId) => {
+        const allSheetData = [...attendanceSheet];
+        const staffAttendance = attendanceSheet.find(att => att.staffId === staffId);
+        staffAttendance.attendanceType = "";
+        allSheetData.push(staffAttendance);
+
+        localStorage.setItem("attendance", JSON.stringify(allSheetData));
+        localStorage.setItem("attendance_timestamp", Date.now());
+        setAttendanceSheet([...allSheetData]);
+    }
+
+
     return (
         <>
             <Nav title={"Staff Attendance"} />
@@ -395,7 +409,8 @@ const StaffAttendance = () => {
                 closeModal={() => setOverTimeModal(false)}
                 staffData={currentStaffData}
                 attendanceData={attendanceDataForModal}
-                sendData={(d) => {
+                sendData={async (d) => {
+                    await handleAttendance(data, "1", Constants.OVER_TIME);
                     let allSheetData = [...attendanceSheet];
 
                     let getStaffAttendanceSheet = allSheetData.find((a, _) => a.staffId === d.staffId);
@@ -406,6 +421,7 @@ const StaffAttendance = () => {
                     localStorage.setItem("attendance", JSON.stringify([...allSheetData, { ...marge }]));
 
                     setAttendanceSheet([...allSheetData, { ...marge }]);
+                    console.log([...allSheetData, { ...marge }])
                 }}
             />
             <ConfirmModal
@@ -625,13 +641,17 @@ const StaffAttendance = () => {
                                                                         </Whisper>
 
                                                                         {userAttendanceData.attendanceType === Constants.PAID_LEAVE && (
-                                                                            <div className={`attendance__chip__btn red`}>
+                                                                            <div
+                                                                                onClick={() => removeAttendanceStatus(data._id)}
+                                                                                className={`attendance__chip__btn red`}>
                                                                                 PL
                                                                             </div>
                                                                         )}
 
                                                                         {userAttendanceData.attendanceType === Constants.WEEK_OFF && (
-                                                                            <div className={`attendance__chip__btn green`}>
+                                                                            <div
+                                                                                onClick={() => removeAttendanceStatus(data._id)}
+                                                                                className={`attendance__chip__btn green`}>
                                                                                 WO
                                                                             </div>
                                                                         )}
@@ -656,7 +676,7 @@ const StaffAttendance = () => {
                                                                                 <div
                                                                                     className='table__list__action__icon'
                                                                                     onClick={async () => {
-                                                                                        await handleAttendance(data, "1", Constants.OVER_TIME);
+                                                                                        //await handleAttendance(data, "1", Constants.OVER_TIME);
                                                                                         setOverTimeModal(true);
 
                                                                                         //Modal a data deyar jonno rakha holo
@@ -674,7 +694,9 @@ const StaffAttendance = () => {
                                                                         </Whisper>
 
                                                                         {userAttendanceData.attendanceType === Constants.HALF_DAY && (
-                                                                            <div className={`attendance__chip__btn yellow`}>
+                                                                            <div
+                                                                                onClick={() => removeAttendanceStatus(data._id)}
+                                                                                className={`attendance__chip__btn yellow`}>
                                                                                 HD
                                                                             </div>
                                                                         )}
@@ -730,7 +752,7 @@ const StaffAttendance = () => {
                             </div>
                         </div>
                             : <AddNew title={"Staff"} link={"/admin/staff-attendance/add"} />
-                            : <AttendanceShimmer/>
+                            : <AttendanceShimmer />
                     }
                 </div>
             </main>

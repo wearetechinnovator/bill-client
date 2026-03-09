@@ -18,11 +18,11 @@ import ConfirmModal from '../../components/ConfirmModal';
 
 
 const AttendanceDetails = () => {
+    const token = Cookies.get("token");
     const userDetails = useSelector((store) => store.userDetail); //get use details from store
     const toast = useMyToaster();
     const { id } = useParams(); //Staff id;
     const [staffData, setStaffData] = useState({})
-    const token = Cookies.get("token");
     const attendanceDateRef = useRef(null);
     const downloadDateRef = useRef(null);
     const [attendanceDatePickerValue, setAttendanceDatePickervalue] = useState();
@@ -415,6 +415,17 @@ const AttendanceDetails = () => {
         }
     }
 
+    const removeAttendanceStatus = async (staffId) => {
+        console.log("---", staffId)
+        const allSheetData = [...attendanceSheet];
+        const staffAttendance = attendanceSheet.find(att => att.staffId === staffId);
+        staffAttendance.attendanceType = "";
+        allSheetData.push(staffAttendance);
+
+        localStorage.setItem("attendance", JSON.stringify(allSheetData));
+        localStorage.setItem("attendance_timestamp", Date.now());
+        setAttendanceSheet([...allSheetData]);
+    }
 
 
 
@@ -609,7 +620,7 @@ const AttendanceDetails = () => {
                                                         const attData = attendanceSheet?.find((at, i) => at.date === date);
                                                         const attendance = attData?.attendance;
 
-                                                        return <tr>
+                                                        return <tr key={date}>
                                                             <td className='py-2 px-4 border-b'>{date}</td>
                                                             <td>
                                                                 <div className='flex gap-2 items-center'>
@@ -652,13 +663,19 @@ const AttendanceDetails = () => {
                                                                                 </Whisper>
 
                                                                                 {attData.attendanceType === "paid-leave" && (
-                                                                                    <div className={`attendance__chip__btn red`}>
+                                                                                    <div
+                                                                                        onClick={() => removeAttendanceStatus(attData.staffId)}
+                                                                                        className={`attendance__chip__btn red`}
+                                                                                    >
                                                                                         PL
                                                                                     </div>
                                                                                 )}
 
                                                                                 {attData.attendanceType === "week-off" && (
-                                                                                    <div className={`attendance__chip__btn green`}>
+                                                                                    <div
+                                                                                        onClick={() => removeAttendanceStatus(attData.staffId)}
+                                                                                        className={`attendance__chip__btn green`}
+                                                                                    >
                                                                                         WO
                                                                                     </div>
                                                                                 )}
@@ -697,13 +714,19 @@ const AttendanceDetails = () => {
                                                                                 </Whisper>
 
                                                                                 {attData.attendanceType === "half-day" && (
-                                                                                    <div className={`attendance__chip__btn yellow`}>
+                                                                                    <div
+                                                                                        onClick={() => removeAttendanceStatus(attData.staffId)}
+                                                                                        className={`attendance__chip__btn yellow`}
+                                                                                    >
                                                                                         HD
                                                                                     </div>
                                                                                 )}
 
                                                                                 {attData.attendanceType === "over-time" && (
-                                                                                    <div className={`attendance__chip__btn blue`}>
+                                                                                    <div
+                                                                                        onClick={() => removeAttendanceStatus(attData.staffId)}
+                                                                                        className={`attendance__chip__btn blue`}
+                                                                                    >
                                                                                         OT
                                                                                     </div>
                                                                                 )}

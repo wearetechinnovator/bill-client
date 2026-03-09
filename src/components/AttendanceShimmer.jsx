@@ -7,7 +7,7 @@ const AttendanceShimmer = () => {
             <div className="w-full flex justify-between mb-5 gap-8">
                 {
                     Array.from({ length: 6 }, (n, i) => {
-                        return <div className='animate w-full h-[65px] rounded'></div>
+                        return <div className='animate w-full h-[65px] rounded' key={i + Math.random()}></div>
                     })
                 }
             </div>

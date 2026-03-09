@@ -12,7 +12,6 @@ import useExportTable from '../../hooks/useExportTable';
 import useMyToaster from '../../hooks/useMyToaster';
 import Cookies from 'js-cookie';
 import downloadPdf from '../../helper/downloadPdf';
-import { GrFormNext, GrFormPrevious } from 'react-icons/gr';
 import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
 import { IoIosAdd, IoMdMore } from 'react-icons/io';
@@ -132,7 +131,7 @@ const Unit = () => {
     }
 
 
-    const removeData = async (trash) => {
+    const removeData = async () => {
         if (selected.length === 0 || tableStatusData !== 'active') {
             return;
         }
@@ -143,7 +142,7 @@ const Unit = () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ ids: selected, trash: trash })
+                body: JSON.stringify({ ids: selected})
             });
             const res = await req.json();
 
@@ -213,7 +212,7 @@ const Unit = () => {
                     openStatus={(status) => { setOpenConfirm(status) }}
                     title={"Are you sure you want to delete the selected Units?"}
                     fun={() => {
-                        removeData(true);
+                        removeData();
                         setOpenConfirm(false);
                     }}
                 />

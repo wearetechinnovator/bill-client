@@ -938,7 +938,7 @@ const PurchaseInvoice = ({ mode }) => {
 												<option value={Constants.CASH}>Cash</option>
 												<option value={Constants.UPI}>UPI</option>
 												<option value={Constants.CARD}>Card</option>
-												<option value={Constants.NETBENKING}>Netbenking</option>
+												<option value={Constants.NETBENKING}>Netbanking</option>
 												<option value={Constants.BANK}>Bank</option>
 												<option value={Constants.CHEQUE}>Cheque</option>
 											</select>

@@ -553,14 +553,16 @@ const Dashboard = () => {
 											{
 												recentInvoiceLoading === false ? recentSales.map((rs, i) => {
 													let paymentStatus = Constants.UNPAID;
-													const paymentAmount = Number(data.paymentAmount) || 0;
-
-													if (data.finalAmount === paymentAmount) {
+													const paymentAmount = Number(rs.paymentAmount) || 0;
+													
+													if (rs.finalAmount === paymentAmount) {
 														paymentStatus = Constants.PAID;
 													}
-													else if (paymentAmount > 0 && paymentAmount < data.finalAmount) {
+													else if (paymentAmount > 0 && paymentAmount < rs.finalAmount) {
 														paymentStatus = Constants.PARTIAL_PAID;
 													}
+
+													console.table()
 													return (
 														<tr key={i}>
 															<td className="flex items-center gap-[5px] w-[100%] font-(family-name:--heading-font) text-[#333333]">
