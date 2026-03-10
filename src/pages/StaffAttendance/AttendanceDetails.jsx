@@ -50,6 +50,8 @@ const AttendanceDetails = () => {
     const [staffTransaction, setStaffTransaction] = useState([]);
     const [editTransactionId, setEditTransactionId] = useState(null);
     const [openConfirm, setOpenConfirm] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(null) // Store current date when click overtime modal;
+    const [attendanceDataForModal, setAttendanceDataForModal] = useState(null);
 
 
 
@@ -415,12 +417,14 @@ const AttendanceDetails = () => {
         }
     }
 
-    const removeAttendanceStatus = async (staffId) => {
-        console.log("---", staffId)
+    const removeAttendanceStatus = async (date) => {
         const allSheetData = [...attendanceSheet];
-        const staffAttendance = attendanceSheet.find(att => att.staffId === staffId);
+        const staffAttendance = attendanceSheet.find(att => att.date === date);
         staffAttendance.attendanceType = "";
+
         allSheetData.push(staffAttendance);
+
+        console.log(staffAttendance);
 
         localStorage.setItem("attendance", JSON.stringify(allSheetData));
         localStorage.setItem("attendance_timestamp", Date.now());
@@ -444,18 +448,25 @@ const AttendanceDetails = () => {
                 open={overTimeModal}
                 closeModal={() => setOverTimeModal(false)}
                 staffData={staffData}
+                attendanceData={attendanceDataForModal}
                 sendData={(d) => {
                     let allSheetData = [...attendanceSheet];
 
                     let getStaffAttendanceSheet = allSheetData.find((a, _) => a.staffId === d.staffId);
-                    allSheetData = allSheetData.filter((a, _) => a.date !== d.date);
-                    let marge = { ...getStaffAttendanceSheet, ...d };
+                    allSheetData = allSheetData.filter((a, _) => a.date !== selectedDate);
+
+                    // Marge with staff's attendance data and overtime data;
+                    let marge = {
+                        ...getStaffAttendanceSheet,
+                        attendanceType: Constants.OVER_TIME,
+                        date: selectedDate,
+                        ...d,
+                    };
 
                     localStorage.setItem("attendance_timestamp", Date.now());
                     localStorage.setItem("attendance", JSON.stringify([...allSheetData, { ...marge }]));
 
                     setAttendanceSheet([...allSheetData, { ...marge }]);
-
                 }}
             />
             <StaffPaymentModal
@@ -664,7 +675,7 @@ const AttendanceDetails = () => {
 
                                                                                 {attData.attendanceType === "paid-leave" && (
                                                                                     <div
-                                                                                        onClick={() => removeAttendanceStatus(attData.staffId)}
+                                                                                        onClick={() => removeAttendanceStatus(date)}
                                                                                         className={`attendance__chip__btn red`}
                                                                                     >
                                                                                         PL
@@ -673,7 +684,7 @@ const AttendanceDetails = () => {
 
                                                                                 {attData.attendanceType === "week-off" && (
                                                                                     <div
-                                                                                        onClick={() => removeAttendanceStatus(attData.staffId)}
+                                                                                        onClick={() => removeAttendanceStatus(date)}
                                                                                         className={`attendance__chip__btn green`}
                                                                                     >
                                                                                         WO
@@ -700,8 +711,11 @@ const AttendanceDetails = () => {
                                                                                         <div
                                                                                             className='table__list__action__icon'
                                                                                             onClick={async () => {
-                                                                                                await handleAttendance("1", "over-time", date);
                                                                                                 setOverTimeModal(true);
+                                                                                                setSelectedDate(date);
+
+                                                                                                //Modal a data deyar jonno rakha holo
+                                                                                                setAttendanceDataForModal(attData);
                                                                                             }}
                                                                                         >
                                                                                             Over Time
@@ -715,16 +729,22 @@ const AttendanceDetails = () => {
 
                                                                                 {attData.attendanceType === "half-day" && (
                                                                                     <div
-                                                                                        onClick={() => removeAttendanceStatus(attData.staffId)}
+                                                                                        onClick={() => removeAttendanceStatus(date)}
                                                                                         className={`attendance__chip__btn yellow`}
                                                                                     >
                                                                                         HD
                                                                                     </div>
                                                                                 )}
 
-                                                                                {attData.attendanceType === "over-time" && (
+                                                                                {attData.attendanceType === Constants.OVER_TIME && (
                                                                                     <div
-                                                                                        onClick={() => removeAttendanceStatus(attData.staffId)}
+                                                                                        onClick={() => {
+                                                                                            removeAttendanceStatus(date);
+                                                                                            // setOverTimeModal(true);
+
+                                                                                            //Modal a data deyar jonno rakha holo
+                                                                                            // setAttendanceDataForModal(attData);
+                                                                                        }}
                                                                                         className={`attendance__chip__btn blue`}
                                                                                     >
                                                                                         OT

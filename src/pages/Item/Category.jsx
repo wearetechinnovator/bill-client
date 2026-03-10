@@ -15,7 +15,7 @@ import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
 
 
-
+const DEBOUNCE_TIME = 300;
 const Category = () => {
 	const toast = useMyToaster();
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -35,6 +35,8 @@ const Category = () => {
 	}, [categoryData]);
 	const [loading, setLoading] = useState(true);
 	const [openConfirm, setOpenConfirm] = useState(false);
+	const [searchText, setSearchText] = useState("");
+	let debounceRef = useRef(null);
 
 
 
@@ -44,8 +46,8 @@ const Category = () => {
 			try {
 				const data = {
 					token: Cookies.get("token"),
-					trash: tableStatusData === "trash" ? true : false,
-					all: tableStatusData === "all" ? true : false
+					all: tableStatusData === "all" ? true : false,
+					searchText: searchText
 				}
 				const url = process.env.REACT_APP_API_URL + `/category/get?page=${activePage}&limit=${dataLimit}`;
 				const req = await fetch(url, {
@@ -62,10 +64,11 @@ const Category = () => {
 
 			} catch (error) {
 				console.log(error)
+				return toast("Item category not get", "error");
 			}
 		}
 		getCategory();
-	}, [tableStatusData, dataLimit, activePage])
+	}, [tableStatusData, dataLimit, activePage, searchText])
 
 
 	const searchTable = (e) => {
@@ -126,7 +129,7 @@ const Category = () => {
 	}
 
 
-	const removeData = async (trash) => {
+	const removeData = async () => {
 		if (selected.length === 0 || tableStatusData !== 'active') {
 			return;
 		}
@@ -137,7 +140,7 @@ const Category = () => {
 				headers: {
 					"Content-Type": "application/json"
 				},
-				body: JSON.stringify({ ids: selected, trash: trash })
+				body: JSON.stringify({ ids: selected})
 			});
 			const res = await req.json();
 
@@ -195,6 +198,19 @@ const Category = () => {
 		}
 	}
 
+
+	const searchData = (e) => {
+		const value = e.target.value;
+
+		if (debounceRef.current) {
+			clearTimeout(debounceRef.current);
+		}
+
+		debounceRef.current = setTimeout(() => {
+			setSearchText(value);
+		}, DEBOUNCE_TIME);
+	};
+
 	return (
 		<>
 			<Nav title={"Item Category"} />
@@ -206,16 +222,13 @@ const Category = () => {
 					openStatus={(status) => { setOpenConfirm(status) }}
 					title={"Are you sure you want to delete the selected Categories?"}
 					fun={() => {
-						removeData(true);
+						removeData();
 						setOpenConfirm(false);
 					}}
 				/>
 				<div className='content__body'>
 					{/* top section */}
-					<div
-						className={`mb-5 w-full bg-white rounded p-4 shadow-sm add_new_compnent overflow-hidden
-              transition-all
-            `}>
+					<div className={`add_new_compnent`}>
 						<div className='flex justify-between items-center'>
 							<div className='flex flex-col'>
 								<select value={dataLimit} onChange={(e) => setDataLimit(e.target.value)}>
@@ -229,7 +242,7 @@ const Category = () => {
 								<div className='flex w-full flex-col lg:w-[300px]'>
 									<input type='text'
 										placeholder='Search...'
-										onChange={searchTable}
+										onChange={searchData}
 										className='p-[6px]'
 									/>
 								</div>

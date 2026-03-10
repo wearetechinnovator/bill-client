@@ -25,7 +25,7 @@ import { Constants } from '../../helper/constants';
 
 
 
-
+const DEBOUNCE_TIME = 300;
 const StaffAttendance = () => {
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -60,6 +60,8 @@ const StaffAttendance = () => {
         present: 0, absent: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0, overTime: 0
     })
     const [openConfirm, setOpenConfirm] = useState(false);
+    const [searchText, setSearchText] = useState("");
+    let debounceRef = useRef(null);
 
 
 
@@ -72,7 +74,8 @@ const StaffAttendance = () => {
                 setLoading(true);
                 const data = {
                     token: Cookies.get("token"),
-                    all: tableStatusData === "all" ? true : false
+                    all: tableStatusData === "all" ? true : false,
+                    searchText: searchText
                 }
                 const url = process.env.REACT_APP_API_URL + `/staff/get?page=${activePage}&limit=${dataLimit}`;
                 const req = await fetch(url, {
@@ -93,7 +96,7 @@ const StaffAttendance = () => {
             }
         }
         get();
-    }, [tableStatusData, dataLimit, activePage])
+    }, [tableStatusData, dataLimit, activePage, searchText])
 
 
     // Get Attendance
@@ -186,27 +189,6 @@ const StaffAttendance = () => {
     }, [attendanceDatePickerValue])
 
 
-    const searchTable = (e) => {
-        const value = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('.list__table tbody tr');
-
-        rows.forEach(row => {
-            const cols = row.querySelectorAll('td');
-            let found = false;
-            cols.forEach((col, index) => {
-                if (index !== 0 && col.innerHTML.toLowerCase().includes(value)) {
-                    found = true;
-                }
-            });
-            if (found) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-        });
-    }
-
-
     const selectAll = (e) => {
         if (e.target.checked) {
             setSelected(data.map((e, _) => e._id));
@@ -244,7 +226,7 @@ const StaffAttendance = () => {
     }
 
 
-    const removeData = async (trash) => {
+    const removeData = async () => {
         if (selected.length === 0 || tableStatusData !== 'active') {
             return;
         }
@@ -255,7 +237,7 @@ const StaffAttendance = () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ ids: selected, trash: trash })
+                body: JSON.stringify({ ids: selected})
             });
             const res = await req.json();
 
@@ -397,6 +379,19 @@ const StaffAttendance = () => {
     }
 
 
+    const searchData = (e) => {
+        const value = e.target.value;
+
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
+
+        debounceRef.current = setTimeout(() => {
+            setSearchText(value);
+        }, DEBOUNCE_TIME);
+    };
+
+
     return (
         <>
             <Nav title={"Staff Attendance"} />
@@ -410,18 +405,22 @@ const StaffAttendance = () => {
                 staffData={currentStaffData}
                 attendanceData={attendanceDataForModal}
                 sendData={async (d) => {
-                    await handleAttendance(data, "1", Constants.OVER_TIME);
                     let allSheetData = [...attendanceSheet];
 
                     let getStaffAttendanceSheet = allSheetData.find((a, _) => a.staffId === d.staffId);
                     allSheetData = allSheetData.filter((a, _) => a.staffId !== d.staffId);
-                    let marge = { ...getStaffAttendanceSheet, ...d };
+
+                    // Marge with staff's attendance data and overtime data;
+                    let marge = {
+                        ...getStaffAttendanceSheet,
+                        attendanceType: Constants.OVER_TIME,
+                        ...d
+                    };
 
                     localStorage.setItem("attendance_timestamp", Date.now());
                     localStorage.setItem("attendance", JSON.stringify([...allSheetData, { ...marge }]));
 
                     setAttendanceSheet([...allSheetData, { ...marge }]);
-                    console.log([...allSheetData, { ...marge }])
                 }}
             />
             <ConfirmModal
@@ -429,7 +428,7 @@ const StaffAttendance = () => {
                 openStatus={(status) => { setOpenConfirm(status) }}
                 title={"Are you sure you want to delete the selected Staff?"}
                 fun={() => {
-                    removeData(true);
+                    removeData();
                     setOpenConfirm(false);
                 }}
             />
@@ -450,10 +449,10 @@ const StaffAttendance = () => {
                             </div>
                             <div className='flex items-center gap-2'>
                                 <div className='flex w-full flex-col lg:w-[300px]'>
-                                    <input type='text'
-                                        placeholder='Search...'
-                                        onChange={searchTable}
-                                        className='p-[6px]'
+                                    <input type='search'
+                                        placeholder='Search Staff Name or Mobile Number...'
+                                        onChange={searchData}
+                                        className='p-[6px] text-xs'
                                     />
                                 </div>
                                 <button
@@ -704,11 +703,12 @@ const StaffAttendance = () => {
                                                                         {userAttendanceData.attendanceType === Constants.OVER_TIME && (
                                                                             <div
                                                                                 onClick={() => {
-                                                                                    setOverTimeModal(true);
+                                                                                    // setOverTimeModal(true);
+                                                                                    removeAttendanceStatus(data._id);
 
                                                                                     //Modal a data deyar jonno rakha holo
-                                                                                    setCurrentStaffData(data);
-                                                                                    setAttendanceDataForModal(userAttendanceData);
+                                                                                    // setCurrentStaffData(data);
+                                                                                    // setAttendanceDataForModal(userAttendanceData);
                                                                                 }}
                                                                                 className={`attendance__chip__btn blue`}>
                                                                                 OT

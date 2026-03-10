@@ -296,7 +296,7 @@ const AddPayment = ({ mode }) => {
 										model={Constants.PARTY}
 										partyType={Constants.BOTHPARTY}
 										onType={(v) => {
-											if(mode) return;
+											if (mode) return;
 											setFormData({ ...formData, party: v })
 										}}
 										value={formData.party}
@@ -347,6 +347,8 @@ const AddPayment = ({ mode }) => {
 											onChange={(e) => setFormData({
 												...formData, paymentInNumber: e.target.value
 											})}
+
+											disabled={true}
 										/>
 									</div>
 								</div>

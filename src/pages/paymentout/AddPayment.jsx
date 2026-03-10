@@ -330,6 +330,7 @@ const AddPayment = ({ mode }) => {
 											onChange={(e) => setFormData({
 												...formData, paymentOutNumber: e.target.value
 											})}
+											disabled={true}
 										/>
 									</div>
 								</div>

@@ -27,16 +27,21 @@ const PaymentOutModal = ({ invoice, openModal, openStatus }) => {
     useEffect(() => {
         if (!invoice) return;
 
-        setFormData({
-            ...formData,
-            party: invoice.party._id,
-            amount: Number(invoice.finalAmount) - Number(invoice.paymentAmount || 0)
-        })
+        const amount = Number(invoice.finalAmount) - Number(invoice.paymentAmount || 0);
 
-        const inv = invoice;
-        inv.receiveAmount = Number(invoice.finalAmount) - Number(invoice.paymentAmount || 0)
-        setCheckedInv(p => [...p, inv]);
-    }, [invoice])
+        setFormData(prev => ({
+            ...prev,
+            party: invoice.party._id,
+            amount
+        }));
+
+        const inv = {
+            ...invoice,
+            receiveAmount: amount
+        };
+
+        setCheckedInv([inv]); // always single invoice
+    }, [invoice]);
 
 
     useEffect(() => {
@@ -98,6 +103,7 @@ const PaymentOutModal = ({ invoice, openModal, openStatus }) => {
             }
 
             toast('Payment add successfully', 'success');
+            openStatus();
             setOpen(false);
             return
 

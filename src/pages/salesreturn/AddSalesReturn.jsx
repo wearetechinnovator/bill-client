@@ -870,7 +870,7 @@ const SalesReturn = ({ mode }) => {
 													<option value="">Select</option>
 													{
 														account.map((a, _) => {
-															return <option value={a._id} key={_}>{a.title}</option>
+															return <option value={a._id} key={_}>{a.accountName}</option>
 														})
 													}
 												</select>

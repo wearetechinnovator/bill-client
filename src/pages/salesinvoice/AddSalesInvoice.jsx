@@ -193,6 +193,7 @@ const SalesInvoice = ({ mode }) => {
 			}
 			{
 				const data = await getApiData("account")
+				console.log("Account->>", data)
 				setAccount([...data.data])
 			}
 		}
@@ -1023,8 +1024,8 @@ const SalesInvoice = ({ mode }) => {
 												>
 													<option value="">Select</option>
 													{
-														account.map((a, _) => {
-															return <option value={a._id} key={_}>{a.title}</option>
+														account?.map((a, _) => {
+															return <option value={a._id} key={_}>{a.accountName}</option>
 														})
 													}
 												</select>

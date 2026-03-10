@@ -160,7 +160,7 @@ const TransactionAdd = ({ mode }) => {
 						<div className='flex justify-between gap-4 flex-col lg:flex-row'>
 							<div className='w-full'>
 								<div>
-									<p> Select Transaction Type</p>
+									<p> Select Transaction Type <span className='required__text'>*</span></p>
 									<select
 										onChange={(e) => {
 											setFormData({ ...formData, transactionType: e.target.value })
@@ -174,7 +174,7 @@ const TransactionAdd = ({ mode }) => {
 								</div>
 								<div className='w-full'>
 									<div className='flex items-center justify-between'>
-										<p className='mt-2'>Category</p>
+										<p className='mt-2'>Category <span className='required__text'>*</span></p>
 										<p className='text-[12px] text-white cursor-pointer bg-blue-400 px-1 rounded-sm'
 											onClick={() => setCategoryModal(true)}
 										>
@@ -192,11 +192,12 @@ const TransactionAdd = ({ mode }) => {
 									<p className='mt-2'>Transaction Number</p>
 									<input type='text'
 										onChange={(e) => setFormData({ ...formData, transactionNumber: e.target.value })}
+										disabled={true}
 										value={formData.transactionNumber}
 									/>
 								</div>
 								<div>
-									<p className='mt-2'>Transaction Date</p>
+									<p className='mt-2'>Transaction Date <span className='required__text'>*</span></p>
 									<input type='date' onChange={(e) => setFormData({ ...formData, transactionDate: e.target.value })}
 										value={formData.transactionDate} />
 								</div>
@@ -204,7 +205,7 @@ const TransactionAdd = ({ mode }) => {
 							<div className='w-full'>
 								<div className='w-full flex items-center gap-2'>
 									<div className='w-full'>
-										<p className='ml-1'>Payment Mode</p>
+										<p className='ml-1'>Payment Mode <span className='required__text'>*</span></p>
 										<select
 											onChange={(e) => {
 												setFormData({ ...formData, paymentMode: e.target.value })
@@ -233,7 +234,7 @@ const TransactionAdd = ({ mode }) => {
 									}
 								</div>
 								<div>
-									<p className='mt-2'>Amount</p>
+									<p className='mt-2'>Amount <span className='required__text'>*</span></p>
 									<input type='text' onChange={(e) =>
 										setFormData({ ...formData, amount: checkNumber(e.target.value) })}
 										value={formData.amount} />

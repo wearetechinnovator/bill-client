@@ -193,7 +193,7 @@ const SalesInvoice = () => {
 	}
 
 
-	const removeData = async (trash) => {
+	const removeData = async () => {
 		if (selected.length === 0 || tableStatusData !== 'active') {
 			return;
 		}
@@ -204,7 +204,7 @@ const SalesInvoice = () => {
 				headers: {
 					"Content-Type": "application/json"
 				},
-				body: JSON.stringify({ ids: selected, trash: trash })
+				body: JSON.stringify({ ids: selected })
 			});
 			const res = await req.json();
 
@@ -247,7 +247,7 @@ const SalesInvoice = () => {
 					openStatus={(status) => { setOpenConfirm(status) }}
 					title={"Are you sure you want to delete the selected invoices?"}
 					fun={() => {
-						removeData(true);
+						removeData();
 						setOpenConfirm(false);
 					}}
 				/>

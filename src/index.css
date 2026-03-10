@@ -83,6 +83,7 @@
   font-size: 13px !important;
   background-color: white;
   @apply border border-slate-300;
+  margin-bottom: 10px;
 }
 
 /* .content__body__main:hover{

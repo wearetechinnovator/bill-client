@@ -24,6 +24,7 @@ import { Icons } from '../../helper/icons';
 
 
 
+const DEBOUNCE_TIME = 300;
 const Account = () => {
 	const token = Cookies.get("token")
 	const toast = useMyToaster();
@@ -46,6 +47,8 @@ const Account = () => {
 	const [loading, setLoading] = useState(true);
 	const [openConfirm, setOpenConfirm] = useState(false);
 	const [balanceAmount, setBalanceAmount] = useState({});
+	const [searchText, setSearchText] = useState("");
+	let debounceRef = useRef(null);
 
 
 
@@ -78,8 +81,8 @@ const Account = () => {
 			try {
 				const data = {
 					token: Cookies.get("token"),
-					trash: tableStatusData === "trash" ? true : false,
-					all: tableStatusData === "all" ? true : false
+					all: tableStatusData === "all" ? true : false,
+					searchText: searchText
 				}
 				const url = process.env.REACT_APP_API_URL + `/account/get?page=${activePage}&limit=${dataLimit}`;
 				const req = await fetch(url, {
@@ -100,28 +103,8 @@ const Account = () => {
 			}
 		}
 		getData();
-	}, [tableStatusData, dataLimit, activePage])
+	}, [tableStatusData, dataLimit, activePage, searchText])
 
-
-	const searchTable = (e) => {
-		const value = e.target.value.toLowerCase();
-		const rows = document.querySelectorAll('.list__table tbody tr');
-
-		rows.forEach(row => {
-			const cols = row.querySelectorAll('td');
-			let found = false;
-			cols.forEach((col, index) => {
-				if (index !== 0 && col.innerHTML.toLowerCase().includes(value)) {
-					found = true;
-				}
-			});
-			if (found) {
-				row.style.display = "";
-			} else {
-				row.style.display = "none";
-			}
-		});
-	}
 
 
 	const selectAll = (e) => {
@@ -161,7 +144,7 @@ const Account = () => {
 	}
 
 
-	const removeData = async (trash) => {
+	const removeData = async () => {
 		if (selected.length === 0 || tableStatusData !== 'active') {
 			return;
 		}
@@ -230,6 +213,17 @@ const Account = () => {
 	}
 
 
+	const searchData = (e) => {
+		const value = e.target.value;
+
+		if (debounceRef.current) {
+			clearTimeout(debounceRef.current);
+		}
+
+		debounceRef.current = setTimeout(() => {
+			setSearchText(value);
+		}, DEBOUNCE_TIME);
+	};
 
 	return (
 		<>
@@ -242,15 +236,12 @@ const Account = () => {
 					openStatus={(status) => { setOpenConfirm(status) }}
 					title={"Are you sure you want to delete the selected Accounts?"}
 					fun={() => {
-						removeData(true);
+						removeData();
 						setOpenConfirm(false);
 					}}
 				/>
 				<div className='content__body'>
-					<div
-						className={`mb-5 w-full bg-white rounded p-4 shadow-sm add_new_compnent overflow-hidden
-						transition-all
-						`}>
+					<div className={`add_new_compnent`}>
 						<div className='flex justify-between items-center'>
 							<div className='flex flex-col'>
 								<select value={dataLimit} onChange={(e) => setDataLimit(e.target.value)}>
@@ -262,10 +253,10 @@ const Account = () => {
 							</div>
 							<div className='flex items-center gap-2'>
 								<div className='flex w-full flex-col lg:w-[300px]'>
-									<input type='text'
-										placeholder='Search...'
-										onChange={searchTable}
-										className='p-[6px]'
+									<input type='search'
+										placeholder='Search Account Name...'
+										onChange={searchData}
+										className='p-[6px] text-xs'
 									/>
 								</div>
 								<button
@@ -334,7 +325,7 @@ const Account = () => {
 									</thead>
 									<tbody>
 										<tr>
-											<td className='py-2' align='center'><Icons.RUPES/></td>
+											<td className='py-2' align='center'><Icons.RUPES /></td>
 											<td>Cash</td>
 											<td>Cash Account</td>
 											<td>
@@ -356,7 +347,7 @@ const Account = () => {
 													<td align='left'>{data.accountHolderName || '--'}</td>
 													<td align='left'>
 														<Icons.RUPES className='inline' />
-														{Number(balanceAmount?.[data._id]).toFixed(2)}
+														{(Number(balanceAmount?.[data._id] || 0) + Number(data.openingBalance || 0)).toFixed(2)}
 													</td>
 													<td>
 														<Whisper

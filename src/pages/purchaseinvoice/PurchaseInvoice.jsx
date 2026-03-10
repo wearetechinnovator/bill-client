@@ -175,7 +175,7 @@ const PurchaseInvoice = () => {
 	}
 
 
-	const removeData = async (trash) => {
+	const removeData = async () => {
 		if (selected.length === 0 || tableStatusData !== 'active') {
 			return;
 		}
@@ -186,7 +186,7 @@ const PurchaseInvoice = () => {
 				headers: {
 					"Content-Type": "application/json"
 				},
-				body: JSON.stringify({ ids: selected, trash: trash })
+				body: JSON.stringify({ ids: selected })
 			});
 			const res = await req.json();
 
@@ -228,7 +228,7 @@ const PurchaseInvoice = () => {
 					openStatus={(status) => { setOpenConfirm(status) }}
 					title={"Are you sure you want to delete the selected Purchase Invoice?"}
 					fun={() => {
-						removeData(true);
+						removeData();
 						setOpenConfirm(false);
 					}}
 				/>

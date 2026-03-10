@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-// import MyBreadCrumb from '../../components/BreadCrumb';
 import { Popover, SelectPicker, Whisper } from 'rsuite';
 import { BiPrinter } from "react-icons/bi";
 import { FaRegCopy, FaRegEdit } from "react-icons/fa";
@@ -173,7 +172,7 @@ const PurchaseReturn = () => {
 	}
 
 
-	const removeData = async (trash) => {
+	const removeData = async () => {
 		if (selected.length === 0 || tableStatusData !== 'active') {
 			return;
 		}
@@ -184,7 +183,7 @@ const PurchaseReturn = () => {
 				headers: {
 					"Content-Type": "application/json"
 				},
-				body: JSON.stringify({ ids: selected, trash: trash })
+				body: JSON.stringify({ ids: selected })
 			});
 			const res = await req.json();
 
@@ -228,7 +227,7 @@ const PurchaseReturn = () => {
 					openStatus={(status) => { setOpenConfirm(status) }}
 					title={"Are you sure you want to delete the selected Purchase Return?"}
 					fun={() => {
-						removeData(true);
+						removeData();
 						setOpenConfirm(false);
 					}}
 				/>

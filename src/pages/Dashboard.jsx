@@ -56,7 +56,7 @@ const Dashboard = () => {
 
 
 
-	
+
 
 	// Get CashIn and CashOut;
 	const getCashInAndCashOut = async () => {
@@ -182,7 +182,6 @@ const Dashboard = () => {
 			});
 			const res = await req.json();
 			if (req.status !== 200) return toast(res.err, "error");
-			console.log(res);
 			setTotalOtherIncome(res.totalIncome)
 			setTotalOtherExpense(res.totalExpense)
 		} catch (err) {
@@ -190,7 +189,7 @@ const Dashboard = () => {
 			return toast("Something went wrong", "error")
 		}
 	}
-	
+
 	// Dashboard Insights Function Calls;
 	useEffect(() => {
 		(async () => {
@@ -277,6 +276,7 @@ const Dashboard = () => {
 	// Get Account Details;
 	useEffect(() => {
 		if (!balanceAmount) return;
+		if (Object.keys(balanceAmount).length === 0) return;
 
 		(async () => {
 			try {
@@ -291,10 +291,14 @@ const Dashboard = () => {
 				const res = await req.json();
 
 				const accountBalanceDataChartData = res.data.reduce((acc, i) => {
-					acc.push({ name: i.accountName, value: balanceAmount[i._id], fill: COLORS[acc.length] });
+					// If nagetive value then add 0;
+					let amount = balanceAmount[i._id] < 1 ? 0 : balanceAmount[i._id];
+
+					acc.push({ name: i.accountName, value: amount, fill: COLORS[acc.length] });
 					return acc;
 				}, [])
-				accountBalanceDataChartData.push({ name: "Cash", value: balanceAmount['cash'], fill: COLORS[3] });
+				accountBalanceDataChartData.push({ name: "Cash", value: balanceAmount['cash'] < 1 ? 0 : balanceAmount['cash'], fill: COLORS[3] });
+
 				setAccountBalanceData(accountBalanceDataChartData)
 
 			} catch (error) {
@@ -554,7 +558,7 @@ const Dashboard = () => {
 												recentInvoiceLoading === false ? recentSales.map((rs, i) => {
 													let paymentStatus = Constants.UNPAID;
 													const paymentAmount = Number(rs.paymentAmount) || 0;
-													
+
 													if (rs.finalAmount === paymentAmount) {
 														paymentStatus = Constants.PAID;
 													}

@@ -22,7 +22,7 @@ import Pagination from '../../components/Pagination';
 
 
 
-
+const DEBOUNCE_TIME = 300;
 const Unit = () => {
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -41,6 +41,8 @@ const Unit = () => {
     }, [unitData]);
     const [loading, setLoading] = useState(true);
     const [openConfirm, setOpenConfirm] = useState(false);
+    const [searchText, setSearchText] = useState("");
+    let debounceRef = useRef(null);
 
 
     // Get data;
@@ -49,8 +51,8 @@ const Unit = () => {
             try {
                 const data = {
                     token: Cookies.get("token"),
-                    trash: tableStatusData === "trash" ? true : false,
-                    all: tableStatusData === "all" ? true : false
+                    all: tableStatusData === "all" ? true : false,
+					searchText: searchText
                 }
                 const url = process.env.REACT_APP_API_URL + `/unit/get?page=${activePage}&limit=${dataLimit}`;
                 const req = await fetch(url, {
@@ -70,7 +72,7 @@ const Unit = () => {
             }
         }
         getParty();
-    }, [tableStatusData, dataLimit, activePage])
+    }, [tableStatusData, dataLimit, activePage, searchText])
 
 
     const searchTable = (e) => {
@@ -142,7 +144,7 @@ const Unit = () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ ids: selected})
+                body: JSON.stringify({ ids: selected })
             });
             const res = await req.json();
 
@@ -200,6 +202,17 @@ const Unit = () => {
         }
     }
 
+    const searchData = (e) => {
+        const value = e.target.value;
+
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
+
+        debounceRef.current = setTimeout(() => {
+            setSearchText(value);
+        }, DEBOUNCE_TIME);
+    };
 
     return (
         <>
@@ -218,10 +231,7 @@ const Unit = () => {
                 />
                 <div className='content__body'>
                     {/* top section */}
-                    <div
-                        className={`mb-5 w-full bg-white rounded p-4 shadow-sm add_new_compnent overflow-hidden
-                            transition-all
-                        `}>
+                    <div className="add_new_compnent">
                         <div className='flex justify-between items-center'>
                             <div className='flex flex-col'>
                                 <select value={dataLimit} onChange={(e) => setDataLimit(e.target.value)}>
@@ -235,7 +245,7 @@ const Unit = () => {
                                 <div className='flex w-full flex-col lg:w-[300px]'>
                                     <input type='text'
                                         placeholder='Search...'
-                                        onChange={searchTable}
+                                        onChange={searchData}
                                         className='p-[6px]'
                                     />
                                 </div>

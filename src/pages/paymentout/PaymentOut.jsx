@@ -172,7 +172,7 @@ const PaymentOut = () => {
 		}
 	}
 
-	const removeData = async (trash) => {
+	const removeData = async () => {
 		if (selected.length === 0 || tableStatusData !== 'active') {
 			return;
 		}
@@ -183,7 +183,7 @@ const PaymentOut = () => {
 				headers: {
 					"Content-Type": "application/json"
 				},
-				body: JSON.stringify({ ids: selected, trash: trash })
+				body: JSON.stringify({ ids: selected })
 			});
 			const res = await req.json();
 
@@ -234,17 +234,14 @@ const PaymentOut = () => {
 					openStatus={(status) => { setOpenConfirm(status) }}
 					title={"Are you sure you want to delete the selected Payment Out?"}
 					fun={() => {
-						removeData(true);
+						removeData();
 						setOpenConfirm(false);
 					}}
 				/>
 				<div className='content__body'>
 
 					{/* top section */}
-					<div
-						className={`mb-5 w-full bg-white rounded p-4 shadow-sm add_new_compnent overflow-hidden
-              transition-all
-            `}>
+					<div className="add_new_compnent">
 						<div className='flex justify-between items-center'>
 							<div className='flex flex-col'>
 								<select value={dataLimit} onChange={(e) => setDataLimit(e.target.value)}>

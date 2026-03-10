@@ -15,6 +15,7 @@ const useBillPrefix = (type) => {
         else if (type === "creditnote") return [i.creditNoteInitial, i.creditNoteCount];
         else if (type === "salesreturn") return [i.salesReturnInitial, i.salesReturnCount];
         else if (type === "deliverychalan") return [i.deliverChalanInitial, i.deliveryChalanCount];
+        else if (type === "purchaseInvoice") return [i.purchaseInvoiceInitial, i.purchaseInvoiceNextCount];
         else return null;
       }
     }

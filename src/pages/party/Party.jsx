@@ -22,7 +22,7 @@ const TOTAL_COLLECT = 'total_collect';
 const CUSTOMER = 'customer';
 const SUPPLIER = 'supplier';
 const BOTHPARTY = 'both';
-
+const DEBOUNCE_TIME = 300;
 const Party = () => {
 	const token = Cookies.get("token");
 	const navigate = useNavigate();
@@ -52,6 +52,8 @@ const Party = () => {
 	const [totalPay, setTotalPay] = useState(null);
 	const [openConfirm, setOpenConfirm] = useState(false);
 	const [selectedTab, setSelectedTab] = useState(TOTAL_PARTY);
+	const [searchText, setSearchText] = useState("");
+	let debounceRef = useRef(null);
 
 
 
@@ -61,8 +63,8 @@ const Party = () => {
 			try {
 				const data = {
 					token,
-					trash: tableStatusData === "trash" ? true : false,
 					all: tableStatusData === "all" ? true : false,
+					searchText: searchText
 				}
 				const url = process.env.REACT_APP_API_URL + `/party/get?page=${activePage}&limit=${dataLimit}`;
 				const req = await fetch(url, {
@@ -102,10 +104,11 @@ const Party = () => {
 				}
 
 			} catch (error) {
-				console.log(error)
+				console.log(error);
+				return toast("Party data not get", "error")
 			}
 		})()
-	}, [tableStatusData, dataLimit, activePage, selectedTab]);
+	}, [tableStatusData, dataLimit, activePage, selectedTab, searchText]);
 
 
 	// Get Party Balance & [Set `Total Pay` and `Total Collect`]
@@ -148,26 +151,6 @@ const Party = () => {
 	}, [])
 
 
-	const searchTable = (e) => {
-		const value = e.target.value.toLowerCase();
-		const rows = document.querySelectorAll('.list__table tbody tr');
-		rows.forEach(row => {
-			const cols = row.querySelectorAll('td');
-			let found = false;
-			cols.forEach((col, index) => {
-				if (index !== 0 && col.innerHTML.toLowerCase().includes(value)) {
-					found = true;
-				}
-			});
-			if (found) {
-				row.style.display = "";
-			} else {
-				row.style.display = "none";
-			}
-		});
-	}
-
-
 	const selectAll = (e) => {
 		if (e.target.checked) {
 			setSelected(partyData.map(party => party._id));
@@ -205,7 +188,7 @@ const Party = () => {
 	}
 
 
-	const removeData = async (trash) => {
+	const removeData = async () => {
 		if (selected.length === 0 || tableStatusData !== 'active') {
 			return;
 		}
@@ -213,42 +196,6 @@ const Party = () => {
 		try {
 			const req = await fetch(url, {
 				method: "DELETE",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify({ ids: selected, trash: trash })
-			});
-			const res = await req.json();
-
-			if (req.status !== 200 || res.err) {
-				return toast(res.err, 'error');
-			}
-
-			selected.forEach((id, _) => {
-				setPartyData((prevData) => {
-					return prevData.filter((data, _) => data._id !== id)
-				})
-			});
-			setSelected([]);
-
-			return toast(res.msg, 'success');
-
-		} catch (error) {
-			console.log(error)
-			toast("Something went wrong", "error")
-		}
-	}
-
-
-	const restoreData = async () => {
-		if (selected.length === 0 || tableStatusData !== "trash") {
-			return;
-		}
-
-		const url = process.env.REACT_APP_API_URL + "/party/restore";
-		try {
-			const req = await fetch(url, {
-				method: "POST",
 				headers: {
 					"Content-Type": "application/json"
 				},
@@ -266,6 +213,7 @@ const Party = () => {
 				})
 			});
 			setSelected([]);
+
 			return toast(res.msg, 'success');
 
 		} catch (error) {
@@ -274,6 +222,17 @@ const Party = () => {
 		}
 	}
 
+	const searchData = (e) => {
+		const value = e.target.value;
+
+		if (debounceRef.current) {
+			clearTimeout(debounceRef.current);
+		}
+
+		debounceRef.current = setTimeout(() => {
+			setSearchText(value);
+		}, DEBOUNCE_TIME);
+	};
 
 
 	return (
@@ -287,7 +246,7 @@ const Party = () => {
 					openStatus={(status) => { setOpenConfirm(status) }}
 					title={"Are you sure you want to delete the selected parties?"}
 					fun={() => {
-						removeData(true);
+						removeData();
 						setOpenConfirm(false);
 					}}
 				/>
@@ -307,7 +266,7 @@ const Party = () => {
 								<div className='flex w-full flex-col lg:w-[300px]'>
 									<input type='text'
 										placeholder='Search...'
-										onChange={searchTable}
+										onChange={searchData}
 										className='p-[6px]'
 									/>
 								</div>
@@ -465,7 +424,7 @@ const Party = () => {
 							</div>
 						</div>
 							: <AddNew title={"Party"} link={"/admin/party/add"} />
-							: <DataShimmer topBox={true}/>
+							: <DataShimmer topBox={true} />
 					}
 				</div>
 			</main >

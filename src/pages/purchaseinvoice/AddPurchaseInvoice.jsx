@@ -27,7 +27,7 @@ const PurchaseInvoice = ({ mode }) => {
 	const toast = useMyToaster();
 	const { id } = useParams()
 	const [loading, setLoading] = useState(false);
-	const getBillPrefix = useBillPrefix("invoice");
+	const getBillPrefix = useBillPrefix("purchaseInvoice");
 	const { getApiData } = useApi();
 	const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
 	const getItemModalState = useSelector((store) => store.itemModalSlice.show);
@@ -129,9 +129,24 @@ const PurchaseInvoice = ({ mode }) => {
 	}, [id])
 
 
+	useEffect(() => {
+		if (getBillPrefix && (mode === "convert" || !mode)) {
+			const newPrefix = getBillPrefix[0] + getBillPrefix[1];
+
+			setFormData(prev => {
+				if (prev.purchaseInvoiceNumber === newPrefix) return prev;
+
+				return {
+					...prev,
+					purchaseInvoiceNumber: newPrefix
+				};
+			});
+		}
+	}, [getBillPrefix, mode]);
+
 
 	// Get all data from api
-	useState(() => {
+	useEffect(() => {
 		const apiData = async () => {
 			{
 				const data = await getApiData("item");
@@ -868,7 +883,7 @@ const PurchaseInvoice = ({ mode }) => {
 													<option value="">Select</option>
 													{
 														account.map((a, _) => {
-															return <option value={a._id} key={_}>{a.title}</option>
+															return <option value={a._id} key={_}>{a.accountName}</option>
 														})
 													}
 												</select>

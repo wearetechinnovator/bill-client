@@ -22,6 +22,7 @@ import Pagination from '../../components/Pagination';
 
 
 
+const DEBOUNCE_TIME = 300;
 const Tax = ({ mode }) => {
 	const toast = useMyToaster();
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -40,6 +41,9 @@ const Tax = ({ mode }) => {
 	}, [taxData]);
 	const [loading, setLoading] = useState(true);
 	const [openConfirm, setOpenConfirm] = useState(false);
+	const [searchText, setSearchText] = useState("");
+	let debounceRef = useRef(null);
+
 
 
 	// Get data;
@@ -48,7 +52,8 @@ const Tax = ({ mode }) => {
 			try {
 				const data = {
 					token: Cookies.get("token"),
-					all: tableStatusData === "all" ? true : false
+					all: tableStatusData === "all" ? true : false,
+					searchText: searchText
 				}
 				const url = process.env.REACT_APP_API_URL + `/tax/get?page=${activePage}&limit=${dataLimit}`;
 				const req = await fetch(url, {
@@ -68,27 +73,8 @@ const Tax = ({ mode }) => {
 			}
 		}
 		get();
-	}, [tableStatusData, dataLimit, activePage])
+	}, [tableStatusData, dataLimit, activePage, searchText])
 
-	const searchTable = (e) => {
-		const value = e.target.value.toLowerCase();
-		const rows = document.querySelectorAll('.list__table tbody tr');
-
-		rows.forEach(row => {
-			const cols = row.querySelectorAll('td');
-			let found = false;
-			cols.forEach((col, index) => {
-				if (index !== 0 && col.innerHTML.toLowerCase().includes(value)) {
-					found = true;
-				}
-			});
-			if (found) {
-				row.style.display = "";
-			} else {
-				row.style.display = "none";
-			}
-		});
-	}
 
 	const selectAll = (e) => {
 		if (e.target.checked) {
@@ -126,7 +112,7 @@ const Tax = ({ mode }) => {
 	}
 
 
-	const removeData = async (trash) => {
+	const removeData = async () => {
 		if (selected.length === 0 || tableStatusData !== 'active') {
 			return;
 		}
@@ -134,42 +120,6 @@ const Tax = ({ mode }) => {
 		try {
 			const req = await fetch(url, {
 				method: "DELETE",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify({ ids: selected, trash: trash })
-			});
-			const res = await req.json();
-
-			if (req.status !== 200 || res.err) {
-				return toast(res.err, 'error');
-			}
-
-			selected.forEach((id, _) => {
-				settaxData((prevData) => {
-					return prevData.filter((data, _) => data._id !== id)
-				})
-			});
-			setSelected([]);
-
-			return toast(res.msg, 'success');
-
-		} catch (error) {
-			console.log(error)
-			toast("Something went wrong", "error")
-		}
-	}
-
-
-	const restoreData = async () => {
-		if (selected.length === 0 || tableStatusData !== "trash") {
-			return;
-		}
-
-		const url = process.env.REACT_APP_API_URL + "/tax/restore";
-		try {
-			const req = await fetch(url, {
-				method: "POST",
 				headers: {
 					"Content-Type": "application/json"
 				},
@@ -187,6 +137,7 @@ const Tax = ({ mode }) => {
 				})
 			});
 			setSelected([]);
+
 			return toast(res.msg, 'success');
 
 		} catch (error) {
@@ -195,6 +146,18 @@ const Tax = ({ mode }) => {
 		}
 	}
 
+
+	const searchData = (e) => {
+		const value = e.target.value;
+
+		if (debounceRef.current) {
+			clearTimeout(debounceRef.current);
+		}
+
+		debounceRef.current = setTimeout(() => {
+			setSearchText(value);
+		}, DEBOUNCE_TIME);
+	};
 
 
 	return (
@@ -208,7 +171,7 @@ const Tax = ({ mode }) => {
 					openStatus={(status) => { setOpenConfirm(status) }}
 					title={"Are you sure you want to delete the selected Taxes?"}
 					fun={() => {
-						removeData(true);
+						removeData();
 						setOpenConfirm(false);
 					}}
 				/>
@@ -229,7 +192,7 @@ const Tax = ({ mode }) => {
 								<div className='flex w-full flex-col lg:w-[300px]'>
 									<input type='text'
 										placeholder='Search...'
-										onChange={searchTable}
+										onChange={searchData}
 										className='p-[6px]'
 									/>
 								</div>

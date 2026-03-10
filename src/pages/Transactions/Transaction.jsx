@@ -27,6 +27,7 @@ import { getAdvanceFilterData } from '../../helper/advanceFilter';
 
 
 
+const DEBOUNCE_TIME = 300;
 const Transaction = () => {
     const token = Cookies.get("token");
     const { getApiData } = useApi();
@@ -60,6 +61,8 @@ const Transaction = () => {
     })
     const [applyFilter, setApplyFilter] = useState(null);
     const [isCustomDate, setIsCustomDate] = useState(false);
+    const [searchText, setSearchText] = useState("");
+    let debounceRef = useRef(null);
 
 
 
@@ -80,6 +83,7 @@ const Transaction = () => {
                 let data = {
                     token,
                     all: tableStatusData === "all" ? true : false,
+                    searchText: searchText,
                 }
                 if (applyFilter) {
                     data = {
@@ -113,33 +117,14 @@ const Transaction = () => {
             }
         }
         getTransaction();
-    }, [tableStatusData, dataLimit, activePage, applyFilter])
+    }, [tableStatusData, dataLimit, activePage, applyFilter, searchText])
 
 
-    const searchTable = (e) => {
-        const value = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('.list__table tbody tr');
-
-        rows.forEach(row => {
-            const cols = row.querySelectorAll('td');
-            let found = false;
-            cols.forEach((col, index) => {
-                if (index !== 0 && col.innerHTML.toLowerCase().includes(value)) {
-                    found = true;
-                }
-            });
-            if (found) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-        });
-    }
 
 
     const selectAll = (e) => {
         if (e.target.checked) {
-            setSelected(Array.from({ length: 10 }, (_, i) => i));
+            setSelected(transactionData.map(data => data._id));
         } else {
             setSelected([]);
         }
@@ -174,7 +159,7 @@ const Transaction = () => {
     }
 
 
-    const removeData = async (trash) => {
+    const removeData = async () => {
         if (selected.length === 0 || tableStatusData !== 'active') {
             return;
         }
@@ -185,7 +170,7 @@ const Transaction = () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ ids: selected, trash: trash })
+                body: JSON.stringify({ ids: selected })
             });
             const res = await req.json();
 
@@ -216,6 +201,19 @@ const Transaction = () => {
         setApplyFilter(false);
     }
 
+
+    const searchData = (e) => {
+        const value = e.target.value;
+
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
+
+        debounceRef.current = setTimeout(() => {
+            setSearchText(value);
+        }, DEBOUNCE_TIME);
+    };
+
     return (
         <>
             <Nav title={"Other Transaction"} />
@@ -236,10 +234,10 @@ const Transaction = () => {
                             </div>
                             <div className='flex items-center gap-2'>
                                 <div className='flex w-full flex-col lg:w-[300px]'>
-                                    <input type='text'
-                                        placeholder='Search...'
-                                        onChange={searchTable}
-                                        className='p-[6px]'
+                                    <input type='search'
+                                        placeholder='Search Transaction Number...'
+                                        onChange={searchData}
+                                        className='p-[6px] text-xs'
                                     />
                                 </div>
                                 <button
@@ -249,7 +247,7 @@ const Transaction = () => {
                                     Filter
                                 </button>
                                 <button
-                                    onClick={() => removeData(false)}
+                                    onClick={() => removeData()}
                                     className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
                                     <MdDeleteOutline className='text-lg' />
                                     Delete
@@ -391,7 +389,7 @@ const Transaction = () => {
                                             <th className='py-2 px-4 border-b'>
                                                 <input type='checkbox'
                                                     onChange={selectAll}
-                                                    checked={selected.length === 10}
+                                                    checked={transactionData.length > 0 && selected.length === transactionData.length}
                                                 />
                                             </th>
                                             <th align='left' className='w-40'>Date</th>

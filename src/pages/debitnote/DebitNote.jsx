@@ -89,7 +89,6 @@ const DebitNote = () => {
 				body: JSON.stringify(data)
 			});
 			const res = await req.json();
-			console.log(res)
 			setTotalData(res.totalData)
 			setBillData([...res.data]);
 			setLoading(false);
@@ -175,7 +174,7 @@ const DebitNote = () => {
 
 
 
-	const removeData = async (trash) => {
+	const removeData = async () => {
 		if (selected.length === 0 || tableStatusData !== 'active') {
 			return;
 		}
@@ -186,7 +185,7 @@ const DebitNote = () => {
 				headers: {
 					"Content-Type": "application/json"
 				},
-				body: JSON.stringify({ ids: selected, trash: trash })
+				body: JSON.stringify({ ids: selected })
 			});
 			const res = await req.json();
 
@@ -230,7 +229,7 @@ const DebitNote = () => {
 					openStatus={(status) => { setOpenConfirm(status) }}
 					title={"Are you sure you want to delete the selected Debit Notes?"}
 					fun={() => {
-						removeData(true);
+						removeData();
 						setOpenConfirm(false);
 					}}
 				/>

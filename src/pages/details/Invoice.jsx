@@ -50,6 +50,7 @@ const Invoice = () => {
 	const [accountDetails, setAccountDetails] = useState(null);
 	const [qr, setQr] = useState("");
 	const [paymentModal, setPaymentModal] = useState(false);
+	const [paymentButtonShow, setPaymentButtonShow] = useState(null);
 
 
 
@@ -130,6 +131,12 @@ const Invoice = () => {
 						);
 						setAccountDetails(res.data.accountId || null);
 
+						if(Number(res.data?.paymentAmount || 0) < res.data?.finalAmount){
+							setPaymentButtonShow(true);
+						}else{
+							setPaymentButtonShow(false)
+						}
+
 						// Genareate QRCode;
 						if (res.data.accountId && res.data.accountId?.upiId) {
 							const account = res.data.accountId;
@@ -171,7 +178,7 @@ const Invoice = () => {
 		getCompanyDetails()
 		getData();
 
-	}, [urlRoute])
+	}, [urlRoute, paymentModal])
 
 
 	useEffect(() => {
@@ -466,7 +473,7 @@ const Invoice = () => {
 										</div>
 
 										{
-											Number(billData?.paymentAmount || 0) < billData?.finalAmount && (bill === "salesinvoice" || bill === "purchaseinvoice") && (
+											paymentButtonShow && (bill === "salesinvoice" || bill === "purchaseinvoice") && (
 												<button className='payment__button' onClick={() => setPaymentModal(true)}>
 													<Icons.RUPES className='inline' />
 													{

@@ -319,7 +319,7 @@ const AddCompany = () => {
 									</tfoot>
 								</table>
 							</div>
-							<div className="w-full flex flex-col lg:flex-row gap-2 lg:gap-5">
+							{/* <div className="w-full flex flex-col lg:flex-row gap-2 lg:gap-5">
 								<div className='w-full'>
 									<p>Sales Invoice Reminder (Days Before)</p>
 									<input type="text" onChange={(e) => setCompanyData({ ...companyData, salesReminder: e.target.value })}
@@ -330,7 +330,7 @@ const AddCompany = () => {
 									<input type="text" onChange={(e) => setCompanyData({ ...companyData, purchaseReminder: e.target.value })}
 										value={companyData.purchaseReminder} />
 								</div>
-							</div>
+							</div> */}
 							<div className='w-full flex justify-center gap-3 my-3'>
 								<button
 									onClick={saveCompany}
