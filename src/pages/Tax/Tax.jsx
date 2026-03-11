@@ -211,32 +211,37 @@ const Tax = ({ mode }) => {
 									<IoIosAdd className='text-xl text-white' />
 									Add New
 								</button>
-								<div className='flex justify-end'>
-									<Whisper placement='leftStart' enterable
-										speaker={<Popover full>
-											<div className='download__menu' onClick={() => exportTable('print')} >
-												<BiPrinter className='text-[16px]' />
-												Print Table
-											</div>
-											<div className='download__menu' onClick={() => exportTable('copy')}>
-												<FaRegCopy className='text-[16px]' />
-												Copy Table
-											</div>
-											<div className='download__menu' onClick={() => exportTable('pdf')}>
-												<FaRegFilePdf className="text-[16px]" />
-												Download Pdf
-											</div>
-											<div className='download__menu' onClick={() => exportTable('excel')} >
-												<FaRegFileExcel className='text-[16px]' />
-												Download Excel
-											</div>
-										</Popover>}
-									>
-										<div className='record__download' >
-											<IoMdMore />
+								{
+									taxData?.length > 0 && (
+										<div className='flex justify-end'>
+											<Whisper placement='leftStart' enterable
+												speaker={<Popover full>
+													<div className='download__menu' onClick={() => exportTable('print')} >
+														<BiPrinter className='text-[16px]' />
+														Print Table
+													</div>
+													<div className='download__menu' onClick={() => exportTable('copy')}>
+														<FaRegCopy className='text-[16px]' />
+														Copy Table
+													</div>
+													<div className='download__menu' onClick={() => exportTable('pdf')}>
+														<FaRegFilePdf className="text-[16px]" />
+														Download Pdf
+													</div>
+													<div className='download__menu' onClick={() => exportTable('excel')} >
+														<FaRegFileExcel className='text-[16px]' />
+														Download Excel
+													</div>
+												</Popover>}
+											>
+												<div className='record__download' >
+													<IoMdMore />
+												</div>
+											</Whisper>
 										</div>
-									</Whisper>
-								</div>
+									)
+								}
+
 							</div>
 						</div>
 					</div>

@@ -40,6 +40,13 @@ import { IoArrowBack } from "react-icons/io5";
 import { HiMiniEyeSlash } from "react-icons/hi2";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
+import { MdOutlineCancel } from "react-icons/md";
+import { GiReceiveMoney } from "react-icons/gi";
+import { GiPayMoney } from "react-icons/gi";
+
+
+
+
 
 
 export const Icons = {
@@ -89,5 +96,8 @@ export const Icons = {
   BACK: IoArrowBack,
   MENU_DOWN_ARROW: IoIosArrowDown,
   MENU_UP_ARROW: IoIosArrowForward,
+  CANCEL: MdOutlineCancel,
+  CASH_IN: GiReceiveMoney,
+  CASH_OUT: GiPayMoney,
 };
 

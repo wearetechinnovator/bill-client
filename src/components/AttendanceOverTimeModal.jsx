@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Modal } from "rsuite";
+import {checkNumber} from '../helper/validation'
 
 
 const OVER_TIME_HOURLY = "hourly";
 const OVER_TIME_AMOUNT = "amount";
 const OVER_TIME_RATE_CUSTOM = "custom";
 const WORK_TIME_HOUR = 240;
-
 const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceData }) => {
     const [modelOpen, setModelOpen] = useState(null);
     const [overTimeType, setOverTimeType] = useState(OVER_TIME_HOURLY);
@@ -137,7 +137,9 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
                                     type="text"
                                     className="mt-2 w-[60%] p-2"
                                     value={fixedOverTimeAmount}
-                                    onChange={(e) => setFixedOverTimeAmount(e.target.value)}
+                                    onChange={(e) => setFixedOverTimeAmount(
+                                        checkNumber(e.target.value)
+                                    )}
                                 />
                             </div>
                         )

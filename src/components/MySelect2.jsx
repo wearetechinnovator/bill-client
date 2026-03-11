@@ -29,12 +29,12 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 	const [categoryDrawer, setCategoryDrawer] = useState(false);
 	const debounceTime = useRef(null);
 	const [loading, setLoading] = useState(false);
-	const [keyCount, setKeyCount] = useState(0);
 
 
 	useEffect(() => {
 		if (selectedData) {
 			setSelectedValue(selectedData.title || selectedData.name);
+			setSearchText("");
 			onType(selectedData._id);
 		}
 
@@ -186,30 +186,29 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 				<input
 					type="text"
 					className='w-full border rounded-[3px]'
-					value={selectedValue || searchText}
+					value={selectedValue ? selectedValue : searchText}
 					onFocus={() => setShowDropDown(true)}
 					onBlur={() => {
 						setShowDropDown(false);
-						setKeyCount(0);
 					}}
 					onChange={(e) => {
+						setSelectedValue(""); 
 						setSearchText(e.target.value);
-						searchData(e.target.value)
-						setKeyCount(0);
+						searchData(e.target.value);
 					}}
 					placeholder='Search...'
 				/>
-				{selectedValue ? <IoClose
-					className='absolute right-2 top-[5px] text-[16px] cursor-pointer text-gray-500'
-					onClick={() => {
-						setKeyCount(0);
-						setSelectedValue("")
-						setSelectedData()
-						setSearchText('')
-						setSearchList([]);
-						onType('');
-					}}
-				/> : <IoIosSearch className='absolute right-2 top-[5px] text-[16px] cursor-pointer' />}
+				{selectedValue ?
+					<IoClose
+						className='absolute right-2 top-[5px] text-[16px] cursor-pointer text-gray-500'
+						onClick={() => {
+							setSelectedValue("")
+							setSelectedData()
+							setSearchText('')
+							setSearchList([]);
+							onType('');
+						}}
+					/> : <IoIosSearch className='absolute right-2 top-[5px] text-[16px] cursor-pointer' />}
 
 
 				{/* List of Dropdown */}

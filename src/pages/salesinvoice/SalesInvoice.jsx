@@ -29,12 +29,24 @@ const SalesInvoice = () => {
 	const tableRef = useRef(null);
 	const [tableStatusData, setTableStatusData] = useState('active');
 	const exportData = useMemo(() => {
-		return billData && billData.map(({ invoiceDate, salesInvoiceNumber, party, DueDate }) => ({
-			"Invoice Date": invoiceDate,
-			"Sales Invoice Number": salesInvoiceNumber,
-			"Party": party.name,
-			"Due Date": DueDate
-		}));
+		return billData && billData.map((data) => {
+			let paymentStatus = Constants.UNPAID;
+			const paymentAmount = Number(data.paymentAmount) || 0;
+			if (data.finalAmount === paymentAmount)
+				paymentStatus = Constants.PAID;
+
+			else if (paymentAmount > 0 && paymentAmount < data.finalAmount)
+				paymentStatus = Constants.PARTIAL_PAID;
+
+			return {
+				"Invoice Date": data.invoiceDate?.split("T")[0],
+				"Invoice Number": data.salesInvoiceNumber,
+				"Party": data.party.name,
+				"Due Date": data.DueDate?.split("T")[0] || "--",
+				Status: paymentStatus,
+				Amount: data.finalAmount
+			}
+		});
 	}, [billData]);
 	const [loading, setLoading] = useState(true);
 	const [filterToggle, setFilterToggle] = useState(false);
@@ -197,8 +209,8 @@ const SalesInvoice = () => {
 		if (selected.length === 0 || tableStatusData !== 'active') {
 			return;
 		}
-		const url = process.env.REACT_APP_API_URL + "/salesinvoice/delete";
 		try {
+			const url = process.env.REACT_APP_API_URL + "/salesinvoice/delete";
 			const req = await fetch(url, {
 				method: "DELETE",
 				headers: {
@@ -264,13 +276,13 @@ const SalesInvoice = () => {
 								</select>
 							</div>
 							<div className='listing__btn_grp'>
-								<div className='flex w-full flex-col lg:w-[300px]'>
-									<input type='text'
+								{/* <div className='flex w-full flex-col lg:w-[300px]'>
+									<input type='search'
 										placeholder='Search...'
 										onChange={searchTable}
 										className='p-[6px]'
 									/>
-								</div>
+								</div> */}
 								<button
 									onClick={() => {
 										setFilterToggle(!filterToggle);
@@ -294,32 +306,36 @@ const SalesInvoice = () => {
 									<Icons.ADD className='text-xl text-white' />
 									Add New
 								</button>
-								<div className='flex justify-end'>
-									<Whisper placement='leftStart' enterable
-										speaker={<Popover full>
-											<div className='download__menu' onClick={() => exportTable('print')} >
-												<Icons.PRINTER className='text-[16px]' />
-												Print Table
-											</div>
-											<div className='download__menu' onClick={() => exportTable('copy')}>
-												<Icons.COPY className='text-[16px]' />
-												Copy Table
-											</div>
-											<div className='download__menu' onClick={() => exportTable('pdf')}>
-												<Icons.PDF className="text-[16px]" />
-												Download Pdf
-											</div>
-											<div className='download__menu' onClick={() => exportTable('excel')} >
-												<Icons.EXCEL className='text-[16px]' />
-												Download Excel
-											</div>
-										</Popover>}
-									>
-										<div className='record__download' >
-											<Icons.MORE />
+								{
+									billData?.length > 0 && (
+										<div className='flex justify-end'>
+											<Whisper placement='leftStart' enterable
+												speaker={<Popover full>
+													<div className='download__menu' onClick={() => exportTable('print')} >
+														<Icons.PRINTER className='text-[16px]' />
+														Print Table
+													</div>
+													<div className='download__menu' onClick={() => exportTable('copy')}>
+														<Icons.COPY className='text-[16px]' />
+														Copy Table
+													</div>
+													<div className='download__menu' onClick={() => exportTable('pdf')}>
+														<Icons.PDF className="text-[16px]" />
+														Download Pdf
+													</div>
+													<div className='download__menu' onClick={() => exportTable('excel')} >
+														<Icons.EXCEL className='text-[16px]' />
+														Download Excel
+													</div>
+												</Popover>}
+											>
+												<div className='record__download' >
+													<Icons.MORE />
+												</div>
+											</Whisper>
 										</div>
-									</Whisper>
-								</div>
+									)
+								}
 							</div>
 						</div>
 						{
@@ -493,9 +509,13 @@ const SalesInvoice = () => {
 														{data.DueDate ? new Date(data.DueDate).toLocaleDateString() : "--"}
 													</td>
 													<td align='left'>
-														<span className={`${paymentStatus === Constants.PAID ? 'green-badge' : paymentStatus === Constants.PARTIAL_PAID ? 'yellow-badge' : 'red-badge'} badge capitalize`}>
-															{paymentStatus}
-														</span>
+														{
+															data.isCancel ?
+																<span className='badge red-badge'>Cancelled</span>
+																: <span className={`${paymentStatus === Constants.PAID ? 'green-badge' : paymentStatus === Constants.PARTIAL_PAID ? 'yellow-badge' : 'red-badge'} badge capitalize`}>
+																	{paymentStatus}
+																</span>
+														}
 													</td>
 													<td align='left'>
 														<Icons.RUPES className='inline' /> {data.finalAmount}

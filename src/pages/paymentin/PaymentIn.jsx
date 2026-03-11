@@ -33,10 +33,11 @@ const PaymentIn = () => {
     const tableRef = useRef(null);
     const [tableStatusData, setTableStatusData] = useState('active');
     const exportData = useMemo(() => {
-        return billData && billData.map(({ paymentInDate, paymentInNumber, party }) => ({
-            "Payment In Date": paymentInDate.split("T")[0],
-            "Payment In Number": paymentInNumber,
-            "Party": party.name,
+        return billData && billData.map(data => ({
+            "Payment In Date": data.paymentInDate.split("T")[0],
+            "Payment In Number": data.paymentInNumber,
+            "Party": data.party.name,
+            Amount: data.amount
         }));
     }, [billData]);
     const [loading, setLoading] = useState(true);
@@ -242,13 +243,13 @@ const PaymentIn = () => {
                                 </select>
                             </div>
                             <div className='flex items-center gap-2 listing__btn_grp'>
-                                <div className='flex w-full flex-col lg:w-[300px]'>
+                                {/* <div className='flex w-full flex-col lg:w-[300px]'>
                                     <input type='text'
                                         placeholder='Search...'
                                         onChange={searchTable}
                                         className='p-[6px]'
                                     />
-                                </div>
+                                </div> */}
                                 <button onClick={() => {
                                     setFilterToggle(!filterToggle)
                                 }}
@@ -271,32 +272,36 @@ const PaymentIn = () => {
                                     <Icons.ADD className='text-xl text-white' />
                                     Add New
                                 </button>
-                                <div className='flex justify-end'>
-                                    <Whisper placement='leftStart' enterable
-                                        speaker={<Popover full>
-                                            <div className='download__menu' onClick={() => exportTable('print')} >
-                                                <Icons.PRINTER className='text-[16px]' />
-                                                Print Table
-                                            </div>
-                                            <div className='download__menu' onClick={() => exportTable('copy')}>
-                                                <Icons.COPY className='text-[16px]' />
-                                                Copy Table
-                                            </div>
-                                            <div className='download__menu' onClick={() => exportTable('pdf')}>
-                                                <Icons.PDF className="text-[16px]" />
-                                                Download Pdf
-                                            </div>
-                                            <div className='download__menu' onClick={() => exportTable('excel')} >
-                                                <Icons.EXCEL className='text-[16px]' />
-                                                Download Excel
-                                            </div>
-                                        </Popover>}
-                                    >
-                                        <div className='record__download' >
-                                            <Icons.MORE />
+                                {
+                                    billData?.length > 0 && (
+                                        <div className='flex justify-end'>
+                                            <Whisper placement='leftStart' enterable
+                                                speaker={<Popover full>
+                                                    <div className='download__menu' onClick={() => exportTable('print')} >
+                                                        <Icons.PRINTER className='text-[16px]' />
+                                                        Print Table
+                                                    </div>
+                                                    <div className='download__menu' onClick={() => exportTable('copy')}>
+                                                        <Icons.COPY className='text-[16px]' />
+                                                        Copy Table
+                                                    </div>
+                                                    <div className='download__menu' onClick={() => exportTable('pdf')}>
+                                                        <Icons.PDF className="text-[16px]" />
+                                                        Download Pdf
+                                                    </div>
+                                                    <div className='download__menu' onClick={() => exportTable('excel')} >
+                                                        <Icons.EXCEL className='text-[16px]' />
+                                                        Download Excel
+                                                    </div>
+                                                </Popover>}
+                                            >
+                                                <div className='record__download' >
+                                                    <Icons.MORE />
+                                                </div>
+                                            </Whisper>
                                         </div>
-                                    </Whisper>
-                                </div>
+                                    )
+                                }
                             </div>
                         </div>
                         {
@@ -446,7 +451,7 @@ const PaymentIn = () => {
                                                                         <Icons.EDIT className='text-[16px]' />
                                                                         Edit
                                                                     </div>
-                                                                    
+
                                                                     <div
                                                                         className='table__list__action__icon'
                                                                         onClick={() => {

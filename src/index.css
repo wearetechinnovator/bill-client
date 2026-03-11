@@ -364,7 +364,7 @@ select {
 }
 
 .form-btn-bar {
-  @apply w-full px-2 py-2 rounded-t mt-1 bg-white sticky bottom-0 left-0 right-0 border-t flex items-center justify-start gap-2 text-sm ;
+  @apply w-full px-2 py-2 rounded-t mt-1 bg-white sticky bottom-0 left-0 right-0 border-t flex items-center justify-start gap-2 text-sm;
   box-shadow: 0px -2px 5px rgb(0 0 0 / 0.1);
 }
 
@@ -389,6 +389,16 @@ select {
 
 #invoice thead td {
   font-weight: 500;
+}
+
+.cancel__invoice {
+  position: absolute;
+  color: rgba(255, 0, 0, 0.295);
+  text-transform: uppercase;
+  font-size: 6.5rem;
+  transform: rotate(-50deg);
+  top: 292px;
+  left: 110px;
 }
 
 #dashboard table th {
@@ -626,7 +636,8 @@ select {
 .list__table__head tr th:first-child {
   @apply w-[50px]
 }
-.list__table__head.without__checkbox tr th:first-child{
+
+.list__table__head.without__checkbox tr th:first-child {
   @apply w-[130px];
 }
 
@@ -1450,7 +1461,7 @@ input {
   @apply border-none
 }
 
-.top__details__card{
+.top__details__card {
   @apply border-[#4d4d4d] w-full rounded p-2;
   box-shadow: 2px 1px 5px rgb(199, 198, 198);
 }

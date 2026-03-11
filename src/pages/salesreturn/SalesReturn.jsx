@@ -68,7 +68,7 @@ const SalesReturn = () => {
 					billNo: filter.billNo,
 				}
 			}
-			const url =  `${process.env.REACT_APP_API_URL}/salesreturn/get?page=${activePage}&limit=${dataLimit}`;
+			const url = `${process.env.REACT_APP_API_URL}/salesreturn/get?page=${activePage}&limit=${dataLimit}`;
 			const req = await fetch(url, {
 				method: "POST",
 				headers: {
@@ -234,13 +234,13 @@ const SalesReturn = () => {
 								</select>
 							</div>
 							<div className='flex items-center gap-2 listing__btn_grp'>
-								<div className='flex w-full flex-col lg:w-[300px]'>
+								{/* <div className='flex w-full flex-col lg:w-[300px]'>
 									<input type='text'
 										placeholder='Search...'
 										onChange={searchTable}
 										className='p-[6px]'
 									/>
-								</div>
+								</div> */}
 								<button onClick={() => {
 									setFilterToggle(!filterToggle)
 								}}
@@ -263,32 +263,36 @@ const SalesReturn = () => {
 									<Icons.ADD className='text-xl text-white' />
 									Add New
 								</button>
-								<div className='flex justify-end'>
-									<Whisper placement='leftStart' enterable
-										speaker={<Popover full>
-											<div className='download__menu' onClick={() => exportTable('print')} >
-												<Icons.PRINTER className='text-[16px]' />
-												Print Table
-											</div>
-											<div className='download__menu' onClick={() => exportTable('copy')}>
-												<Icons.COPY className='text-[16px]' />
-												Copy Table
-											</div>
-											<div className='download__menu' onClick={() => exportTable('pdf')}>
-												<Icons.PDF className="text-[16px]" />
-												Download Pdf
-											</div>
-											<div className='download__menu' onClick={() => exportTable('excel')} >
-												<Icons.EXCEL className='text-[16px]' />
-												Download Excel
-											</div>
-										</Popover>}
-									>
-										<div className='record__download' >
-											<Icons.MORE />
+								{
+									billData?.length > 0 && (
+										<div className='flex justify-end'>
+											<Whisper placement='leftStart' enterable
+												speaker={<Popover full>
+													<div className='download__menu' onClick={() => exportTable('print')} >
+														<Icons.PRINTER className='text-[16px]' />
+														Print Table
+													</div>
+													<div className='download__menu' onClick={() => exportTable('copy')}>
+														<Icons.COPY className='text-[16px]' />
+														Copy Table
+													</div>
+													<div className='download__menu' onClick={() => exportTable('pdf')}>
+														<Icons.PDF className="text-[16px]" />
+														Download Pdf
+													</div>
+													<div className='download__menu' onClick={() => exportTable('excel')} >
+														<Icons.EXCEL className='text-[16px]' />
+														Download Excel
+													</div>
+												</Popover>}
+											>
+												<div className='record__download' >
+													<Icons.MORE />
+												</div>
+											</Whisper>
 										</div>
-									</Whisper>
-								</div>
+									)
+								}
 							</div>
 						</div>
 

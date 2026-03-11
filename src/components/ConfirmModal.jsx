@@ -21,7 +21,8 @@ const ConfirmModal = ({ openConfirm, openStatus, title, isDel = true, fun }) => 
             centered={true}
         >
             <Modal.Body>
-                <p className="title">{title}</p>
+                <span className="text-lg">Confirmation</span>
+                <p className="title text-xs">{title}</p>
                 <div className="mt-5 text-end">
                     <button className="cancel" onClick={() => {
                         setOpen(false);

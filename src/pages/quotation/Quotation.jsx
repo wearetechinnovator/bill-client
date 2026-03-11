@@ -17,6 +17,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 import { Constants } from '../../helper/constants';
 
 
+
 const Quotation = () => {
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -29,11 +30,12 @@ const Quotation = () => {
     const tableRef = useRef(null);
     const [tableStatusData, setTableStatusData] = useState('active');
     const exportData = useMemo(() => {
-        return billData && billData.map(({ estimateDate, quotationNumber, party, validDate }) => ({
-            "Estimate Data": estimateDate,
+        return billData && billData.map(({ estimateDate, quotationNumber, party, validDate, billStatus }) => ({
+            "Estimate Data": estimateDate?.split("T")[0],
             "Quotation Number": quotationNumber,
             "Party": party.name,
-            "Valid Date": validDate
+            "Valid Date": validDate?.split("T")[0],
+            "Status" : billStatus === Constants.CONVERT ? "converted" : billStatus
         }));
     }, [billData]);
     const [loading, setLoading] = useState(true);
@@ -101,27 +103,6 @@ const Quotation = () => {
     };
 
 
-    const searchTable = (e) => {
-        const value = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('.list__table tbody tr');
-
-        rows.forEach(row => {
-            const cols = row.querySelectorAll('td');
-            let found = false;
-            cols.forEach((col, index) => {
-                if (index !== 0 && col.innerHTML.toLowerCase().includes(value)) {
-                    found = true;
-                }
-            });
-            if (found) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-        });
-    }
-
-
     const selectAll = (e) => {
         if (e.target.checked) {
             setSelected(billData.map(data => data._id));
@@ -147,16 +128,17 @@ const Quotation = () => {
             copyTable("listQuotation"); // Pass tableid
         }
         else if (whichType === "excel") {
-            downloadExcel(exportData, 'party-list.xlsx') // Pass data and filename
+            downloadExcel(exportData, 'quotation-list.xlsx') // Pass data and filename
         }
         else if (whichType === "print") {
-            printTable(tableRef, "Party List"); // Pass table ref and title
+            printTable(tableRef, "Quotation List"); // Pass table ref and title
         }
         else if (whichType === "pdf") {
             let document = exportPdf('Quotation List', exportData);
             downloadPdf(document)
         }
     }
+
 
     const removeData = async () => {
         if (selected.length === 0 || tableStatusData !== 'active') {
@@ -169,7 +151,7 @@ const Quotation = () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ ids: selected})
+                body: JSON.stringify({ ids: selected })
             });
             const res = await req.json();
 
@@ -191,6 +173,7 @@ const Quotation = () => {
             toast("Something went wrong", "error")
         }
     }
+
 
     const clearFilterData = () => {
         setFilter({
@@ -229,13 +212,13 @@ const Quotation = () => {
                                 </select>
                             </div>
                             <div className='listing__btn_grp'>
-                                <div className='flex w-full flex-col lg:w-[300px]'>
+                                {/* <div className='flex w-full flex-col lg:w-[300px]'>
                                     <input type='text'
                                         placeholder='Search...'
                                         onChange={searchTable}
                                         className='p-[6px]'
                                     />
-                                </div>
+                                </div> */}
                                 <button
                                     onClick={() => {
                                         setFilterToggle(!filterToggle)
@@ -259,33 +242,36 @@ const Quotation = () => {
                                     <Icons.ADD className='text-xl text-white' />
                                     Add New
                                 </button>
-
-                                <div className='flex justify-end'>
-                                    <Whisper placement='leftStart' enterable
-                                        speaker={<Popover full>
-                                            <div className='download__menu' onClick={() => exportTable('print')} >
-                                                <Icons.PRINTER className='text-[16px]' />
-                                                Print Table
-                                            </div>
-                                            <div className='download__menu' onClick={() => exportTable('copy')}>
-                                                <Icons.COPY className='text-[16px]' />
-                                                Copy Table
-                                            </div>
-                                            <div className='download__menu' onClick={() => exportTable('pdf')}>
-                                                <Icons.PDF className="text-[16px]" />
-                                                Download Pdf
-                                            </div>
-                                            <div className='download__menu' onClick={() => exportTable('excel')} >
-                                                <Icons.EXCEL className='text-[16px]' />
-                                                Download Excel
-                                            </div>
-                                        </Popover>}
-                                    >
-                                        <div className='record__download' >
-                                            <Icons.MORE />
+                                {
+                                    billData?.length > 0 && (
+                                        <div className='flex justify-end'>
+                                            <Whisper placement='leftStart' enterable
+                                                speaker={<Popover full>
+                                                    <div className='download__menu' onClick={() => exportTable('print')} >
+                                                        <Icons.PRINTER className='text-[16px]' />
+                                                        Print Table
+                                                    </div>
+                                                    <div className='download__menu' onClick={() => exportTable('copy')}>
+                                                        <Icons.COPY className='text-[16px]' />
+                                                        Copy Table
+                                                    </div>
+                                                    <div className='download__menu' onClick={() => exportTable('pdf')}>
+                                                        <Icons.PDF className="text-[16px]" />
+                                                        Download Pdf
+                                                    </div>
+                                                    <div className='download__menu' onClick={() => exportTable('excel')} >
+                                                        <Icons.EXCEL className='text-[16px]' />
+                                                        Download Excel
+                                                    </div>
+                                                </Popover>}
+                                            >
+                                                <div className='record__download' >
+                                                    <Icons.MORE />
+                                                </div>
+                                            </Whisper>
                                         </div>
-                                    </Whisper>
-                                </div>
+                                    )
+                                }
                             </div>
                         </div>
 

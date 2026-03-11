@@ -21,11 +21,13 @@ import Loading from '../../components/Loading';
 import QRCode from "qrcode";
 import PaymentInModal from '../../components/PaymentInModal';
 import PaymentOutModal from '../../components/PaymentOutModal';
+import ConfirmModal from '../../components/ConfirmModal';
 
 
 
 
 const Invoice = () => {
+	const token = Cookies.get("token");
 	const navigate = useNavigate();
 	const { id, bill } = useParams();
 	const [loading, setLoading] = useState(false);
@@ -51,6 +53,7 @@ const Invoice = () => {
 	const [qr, setQr] = useState("");
 	const [paymentModal, setPaymentModal] = useState(false);
 	const [paymentButtonShow, setPaymentButtonShow] = useState(null);
+	const [openConfirm, setOpenConfirm] = useState(false);
 
 
 
@@ -113,7 +116,7 @@ const Invoice = () => {
 						headers: {
 							"Content-Type": 'application/json'
 						},
-						body: JSON.stringify({ token: Cookies.get("token"), id: id })
+						body: JSON.stringify({ token, id: id })
 					});
 					const res = await req.json();
 					if (req.status === 200) {
@@ -131,9 +134,9 @@ const Invoice = () => {
 						);
 						setAccountDetails(res.data.accountId || null);
 
-						if(Number(res.data?.paymentAmount || 0) < res.data?.finalAmount){
+						if (Number(res.data?.paymentAmount || 0) < res.data?.finalAmount && res.data?.isCancel === false) {
 							setPaymentButtonShow(true);
-						}else{
+						} else {
 							setPaymentButtonShow(false)
 						}
 
@@ -178,7 +181,7 @@ const Invoice = () => {
 		getCompanyDetails()
 		getData();
 
-	}, [urlRoute, paymentModal])
+	}, [urlRoute, paymentModal, openConfirm])
 
 
 	useEffect(() => {
@@ -338,6 +341,29 @@ const Invoice = () => {
 
 	}
 
+	// Cancel Invoice ::Only for Sales
+	const cancelInvoice = async () => {
+		try {
+			const URL = `${process.env.REACT_APP_API_URL}/salesinvoice/cancel-invoice`;
+			const req = await fetch(URL, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({ token, id })
+			});
+			const res = await req.json();
+			if (req.status !== 200) {
+				return toast(res.err, 'error');
+			}
+
+			setOpenConfirm(false); // Close Confirm Modal;
+			return toast(res.msg, 'success');
+
+		} catch (err) {
+			return toast("Something went wrong", 'error');
+		}
+	}
 
 	return (
 
@@ -368,11 +394,19 @@ const Invoice = () => {
 						/>
 					)
 				}
-
 				<MailModal
 					open={openModal}
 					pdf={pdfData}
 					email={billData?.party?.email}
+				/>
+				<ConfirmModal
+					openConfirm={openConfirm}
+					isDel={false}
+					openStatus={(status) => { setOpenConfirm(status) }}
+					title={"Are you sure you want to cancel this invoice?"}
+					fun={() => {
+						cancelInvoice();
+					}}
 				/>
 
 				<div className="content__body">
@@ -384,29 +418,6 @@ const Invoice = () => {
 								!loading ? (
 									<div className='flex items-center justify-between mb-5 bg-gray-50 p-2'>
 										<div id='invoiceBtn' className='flex gap-2 items-center'>
-											<button
-												onClick={() => {
-													swal({
-														title: "Are you sure?",
-														icon: "warning",
-														buttons: true,
-													})
-														.then((cnv) => {
-															if (cnv) {
-																swal("Quotation successfully duplicate", {
-																	icon: "success",
-																});
-																navigate(`/admin/${route}/add/${id}`)
-															}
-														});
-												}}
-												title='Clone Invoice'
-												className='bg-[#003E32] text-white rounded-[5px] flex justify-center items-center px-2 py-[5px] gap-1'
-											>
-												<Icons.COPY />
-												Clone
-											</button>
-
 											<button
 												onClick={downloadLoading ? null : () => downloadBill(`${billNumber}-${billData?.party.name}`)}
 												title='PDF'
@@ -449,39 +460,80 @@ const Invoice = () => {
 													<MdOutlineArrowDropDown />
 												</div>
 											</Whisper>
+										</div>
 
-											<button
-												onClick={printBill}
-												title='Print Bill'
-												className='bg-[#003E32] text-white rounded-[5px] flex justify-center items-center px-2 py-[5px]'>
-												<Icons.PRINTER className="text-white text-[15px] mr-1" />
-												Print
-											</button>
-
+										<div className='flex items-center gap-4'>
 											{
-												Number(billData?.paymentAmount || 0) <= 0 && (
-													<button
-														title='Edit Bill'
-														onClick={() => navigate(`/admin/${route}/edit/${id}`)}
-														className='bg-[#003E32] text-white rounded-[5px] flex justify-center items-center px-2 py-[5px]'
-													>
-														<Icons.EDIT className="text-white text-[15px] mr-1" />
-														Edit
+												paymentButtonShow && (bill === "salesinvoice" || bill === "purchaseinvoice") && (
+													<button className='payment__button' onClick={() => setPaymentModal(true)}>
+														<Icons.RUPES className='inline' />
+														{
+															bill === "purchaseinvoice" ? "Record Payment Out" : bill === "salesinvoice" ? "Record Payment In" : ""
+														}
 													</button>
 												)
 											}
-										</div>
+											<div className='flex justify-end'>
+												<Whisper
+													placement='leftStart'
+													trigger={"click"}
+													speaker={<Popover full>
+														{
+															Number(billData?.paymentAmount || 0) <= 0 && billData?.isCancel === false && (
+																<div className='download__menu w-[120px]'
+																	title='Edit Bill'
+																	onClick={() => navigate(`/admin/${route}/edit/${id}`)}
+																>
+																	<Icons.EDIT className="text-[15px]" />
+																	Edit
+																</div>
+															)
+														}
 
-										{
-											paymentButtonShow && (bill === "salesinvoice" || bill === "purchaseinvoice") && (
-												<button className='payment__button' onClick={() => setPaymentModal(true)}>
-													<Icons.RUPES className='inline' />
-													{
-														bill === "purchaseinvoice" ? "Record Payment Out" : bill === "salesinvoice" ? "Record Payment In" : ""
-													}
-												</button>
-											)
-										}
+														<div className='download__menu'
+															onClick={() => {
+																swal({
+																	title: "Are you sure?",
+																	icon: "warning",
+																	buttons: true,
+																})
+																	.then((cnv) => {
+																		if (cnv) {
+																			swal("Quotation successfully duplicate", {
+																				icon: "success",
+																			});
+																			navigate(`/admin/${route}/add/${id}`)
+																		}
+																	});
+															}}
+														>
+															<Icons.COPY />
+															Clone
+														</div>
+														<div className='download__menu'
+															onClick={printBill}
+														>
+															<Icons.PRINTER className="text-[15px]" />
+															Print
+														</div>
+														{
+															Number(billData?.paymentAmount || 0) <= 0 && billData?.isCancel === false && (
+																<div className='download__menu'
+																	onClick={() => setOpenConfirm(true)}
+																>
+																	<Icons.CANCEL className="text-[15px]" />
+																	Cancel Invoice
+																</div>
+															)
+														}
+													</Popover>}
+												>
+													<div className='record__download' >
+														<Icons.MORE />
+													</div>
+												</Whisper>
+											</div>
+										</div>
 									</div>
 								) : (
 									<div className='shimmer__parent mb-4'>
@@ -490,13 +542,18 @@ const Invoice = () => {
 								)
 							}
 
-
 							{
 								!loading ? (
 									<div id='mainBill' className='border border-slate-600 rounded p-4'>
 										<div ref={downloadRef} id='invoice'>
 											<p className='font-bold text-center uppercase'>{billName}</p>
-											<div className='border border-b-0 w-full mt-3'>
+											<div className='border border-b-0 w-full mt-3 relative'>
+												{
+													billData?.isCancel && (
+														<h1 className='cancel__invoice'>Cancelled</h1>
+													)
+												}
+
 												<div className='flex w-full border-b'>
 													<div className='p-3 flex items-center gap-5 border-r' style={{ width: "60%" }}>
 														<div>
@@ -746,8 +803,6 @@ const Invoice = () => {
 									</div>
 								)
 							}
-
-
 						</div>
 					</div>
 				</div>

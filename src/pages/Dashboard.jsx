@@ -293,12 +293,10 @@ const Dashboard = () => {
 				const accountBalanceDataChartData = res.data.reduce((acc, i) => {
 					// If nagetive value then add 0;
 					let amount = balanceAmount[i._id] < 1 ? 0 : balanceAmount[i._id];
-
 					acc.push({ name: i.accountName, value: amount, fill: COLORS[acc.length] });
 					return acc;
 				}, [])
 				accountBalanceDataChartData.push({ name: "Cash", value: balanceAmount['cash'] < 1 ? 0 : balanceAmount['cash'], fill: COLORS[3] });
-
 				setAccountBalanceData(accountBalanceDataChartData)
 
 			} catch (error) {
@@ -332,6 +330,7 @@ const Dashboard = () => {
 			}
 		})()
 	}, [])
+
 
 	// Get Recent Sales Invoice
 	useEffect(() => {
@@ -387,7 +386,9 @@ const Dashboard = () => {
 														</p>
 													</div>
 													<div className="interaction-right-box text-end w-[15%]">
-														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
+														<div className="round-stroke w-[30px] h-[30px] flex items-center content-center mx-auto">
+															<Icons.CASH_IN size={25} color="#000" className="flex mx-auto" />
+														</div>
 													</div>
 												</div>
 											</div>
@@ -400,7 +401,9 @@ const Dashboard = () => {
 														</p>
 													</div>
 													<div className="interaction-right-box text-end w-[15%]">
-														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
+														<div className="round-stroke w-[30px] h-[30px] flex items-center content-center mx-auto">
+															<Icons.CASH_OUT size={25} color="#000" className="flex mx-auto" />
+														</div>
 													</div>
 												</div>
 											</div>
@@ -516,6 +519,8 @@ const Dashboard = () => {
 												wrapperStyle={{
 													right: 30,
 													top: "30%",
+													maxHeight: 120,
+													overflowY: "auto"
 												}}
 											// formatter={(value, entry) => {
 											// 	return `${value.slice(0,6)}... : ₹ ${entry.payload.value}`;
