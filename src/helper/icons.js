@@ -43,6 +43,8 @@ import { IoIosArrowForward } from "react-icons/io";
 import { MdOutlineCancel } from "react-icons/md";
 import { GiReceiveMoney } from "react-icons/gi";
 import { GiPayMoney } from "react-icons/gi";
+import { FaArrowUp } from "react-icons/fa";
+import { FaArrowDown } from "react-icons/fa";
 
 
 
@@ -50,6 +52,8 @@ import { GiPayMoney } from "react-icons/gi";
 
 
 export const Icons = {
+  ARROW_UP: FaArrowUp,
+  ARROW_DOWN: FaArrowDown,
   RESET: LuRefreshCcw,
   SEARCH: LuSearch,
   ADD: IoIosAdd,

@@ -1465,3 +1465,15 @@ input {
   @apply border-[#4d4d4d] w-full rounded p-2;
   box-shadow: 2px 1px 5px rgb(199, 198, 198);
 }
+
+.staff__make__payment{
+  @apply bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 h-[30px] border-blue-600 border;
+  border-start-start-radius: 5px;
+  border-end-start-radius: 5px;
+}
+.staff__make__payment__drpdwn{
+  @apply bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 h-[30px] border-blue-600 border;
+  border-start-end-radius: 5px;
+  border-end-end-radius: 5px;
+  border-left-color: white;
+}

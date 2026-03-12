@@ -14,9 +14,22 @@ import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import StaffPaymentModal from '../../components/StaffPaymentModal';
 import ConfirmModal from '../../components/ConfirmModal';
+import StaffPaymentCollectModal from '../../components/StaffPaymentCollectModal';
 
-
-
+const MONTH_LIST = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+];
 const AttendanceDetails = () => {
     const token = Cookies.get("token");
     const userDetails = useSelector((store) => store.userDetail); //get use details from store
@@ -29,8 +42,6 @@ const AttendanceDetails = () => {
     const [attendancePickerLabel, setAttendancePickerLabel] = useState("");
     const [tab, setTab] = useState(0); // 0=`Attendance` | 1=`Details`;
     const [datesArr, setDatesArr] = useState([]);
-    const [attendanceData, setAttendanceData] = useState([]);
-    const [downloadAttendanceData, downloadSetAttendanceData] = useState([]);
     const [attendanceSheet, setAttendanceSheet] = useState([]);
     const ATTENDANCE_SAVE_TIME = 2000; // Debounce time;
     const attendanceSaveTimer = useRef(null);
@@ -48,10 +59,16 @@ const AttendanceDetails = () => {
     })
     const [paymentModal, setPaymentModal] = useState(false);
     const [staffTransaction, setStaffTransaction] = useState([]);
+    //Store current transactionId when edit transaction
     const [editTransactionId, setEditTransactionId] = useState(null);
     const [openConfirm, setOpenConfirm] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(null) // Store current date when click overtime modal;
+    // Store current date when click overtime modal;
+    const [selectedDate, setSelectedDate] = useState(null)
     const [attendanceDataForModal, setAttendanceDataForModal] = useState(null);
+    const [paymentCollectModal, setPaymentCollectModal] = useState(false);
+    const currentMonthInIndex = new Date().getMonth();
+    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
 
 
 
@@ -112,7 +129,6 @@ const AttendanceDetails = () => {
                 const res = await req.json();
 
                 if (req.status === 200) {
-                    setAttendanceData(res.data);
                     setAttendanceSheet(res.data);
 
                     const total = res.data.reduce((acc, item) => {
@@ -221,6 +237,7 @@ const AttendanceDetails = () => {
 
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, "0");
+        setCurrentYear(year);
 
         setAttendanceDatePickervalue(`${year}-${month}`);
         setAttendancePickerLabel(
@@ -337,9 +354,9 @@ const AttendanceDetails = () => {
             })
         })
         const res = await req.json();
-        if (req.status === 200) {
-            downloadSetAttendanceData(res.data)
-        }
+        // if (req.status === 200) {
+        //     downloadSetAttendanceData(res.data)
+        // }
 
         const options = {
             margin: 10,
@@ -353,7 +370,7 @@ const AttendanceDetails = () => {
     }
 
 
-    // Get and Set Staff Transaction Data;
+    // Get and Set Staff Payment for Transaction Data;
     useEffect(() => {
         if (tab === 3) {
             (async () => {
@@ -383,7 +400,7 @@ const AttendanceDetails = () => {
                 }
             })()
         }
-    }, [tab, filter, paymentModal])
+    }, [tab, filter, paymentModal, paymentCollectModal])
 
 
     // Delete Staff Transaction;
@@ -416,6 +433,7 @@ const AttendanceDetails = () => {
             toast("Something went wrong", "error")
         }
     }
+
 
     const removeAttendanceStatus = async (date) => {
         const allSheetData = [...attendanceSheet];
@@ -476,6 +494,14 @@ const AttendanceDetails = () => {
                 }}
                 paymentId={editTransactionId}
             />
+            <StaffPaymentCollectModal
+                openModal={paymentCollectModal}
+                staffName={staffData?.staffName}
+                openStatus={() => {
+                    setPaymentCollectModal(false);
+                }}
+                paymentId={editTransactionId}
+            />
             <ConfirmModal
                 openConfirm={openConfirm}
                 openStatus={(status) => { setOpenConfirm(status) }}
@@ -517,13 +543,26 @@ const AttendanceDetails = () => {
                         </div>
 
                         <div className='flex items-center gap-2'>
-                            <button
-                                onClick={() => setPaymentModal(true)}
-                                className='bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded border-blue-600 border'
-                            >
-                                <Icons.RUPES className='inline ml-1' />
-                                Make Payment
-                            </button>
+                            <div className='flex items-center'>
+                                <button
+                                    onClick={() => setPaymentModal(true)}
+                                    className='staff__make__payment'
+                                >
+                                    <Icons.RUPES className='inline ml-1' />
+                                    Make Payment
+                                </button>
+                                <Whisper placement='bottomEnd' trigger={"click"}
+                                    speaker={<Popover full>
+                                        <div className='download__menu' onClick={() => setPaymentCollectModal(true)}>
+                                            Collect Payment
+                                        </div>
+                                    </Popover>}
+                                >
+                                    <button className='staff__make__payment__drpdwn'>
+                                        <Icons.MENU_DOWN_ARROW className='text-[16px]' />
+                                    </button>
+                                </Whisper>
+                            </div>
                             <div className='relative'>
                                 <button
                                     onClick={() => downloadDateRef.current.showPicker()}
@@ -822,6 +861,117 @@ const AttendanceDetails = () => {
                             )
                         }
 
+                        {/* ===========================[Payroll Tab]======================*/}
+                        {/* ============================================================= */}
+                        {
+                            tab === 2 && (
+                                <div>
+                                    <div className='w-full flex items-center justify-between'>
+                                        <p className='text-[15px]'>{MONTH_LIST[currentMonthInIndex]} {currentYear}</p>
+
+                                        <div className='bg-gray-50 h-[30px] border rounded p-1 flex items-center gap-2 w-[125px] justify-center'>
+                                            <button onClick={(e) => dateChanger("prev")}>
+                                                <Icons.PREV_PAGE_ARROW />
+                                            </button>
+                                            <div className="relative w-[150px] text-center">
+                                                <input
+                                                    type="month"
+                                                    ref={attendanceDateRef}
+                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                    onChange={(e) => {
+                                                        if (!e.target.value) return;
+
+                                                        setAttendanceDatePickervalue(e.target.value)
+                                                        setAttendancePickerLabel(
+                                                            new Date(e.target.value).toString().split(" ")[1] + " " + new Date(e.target.value).toString().split(" ")[3]
+                                                        );
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => attendanceDateRef.current.showPicker()}
+                                                    className="relative z-10"
+                                                >
+                                                    {attendancePickerLabel || "Select Month"}
+                                                </button>
+                                            </div>
+                                            <button onClick={() => dateChanger("next")} >
+                                                <Icons.NEXT_PAGE_ARROW />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className='border rounded w-full min-h-10 mt-2'>
+                                        <div className='w-full flex items-center gap-6 border-b p-2'>
+                                            <div>
+                                                <p className='uppercase font-bold text-slate-500'>Total Dues</p>
+                                                <span className='font-bold'>
+                                                    <Icons.RUPES className='inline' />1454.59
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <p className='uppercase font-bold text-slate-500'>Last month (Due)</p>
+                                                <span className='font-bold'>
+                                                    <Icons.RUPES className='inline' />1454.59
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <p className='uppercase font-bold text-slate-500'>Loan</p>
+                                                <span className='font-bold'>
+                                                    <Icons.RUPES className='inline' />1454.59
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className='w-full flex justify-between border-b p-2 bg-gray-50'>
+                                            <div className='text-gray-500'>
+                                                <span className='font-bold'>March </span>
+                                                (01 Mar 2026 - 31 Mar 2026)
+                                            </div>
+                                            <p className='font-bold'>
+                                                <Icons.RUPES className='inline' />23.33
+                                            </p>
+                                        </div>
+                                        <div className='w-full flex justify-between border-b p-2'>
+                                            <div className='font-bold'>
+                                                Earnings
+                                            </div>
+                                            <p className='font-bold'>
+                                                <Icons.RUPES className='inline' />23.33
+                                            </p>
+                                        </div>
+                                        {/*=========================[Under Earning]=================*/}
+                                        <div className='w-full flex justify-between border-b p-2 pl-4'>
+                                            <div className=''>Paid Leave (1 Days)</div>
+                                            <p>
+                                                <Icons.RUPES className='inline' />23.33
+                                            </p>
+                                        </div>
+                                        <div className='w-full flex justify-between border-b p-2 pl-4'>
+                                            <div className=''>Present (7 Days)</div>
+                                            <p>
+                                                <Icons.RUPES className='inline' />23.33
+                                            </p>
+                                        </div>
+                                        <div className='w-full flex justify-between border-b p-2 pl-4'>
+                                            <div className=''>Weekly off (2 Days)</div>
+                                            <p>
+                                                <Icons.RUPES className='inline' />23.33
+                                            </p>
+                                        </div>
+                                        {/* OverTime Loop Here */}
+                                        {/*====================*/}
+                                        <div className='w-full flex justify-between border-b p-2 pl-4'>
+                                            <div className=''>Overtime ( 3.5 Hrs X ₹4.17)</div>
+                                            <p className='font-bold'>
+                                                <Icons.RUPES className='inline' />23.33
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        }
+
+
                         {/* =======================[Transaction Tab]===================== */}
                         {/* ============================================================= */}
                         {
@@ -887,9 +1037,10 @@ const AttendanceDetails = () => {
                                                 searchable={false}
                                                 className='w-full'
                                                 data={[
-                                                    { label: "Salary", value: "salary" },
-                                                    { label: "Bonus", value: "bonus" },
-                                                    { label: "Advance Payment", value: "advance_payment" }
+                                                    { label: "Salary", value: Constants.SALARY },
+                                                    { label: "Bonus", value: Constants.BONUS },
+                                                    { label: "Advance Payment", value: Constants.ADVANCE_PAYMENT },
+                                                    { label: "Loan", value: Constants.LOAN }
                                                 ]}
                                                 onChange={(v) => setFilter({ ...filter, paymentType: v })}
                                                 value={filter.paymentType}
@@ -913,8 +1064,15 @@ const AttendanceDetails = () => {
                                                         return (
                                                             <tr key={i}>
                                                                 <td className='py-2'>{st.paymentDate.split("T")[0]}</td>
-                                                                <td className='capitalize'>{st.paymentType}</td>
-                                                                <td><Icons.RUPES className='inline' />{st.paymentAmount}</td>
+                                                                <td className='capitalize'>{st.paymentType.replace("_", " ")}</td>
+                                                                <td>
+                                                                    {
+                                                                        st.paymentType === Constants.LOAN_RECEIVED ?
+                                                                            <Icons.ARROW_DOWN className='inline mr-1 text-green-500' /> :
+                                                                            <Icons.ARROW_UP className='inline mr-1 text-red-600' />
+                                                                    }
+                                                                    <Icons.RUPES className='inline' />{st.paymentAmount}
+                                                                </td>
                                                                 <td>{st.paymentRemark || "--"}</td>
                                                                 <td>
                                                                     <Whisper
@@ -925,7 +1083,11 @@ const AttendanceDetails = () => {
                                                                                 onClick={(e) => {
                                                                                     e.stopPropagation();
                                                                                     setEditTransactionId(st._id);
-                                                                                    setPaymentModal(true);
+
+                                                                                    if (st.paymentType === Constants.LOAN_RECEIVED)
+                                                                                        setPaymentCollectModal(true);
+                                                                                    else
+                                                                                        setPaymentModal(true);
                                                                                 }}
                                                                             >
                                                                                 <Icons.EDIT className='text-[16px]' />

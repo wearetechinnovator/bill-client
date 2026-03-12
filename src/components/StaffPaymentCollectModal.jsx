@@ -7,12 +7,12 @@ import { Icons } from '../helper/icons';
 import { Constants } from '../helper/constants';
 import useApi from '../hooks/useApi';
 import { checkNumber } from '../helper/validation';
-import Loading from '../components/Loading';
+import Loading from './Loading';
 
 
 
 
-const StaffPaymentModal = ({ openModal, openStatus, paymentId }) => {
+const StaffPaymentCollectModal = ({ openModal, openStatus, paymentId, staffName }) => {
     const token = Cookies.get('token');
     const { getApiData } = useApi();
     const { id } = useParams();
@@ -20,7 +20,7 @@ const StaffPaymentModal = ({ openModal, openStatus, paymentId }) => {
     const [open, setOpen] = useState(false);
     const currentDate = new Date().toISOString().split("T")[0];
     const [formData, setFormData] = useState({
-        paymentType: '', paymentDate: currentDate, paymentMode: Constants.CASH,
+        paymentType: Constants.LOAN_RECEIVED, paymentDate: currentDate, paymentMode: Constants.CASH,
         paymentAccount: '', paymentAmount: '', paymentRemark: ''
     })
     const [account, setAccount] = useState([]);
@@ -49,9 +49,7 @@ const StaffPaymentModal = ({ openModal, openStatus, paymentId }) => {
 
 
     const savePayment = async () => {
-        if (!formData.paymentType)
-            return toast("Payment type is required", "error");
-        else if (!formData.paymentDate)
+        if (!formData.paymentDate)
             return toast("Date is required", "error");
         else if (!formData.paymentAmount)
             return toast("Amount is required", "error");
@@ -140,23 +138,15 @@ const StaffPaymentModal = ({ openModal, openStatus, paymentId }) => {
             <Modal.Header className='border-b pb-2'>
                 <Modal.Title>
                 </Modal.Title>
-                <p className='font-bold'>Make Payment</p>
+                <p className='font-bold'>Collect Payment</p>
             </Modal.Header>
             <Modal.Body className='text-xs px-2'>
                 <div className='w-full flex items-center gap-4'>
                     <div className='w-full'>
-                        <p>Payment type <span className='required__text'>*</span></p>
-                        <SelectPicker
-                            searchable={false}
-                            className='w-full'
-                            data={[
-                                { label: "Salary", value: Constants.SALARY },
-                                { label: "Bonus", value: Constants.BONUS },
-                                { label: "Advance Payment", value: Constants.ADVANCE_PAYMENT },
-                                { label: "Loan", value: Constants.LOAN }
-                            ]}
-                            onChange={(v) => setFormData({ ...formData, paymentType: v })}
-                            value={formData.paymentType}
+                        <p>Staff Name <span className='required__text'>*</span></p>
+                        <input type="text"
+                            value={staffName}
+                            disabled={true}
                         />
                     </div>
                     <div className='w-full'>
@@ -216,14 +206,10 @@ const StaffPaymentModal = ({ openModal, openStatus, paymentId }) => {
                         value={formData.paymentRemark}
                     ></textarea>
                 </div>
-                {
-                    formData.paymentType !== "loan" && (
-                        <div className='bg-yellow-50 p-2 rounded mt-4'>
-                            <strong>Note: </strong>
-                            <span className='text-[11px]'>An expense under the category 'Employee Salary & Advance' will automatically be created for this payment</span>
-                        </div>
-                    )
-                }
+                <div className='bg-yellow-50 p-2 rounded mt-4'>
+                    <strong>Note: </strong>
+                    <span className='text-[11px]'>Loan given to the staff would be reduced on collecting payment from staff.</span>
+                </div>
             </Modal.Body>
             <Modal.Footer>
                 <button
@@ -255,4 +241,4 @@ const StaffPaymentModal = ({ openModal, openStatus, paymentId }) => {
     )
 }
 
-export default StaffPaymentModal;
+export default StaffPaymentCollectModal;

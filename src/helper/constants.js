@@ -38,4 +38,9 @@ export const Constants = {
     WEEK_OFF: 'week-off',
     HALF_DAY: 'half-day',
     OVER_TIME: 'over-time',
+    LOAN: 'loan',
+    LOAN_RECEIVED: 'loan_received',
+    ADVANCE_PAYMENT: 'advance_payment',
+    BONUS: 'bonus',
+    SALARY: 'salary'
 }
