@@ -22,6 +22,7 @@ import AttendanceOverTime from '../../components/AttendanceOverTimeModal';
 import ConfirmModal from '../../components/ConfirmModal';
 import AttendanceShimmer from '../../components/AttendanceShimmer';
 import { Constants } from '../../helper/constants';
+import Loading from '../../components/Loading';
 
 
 
@@ -62,12 +63,14 @@ const StaffAttendance = () => {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [searchText, setSearchText] = useState("");
     let debounceRef = useRef(null);
+    // When click on attendance button loading true after response loading false;
+    const [attendanceLoading, setAttendanceLoading] = useState(false);
 
 
 
 
 
-    // Get data;
+    // Get staffs;
     useEffect(() => {
         const get = async () => {
             try {
@@ -263,6 +266,7 @@ const StaffAttendance = () => {
 
     // When click attendance button `A` | `P`
     const handleAttendance = async (userData, attendance, type = "none") => {
+        setAttendanceLoading(true);
         let attSheet = [...attendanceSheet];
         attSheet = attSheet.filter((a, _) => a.staffId !== userData._id);
 
@@ -332,6 +336,7 @@ const StaffAttendance = () => {
                 finally {
                     localStorage.removeItem('attendance');
                     localStorage.removeItem("attendance_timestamp");
+                    setAttendanceLoading(false);
                 }
             })()
 
@@ -585,7 +590,12 @@ const StaffAttendance = () => {
                                             </th>
                                             <td>STAFF NAME</td>
                                             <td>MOBILE NUMBER</td>
-                                            <td>ATTENDANCE</td>
+                                            <td>
+                                                <div className='flex items-center gap-2'>
+                                                    ATTENDANCE
+                                                    {attendanceLoading && <Loading />}
+                                                </div>
+                                            </td>
                                             <td align='center'>ACTION</td>
                                         </tr>
                                     </thead>

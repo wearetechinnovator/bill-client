@@ -12,7 +12,7 @@ import Loading from '../components/Loading';
 
 
 
-const StaffPaymentModal = ({ openModal, openStatus, paymentId }) => {
+const StaffPaymentModal = ({ openModal, openStatus, paymentId, salaryData }) => {
     const token = Cookies.get('token');
     const { getApiData } = useApi();
     const { id } = useParams();
@@ -65,6 +65,9 @@ const StaffPaymentModal = ({ openModal, openStatus, paymentId }) => {
             if (paymentId) {
                 data.update = true;
                 data.id = paymentId;
+            }
+            if(formData.paymentType === Constants.SALARY){
+                data = {...data, ...salaryData}; //month, year, totalSalary
             }
 
             const req = await fetch(URL, {

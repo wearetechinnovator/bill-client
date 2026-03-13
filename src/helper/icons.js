@@ -45,6 +45,7 @@ import { GiReceiveMoney } from "react-icons/gi";
 import { GiPayMoney } from "react-icons/gi";
 import { FaArrowUp } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa";
+import { IoWarningOutline } from "react-icons/io5";
 
 
 
@@ -52,6 +53,7 @@ import { FaArrowDown } from "react-icons/fa";
 
 
 export const Icons = {
+  WARNING: IoWarningOutline,
   ARROW_UP: FaArrowUp,
   ARROW_DOWN: FaArrowDown,
   RESET: LuRefreshCcw,

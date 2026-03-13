@@ -1,7 +1,7 @@
 // Circular Progress indicator
-const Loading = () => {
+const Loading = ({className}) => {
   return (
-    <div className="flex items-center justify-center">
+    <div className={`flex items-center justify-center ${className}`}>
       <div className="loader"></div>
     </div>
   )

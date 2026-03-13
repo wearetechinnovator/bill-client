@@ -10,6 +10,7 @@ import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import { Constants } from '../../helper/constants';
 import Loading from '../../components/Loading'
+import { checkNumber } from '../../helper/validation';
 
 
 
@@ -178,7 +179,7 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 						<div className='w-full'>
 							<p className='mb-1'>Sale Price <span className='required__text'>*</span></p>
 							<input type="text"
-								onChange={(e) => setForm({ ...form, salePrice: e.target.value })}
+								onChange={(e) => setForm({ ...form, salePrice: checkNumber(e.target.value) })}
 								value={form.salePrice} />
 						</div>
 						<div className='w-full mt-[20px]'>
@@ -229,7 +230,7 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 						<div className='w-full'>
 							<p className='mt-2 mb-1'>Purchase Price <span className='required__text'>*</span></p>
 							<input type="text"
-								onChange={(e) => setForm({ ...form, purchasePrice: e.target.value })}
+								onChange={(e) => setForm({ ...form, purchasePrice: checkNumber(e.target.value) })}
 								value={form.purchasePrice} />
 						</div>
 						<div className='w-full mt-[28px]'>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal } from "rsuite"
+import { Icons } from "../helper/icons";
 
 
 const ConfirmModal = ({ openConfirm, openStatus, title, isDel = true, fun }) => {
@@ -21,9 +22,12 @@ const ConfirmModal = ({ openConfirm, openStatus, title, isDel = true, fun }) => 
             centered={true}
         >
             <Modal.Body>
-                <span className="text-lg">Confirmation</span>
+                <div className="flex items-start">
+                    <Icons.WARNING className="text-xl"/>
+                    <span className="text-[17px]">Confirmation</span>
+                </div>
                 <p className="title text-xs">{title}</p>
-                <div className="mt-5 text-end">
+                <div className="mt-7 text-end">
                     <button className="cancel" onClick={() => {
                         setOpen(false);
                         openStatus(false);

@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Nav from '../../components/Nav'
 import useMyToaster from '../../hooks/useMyToaster';
 import SideNav from '../../components/SideNav'
@@ -15,38 +15,31 @@ import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import StaffPaymentModal from '../../components/StaffPaymentModal';
 import ConfirmModal from '../../components/ConfirmModal';
 import StaffPaymentCollectModal from '../../components/StaffPaymentCollectModal';
+import Loading from '../../components/Loading';
 
 const MONTH_LIST = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
+    "January", "February", "March", "April", "May", "June", "July", "August", "September",
+    "October", "November", "December"
 ];
+const ATTENDANCE_SAVE_TIME = 2000; // Debounce time;
 const AttendanceDetails = () => {
+    const navigate = useNavigate();
     const token = Cookies.get("token");
-    const userDetails = useSelector((store) => store.userDetail); //get use details from store
+    const userDetails = useSelector((store) => store.userDetail); //Get user details from store
     const toast = useMyToaster();
     const { id } = useParams(); //Staff id;
     const [staffData, setStaffData] = useState({})
     const attendanceDateRef = useRef(null);
     const downloadDateRef = useRef(null);
+    const attendanceSaveTimer = useRef(null);
+    const salaryRef = useRef(null);
     const [attendanceDatePickerValue, setAttendanceDatePickervalue] = useState();
     const [attendancePickerLabel, setAttendancePickerLabel] = useState("");
-    const [tab, setTab] = useState(0); // 0=`Attendance` | 1=`Details`;
+    const [tab, setTab] = useState(0); // 0=`Attendance` | 1=`Details` | 2=`Payroll` | 3=`Transactions`
     const [datesArr, setDatesArr] = useState([]);
     const [attendanceSheet, setAttendanceSheet] = useState([]);
-    const ATTENDANCE_SAVE_TIME = 2000; // Debounce time;
-    const attendanceSaveTimer = useRef(null);
     const [overTimeModal, setOverTimeModal] = useState(false);
-    const salaryRef = useRef(null);
+    // Use Top Card also use in Payroll calculation;
     const [allTotalData, setAllTotalData] = useState({
         present: 0, absent: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0, overTime: 0
     })
@@ -67,7 +60,12 @@ const AttendanceDetails = () => {
     const [attendanceDataForModal, setAttendanceDataForModal] = useState(null);
     const [paymentCollectModal, setPaymentCollectModal] = useState(false);
     const currentMonthInIndex = new Date().getMonth();
+    const [currentMonth, setCurrentMonth] = useState(currentMonthInIndex);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+    // When click on attendance button loading true after response loading false;
+    const [attendanceLoading, setAttendanceLoading] = useState(false);
+    const [oneDaySalary, setOneDaySalary] = useState(0);
+    const [totalLoan, setTotalLoan] = useState(0);
 
 
 
@@ -85,12 +83,11 @@ const AttendanceDetails = () => {
     }, [])
 
 
-    // Get User data
+    // Get Staff data
     useEffect(() => {
         (async () => {
             try {
                 const url = process.env.REACT_APP_API_URL + "/staff/get";
-
                 const req = await fetch(url, {
                     method: "POST",
                     headers: {
@@ -107,6 +104,16 @@ const AttendanceDetails = () => {
         })()
     }, [id])
 
+
+    // Set PerDay Salary when DateArr or StaffData Change;
+    useEffect(() => {
+        const TOTAL_WORKING_DAY = Number(datesArr.length || 0);
+        const TOTAL_SALARY = Number(staffData?.salary || 0)
+        if (TOTAL_WORKING_DAY === 0 || TOTAL_SALARY === 0) return;
+
+        const PER_DAY_SALARY = (TOTAL_SALARY / TOTAL_WORKING_DAY).toFixed(2)
+        setOneDaySalary(PER_DAY_SALARY)
+    }, [datesArr, staffData])
 
     // Get User Attendance
     useEffect(() => {
@@ -206,7 +213,7 @@ const AttendanceDetails = () => {
     }, [attendanceDatePickerValue])
 
 
-    // Genarate Dates
+    // Genarate Dates Array
     useEffect(() => {
         if (!attendanceDatePickerValue) return;
 
@@ -225,6 +232,34 @@ const AttendanceDetails = () => {
     }, [attendanceDatePickerValue]);
 
 
+    // Get Total Loan Amounts like: `Loan` | `Loan Received` | `Total Loan`
+    useEffect(() => {
+        if (tab !== 2) return;
+        (async () => {
+            try {
+                const URL = process.env.REACT_APP_API_URL + "/staff-payment/get-total-loan";
+                const req = await fetch(URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify({ token, staffId: id })
+                })
+                const res = await req.json();
+                if(req.status !== 200){
+                    return toast(res.err, "error");
+                }
+
+                setTotalLoan(res.totalLoan);
+
+            } catch (err) {
+                console.log(err);
+                return toast("Total Loan not get", "error");
+            }
+        })()
+    }, [tab, paymentCollectModal, paymentModal])
+
+
     // Custom Date change on Attendance `Next` | `Prev` Button;
     const dateChanger = (type) => {
         const d = new Date(attendanceDatePickerValue);
@@ -237,17 +272,21 @@ const AttendanceDetails = () => {
 
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, "0");
+        
         setCurrentYear(year);
+        setCurrentMonth(d.getMonth());
 
         setAttendanceDatePickervalue(`${year}-${month}`);
         setAttendancePickerLabel(
             new Date(d).toString().split(" ")[1] + " " + new Date(d).toString().split(" ")[3]
-        )
+        );
     };
 
 
     // When click attendance button `A` | `P`
     const handleAttendance = async (attendance, type = "none", date) => {
+        setAttendanceLoading(true);
+
         let attSheet = [...attendanceSheet];
         attSheet = attSheet.filter((a, _) => a.date !== date);
 
@@ -316,6 +355,7 @@ const AttendanceDetails = () => {
                 finally {
                     localStorage.removeItem('attendance');
                     localStorage.removeItem("attendance_timestamp");
+                    setAttendanceLoading(false);
                 }
             })()
 
@@ -493,6 +533,11 @@ const AttendanceDetails = () => {
                     setPaymentModal(false);
                 }}
                 paymentId={editTransactionId}
+                salaryData={{
+                    month:currentMonth,
+                    year: currentYear,
+                    totalSalary: 2000
+                }}
             />
             <StaffPaymentCollectModal
                 openModal={paymentCollectModal}
@@ -661,7 +706,12 @@ const AttendanceDetails = () => {
                                             <thead className='list__table__head'>
                                                 <tr>
                                                     <td className='py-2 px-4 border-b w-[30%]'>Date</td>
-                                                    <td className='py-2 border-b w-[25%]'>Attendance</td>
+                                                    <td className='py-2 border-b w-[25%]'>
+                                                        <div className='flex items-center gap-2'>
+                                                            Attendance
+                                                            {attendanceLoading && <Loading />}
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -809,52 +859,66 @@ const AttendanceDetails = () => {
                         {/* ============================================================= */}
                         {
                             tab === 1 && (
-                                <div className='user__details__tab'>
-                                    <div className='flex flex-col gap-5 w-full pl-2'>
-                                        <div>
-                                            <p>Staff Name</p>
-                                            <span>{staffData.staffName || "--"}</span>
-                                        </div>
-                                        <div>
-                                            <p>DOB</p>
-                                            <span>{staffData?.dob?.split("T")[0] || "--"}</span>
-                                        </div>
-                                        <div>
-                                            <p>Salary</p>
-                                            <span>{staffData.salary || "--"}</span>
-                                        </div>
+                                <div>
+                                    <div className='flex justify-end gap-3'>
+                                        <button
+                                            onClick={() => navigate(`/admin/staff-attendance/edit/${id}`)}
+                                            className='flex items-center justify-center gap-1 border border-green-400 hover:bg-green-400 hover:text-white rounded w-[60px] py-[4px]'>
+                                            <Icons.PENCIL size={'16px'} />
+                                            Edit
+                                        </button>
+                                        <button className='flex items-center justify-center gap-1 border border-red-400 hover:bg-red-400 hover:text-white rounded w-[70px] py-[4px]'>
+                                            <Icons.DELETE size={'16px'} />
+                                            Delete
+                                        </button>
                                     </div>
-                                    <div className='flex flex-col gap-5 w-full'>
-                                        <div>
-                                            <p>Mobile Number</p>
-                                            <span>{staffData.mobileNumber || "--"}</span>
+                                    <div className='user__details__tab'>
+                                        <div className='flex flex-col gap-5 w-full pl-2'>
+                                            <div>
+                                                <p>Staff Name</p>
+                                                <span>{staffData.staffName || "--"}</span>
+                                            </div>
+                                            <div>
+                                                <p>DOB</p>
+                                                <span>{staffData?.dob?.split("T")[0] || "--"}</span>
+                                            </div>
+                                            <div>
+                                                <p>Salary</p>
+                                                <span>{staffData.salary || "--"}</span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p>Joining Date</p>
-                                            <span>{staffData.joiningDate || "--"}</span>
+                                        <div className='flex flex-col gap-5 w-full'>
+                                            <div>
+                                                <p>Mobile Number</p>
+                                                <span>{staffData.mobileNumber || "--"}</span>
+                                            </div>
+                                            <div>
+                                                <p>Joining Date</p>
+                                                <span>{staffData.joiningDate || "--"}</span>
+                                            </div>
+                                            <div>
+                                                <p>Salary Cycle</p>
+                                                <span>{staffData.salaryCycle || "--"}</span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p>Salary Cycle</p>
-                                            <span>{staffData.salaryCycle || "--"}</span>
-                                        </div>
-                                    </div>
-                                    <div className='flex flex-col gap-5 w-full'>
-                                        <div>
-                                            <p>Email</p>
-                                            <span>{staffData.email || "--"}</span>
-                                        </div>
-                                        <div>
-                                            <p>Salary Payout Type</p>
-                                            <span>{staffData.salaryPayOutType || "--"}</span>
-                                        </div>
-                                        <div>
-                                            <p>Outstanding/Opening Balance</p>
-                                            <span>{staffData.openingBalance || "--"}</span>
-                                            {
-                                                staffData.openingBalance && <span className='bg-gray-200 rounded px-1 ml-1 text-gray-500'>
-                                                    {staffData.openingBalanceType}
-                                                </span>
-                                            }
+                                        <div className='flex flex-col gap-5 w-full'>
+                                            <div>
+                                                <p>Email</p>
+                                                <span>{staffData.email || "--"}</span>
+                                            </div>
+                                            <div>
+                                                <p>Salary Payout Type</p>
+                                                <span>{staffData.salaryPayOutType || "--"}</span>
+                                            </div>
+                                            <div>
+                                                <p>Outstanding/Opening Balance</p>
+                                                <span>{staffData.openingBalance || "--"}</span>
+                                                {
+                                                    staffData.openingBalance && <span className='bg-gray-200 rounded px-1 ml-1 text-gray-500'>
+                                                        {staffData.openingBalanceType}
+                                                    </span>
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -867,7 +931,7 @@ const AttendanceDetails = () => {
                             tab === 2 && (
                                 <div>
                                     <div className='w-full flex items-center justify-between'>
-                                        <p className='text-[15px]'>{MONTH_LIST[currentMonthInIndex]} {currentYear}</p>
+                                        <p className='text-[15px]'>{MONTH_LIST[currentMonth]} {currentYear}</p>
 
                                         <div className='bg-gray-50 h-[30px] border rounded p-1 flex items-center gap-2 w-[125px] justify-center'>
                                             <button onClick={(e) => dateChanger("prev")}>
@@ -885,6 +949,9 @@ const AttendanceDetails = () => {
                                                         setAttendancePickerLabel(
                                                             new Date(e.target.value).toString().split(" ")[1] + " " + new Date(e.target.value).toString().split(" ")[3]
                                                         );
+
+                                                        setCurrentMonth(new Date(e.target.value).getMonth())
+                                                        setCurrentYear(new Date(e.target.value).getFullYear())
                                                     }}
                                                 />
                                                 <button
@@ -918,7 +985,7 @@ const AttendanceDetails = () => {
                                             <div>
                                                 <p className='uppercase font-bold text-slate-500'>Loan</p>
                                                 <span className='font-bold'>
-                                                    <Icons.RUPES className='inline' />1454.59
+                                                    <Icons.RUPES className='inline' />{(totalLoan).toFixed(2)}
                                                 </span>
                                             </div>
                                         </div>
@@ -931,6 +998,7 @@ const AttendanceDetails = () => {
                                                 <Icons.RUPES className='inline' />23.33
                                             </p>
                                         </div>
+                                        {/* Earning */}
                                         <div className='w-full flex justify-between border-b p-2'>
                                             <div className='font-bold'>
                                                 Earnings
@@ -941,28 +1009,59 @@ const AttendanceDetails = () => {
                                         </div>
                                         {/*=========================[Under Earning]=================*/}
                                         <div className='w-full flex justify-between border-b p-2 pl-4'>
-                                            <div className=''>Paid Leave (1 Days)</div>
+                                            <div className=''>Paid Leave ({allTotalData.paidLeave} Days)</div>
                                             <p>
-                                                <Icons.RUPES className='inline' />23.33
+                                                <Icons.RUPES className='inline' />
+                                                {(Number(allTotalData.paidLeave || 0) * oneDaySalary).toFixed(2)}
                                             </p>
                                         </div>
                                         <div className='w-full flex justify-between border-b p-2 pl-4'>
-                                            <div className=''>Present (7 Days)</div>
+                                            <div className=''>Present ({allTotalData.present} Days)</div>
                                             <p>
-                                                <Icons.RUPES className='inline' />23.33
+                                                <Icons.RUPES className='inline' />
+                                                {(Number(allTotalData.present || 0) * oneDaySalary).toFixed(2)}
                                             </p>
                                         </div>
                                         <div className='w-full flex justify-between border-b p-2 pl-4'>
-                                            <div className=''>Weekly off (2 Days)</div>
+                                            <div className=''>Weekly off ({allTotalData.weeklyOff} Days)</div>
                                             <p>
-                                                <Icons.RUPES className='inline' />23.33
+                                                <Icons.RUPES className='inline' />
+                                                {(Number(allTotalData.weeklyOff || 0) * oneDaySalary).toFixed(2)}
                                             </p>
                                         </div>
                                         {/* OverTime Loop Here */}
                                         {/*====================*/}
                                         <div className='w-full flex justify-between border-b p-2 pl-4'>
                                             <div className=''>Overtime ( 3.5 Hrs X ₹4.17)</div>
+                                            <p>
+                                                <Icons.RUPES className='inline' />23.33
+                                            </p>
+                                        </div>
+
+                                        {/*==========================[Under Payments]=======================*/}
+                                        <div className='w-full flex justify-between border-b p-2'>
+                                            <div className='font-bold'>
+                                                Payments
+                                            </div>
                                             <p className='font-bold'>
+                                                <Icons.RUPES className='inline' />23.33
+                                            </p>
+                                        </div>
+                                        <div className='w-full flex justify-between border-b p-2 pl-4'>
+                                            <div className=''>Salary</div>
+                                            <p>
+                                                <Icons.RUPES className='inline' />23.33
+                                            </p>
+                                        </div>
+                                        <div className='w-full flex justify-between border-b p-2 pl-4'>
+                                            <div className=''>Loan</div>
+                                            <p>
+                                                <Icons.RUPES className='inline' />23.33
+                                            </p>
+                                        </div>
+                                        <div className='w-full flex justify-between border-b p-2 pl-4'>
+                                            <div className=''>Received payment from employee</div>
+                                            <p>
                                                 <Icons.RUPES className='inline' />23.33
                                             </p>
                                         </div>
