@@ -10,8 +10,8 @@ const AttendanceSettingModal = ({ open, closeModal }) => {
     const [modelOpen, setModelOpen] = useState(null);
     const weekDay = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const [settings, setSettings] = useState({
-        attendanceReminder: '', reminderTime: "", defaultPresent: '',
-        workingHourFrom: "", workingHourTo: "", weeklyOffDays: []
+        attendanceReminder: false, reminderTime: "", defaultPresent: false,
+        workingHour: "", workingMinute: "0", weeklyOffDays: []
     })
 
 
@@ -117,33 +117,30 @@ const AttendanceSettingModal = ({ open, closeModal }) => {
                         <p className="text-gray-500 text-xs mt-2 mb-1">Number of hours</p>
                         <div className="w-full flex items-center gap-2">
                             <select
-                                onChange={(e) => setSettings({ ...settings, workingHourFrom: e.target.value })}
-                                value={settings.workingHourFrom}
+                                onChange={(e) => setSettings({ ...settings, workingHour: e.target.value })}
+                                value={settings.workingHour}
                                 className="attendace__setting__time__drp"
                             >
                                 {Array.from({ length: 25 }, (_, t) =>
                                     t > 0 ? (
-                                        <option key={t} value={`${t}:00`}>
-                                            {t}:00
+                                        <option key={t} value={t}>
+                                            {t}
                                         </option>
                                     ) : null
                                 )}
                             </select>
                             <span>:</span>
                             <select
-                                onChange={(e) => setSettings({ ...settings, workingHourTo: e.target.value })}
-                                value={settings.workingHourTo}
+                                onChange={(e) => setSettings({ ...settings, workingMinute: e.target.value })}
+                                value={settings.workingMinute}
                                 className="attendace__setting__time__drp"
                             >
-                                {Array.from({ length: 31 }, (_, t) =>
-                                    <option key={t} value={`${t}:00`}>
-                                        {t}:00
-                                    </option>
-                                )}
+                                <option value={0}>00</option>
+                                <option value={30}>30</option>
                             </select>
                         </div>
                         <p className="text-gray-500 text-[11px] mt-2 mb-1">
-                            Total working hours in a day = 08:00hrs
+                            Total working hours in a day = {settings.workingHour}:{settings.workingMinute}hrs
                         </p>
                     </div>
 

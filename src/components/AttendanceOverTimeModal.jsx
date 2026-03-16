@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal } from "rsuite";
-import {checkNumber} from '../helper/validation'
+import { checkNumber } from '../helper/validation'
 
 
 const OVER_TIME_HOURLY = "hourly";
@@ -16,12 +16,14 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
     const [overTimeHour, setOverTimeHour] = useState(null);
     const [overTimeMinute, setOverTimeMinute] = useState(null);
     const [overTimeTotalAmount, setOverTimeTotalAmount] = useState(0);
+    const [hourlyHourTimeRate, setHourlyOverTimeRate] = useState(0)
 
 
     useEffect(() => {
         setModelOpen(open);
 
-        if(attendanceData){
+        if (attendanceData) {
+            console.log(attendanceData);
             setOverTimeType(attendanceData.overTimeType);
             setFixedOverTimeAmount(attendanceData.fixedOverTimeAmount);
             setOverTimeHour(attendanceData.overTimeHour);
@@ -32,11 +34,12 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
     }, [open, attendanceData])
 
 
+    // Set OverTime if OverTime Type is Hourly;
     useEffect(() => {
         if (
             overTimeType !== OVER_TIME_HOURLY ||
-            !overTimeHour ||
-            !overTimeMinute
+            overTimeHour === null || overTimeHour === "" ||
+            overTimeMinute === null || overTimeMinute === ""
         ) return;
 
         let rate = overTimeRate;
@@ -47,7 +50,7 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
         const hrs = Number(overTimeHour);
         const min = Number(overTimeMinute);
 
-        const oneHourSalary = salary / WORK_TIME_HOUR;
+        const oneHourSalary = (salary / 30) / 8;
 
         const appliedRate =
             rate === OVER_TIME_RATE_CUSTOM
@@ -55,11 +58,11 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
                 : Number(rate);
 
         const overTimeAmountPerHour = oneHourSalary * (appliedRate || 0);
+        setHourlyOverTimeRate((overTimeAmountPerHour).toFixed(2))
 
         const totalHours = hrs + min / 60;
 
         const totalAmount = totalHours * overTimeAmountPerHour;
-
         setOverTimeTotalAmount(totalAmount.toFixed(2));
     }, [
         overTimeType,
@@ -155,20 +158,13 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
                                     </p>
                                     <div className="w-full flex items-center mt-2">
                                         <div className="w-full flex items-center gap-2">
-                                            <select
-                                                onChange={(e) => setOverTimeHour(e.target.value)}
+                                            <input
+                                                type="text"
+                                                placeholder="Hrs"
                                                 value={overTimeHour}
-                                                className="attendace__setting__time__drp text-xs"
-                                            >
-                                                <option value="">Hrs</option>
-                                                {Array.from({ length: 25 }, (_, t) =>
-                                                    t > 0 ? (
-                                                        <option key={t} value={`${t}`}>
-                                                            {t}
-                                                        </option>
-                                                    ) : null
-                                                )}
-                                            </select>
+                                                onChange={(e) => setOverTimeHour(e.target.value)}
+                                                className="w-[50px] text-xs"
+                                            />
                                             <span>:</span>
                                             <select
                                                 onChange={(e) => setOverTimeMinute(e.target.value)}
@@ -176,11 +172,8 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
                                                 className="attendace__setting__time__drp text-xs"
                                             >
                                                 <option value="">Min</option>
-                                                {Array.from({ length: 31 }, (_, t) =>
-                                                    <option key={t} value={`${t}`}>
-                                                        {t}
-                                                    </option>
-                                                )}
+                                                <option value={0}>00</option>
+                                                <option value={30}>30</option>
                                             </select>
                                         </div>
                                     </div>
@@ -198,9 +191,15 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
                                             onChange={(e) => setOverTimeRate(e.target.value)}
                                         >
                                             <option value="">Select</option>
-                                            <option value="1">1x Salary</option>
-                                            <option value="1.5">1.5x Salary</option>
-                                            <option value="2">2x Salary</option>
+                                            <option value="1">
+                                                1x Salary
+                                            </option>
+                                            <option value="1.5">
+                                                1.5x Salary
+                                            </option>
+                                            <option value="2">
+                                                2x Salary
+                                            </option>
                                             <option value={OVER_TIME_RATE_CUSTOM}>Custom rate</option>
                                         </select>
                                         {
@@ -225,7 +224,7 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
                                 <span className="text-left w-full text-gray-400 text-xs">Total amount</span>
                                 <span className="mt-1 text-left w-full font-semibold text-xs">
                                     {String(overTimeHour || 0).padStart(2, '0')}:
-                                    {String(overTimeMinute || 0).padStart(2, '0')} x {staffData?.salary} = {overTimeTotalAmount}
+                                    {String(overTimeMinute || 0).padStart(2, '0')} x {hourlyHourTimeRate} = {overTimeTotalAmount}
                                 </span>
                             </div>
                         )
@@ -247,7 +246,8 @@ const AttendanceOverTime = ({ open, closeModal, sendData, staffData, attendanceD
                                 sendData({
                                     overTimeType, overTimeRate,
                                     customeOverTimeRate, overTimeHour, overTimeMinute,
-                                    fixedOverTimeAmount, staffId: staffData._id
+                                    fixedOverTimeAmount, staffId: staffData._id,
+                                    overTimeHourlyAmount: hourlyHourTimeRate
                                 })
                                 resetData();
                                 setModelOpen(false);
