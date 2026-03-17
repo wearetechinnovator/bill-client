@@ -16,7 +16,7 @@ import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
-
+import ContextMenu from '../../components/ContextMenu';
 
 
 
@@ -223,6 +223,12 @@ const DeliveryChalan = () => {
 						setOpenConfirm(false);
 					}}
 				/>
+				<ContextMenu
+					print={() => exportTable('print')}
+					copy={() => exportTable('copy')}
+					pdf={() => exportTable('pdf')}
+					excel={() => exportTable('excel')}
+				/>
 
 				<div className='content__body'>
 					{/* top section */}
@@ -394,7 +400,7 @@ const DeliveryChalan = () => {
 					</div>
 
 					{
-						!loading ? billData.length > 0 ? <div className='content__body__main'>
+						!loading ? billData.length > 0 ? <div className='content__body__main view'>
 
 							{/* Table start */}
 							<div className='overflow-x-auto list__table'>

@@ -20,6 +20,7 @@ import { FiMoreHorizontal } from 'react-icons/fi';
 import ConfirmModal from '../../components/ConfirmModal';
 import Pagination from '../../components/Pagination';
 import { Icons } from '../../helper/icons';
+import ContextMenu from '../../components/ContextMenu';
 
 
 
@@ -240,6 +241,12 @@ const Account = () => {
 						setOpenConfirm(false);
 					}}
 				/>
+				<ContextMenu
+					print={() => exportTable('print')}
+					copy={() => exportTable('copy')}
+					pdf={() => exportTable('pdf')}
+					excel={() => exportTable('excel')}
+				/>
 				<div className='content__body'>
 					<div className={`add_new_compnent`}>
 						<div className='flex justify-between items-center'>
@@ -310,7 +317,7 @@ const Account = () => {
 					</div>
 
 					{
-						!loading ? billData.length > 0 ? <div className='content__body__main'>
+						!loading ? billData.length > 0 ? <div className='content__body__main view'>
 							{/* Table start */}
 							<div className='overflow-x-auto list__table'>
 								<table className='min-w-full bg-white' id='listQuotation' ref={tableRef}>

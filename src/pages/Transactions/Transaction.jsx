@@ -23,6 +23,7 @@ import { Icons } from '../../helper/icons';
 import useApi from '../../hooks/useApi';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
+import ContextMenu from '../../components/ContextMenu';
 
 
 
@@ -220,6 +221,12 @@ const Transaction = () => {
             <main id='main'>
                 <SideNav />
                 <Tooltip id='transactionTooltip' />
+                <ContextMenu
+					print={() => exportTable('print')}
+					copy={() => exportTable('copy')}
+					pdf={() => exportTable('pdf')}
+					excel={() => exportTable('excel')}
+				/>
                 <div className='content__body'>
                     {/* top section */}
                     <div className={"add_new_compnent"}>
@@ -385,7 +392,7 @@ const Transaction = () => {
                         }
                     </div>
                     {
-                        !loading ? transactionData.length > 0 ? <div className='content__body__main'>
+                        !loading ? transactionData.length > 0 ? <div className='content__body__main view'>
                             {/* Table start */}
                             <div className='overflow-x-auto list__table'>
                                 <table className='min-w-full bg-white' id='listTransaction'>

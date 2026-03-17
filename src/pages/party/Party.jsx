@@ -13,6 +13,7 @@ import { Popover, Whisper } from 'rsuite';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
+import ContextMenu from '../../components/ContextMenu';
 
 
 
@@ -250,6 +251,12 @@ const Party = () => {
 						setOpenConfirm(false);
 					}}
 				/>
+				<ContextMenu
+					print={() => exportTable('print')}
+					copy={() => exportTable('copy')}
+					pdf={() => exportTable('pdf')}
+					excel={() => exportTable('excel')}
+				/>
 				<div className="content__body">
 					{/* top section */}
 					<div className={`add_new_compnent`}>
@@ -320,7 +327,7 @@ const Party = () => {
 						</div>
 					</div>
 					{
-						!loading ? partyData.length > 0 ? <div className='content__body__main'>
+						!loading ? partyData.length > 0 ? <div className='content__body__main view'>
 							<div className='flex flex-col md:flex-row justify-between items-center mb-5 gap-8'>
 								<div
 									onClick={() => setSelectedTab(TOTAL_PARTY)}

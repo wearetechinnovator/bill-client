@@ -13,6 +13,7 @@ import { Popover, Whisper } from 'rsuite';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
+import ContextMenu from '../../components/ContextMenu';
 
 
 
@@ -226,6 +227,12 @@ const Item = ({ mode }) => {
 						setOpenConfirm(false);
 					}}
 				/>
+				<ContextMenu
+					print={() => exportTable('print')}
+					copy={() => exportTable('copy')}
+					pdf={() => exportTable('pdf')}
+					excel={() => exportTable('excel')}
+				/>
 				<div className='content__body'>
 					{/* top section */}
 					<div
@@ -300,7 +307,7 @@ const Item = ({ mode }) => {
 						</div>
 					</div>
 					{
-						!loading ? itemData.length > 0 ? <div className='content__body__main'>
+						!loading ? itemData.length > 0 ? <div className='content__body__main view'>
 							{/* Table start */}
 							<div className='overflow-x-auto list__table'>
 								<table className='min-w-full bg-white' id='itemTable' ref={tableRef}>

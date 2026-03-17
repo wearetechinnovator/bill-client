@@ -15,6 +15,7 @@ import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
+import ContextMenu from '../../components/ContextMenu';
 
 
 const SalesInvoice = () => {
@@ -61,6 +62,7 @@ const SalesInvoice = () => {
 	const [selectedTab, setSelectedTab] = useState(Constants.TOTAL_SALE);
 	const [applyFilter, setApplyFilter] = useState(null);
 	const [isCustomDate, setIsCustomDate] = useState(false);
+	const mainRef = useRef(null)
 
 
 
@@ -263,9 +265,14 @@ const SalesInvoice = () => {
 						setOpenConfirm(false);
 					}}
 				/>
+				<ContextMenu
+					print={() => exportTable('print')}
+					copy={() => exportTable('copy')}
+					pdf={() => exportTable('pdf')}
+					excel={() => exportTable('excel')}
+				/>
 				<div className='content__body'>
-					<div
-						className={`add_new_compnent`}>
+					<div className={`add_new_compnent`}>
 						<div className='flex justify-between items-center'>
 							<div className='flex flex-col'>
 								<select value={dataLimit} onChange={(e) => setDataLimit(e.target.value)}>
@@ -431,10 +438,9 @@ const SalesInvoice = () => {
 						}
 					</div>
 					{
-						!loading ? billData.length > 0 ? <div className='content__body__main'>
+						!loading ? billData.length > 0 ? <div className='content__body__main view'>
 							<div className='flex flex-col md:flex-row justify-between items-center mb-5 gap-8'>
-								<div
-									onClick={() => setSelectedTab(Constants.TOTAL_SALE)}
+								<div onClick={() => setSelectedTab(Constants.TOTAL_SALE)}
 									className={`party__data ${selectedTab === Constants.TOTAL_SALE ? 'active' : ''}`}
 								>
 									<h6><Icons.INVOICE /> Total Sale</h6>

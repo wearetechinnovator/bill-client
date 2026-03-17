@@ -14,14 +14,10 @@ import useExportTable from '../../hooks/useExportTable';
 import useMyToaster from '../../hooks/useMyToaster';
 import Cookies from 'js-cookie';
 import downloadPdf from '../../helper/downloadPdf';
-import { GrFormNext, GrFormPrevious } from 'react-icons/gr';
-import { SiConvertio } from "react-icons/si";
 import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
 import { IoIosAdd, IoMdInformationCircleOutline, IoMdMore } from 'react-icons/io';
 import AddNew from '../../components/AddNew';
-import { TbZoomReset } from 'react-icons/tb';
-import { LuSearch } from 'react-icons/lu';
 import { FiMoreHorizontal } from 'react-icons/fi';
 import { RiArrowDropUpFill } from "react-icons/ri";
 import Pagination from '../../components/Pagination';
@@ -29,6 +25,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 import { Icons } from '../../helper/icons';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
+import ContextMenu from '../../components/ContextMenu';
 
 
 
@@ -138,7 +135,6 @@ const PO = () => {
 		});
 	}
 
-
 	const selectAll = (e) => {
 		if (e.target.checked) {
 			setSelected(billData.map(data => data._id));
@@ -237,6 +233,13 @@ const PO = () => {
 						setOpenConfirm(false);
 					}}
 				/>
+				<ContextMenu
+					print={() => exportTable('print')}
+					copy={() => exportTable('copy')}
+					pdf={() => exportTable('pdf')}
+					excel={() => exportTable('excel')}
+				/>
+
 				<div className='content__body'>
 					{/* top section */}
 					<div className={`add_new_compnent`}>
@@ -407,7 +410,7 @@ const PO = () => {
 					</div>
 
 					{
-						!loading ? billData.length > 0 ? <div className='content__body__main bg-white'>
+						!loading ? billData.length > 0 ? <div className='content__body__main view'>
 
 							{/* Table start */}
 							<div className='overflow-x-auto list__table'>

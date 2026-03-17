@@ -17,7 +17,7 @@ import Pagination from '../../components/Pagination';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import PrintPaymentInModal from '../../components/PrintPaymentInModal';
-
+import ContextMenu from '../../components/ContextMenu';
 
 
 const PaymentIn = () => {
@@ -231,6 +231,12 @@ const PaymentIn = () => {
                         setOpenConfirm(false);
                     }}
                 />
+                <ContextMenu
+					print={() => exportTable('print')}
+					copy={() => exportTable('copy')}
+					pdf={() => exportTable('pdf')}
+					excel={() => exportTable('excel')}
+				/>
                 <div className='content__body'>
                     <div className={`add_new_compnent`}>
                         <div className='flex justify-between items-center'>
@@ -398,7 +404,7 @@ const PaymentIn = () => {
                     </div>
 
                     {
-                        !loading ? billData.length > 0 ? <div className='content__body__main'>
+                        !loading ? billData.length > 0 ? <div className='content__body__main view'>
 
                             {/* Table start */}
                             <div className='overflow-x-auto list__table'>

@@ -13,6 +13,8 @@ import AddNew from '../../components/AddNew';
 import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
+import ContextMenu from '../../components/ContextMenu';
+
 
 
 const DEBOUNCE_TIME = 300;
@@ -226,6 +228,12 @@ const Category = () => {
 						setOpenConfirm(false);
 					}}
 				/>
+				<ContextMenu
+					print={() => exportTable('print')}
+					copy={() => exportTable('copy')}
+					pdf={() => exportTable('pdf')}
+					excel={() => exportTable('excel')}
+				/>
 				<div className='content__body'>
 					{/* top section */}
 					<div className={`add_new_compnent`}>
@@ -300,7 +308,7 @@ const Category = () => {
 					</div>
 
 					{
-						!loading > 0 ? categoryData.length > 0 ? <div className='content__body__main'>
+						!loading > 0 ? categoryData.length > 0 ? <div className='content__body__main view'>
 							{/* First Row */}
 
 							{/* Table start */}

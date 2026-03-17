@@ -23,6 +23,9 @@ import ConfirmModal from '../../components/ConfirmModal';
 import AttendanceShimmer from '../../components/AttendanceShimmer';
 import { Constants } from '../../helper/constants';
 import Loading from '../../components/Loading';
+import ContextMenu from '../../components/ContextMenu';
+
+
 
 
 
@@ -437,6 +440,12 @@ const StaffAttendance = () => {
                     setOpenConfirm(false);
                 }}
             />
+            <ContextMenu
+                print={() => exportTable('print')}
+                copy={() => exportTable('copy')}
+                pdf={() => exportTable('pdf')}
+                excel={() => exportTable('excel')}
+            />
             <main id='main'>
                 <SideNav />
                 <Tooltip id='unitTooltip' />
@@ -520,7 +529,7 @@ const StaffAttendance = () => {
                     </div>
 
                     {
-                        !loading ? data.length > 0 ? <div className='content__body__main'>
+                        !loading ? data.length > 0 ? <div className='content__body__main view'>
                             <div className='flex flex-col-reverse justify-between items-end'>
                                 <div className='w-full flex items-center justify-between gap-3 mt-4'>
                                     <div className='bg-[#E2FFED] top__details__card'>

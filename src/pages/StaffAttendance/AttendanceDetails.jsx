@@ -47,7 +47,8 @@ const AttendanceDetails = () => {
         present: 0, absent: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0, overTime: 0
     })
     const [salarySlipAttendance, setSalarySlipAttendance] = useState({
-        present: 0, absent: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0, overTime: 0
+        present: 0, absent: 0, halfDay: 0, paidLeave: 0, weeklyOff: 0, overTime: 0,
+        totalBonus: 0
     })
     const [isCustomDate, setIsCustomDate] = useState(false);
     const [filter, setFilter] = useState({
@@ -77,6 +78,7 @@ const AttendanceDetails = () => {
     const [totalEarning, setTotalEarning] = useState(0);
     const [paymentDrpWn, setPaymentDrpDwn] = useState(true);
     const [earningDrpWn, setEarningDrpDwn] = useState(true);
+    const [salarySlipDownloadLoading, setSalarySlipDownloadLoading] = useState(false);
 
 
 
@@ -120,6 +122,7 @@ const AttendanceDetails = () => {
     useEffect(() => {
         const TOTAL_WORKING_DAY = Number(datesArr.length || 0);
         const TOTAL_SALARY = Number(staffData?.salary || 0)
+
         if (TOTAL_WORKING_DAY === 0 || TOTAL_SALARY === 0) return;
 
         const PER_DAY_SALARY = (TOTAL_SALARY / TOTAL_WORKING_DAY).toFixed(2)
@@ -129,9 +132,11 @@ const AttendanceDetails = () => {
 
     // Get User Attendance;
     /**
+     * User Attendance and All Payroll Data set here like bellow:~
      * Set TotalEarning Data.
      * Set Total Data used for top card like Total `present`, `absent` etc.
      * Set Salary slip attendance data.
+     * Set Total Bonus as a Earning
      */
     useEffect(() => {
         (async () => {
@@ -146,8 +151,8 @@ const AttendanceDetails = () => {
                     },
                     body: JSON.stringify({
                         token, staffId: id,
-                        month: attendanceDatePickerValue.split("-")[1],
-                        year: attendanceDatePickerValue.split("-")[0],
+                        month: currentMonth + 1,
+                        year: currentYear,
                     })
                 })
                 const res = await req.json();
@@ -190,10 +195,10 @@ const AttendanceDetails = () => {
                         overTime: total.ot
                     })
 
-
                     // Total amounts;
-                    const Tpresent = total.p * Number(oneDaySalary || 0);
-                    const ThalfDay = total.hd * Number(oneDaySalary || 0);
+                    // TOTAL = [(present) + halfday(halfSalary) + paidLeave + weeklyOff + overTime + Bonus]
+                    const ThalfDay = total.hd * (Number(oneDaySalary || 0) / 2);
+                    const Tpresent = ((total.p - total.hd) * Number(oneDaySalary || 0));
                     const TpaidLeave = total.pl * Number(oneDaySalary || 0);
                     const TweeklyOff = total.wo * Number(oneDaySalary || 0);
                     const ToverTime = overTimes.reduce((acc, ov) => {
@@ -205,13 +210,20 @@ const AttendanceDetails = () => {
 
                         return acc;
                     }, 0)
-                    setTotalEarning(Tpresent + ThalfDay + TpaidLeave + TweeklyOff + ToverTime);
+                    const Tbonus = currentMonthPayments.reduce((acc, i) => {
+                        if (i.paymentType === Constants.BONUS) {
+                            acc += i.paymentAmount;
+                        }
+                        return acc;
+                    }, 0)
+                    setTotalEarning(Tpresent + ThalfDay + TpaidLeave + TweeklyOff + ToverTime + Tbonus);
+
 
 
                     const salaryAttendance = res.data.reduce((acc, i) => {
                         // Present
                         if (i.attendance === "1") {
-                            if (i.attendanceType !== Constants.HALF_DAY && i.attendanceType !== Constants.OVER_TIME) {
+                            if (i.attendanceType !== Constants.HALF_DAY) {
                                 acc.p += 1;
                             } else if (i.attendanceType === Constants.HALF_DAY) {
                                 acc.hd += 1;
@@ -238,7 +250,44 @@ const AttendanceDetails = () => {
                         halfDay: salaryAttendance.hd,
                         paidLeave: salaryAttendance.pl,
                         weeklyOff: salaryAttendance.wo,
-                        overTime: salaryAttendance.ot
+                        overTime: salaryAttendance.ot,
+                        amounts: {
+                            present: Tpresent,
+                            halfDay: ThalfDay,
+                            paidLeave: TpaidLeave,
+                            weeklyOff: TweeklyOff,
+                            overTime: ToverTime,
+                            totalBonus: Tbonus,
+                        }
+                    })
+                }
+                // If Data Not Found set All 0, []
+                else {
+                    setAllTotalData({
+                        present: 0,
+                        absent: 0,
+                        halfDay: 0,
+                        paidLeave: 0,
+                        weeklyOff: 0,
+                        overTime: 0
+                    })
+                    setOverTimeData([]);
+                    setTotalEarning(0);
+                    setSalarySlipAttendance({
+                        present: 0,
+                        absent: 0,
+                        halfDay: 0,
+                        paidLeave: 0,
+                        weeklyOff: 0,
+                        overTime: 0,
+                        amounts: {
+                            present: 0,
+                            halfDay: 0,
+                            paidLeave: 0,
+                            weeklyOff: 0,
+                            overTime: 0,
+                            totalBonus: 0,
+                        }
                     })
                 }
 
@@ -246,26 +295,7 @@ const AttendanceDetails = () => {
                 return toast("Staff attendance not fetch", "error");
             }
         })()
-    }, [attendanceDatePickerValue, oneDaySalary])
-
-
-    // Genarate Dates Array
-    useEffect(() => {
-        if (!attendanceDatePickerValue) return;
-
-        const [year, month] = attendanceDatePickerValue.split("-").map(Number);
-        const date = new Date(year, month - 1, 1);
-        const dates = [];
-
-        while (date.getMonth() === month - 1) {
-            dates.push(
-                `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
-            );
-            date.setDate(date.getDate() + 1);
-        }
-
-        setDatesArr(dates);
-    }, [attendanceDatePickerValue]);
+    }, [attendanceDatePickerValue, oneDaySalary, currentMonthPayments])
 
 
     // Get Total Loan Amounts like: `Loan` | `Loan Received` | `Total Loan`
@@ -298,7 +328,6 @@ const AttendanceDetails = () => {
 
     // Get Total Dues;
     useEffect(() => {
-        if (tab !== 2) return;
         (async () => {
             try {
                 const URL = process.env.REACT_APP_API_URL + "/staff-payment/get-total-due";
@@ -358,6 +387,25 @@ const AttendanceDetails = () => {
             }
         })()
     }, [tab, currentMonth, currentYear])
+
+
+    // Genarate Dates Array
+    useEffect(() => {
+        if (!attendanceDatePickerValue) return;
+
+        const [year, month] = attendanceDatePickerValue.split("-").map(Number);
+        const date = new Date(year, month - 1, 1);
+        const dates = [];
+
+        while (date.getMonth() === month - 1) {
+            dates.push(
+                `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+            );
+            date.setDate(date.getDate() + 1);
+        }
+
+        setDatesArr(dates);
+    }, [attendanceDatePickerValue]);
 
 
     // Custom Date change on Attendance `Next` | `Prev` Button;
@@ -479,6 +527,7 @@ const AttendanceDetails = () => {
 
     // Download Salary Slip by Month Year;
     const downloadSalarySlip = async (date) => {
+        setSalarySlipDownloadLoading(true);
         const element = salaryRef.current;
 
         const url = process.env.REACT_APP_API_URL + "/attendance/get-user-attendance";
@@ -489,14 +538,14 @@ const AttendanceDetails = () => {
             },
             body: JSON.stringify({
                 token, staffId: id,
-                year: date.split("-")[0],
-                month: date.split("-")[1],
+                year: currentYear,
+                month: currentMonth + 1,
             })
         })
         const res = await req.json();
-        // if (req.status === 200) {
-        //     downloadSetAttendanceData(res.data)
-        // }
+        if (req.status === 200) {
+            // downloadSetAttendanceData(res.data)
+        }
 
         const options = {
             margin: 10,
@@ -507,6 +556,7 @@ const AttendanceDetails = () => {
         };
 
         html2pdf().set(options).from(element).save();
+        setSalarySlipDownloadLoading(false);
     }
 
 
@@ -545,41 +595,46 @@ const AttendanceDetails = () => {
 
     // Get current Month Transactions;
     useEffect(() => {
-        if (tab === 2) {
-            (async () => {
-                try {
-                    const URL = `${process.env.REACT_APP_API_URL}/staff-payment/get`;
-                    const { fromDate, toDate } = await getAdvanceFilterData(Constants.THISMONTH);
-                    const req = await fetch(URL, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            token, staffId: id,
-                            startDate: fromDate,
-                            endDate: toDate,
-                        })
-                    })
-                    const res = await req.json();
-                    if (req.status !== 200) {
-                        return toast(res.err, 'error');
-                    }
-
-                    setCurrentMonthPayments(res.data)
-                    const total = res.data.reduce((acc, i) => {
-                        if (i.paymentType !== Constants.LOAN_RECEIVED)
-                            acc += i.paymentAmount;
-                        return acc;
-                    }, 0)
-                    setTotalCurrentMonthPayment(Number(total).toFixed(2));
-
-                } catch (err) {
-                    return toast("Transaction Data not get", "error");
+        (async () => {
+            try {
+                const URL = `${process.env.REACT_APP_API_URL}/staff-payment/get`;
+                let { fromDate, toDate } = await getAdvanceFilterData(Constants.THISMONTH);
+                
+                if (new Date(fromDate).getMonth() !== currentMonth) {
+                    setCurrentMonthPayments([]);
+                    setTotalCurrentMonthPayment(0);
+                    return;
                 }
-            })()
-        }
-    }, [tab, paymentModal, paymentCollectModal])
+
+                const req = await fetch(URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        token, staffId: id,
+                        startDate: fromDate,
+                        endDate: toDate,
+                    })
+                })
+                const res = await req.json();
+                if (req.status !== 200) {
+                    return toast(res.err, 'error');
+                }
+
+                setCurrentMonthPayments(res.data)
+                const total = res.data.reduce((acc, i) => {
+                    if (i.paymentType !== Constants.LOAN_RECEIVED)
+                        acc += i.paymentAmount;
+                    return acc;
+                }, 0)
+                setTotalCurrentMonthPayment(Number(total).toFixed(2));
+
+            } catch (err) {
+                return toast("Transaction Data not get", "error");
+            }
+        })()
+    }, [tab, paymentModal, paymentCollectModal, currentMonth, currentYear])
 
 
     // Delete Staff Transaction;
@@ -639,6 +694,9 @@ const AttendanceDetails = () => {
                     staffData={staffData}
                     salaryAttendance={salarySlipAttendance}
                     userDetails={userDetails}
+                    OverTimeData={OverTimeData}
+                    totalDues={totalDues}
+                    currentMonthPayments={currentMonthPayments}
                 />
             </div>
             <AttendanceOverTime
@@ -749,22 +807,27 @@ const AttendanceDetails = () => {
                             </div>
                             <div className='relative'>
                                 <button
-                                    onClick={() => downloadDateRef.current.showPicker()}
-                                    className='border bg-gray-50 rounded px-2 py-1'
+                                    onClick={async () => await downloadSalarySlip()}
+                                    className='border bg-gray-50 rounded px-2 py-1 flex items-center gap-1'
                                 >
-                                    <Icons.DOWNLOAD className='inline-block mr-1' />
+                                    {
+                                        salarySlipDownloadLoading ?
+                                            <Loading /> :
+                                            <Icons.DOWNLOAD />
+                                    }
                                     <span>Download Salary Slip</span>
 
-                                    <input
+                                    {/* <input
                                         type="month"
                                         ref={downloadDateRef}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                         onChange={async (e) => {
                                             if (!e.target.value) return;
+                                            console.log(e.target.value);
 
-                                            await downloadSalarySlip(e.target.value)
+                                            await downloadSalarySlip()
                                         }}
-                                    />
+                                    /> */}
                                 </button>
                             </div>
                         </div>
@@ -797,6 +860,9 @@ const AttendanceDetails = () => {
                                                         setAttendancePickerLabel(
                                                             new Date(e.target.value).toString().split(" ")[1] + " " + new Date(e.target.value).toString().split(" ")[3]
                                                         )
+
+                                                        setCurrentMonth(new Date(e.target.value).getMonth())
+                                                        setCurrentYear(new Date(e.target.value).getFullYear())
                                                     }}
                                                 />
                                                 <button
@@ -994,7 +1060,7 @@ const AttendanceDetails = () => {
                             )
                         }
 
-                        {/* =======================[Staff Details Tab]===================*/}
+                        {/* =======================[Staff Details Tab]====================*/}
                         {/* ============================================================= */}
                         {
                             tab === 1 && (
@@ -1006,10 +1072,10 @@ const AttendanceDetails = () => {
                                             <Icons.PENCIL size={'16px'} />
                                             Edit
                                         </button>
-                                        <button className='flex items-center justify-center gap-1 border border-red-400 hover:bg-red-400 hover:text-white rounded w-[70px] py-[4px]'>
+                                        {/* <button className='flex items-center justify-center gap-1 border border-red-400 hover:bg-red-400 hover:text-white rounded w-[70px] py-[4px]'>
                                             <Icons.DELETE size={'16px'} />
                                             Delete
-                                        </button>
+                                        </button> */}
                                     </div>
                                     <div className='user__details__tab'>
                                         <div className='flex flex-col gap-5 w-full pl-2'>
@@ -1140,7 +1206,7 @@ const AttendanceDetails = () => {
                                                 Earnings
                                             </div>
                                             <p className='font-bold'>
-                                                <Icons.RUPES className='inline' /> {totalEarning}
+                                                <Icons.RUPES className='inline' /> {(totalEarning).toFixed(2)}
                                                 {
                                                     earningDrpWn ?
                                                         <Icons.MENU_DOWN_ARROW className='inline ml-2' />
@@ -1166,10 +1232,10 @@ const AttendanceDetails = () => {
                                                     {
                                                         (Number(allTotalData.present || 0) * oneDaySalary) > 0 && (
                                                             <div className='w-full flex justify-between border-b p-2 pl-4 hover:bg-gray-100'>
-                                                                <div className=''>Present ({allTotalData.present} Days)</div>
+                                                                <div className=''>Present ({Number(allTotalData.present) - Number(allTotalData.halfDay)} Days)</div>
                                                                 <p>
                                                                     <Icons.RUPES className='inline' />
-                                                                    {(Number(allTotalData.present || 0) * oneDaySalary).toFixed(2)}
+                                                                    {((Number(allTotalData.present || 0) - Number(allTotalData.halfDay || 0)) * oneDaySalary).toFixed(2)}
                                                                 </p>
                                                             </div>
                                                         )
@@ -1181,6 +1247,17 @@ const AttendanceDetails = () => {
                                                                 <p>
                                                                     <Icons.RUPES className='inline' />
                                                                     {(Number(allTotalData.weeklyOff || 0) * oneDaySalary).toFixed(2)}
+                                                                </p>
+                                                            </div>
+                                                        )
+                                                    }
+                                                    {
+                                                        (Number(allTotalData.halfDay || 0) * (oneDaySalary / 2)) > 0 && (
+                                                            <div className='w-full flex justify-between border-b p-2 pl-4 hover:bg-gray-100'>
+                                                                <div className=''>Half Day ({allTotalData.halfDay} Days)</div>
+                                                                <p>
+                                                                    <Icons.RUPES className='inline' />
+                                                                    {(Number(allTotalData.halfDay || 0) * (oneDaySalary / 2)).toFixed(2)}
                                                                 </p>
                                                             </div>
                                                         )
@@ -1211,6 +1288,21 @@ const AttendanceDetails = () => {
                                                                     )
                                                                 }
                                                             </div>
+                                                        })
+                                                    }
+
+                                                    {/* Add Bonus */}
+                                                    {
+                                                        currentMonthPayments.filter(p => p.paymentType === Constants.BONUS).map((b, _) => {
+                                                            return (
+                                                                <div className='w-full flex justify-between border-b p-2 pl-4 hover:bg-gray-100' key={b._id}>
+                                                                    <div>Bonus</div>
+                                                                    <p>
+                                                                        <Icons.RUPES className='inline' />
+                                                                        {Number(b.paymentAmount).toFixed(2)}
+                                                                    </p>
+                                                                </div>
+                                                            )
                                                         })
                                                     }
                                                 </div>

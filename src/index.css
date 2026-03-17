@@ -1477,3 +1477,8 @@ input {
   border-end-end-radius: 5px;
   border-left-color: white;
 }
+
+.context__menu{
+  @apply w-[150px] h-[auto] z-[999999] rounded border absolute bg-white flex-col justify-evenly hidden p-1;
+  box-shadow: 0px 0px 10px rgb(153, 153, 153);
+}
