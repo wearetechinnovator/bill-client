@@ -17,10 +17,12 @@ const PaymentInModal = ({ invoice, openModal, openStatus }) => {
     const currentDate = new Date().toISOString().split("T")[0]
     const [formData, setFormData] = useState({
         party: "", paymentInNumber: "", paymentInDate: currentDate, paymentMode: Constants.CASH,
-        account: "", amount: "", invoiceId: ''
+        account: "", amount: "", invoiceId: '', tdsRate: ''
     });
     let [checkedInv, setCheckedInv] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [tdsRate, setTdsRate] = useState([]); //For DropDown;
+    const [tdsData, setTdsData] = useState([]);
 
 
     // Set some invoice data into formData;
@@ -69,12 +71,18 @@ const PaymentInModal = ({ invoice, openModal, openStatus }) => {
     }, [])
 
 
-    // Get Account Data
+    // Get `Account` and `TDS Rate` Data
     useEffect(() => {
         (async () => {
             const data = await getApiData("account");
             const account = data.data.map(d => ({ label: d.accountName, value: d._id }));
-            setAccount([...account])
+            setAccount([...account]);
+
+            // Tds
+            const tdsRate = await getApiData("tds-rate");
+            const tdsData = tdsRate.map(d => ({ label: d.title, value: d._id, rate: d.rate }));
+            setTdsRate([...tdsData]);
+            setTdsData(tdsRate);
         })()
     }, [])
 
@@ -145,6 +153,18 @@ const PaymentInModal = ({ invoice, openModal, openStatus }) => {
                                 value={formData.amount}
                             />
                         </div>
+                        <div className='w-full mt-6'>
+                            <SelectPicker
+                                className='w-full'
+                                searchable={false}
+                                placeholder={"Select TDS Rate"}
+                                data={tdsRate}
+                                onChange={(v) => {
+                                    const { rate } = tdsData.find(t => t._id === v);
+                                    setFormData({ ...formData, tdsRate: rate })
+                                }}
+                            />
+                        </div>
                         <div className='mt-4 flex gap-2 w-full'>
                             <div className='w-full'>
                                 <p>Payment Date</p>
@@ -157,19 +177,27 @@ const PaymentInModal = ({ invoice, openModal, openStatus }) => {
                             </div>
                             <div className='w-full'>
                                 <p>Payment Mode</p>
-                                <select
+                                <SelectPicker
+                                    className='w-full'
+                                    searchable={false}
+                                    data={[
+                                        { label: 'Cash', value: Constants.CASH },
+                                        { label: 'UPI', value: Constants.UPI },
+                                        { label: 'Card', value: Constants.CARD },
+                                        { label: 'Netbenking', value: Constants.NETBENKING },
+                                        { label: 'Bank', value: Constants.BANK },
+                                        { label: 'Cheque', value: Constants.CHEQUE },
+                                    ]}
                                     value={formData.paymentMode}
-                                    onChange={(e) => setFormData({
-                                        ...formData, paymentMode: e.target.value
+                                    onChange={(v) => setFormData({
+                                        ...formData, paymentMode: v
                                     })}
-                                >
-                                    <option value={Constants.CASH}>Cash</option>
-                                    <option value={Constants.UPI}>UPI</option>
-                                    <option value={Constants.CARD}>Card</option>
-                                    <option value={Constants.NETBENKING}>Netbenking</option>
-                                    <option value={Constants.BANK}>Bank</option>
-                                    <option value={Constants.CHEQUE}>Cheque</option>
-                                </select>
+                                    onClean={() => {
+                                        setFormData({
+                                            ...formData, paymentMode: Constants.CASH
+                                        })
+                                    }}
+                                />
                             </div>
                             {
                                 (formData.paymentMode !== Constants.CASH) && (

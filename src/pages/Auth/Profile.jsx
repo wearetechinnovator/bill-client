@@ -49,7 +49,6 @@ const Profile = () => {
 	}
 
 
-
 	const updateProfile = async (e) => {
 
 		if (data.name === "" || data.email === "" || data.password === "") {
@@ -84,6 +83,7 @@ const Profile = () => {
 
 	}
 
+
 	const updatePassword = async () => {
 		if (cPassword.currentPassword === "" || cPassword.newPassword === "") {
 			return toast("fill the blank", "error")
@@ -115,6 +115,7 @@ const Profile = () => {
 
 
 	}
+	
 
 	const clear = (which) => {
 		if (which === 1) {

@@ -22,11 +22,11 @@ const ConfirmModal = ({ openConfirm, openStatus, title, isDel = true, fun }) => 
             centered={true}
         >
             <Modal.Body>
-                <div className="flex items-start">
-                    <Icons.WARNING className="text-xl"/>
+                <div className="flex items-start justify-center">
+                    <Icons.WARNING className="text-[16px] mt-[3px]"/>
                     <span className="text-[17px]">Confirmation</span>
                 </div>
-                <p className="title text-xs">{title}</p>
+                <p className="title text-[14px] mt-1 text-center">{title}</p>
                 <div className="mt-7 text-end">
                     <button className="cancel" onClick={() => {
                         setOpen(false);

@@ -557,7 +557,11 @@ const Invoice = () => {
 												<div className='flex w-full border-b'>
 													<div className='p-3 flex items-center gap-5 border-r' style={{ width: "60%" }}>
 														<div>
-															<img src={companyDetails?.invoiceLogo} style={{ height: "100px", width: '100px' }} />
+															{
+																companyDetails?.invoiceLogo && (
+																	<img src={companyDetails?.invoiceLogo} style={{ height: "100px", width: '100px' }} />
+																)
+															}
 														</div>
 														<div className='flex flex-col gap-1' style={{ fontSize: '12px' }}>
 															<p className='text-blue-700 font-bold' style={{ fontSize: '12px' }}>
@@ -614,7 +618,7 @@ const Invoice = () => {
 													<tbody>
 														{
 															billData && billData.items.map((data, index) => {
-																return <tr key={index}>
+																return <tr key={data._id}>
 																	<td valign='top' align='center' className='p-2 border'>{index + 1}</td>
 																	<td valign='top' align='left'>
 																		{data.itemName}
@@ -706,21 +710,21 @@ const Invoice = () => {
 													<tbody>
 														{hsnData && (
 															[...new Map(hsnData.map(item => [item.hsn, item]))].map(([hsn, data], i) => {
-																return <>
-																	<tr key={`${i}-sgst`}>
+																return <React.Fragment key={`${i}-cgst`}>
+																	<tr>
 																		<td rowSpan={2}>{data.hsn}</td>
 																		<td>SGST</td>
 																		<td>{data.rate / 2}%</td>
 																		<td>{data.price / 2}</td>
 																		<td>{(data.taxAmount).toFixed(2)}</td>
 																	</tr>
-																	<tr key={`${i}-cgst`}>
+																	<tr>
 																		<td>CGST</td>
 																		<td>{data.rate / 2}%</td>
 																		<td>{data.price / 2}</td>
 																		<td>{(data.taxAmount).toFixed(2)}</td>
 																	</tr>
-																</>
+																</React.Fragment>
 															})
 														)}
 													</tbody>
@@ -731,7 +735,7 @@ const Invoice = () => {
 											<div className='border w-full mt-2'>
 												<div className='w-full border-b'>
 													<p className='p-1 capitalize' style={{ fontSize: '12px' }}>
-														<p className='font-bold '>Total Amount (in words) : </p>
+														<span className='font-bold '>Total Amount (in words) : </span>
 														{/* five hundred and fifty four Rupees .six Paise */}
 														{totalAmountInText}
 													</p>
@@ -787,7 +791,11 @@ const Invoice = () => {
 														<p className='text-xs text-gray-500'>{billData?.terms}</p>
 													</div>
 													<div className='border-l w-full text-center p-2'>
-														<img src={companyDetails?.signature} alt="signature" className='mx-auto' style={{ height: '30px' }} />
+														{
+															companyDetails?.signature && (
+																<img src={companyDetails?.signature} alt="signature" className='mx-auto' style={{ height: '30px' }} />
+															)
+														}
 														<p className='mt-5' style={{ fontSize: '10px', lineHeight: '0' }}>
 															Authorised Signatory For
 														</p>
@@ -906,7 +914,7 @@ const InvoicePdf = ({ companyDetails, billData, billDetails, hsnData, totalAmoun
 						))}
 					</View>
 					{billData?.items.map((data, index) => (
-						<View style={[styles.tableRow]} key={index}>
+						<View style={[styles.tableRow]} key={data._id}>
 							<View style={[styles.tableCol, { width: '10%' }]}><Text style={styles.textSmall}>{index + 1}</Text></View>
 							<View style={[styles.tableCol, { width: '30%' }]}><Text style={styles.textSmall}>{data.itemName}</Text></View>
 							<View style={[styles.tableCol, { width: '10%' }]}><Text style={styles.textSmall}>{data.hsn}</Text></View>
@@ -951,8 +959,8 @@ const InvoicePdf = ({ companyDetails, billData, billDetails, hsnData, totalAmoun
 						))}
 					</View>
 					{hsnData && [...new Map(hsnData.map(item => [item.hsn, item]))].map(([hsn, data], i) => (
-						<>
-							<View style={styles.tableRow} key={`${i}-sgst`}>
+						<React.Fragment key={data._id}>
+							<View style={styles.tableRow} key={data._id}>
 								<View style={[styles.tableCol, { width: '20%', borderBottom: '0' }]}>
 									<Text style={styles.textSmall}>{data.hsn}</Text>
 								</View>
@@ -986,7 +994,7 @@ const InvoicePdf = ({ companyDetails, billData, billDetails, hsnData, totalAmoun
 									<Text style={styles.textSmall}>{(data.taxAmount).toFixed(2)}</Text>
 								</View>
 							</View>
-						</>
+						</React.Fragment>
 					))}
 				</View>
 
