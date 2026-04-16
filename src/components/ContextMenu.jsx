@@ -11,25 +11,32 @@ const ContextMenu = ({ print, copy, pdf, excel }) => {
     useEffect(() => {
         const win = document.querySelector(".view");
         const contentBody = document.querySelector(".content__body");
-
         const menu = menuRef.current;
-        if (!win) return;
 
-        win.addEventListener("contextmenu", (e) => {
+        if (!win || !contentBody || !menu) return;
+
+        const handleContextMenu = (e) => {
             e.preventDefault();
 
             menu.style.display = "flex";
             menu.style.left = `${e.pageX}px`;
             menu.style.top = `${e.pageY}px`;
-        })
+        };
 
-        contentBody.addEventListener("click", (e)=>{
-            e.preventDefault();
+        const handleClick = () => {
             menu.style.display = "none";
-        })
-        
-    }, [print])
+        };
 
+        win.addEventListener("contextmenu", handleContextMenu);
+        contentBody.addEventListener("click", handleClick);
+
+        
+        return () => {
+            win.removeEventListener("contextmenu", handleContextMenu);
+            contentBody.removeEventListener("click", handleClick);
+        };
+
+    }, [print, copy, pdf, excel]);
     return (
         <div ref={menuRef} className='context__menu'>
             <div className='download__menu border-b' onClick={() => window.location.reload()} >

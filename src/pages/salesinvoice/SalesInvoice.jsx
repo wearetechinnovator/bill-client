@@ -18,6 +18,8 @@ import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import ContextMenu from '../../components/ContextMenu';
 
 
+
+
 const SalesInvoice = () => {
 	const toast = useMyToaster();
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -58,11 +60,14 @@ const SalesInvoice = () => {
 	const [totalSaleAmount, setTotalSaleAmount] = useState(0);
 	const [totalPaymentIn, setTotalPaymentIn] = useState(0);
 	const [totalDuePayment, setTotalDuePayment] = useState(0);
+	const [totalCancelAmount, setTotalCancelAmount] = useState(0);
 	const [openConfirm, setOpenConfirm] = useState(false);
 	const [selectedTab, setSelectedTab] = useState(Constants.TOTAL_SALE);
 	const [applyFilter, setApplyFilter] = useState(null);
 	const [isCustomDate, setIsCustomDate] = useState(false);
-	const mainRef = useRef(null)
+	const [totalBills, setTotalBills] = useState({
+		all: 0, paid: 0, unpaid: 0, cancel: 0
+	})
 
 
 
@@ -100,25 +105,54 @@ const SalesInvoice = () => {
 				const totalAmount = res.data.reduce((acc, i) => acc += i.finalAmount, 0);
 				setTotalSaleAmount(totalAmount.toFixed(2));
 
-				// Total Unpaid
-				const totalPaid = res.data.reduce((acc, i) => {
+				// Total Paid
+				const [totalPaid, paidLen] = res.data.reduce((acc, i) => {
 					if (i.paymentAmount) {
-						acc += i.paymentAmount;
+						acc[0] += i.paymentAmount;
+						acc[1] += 1;
 					}
 					return acc;
-				}, 0);
-				setTotalPaymentIn(totalPaid.toFixed(2))
+				}, [0, 0]);
+				setTotalPaymentIn(totalPaid.toFixed(2));
 
 				// Total UnPaid
-				setTotalDuePayment((totalAmount - totalPaid).toFixed(2))
+				const [totalUnpaid, unPaidLen] = res.data.reduce((acc, i) => {
+					if (!i.isCancel && (!i.paymentAmount || i.paymentAmount < i.finalAmount)) {
+						acc[0] += !i.paymentAmount ? i.finalAmount : i.finalAmount - i.paymentAmount;
+						acc[1] += 1;
+					}
+					return acc;
+				}, [0, 0]);
+				setTotalDuePayment((totalUnpaid).toFixed(2));
+
+				// Total Cancel Amount;
+				const [totalCancel, cancelLen] = res.data.reduce((acc, i) => {
+					if (i.isCancel) {
+						acc[0] += i.finalAmount;
+						acc[1] += 1;
+					}
+					return acc;
+				}, [0, 0]);
+				setTotalCancelAmount(totalCancel.toFixed(2));
+
+				// ----------------------[Set Total Bill Counts]-----------------------
+				setTotalBills({
+					cancel: cancelLen, all: res.totalData,
+					paid: paidLen, unpaid: unPaidLen
+				});
 
 
+				// TAB Wise Bill;
 				if (selectedTab === Constants.PAID) {
-					const unpaidInv = res.data.filter(d => d.paymentAmount);
-					setBillData(unpaidInv);
+					const paidInv = res.data.filter(d => d.paymentAmount);
+					setBillData(paidInv);
 				}
 				else if (selectedTab === Constants.UNPAID) {
-					const paidInv = res.data.filter(d => !d.paymentAmount || d.paymentAmount < d.finalAmount);
+					const unPaidInv = res.data.filter(d => (!d.paymentAmount || d.paymentAmount < d.finalAmount) && !d.isCancel);
+					setBillData(unPaidInv);
+				}
+				else if (selectedTab === Constants.CANCEL) {
+					const paidInv = res.data.filter(d => d.isCancel);
 					setBillData(paidInv);
 				}
 				else {
@@ -148,26 +182,6 @@ const SalesInvoice = () => {
 		setAscending(!ascending);
 	};
 
-
-	const searchTable = (e) => {
-		const value = e.target.value.toLowerCase();
-		const rows = document.querySelectorAll('.list__table tbody tr');
-
-		rows.forEach(row => {
-			const cols = row.querySelectorAll('td');
-			let found = false;
-			cols.forEach((col, index) => {
-				if (index !== 0 && col.innerHTML.toLowerCase().includes(value)) {
-					found = true;
-				}
-			});
-			if (found) {
-				row.style.display = "";
-			} else {
-				row.style.display = "none";
-			}
-		});
-	}
 
 
 	const selectAll = (e) => {
@@ -443,24 +457,43 @@ const SalesInvoice = () => {
 								<div onClick={() => setSelectedTab(Constants.TOTAL_SALE)}
 									className={`party__data ${selectedTab === Constants.TOTAL_SALE ? 'active' : ''}`}
 								>
-									<h6><Icons.INVOICE /> Total Sale</h6>
+									<div className='w-full flex items-center justify-between'>
+										<h6><Icons.INVOICE /> Total Sale</h6>
+										<p>{totalBills?.all}</p>
+									</div>
 									<p><Icons.RUPES />{totalSaleAmount}</p>
 								</div>
-								<div
-									onClick={() => setSelectedTab(Constants.PAID)}
+								<div onClick={() => setSelectedTab(Constants.PAID)}
 									className={`party__data ${selectedTab === Constants.PAID ? 'active' : ''}`}
 								>
-									<h6><Icons.TREDING_UP />Paid</h6>
+									<div className='w-full flex items-center justify-between'>
+										<h6><Icons.TREDING_UP />Paid</h6>
+										<p>{totalBills.paid}</p>
+									</div>
 									<p><Icons.RUPES />{totalPaymentIn}</p>
 								</div>
-								<div
-									onClick={() => setSelectedTab(Constants.UNPAID)}
+
+								<div onClick={() => setSelectedTab(Constants.UNPAID)}
 									className={`party__data ${selectedTab === Constants.UNPAID ? 'active' : ''}`}
 								>
-									<h6><Icons.TREDING_DOWN />Unpaid</h6>
+									<div className='w-full flex items-center justify-between'>
+										<h6><Icons.TREDING_DOWN />Unpaid</h6>
+										<p>{totalBills.unpaid}</p>
+									</div>
 									<p><Icons.RUPES /> {totalDuePayment} </p>
 								</div>
+
+								<div onClick={() => setSelectedTab(Constants.CANCEL)}
+									className={`party__data ${selectedTab === Constants.CANCEL ? 'active' : ''}`}
+								>
+									<div className='w-full flex items-center justify-between'>
+										<h6><Icons.CANCEL />Cancel</h6>
+										<p>{totalBills.cancel}</p>
+									</div>
+									<p><Icons.RUPES /> {totalCancelAmount} </p>
+								</div>
 							</div>
+
 							{/* Table start */}
 							<div className='overflow-x-auto list__table'>
 								<table className='min-w-full bg-white' id='listQuotation' ref={tableRef}>
@@ -588,7 +621,7 @@ const SalesInvoice = () => {
 							</div>
 						</div>
 							: <AddNew title={"Sales Invoice"} link={"/admin/sales-invoice/add"} />
-							: <DataShimmer topBox={true} />
+							: <DataShimmer topBox={true} topBoxCount={4} />
 					}
 				</div>
 			</main>

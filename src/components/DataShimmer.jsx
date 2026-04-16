@@ -1,12 +1,14 @@
-const DataShimmer = ({ topBox = false }) => {
+const DataShimmer = ({ topBox = false, topBoxCount = 3 }) => {
   return (
     <div className='shimmer__parent'>
       {
         topBox && (
           <div className="w-full flex justify-between mb-5 gap-8">
-            <div className='animate w-full h-[75px] rounded'></div>
-            <div className='animate w-full h-[75px] rounded'></div>
-            <div className='animate w-full h-[75px] rounded'></div>
+            {
+              Array.from({ length: topBoxCount }, (v, i) => {
+                return <div className='animate w-full h-[75px] rounded' key={i}></div>
+              })
+            }
           </div>
         )
       }

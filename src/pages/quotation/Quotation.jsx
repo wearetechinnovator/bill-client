@@ -114,6 +114,7 @@ const Quotation = () => {
 
 
     const handleCheckboxChange = (id) => {
+        console.log(id)
         setSelected((prevSelected) => {
             if (prevSelected.includes(id)) {
                 return prevSelected.filter((previd, _) => previd !== id);

@@ -163,41 +163,6 @@ const Item = ({ mode }) => {
 	}
 
 
-	const restoreData = async () => {
-		if (selected.length === 0 || tableStatusData !== "trash") {
-			return;
-		}
-
-		const url = process.env.REACT_APP_API_URL + "/item/restore";
-		try {
-			const req = await fetch(url, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify({ ids: selected })
-			});
-			const res = await req.json();
-
-			if (req.status !== 200 || res.err) {
-				return toast(res.err, 'error');
-			}
-
-			selected.forEach((id, _) => {
-				setItemData((prevData) => {
-					return prevData.filter((data, _) => data._id !== id)
-				})
-			});
-			setSelected([]);
-			return toast(res.msg, 'success');
-
-		} catch (error) {
-			console.log(error)
-			toast("Something went wrong", "error")
-		}
-	}
-
-
 	const searchData = (e) => {
 		const value = e.target.value;
 
@@ -235,8 +200,7 @@ const Item = ({ mode }) => {
 				/>
 				<div className='content__body'>
 					{/* top section */}
-					<div
-						className="add_new_compnent">
+					<div className="add_new_compnent">
 						<div className='flex justify-between items-center'>
 							<div className='flex flex-col'>
 								<select value={dataLimit} onChange={(e) => setDataLimit(e.target.value)}>
@@ -298,12 +262,8 @@ const Item = ({ mode }) => {
 											</Whisper>
 										</div>
 									)
-								}
-
+								}            
 							</div>
-						</div>
-
-						<div id='itemFilter'>
 						</div>
 					</div>
 					{
@@ -316,7 +276,8 @@ const Item = ({ mode }) => {
 											<th className='py-2 px-4 border-b w-[50px]'>
 												<input type='checkbox'
 													onChange={selectAll}
-													checked={itemData.length > 0 && selected.length === itemData.length} />
+													checked={itemData.length > 0 && selected.length === itemData.length} 
+												/>
 											</th>
 											<th align='left'>Name</th>
 											<th align='left'>HSN</th>

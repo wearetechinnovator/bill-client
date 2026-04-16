@@ -7,6 +7,7 @@ export const Constants = {
     NETBENKING: "netbenking",
     PAID: 'paid',
     UNPAID: 'unpaid',
+    CANCEL: 'cancel',
     PARTIAL_PAID: 'partial paid',
     TOTAL_SALE: 'total_sale',
     CUSTOMER: 'customer',

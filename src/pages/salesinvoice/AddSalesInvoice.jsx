@@ -72,7 +72,7 @@ const SalesInvoice = ({ mode }) => {
 	// Store party
 	const [party, setParty] = useState([]);
 	// Account
-	const [account, setAccount] = useState([])
+	const [account, setAccount] = useState([]);
 
 
 	// store label and value pair for dropdown
