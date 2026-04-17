@@ -52,7 +52,7 @@ const ProtectRoute = ({ children }) => {
 
 
   if (userData?.companies?.length < 1) {
-    if (window.location.pathname !== "/admin/company") {
+    if (window.location.pathname !== "/admin/company" && window.location.pathname !== "/admin/profile") {
       toast("You need to create a company first", "warning")
       navigate("/admin/company");
 
