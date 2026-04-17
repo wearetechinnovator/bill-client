@@ -11,7 +11,7 @@ import Loading from "../../components/Loading";
 
 
 const Forget = () => {
-  const [loginData, setLoginData] = useState({ email: ''});
+  const [loginData, setLoginData] = useState({ email: '' });
   const shakeIt = useLoginShake();
   const navigate = useNavigate();
   const toast = useMyToaster();
@@ -45,8 +45,8 @@ const Forget = () => {
         return toast(res.err, "error")
       }
 
-      Cookies.set("user-token", res.token, { secure: true });
-      navigate("/admin/otp", {state:{email: loginData.email}});
+      Cookies.set("user-token", res.token);
+      navigate("/admin/otp", { state: { email: loginData.email } });
 
     } catch (error) {
       console.log(error)

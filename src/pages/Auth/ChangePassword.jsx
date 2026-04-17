@@ -63,12 +63,12 @@ const ChangePassword = () => {
       <div className="login__box flex flex-col" id="loginBox">
         <h1 className='text-center text-[25px] mb-8 mt-4'>Change Password</h1>
         <form onSubmit={formAction}>
-          <input type="text" name="text"
+          <input type="password" name="text"
             value={loginData.password}
             onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
             className='input_style' placeholder='New password'
           />
-          <input type="text" name="text"
+          <input type="password" name="text"
             value={loginData.confirPassword}
             onChange={(e) => setLoginData({ ...loginData, confirPassword: e.target.value })}
             className='input_style' placeholder='Confirm password'
