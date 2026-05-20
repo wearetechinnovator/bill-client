@@ -32,7 +32,7 @@ const PartyComponent = ({ mode, save, getRes }) => {
 	const toast = useMyToaster()
 	const [partyData, setPartyData] = useState({
 		name: "", type: Constants.CUSTOMER, contactNumber: "", billingAddress: "", shippingAddress: '',
-		pan: "", gst: "", openingBalance: "0", details: '', email: '',
+		pan: "", gst: "", openingBalance: "0", details: '', email: '', openingBalanceType: Constants.COLLECT,
 		partyCategory: '', creditPeriod: '', creditLimit: '', dob: '', partyCategory: ''
 	})
 	const navigate = useNavigate();
@@ -147,7 +147,14 @@ const PartyComponent = ({ mode, save, getRes }) => {
 					<div>
 						<p className='mb-1'>Party Type <span className='required__text'>*</span></p>
 						<select
-							onChange={(e) => setPartyData({ ...partyData, type: e.target.value })}
+							onChange={(e) => {
+								const balanceType = e.target.value === Constants.CUSTOMER ? Constants.COLLECT : Constants.PAY;
+								setPartyData({
+									...partyData, openingBalanceType: balanceType,
+									type: e.target.value
+								})
+
+							}}
 							value={partyData.type}
 						>
 							<option value={Constants.CUSTOMER}>Customer</option>
@@ -156,14 +163,14 @@ const PartyComponent = ({ mode, save, getRes }) => {
 						</select>
 					</div>
 
-					<div>
+					{/* <div>
 						<p className='mb-1'>Credit Period</p>
 						<input
 							type="text"
 							onChange={(e) => setPartyData({ ...partyData, creditPeriod: e.target.value })}
 							value={partyData.creditPeriod}
 						/>
-					</div>
+					</div> */}
 
 					<div>
 						<p className='mb-1'>Party Category</p>
@@ -233,6 +240,8 @@ const PartyComponent = ({ mode, save, getRes }) => {
 							/>
 							<select
 								className='border-none bg-gray-50 rounded-l-none'
+								onChange={(e) => setPartyData({ ...partyData, openingBalanceType: e.target.value })}
+								value={partyData.openingBalanceType}
 							>
 								<option value={Constants.COLLECT}>To Collect</option>
 								<option value={Constants.PAY}>To Pay</option>
@@ -240,13 +249,13 @@ const PartyComponent = ({ mode, save, getRes }) => {
 						</div>
 					</div>
 
-					<div>
+					{/* <div>
 						<p className='mb-1'>Credit Limit</p>
 						<input type="text"
 							onChange={(e) => setPartyData({ ...partyData, creditLimit: e.target.value })}
 							value={partyData.creditLimit}
 						/>
-					</div>
+					</div> */}
 
 					<div>
 						<p className='mb-1'>DOB</p>

@@ -560,31 +560,44 @@ const Dashboard = () => {
 									<table className="table-fixed w-[100%]">
 										<tbody>
 											{
-												recentInvoiceLoading === false ? recentSales.map((rs, i) => {
-													let paymentStatus = Constants.UNPAID;
-													const paymentAmount = Number(rs.paymentAmount) || 0;
+												recentInvoiceLoading === false ? (
+													recentSales.length > 0 ? (
+														recentSales.map((rs, i) => {
+															let paymentStatus = Constants.UNPAID;
+															const paymentAmount = Number(rs.paymentAmount) || 0;
 
-													if (rs.finalAmount === paymentAmount) {
-														paymentStatus = Constants.PAID;
-													}
-													else if (paymentAmount > 0 && paymentAmount < rs.finalAmount) {
-														paymentStatus = Constants.PARTIAL_PAID;
-													}
+															if (rs.finalAmount === paymentAmount) {
+																paymentStatus = Constants.PAID;
+															}
+															else if (paymentAmount > 0 && paymentAmount < rs.finalAmount) {
+																paymentStatus = Constants.PARTIAL_PAID;
+															}
 
-													console.table()
-													return (
-														<tr key={i}>
-															<td className="flex items-center gap-[5px] w-[100%] font-(family-name:--heading-font) text-[#333333]">
-																{i + 1}. {rs.party.name}
-															</td>
-															<td className="text-end">
-																<span className={`${paymentStatus === Constants.PAID ? 'green-badge' : paymentStatus === Constants.PARTIAL_PAID ? 'yellow-badge' : 'red-badge'} badge capitalize`}>
-																	{paymentStatus}
-																</span>
+															if (rs.isCancel) {
+																return;
+															}
+
+															return (
+																<tr key={i}>
+																	<td className="flex items-center gap-[5px] w-[100%] font-(family-name:--heading-font) text-[#333333]">
+																		{i + 1}. {rs.party.name}
+																	</td>
+																	<td className="text-end">
+																		<span className={`${paymentStatus === Constants.PAID ? 'green-badge' : paymentStatus === Constants.PARTIAL_PAID ? 'yellow-badge' : 'red-badge'} badge capitalize`}>
+																			{paymentStatus}
+																		</span>
+																	</td>
+																</tr>
+															)
+														})
+													) : (
+														<tr>
+															<td colSpan="2" className="text-center text-gray-500 py-4">
+																No invoices found
 															</td>
 														</tr>
 													)
-												}) : <DataShimmer />
+												) : <DataShimmer />
 											}
 										</tbody>
 									</table>

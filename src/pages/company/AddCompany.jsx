@@ -13,12 +13,13 @@ import Cookies from 'js-cookie';
 import { useDispatch } from 'react-redux';
 import { addCompany } from '../../store/userDetailSlice';
 import { Icons } from '../../helper/icons';
+import Loading from '../../components/Loading';
 
 
 const AddCompany = () => {
 	const toast = useMyToaster();
 	const dispatch = useDispatch()
-
+	const [loading, setLoading] = useState(false);
 	const [companyData, setCompanyData] = useState({
 		name: '', phone: '', email: '', gst: '', pan: '', invoiceLogo: '', signature: '',
 		address: '', country: '', state: '', poInitial: '', invoiceInitial: '',
@@ -65,13 +66,25 @@ const AddCompany = () => {
 
 
 	const saveCompany = async () => {
-		if ([companyData.name, companyData.address, companyData.phone,
-		companyData.email, companyData.gst, companyData.pan, companyData.state, companyData.country
-		].some((field) => field === "")) {
-			return toast("fill the blank", "error")
+		const validations = [
+			{ field: companyData.name, msg: "Company name is required" },
+			{ field: companyData.address, msg: "Address is required" },
+			{ field: companyData.phone, msg: "Phone number is required" },
+			{ field: companyData.email, msg: "Email is required" },
+			{ field: companyData.gst, msg: "GST number is required" },
+			{ field: companyData.pan, msg: "PAN number is required" },
+			{ field: companyData.state, msg: "State is required" },
+			{ field: companyData.country, msg: "Country is required" },
+		];
+
+		for (const item of validations) {
+			if (!item.field || item.field.trim() === "") {
+				return toast(item.msg, "error");
+			}
 		}
 
 		try {
+			setLoading(true);
 			// const formData = new FormData();
 			// Object.keys(companyData).forEach((elm, _) => {
 			//   formData.append(elm, companyData[elm])
@@ -102,6 +115,8 @@ const AddCompany = () => {
 		} catch (error) {
 			console.log(error)
 			return toast("something went wrong", 'error')
+		} finally {
+			setLoading(false);
 		}
 
 	}
@@ -333,9 +348,9 @@ const AddCompany = () => {
 							</div> */}
 							<div className='w-full flex justify-center gap-3 my-3'>
 								<button
-									onClick={saveCompany}
+									onClick={loading ? null : saveCompany}
 									className='add-bill-btn'>
-									<Icons.CHECK />
+									{loading ? <Loading /> : <Icons.CHECK />}
 									Update
 								</button>
 								<button className='reset-bill-btn'>

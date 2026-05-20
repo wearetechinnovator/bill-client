@@ -259,7 +259,7 @@ const Party = () => {
 				/>
 				<div className="content__body">
 					{/* top section */}
-					<div className={`add_new_compnent`}>
+					<div className='add_new_compnent'>
 						<div className='flex justify-between items-center'>
 							<div className='flex flex-col'>
 								<select value={dataLimit} onChange={(e) => setDataLimit(e.target.value)}>
