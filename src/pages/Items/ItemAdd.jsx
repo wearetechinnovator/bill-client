@@ -250,6 +250,26 @@ const AddItemComponent = ({ mode, save, getRes }) => {
 								onChange={(e) => setForm({ ...form, hsn: e.target.value })}
 								value={form.hsn} />
 						</div>
+						<div className='w-full'>
+							<div className='flex items-center justify-between'>
+								<p className='mb-1'>Item Code</p>
+								<button
+									onClick={() => {
+										const uniqueNum = Date.now() + Math.floor(Math.random() * 9000 + 1000);
+										setForm({ ...form, itemCode: uniqueNum.toString() })
+									}}
+									className={'text-blue-500 text-xs' + (mode ? 'cursor-not-allowed opacity-50' : ' cursor-pointer')}
+									disabled={mode ? true : false}
+								>
+									Generate Barcode
+								</button>
+							</div>
+							<input type="text"
+								className='text-xs bg-gray-100'
+								disabled={true}
+								placeholder='Barcode Number'
+								value={form.itemCode} />
+						</div>
 					</div>
 				</div>
 			</div>

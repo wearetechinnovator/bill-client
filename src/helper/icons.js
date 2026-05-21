@@ -46,9 +46,7 @@ import { GiPayMoney } from "react-icons/gi";
 import { FaArrowUp } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa";
 import { IoWarningOutline } from "react-icons/io5";
-
-
-
+import { CiBarcode } from "react-icons/ci";
 
 
 
@@ -105,5 +103,6 @@ export const Icons = {
   CANCEL: MdOutlineCancel,
   CASH_IN: GiReceiveMoney,
   CASH_OUT: GiPayMoney,
+  BARCODE: CiBarcode
 };
 

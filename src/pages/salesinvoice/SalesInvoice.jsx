@@ -16,6 +16,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import ContextMenu from '../../components/ContextMenu';
+import TableNoData from '../../components/TableNoData';
 
 
 
@@ -452,7 +453,7 @@ const SalesInvoice = () => {
 						}
 					</div>
 					{
-						!loading ? billData.length > 0 ? <div className='content__body__main view'>
+						!loading ? totalBills?.all > 0 ? <div className='content__body__main view'>
 							<div className='flex flex-col md:flex-row justify-between items-center mb-5 gap-8'>
 								<div onClick={() => setSelectedTab(Constants.TOTAL_SALE)}
 									className={`party__data ${selectedTab === Constants.TOTAL_SALE ? 'active' : ''}`}
@@ -520,7 +521,7 @@ const SalesInvoice = () => {
 									</thead>
 									<tbody>
 										{
-											billData.map((data, i) => {
+											billData.length > 0 ? billData.map((data, i) => {
 												let paymentStatus = Constants.UNPAID;
 												const paymentAmount = Number(data.paymentAmount) || 0;
 
@@ -604,7 +605,9 @@ const SalesInvoice = () => {
 														</Whisper>
 													</td>
 												</tr>
-											})
+											}) : (
+												<TableNoData />
+											)
 										}
 									</tbody>
 								</table>

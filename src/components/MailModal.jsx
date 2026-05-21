@@ -1,4 +1,4 @@
-import React, { use, useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import { Modal } from 'rsuite'
 import useMyToaster from '../hooks/useMyToaster';
 import { toggle } from '../store/mailSlice';
@@ -15,6 +15,11 @@ const MailModal = ({ open, pdf, email }) => {
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
 
+
+    useEffect(()=>{
+        console.log(email);
+        console.log(pdf);
+    }, [])
 
     const sendMail = async () => {
         if (mailData.subject === "" || mailData.body === "" || pdf === "") {

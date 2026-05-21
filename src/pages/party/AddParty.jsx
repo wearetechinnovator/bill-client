@@ -8,6 +8,8 @@ import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import { Constants } from '../../helper/constants';
 import Loading from '../../components/Loading';
+import { countryList, statesAndUTs } from '../../helper/data';
+import { SelectPicker } from 'rsuite';
 
 
 
@@ -33,7 +35,8 @@ const PartyComponent = ({ mode, save, getRes }) => {
 	const [partyData, setPartyData] = useState({
 		name: "", type: Constants.CUSTOMER, contactNumber: "", billingAddress: "", shippingAddress: '',
 		pan: "", gst: "", openingBalance: "0", details: '', email: '', openingBalanceType: Constants.COLLECT,
-		partyCategory: '', creditPeriod: '', creditLimit: '', dob: '', partyCategory: ''
+		partyCategory: '', creditPeriod: '', creditLimit: '', dob: '', partyCategory: '',
+		country: 'india', state: '', postalCode: ''
 	})
 	const navigate = useNavigate();
 	const [shipingCheck, setShipingCheck] = useState(true);
@@ -61,11 +64,19 @@ const PartyComponent = ({ mode, save, getRes }) => {
 
 
 	const saveParty = async () => {
-		if (partyData.name === "") {
-			return toast("Please enter party name", "error");
-		}
-		if (partyData.contactNumber === "") {
-			return toast("Please enter contact number", "error");
+		const validations = [
+			{ field: partyData.name, msg: "Party name is required" },
+			{ field: partyData.contactNumber, msg: "Contact number is required" },
+			{ field: partyData.type, msg: "Party type is required" },
+			{ field: partyData.state, msg: "State is required" },
+			{ field: partyData.country, msg: "Country is required" },
+			{ field: partyData.billingAddress, msg: "Billing address is required" },
+		];
+
+		for (const item of validations) {
+			if (!item.field || item.field.trim() === "") {
+				return toast(item.msg, "error");
+			}
 		}
 
 
@@ -119,7 +130,8 @@ const PartyComponent = ({ mode, save, getRes }) => {
 			name: "", type: Constants.CUSTOMER, contactNumber: "", address: "",
 			pan: "", gst: "", country: "", state: "", openingBalance: "0",
 			details: '', email: '', billingAddress: '', shippingAddress: '',
-			creditPeriod: '', creditLimit: '', dob: '', partyCategory: ''
+			creditPeriod: '', creditLimit: '', dob: '', partyCategory: '',
+			postalCode: ''
 		})
 	}
 
@@ -144,24 +156,7 @@ const PartyComponent = ({ mode, save, getRes }) => {
 							value={partyData.contactNumber}
 						/>
 					</div>
-					<div>
-						<p className='mb-1'>Party Type <span className='required__text'>*</span></p>
-						<select
-							onChange={(e) => {
-								const balanceType = e.target.value === Constants.CUSTOMER ? Constants.COLLECT : Constants.PAY;
-								setPartyData({
-									...partyData, openingBalanceType: balanceType,
-									type: e.target.value
-								})
 
-							}}
-							value={partyData.type}
-						>
-							<option value={Constants.CUSTOMER}>Customer</option>
-							<option value={Constants.SUPPLIER}>Supplier</option>
-							<option value={Constants.BOTHPARTY}>Both</option>
-						</select>
-					</div>
 
 					{/* <div>
 						<p className='mb-1'>Credit Period</p>
@@ -171,14 +166,64 @@ const PartyComponent = ({ mode, save, getRes }) => {
 							value={partyData.creditPeriod}
 						/>
 					</div> */}
+					<div className='flex flex-col md:flex-row gap-2 items-center w-full'>
+						<div className='w-full'>
+							<p className='mb-1'>Party Type <span className='required__text'>*</span></p>
+							<SelectPicker
+								searchable={false}
+								className='w-full' data={[
+									{ label: "Customer", value: Constants.CUSTOMER },
+									{ label: "Supplier", value: Constants.SUPPLIER },
+									{ label: "Both", value: Constants.BOTHPARTY }
+								]}
+								value={partyData.type}
+								onChange={(v) => {
+									const balanceType = v === Constants.CUSTOMER ? Constants.COLLECT : Constants.PAY;
+									setPartyData({
+										...partyData, openingBalanceType: balanceType,
+										type: v
+									})
+								}}
+								menuMaxHeight={150}
+							/>
+						</div>
 
-					<div>
-						<p className='mb-1'>Party Category</p>
-						<MySelect2
-							model={"partycategory"}
-							onType={(v) => setPartyData({ ...partyData, partyCategory: v })}
-							value={partyData.partyCategory}
-						/>
+						<div className='w-full'>
+							<p className='mb-1'>Party Category</p>
+							<MySelect2
+								model={"partycategory"}
+								onType={(v) => setPartyData({ ...partyData, partyCategory: v })}
+								value={partyData.partyCategory}
+							/>
+						</div>
+					</div>
+
+
+					<div className='flex flex-col md:flex-row gap-2 items-center w-full'>
+						<div className='w-full'>
+							<p className='mb-1'>Select Country <span className='required__text'>*</span></p>
+							<SelectPicker
+								className='w-full' data={countryList}
+								value={partyData.country}
+								onChange={(v) => setPartyData({ ...partyData, country: v })}
+								menuMaxHeight={150}
+							/>
+						</div>
+						<div className='w-full'>
+							<p className='mb-1'>Select State <span className='required__text'>*</span></p>
+							<SelectPicker className='w-full' data={statesAndUTs}
+								value={partyData.state}
+								onChange={(v) => setPartyData({ ...partyData, state: v })}
+								menuMaxHeight={150}
+							/>
+						</div>
+						<div className='w-full'>
+							<p className='mb-1'>Postal Code</p>
+							<input type="text"
+								onChange={(e) => setPartyData({ ...partyData, pin: e.target.value })}
+								value={partyData.pin}
+							/>
+						</div>
 					</div>
 
 					<div>
@@ -289,9 +334,9 @@ const PartyComponent = ({ mode, save, getRes }) => {
 							onChange={(e) => setPartyData({ ...partyData, shippingAddress: e.target.value })}
 						></textarea>
 					</div>
-
 				</div>
 			</div>
+
 
 			<div className='w-full flex justify-center gap-3 my-3 mt-5'>
 				<button

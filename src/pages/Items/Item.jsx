@@ -14,12 +14,16 @@ import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
 import ContextMenu from '../../components/ContextMenu';
+import { toggleBarCodeModal } from '../../store/barcodeModalSlice';
+import { useDispatch } from 'react-redux';
+import BarCodeModal from '../../components/BarCodeModal';
 
 
 
 const DEBOUNCE_TIME = 300;
 const Item = ({ mode }) => {
 	const toast = useMyToaster();
+	const dispatch = useDispatch();
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
 	const [activePage, setActivePage] = useState(1);
 	const [dataLimit, setDataLimit] = useState(10);
@@ -181,6 +185,7 @@ const Item = ({ mode }) => {
 		<>
 			<Nav title={"Item"} />
 			<main id='main'>
+				<BarCodeModal data={currentData} />
 				<SideNav />
 				<Tooltip id='itemTooltip' />
 				<ConfirmModal
@@ -262,7 +267,7 @@ const Item = ({ mode }) => {
 											</Whisper>
 										</div>
 									)
-								}            
+								}
 							</div>
 						</div>
 					</div>
@@ -276,7 +281,7 @@ const Item = ({ mode }) => {
 											<th className='py-2 px-4 border-b w-[50px]'>
 												<input type='checkbox'
 													onChange={selectAll}
-													checked={itemData.length > 0 && selected.length === itemData.length} 
+													checked={itemData.length > 0 && selected.length === itemData.length}
 												/>
 											</th>
 											<th align='left'>Name</th>
@@ -293,56 +298,92 @@ const Item = ({ mode }) => {
 												let stockKeys = Object.keys(currentItemStock.stock);
 												let stockValues = Object.values(currentItemStock.stock);
 
+												// Parse unit/alert configuration
+												let unitConfig = data.unit || [];
+
 												let stockStr = "";
 												for (let i = 0; i < stockKeys.length; i++) {
 													stockStr += `${stockValues[i]} ${stockKeys[i]} `;
 												}
 
-												return <tr key={i} onClick={() => navigate("/admin/item/details/" + data._id)} className='cursor-pointer hover:bg-gray-100'>
-													<td className='py-2 max-w-[10px]' align='center'>
-														<input type='checkbox'
-															checked={selected.includes(data._id)}
-															onClick={(e) => e.stopPropagation()}
-															onChange={() => handleCheckboxChange(data._id)} />
-													</td>
-													<td>
-														{data.title}
-														{
-															data.category &&
-															<span className="text-[10px] bg-gray-100 rounded w-fit px-[2px] border ms-[5px]">
-																{data.category?.title}
-															</span>
-														}
-													</td>
-													<td>{data.category?.hsn || data.hsn || "--"}</td>
-													<td>{data.salePrice || 0.00}</td>
-													<td className={`${Number(stockValues) < 1 ? 'text-red-600' : ''}`}>{stockStr}</td>
+												let isOutOfStock = stockValues.every(val => Number(val) < 1);
 
-													<td className='px-4 text-center'>
-														<Whisper
-															placement='leftStart'
-															trigger={"click"}
-															onClick={(e) => e.stopPropagation()}
-															speaker={<Popover full>
-																<div
-																	className='table__list__action__icon'
-																	onClick={(e) => {
-																		e.stopPropagation()
-																		navigate("/admin/item/edit/" + data._id)
-																	}}
-																>
-																	<Icons.EDIT className='text-[16px]' />
-																	Edit
+												// Check if any stock is below alert threshold
+												let isBelowAlert = false;
+												if (Array.isArray(unitConfig) && unitConfig.length > 0) {
+													isBelowAlert = unitConfig.some((config, idx) => {
+														console.log(config, idx);
+														const alertThreshold = Number(config.alert) || 0;
+														const currentStock = Number(stockValues[idx]) || 0;
+														return currentStock < alertThreshold && alertThreshold > 0;
+													});
+												}
+												console.log("------")
+
+												return (
+													<tr
+														key={i}
+														onClick={() => navigate("/admin/item/details/" + data._id)}
+														className={`cursor-pointer hover:bg-gray-100 ${isBelowAlert ? 'bg-orange-100 text-orange-700' : ''}`}
+													>
+														<td className='py-2 max-w-[10px]' align='center'>
+															<input
+																type='checkbox'
+																checked={selected.includes(data._id)}
+																onClick={(e) => e.stopPropagation()}
+																onChange={() => handleCheckboxChange(data._id)}
+															/>
+														</td>
+														<td>
+															{data.title}
+															{data.category && (
+																<span className="text-[10px] bg-gray-100 rounded w-fit px-[2px] border ms-[5px]">
+																	{data.category?.title}
+																</span>
+															)}
+														</td>
+														<td>{data.category?.hsn || data.hsn || "--"}</td>
+														<td>{data.salePrice || 0.00}</td>
+														<td className={`${isOutOfStock ? 'text-orange-600' : ''}`}>{stockStr}</td>
+
+														<td className='px-4 text-center'>
+															<Whisper
+																placement='leftStart'
+																trigger={"click"}
+																onClick={(e) => e.stopPropagation()}
+																speaker={<Popover full>
+																	<div
+																		className='table__list__action__icon'
+																		onClick={(e) => {
+																			e.stopPropagation()
+																			navigate("/admin/item/edit/" + data._id)
+																		}}
+																	>
+																		<Icons.EDIT className='text-[16px]' />
+																		Edit
+																	</div>
+																	{data?.itemCode && (
+																		<div
+																			className='table__list__action__icon'
+																			onClick={(e) => {
+																				e.stopPropagation()
+																				dispatch(toggleBarCodeModal(true));
+																				setCurrentData(data);
+																			}}
+																		>
+																			<Icons.BARCODE className='text-[16px]' />
+																			View Barcode
+																		</div>
+																	)}
+																</Popover>}
+															>
+																<div className='table__list__action' >
+																	<Icons.HORIZONTAL_MORE />
 																</div>
-															</Popover>}
-														>
-															<div className='table__list__action' >
-																<Icons.HORIZONTAL_MORE />
-															</div>
-														</Whisper>
-													</td>
-
-												</tr>
+															</Whisper>
+														</td>
+													</tr>
+												)
 											})
 										}
 									</tbody>

@@ -130,19 +130,22 @@ const PurchaseInvoice = ({ mode }) => {
 
 
 	useEffect(() => {
-		if (getBillPrefix && (mode === "convert" || !mode)) {
-			const newPrefix = getBillPrefix[0] + getBillPrefix[1];
+    if (getBillPrefix && (mode === "convert" || !mode)) {
+        setFormData(prev => {
+            // Only set if field is currently empty (initial state)
+            if (prev.purchaseInvoiceNumber) return prev;
 
-			setFormData(prev => {
-				if (prev.purchaseInvoiceNumber === newPrefix) return prev;
+            const prefix0 = getBillPrefix[0] ?? "";
+            const prefix1 = getBillPrefix[1] ?? "";
+            const newPrefix = prefix0 + prefix1;
 
-				return {
-					...prev,
-					purchaseInvoiceNumber: newPrefix
-				};
-			});
-		}
-	}, [getBillPrefix, mode]);
+            return {
+                ...prev,
+                purchaseInvoiceNumber: newPrefix || "1"
+            };
+        });
+    }
+}, [getBillPrefix, mode]);
 
 
 	// Get all data from api

@@ -4,7 +4,6 @@ import Cookies from 'js-cookie';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
 import { toWords } from 'number-to-words';
-import { Document, Page, View, Text, Image, StyleSheet, PDFViewer, pdf } from '@react-pdf/renderer';
 import downloadPdf from '../../helper/downloadPdf';
 import useMyToaster from '../../hooks/useMyToaster';
 import MailModal from '../../components/MailModal';
@@ -258,18 +257,22 @@ const Invoice = () => {
 		}
 
 		try {
-			const blob = await pdf(
-				InvoicePdf({
-					companyDetails, billData, billDetails,
-					hsnData, totalAmountInText, billname: urlRoute.toUpperCase()
-				})
-			).toBlob();
+			const html = document.getElementById('mainBill').innerHTML;
 
+			const response = await fetch(`${process.env.REACT_APP_API_URL}/generate-pdf`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ html })
+			});
+
+			const blob = await response.blob();
 			let pdfData = await blobToBase64(blob);
-			setPdfData(pdfData)
+			console.log(pdfData)
+			setPdfData(pdfData);
 
 			dispatch(toggle(true)) //open modal
 		} catch (error) {
+			console.log(error)
 			toast("Something went wrong", 'error')
 			return error;
 		}
@@ -282,7 +285,7 @@ const Invoice = () => {
 			setDownloadLoading(true);
 			const html = document.getElementById('mainBill').innerHTML;
 
-			const response = await fetch(`http://localhost:8080/generate-pdf`, {
+			const response = await fetch(`${process.env.REACT_APP_API_URL}/generate-pdf`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ html })
@@ -708,7 +711,22 @@ const Invoice = () => {
 														</tr>
 													</thead>
 													<tbody>
-														{hsnData && (
+														{
+															hsnData && companyDetails?.state !== billData?.party.state && (
+																[...new Map(hsnData.map(item => [item.hsn, item]))].map(([hsn, data], i) => {
+																	return <React.Fragment key={`${i}-igst`}>
+																		<tr>
+																			<td rowSpan={1}>{data.hsn}</td>
+																			<td>IGST</td>
+																			<td>{data.rate}%</td>
+																			<td>{data.price}</td>
+																			<td>{(data.taxAmount).toFixed(2)}</td>
+																		</tr>
+																	</React.Fragment>
+																})
+															)
+														}
+														{hsnData && companyDetails?.state === billData?.party.state &&(
 															[...new Map(hsnData.map(item => [item.hsn, item]))].map(([hsn, data], i) => {
 																return <React.Fragment key={`${i}-cgst`}>
 																	<tr>
@@ -820,213 +838,4 @@ const Invoice = () => {
 	);
 }
 
-
-
-
-// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-// ==================================== [PDF Generate component] ===================================
-// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-const InvoicePdf = ({ companyDetails, billData, billDetails, hsnData, totalAmountInText, billname }) => {
-	const styles = StyleSheet.create({
-		page: { padding: 20 },
-		section: { marginBottom: 0 },
-		bold: { fontWeight: 'bold' },
-		flexRow: { flexDirection: 'row' },
-		flexCol: { flexDirection: 'column' },
-		border: { border: '1px solid black' },
-		table: { display: 'table', width: 'auto' },
-		tableRow: { flexDirection: 'row' },
-		tableCol: {
-			borderBottom: '1px solid black', padding: 2,
-			borderRight: '0px solid black',
-			borderLeft: '1px solid black',
-		},
-		header: { backgroundColor: '#f0f0f0' },
-		textSmall: { fontSize: 10 },
-		textXSmall: { fontSize: 5 },
-		partyText: { paddingTop: 3, paddingBottom: 3 }
-	});
-
-	return (
-		<Document>
-			<Page size="A4" style={styles.page}>
-				{/* Header */}
-				<View style={styles.section}>
-					<Text style={[styles.bold, { marginBottom: 10, textAlign: 'center' }]}>{billname}</Text>
-					<View style={[styles.border, { borderBottomWidth: 0 }]}>
-						<View style={[styles.flexRow, { borderBottom: '1px solid black', height: 90 }]}>
-							<View style={{ width: '60%', padding: 10, flexDirection: 'row', borderRight: '1px solid black' }}>
-								<Image src={companyDetails?.invoiceLogo} style={{ height: 35, marginRight: 10, marginTop: 15 }} />
-								<View style={[styles.flexCol, styles.textSmall]}>
-									<Text style={[{ color: '#2202D0', fontWeight: '800', fontSize: 14, }, styles.partyText]}>
-										{companyDetails?.name}
-									</Text>
-									<Text style={styles.partyText}>{companyDetails?.address}</Text>
-									{/* <Text> */}
-									<Text style={[styles.bold, styles.partyText]}>GSTIN: {companyDetails?.gst}</Text>
-									<Text style={[styles.bold, styles.partyText]}>Mobile: {companyDetails?.phone}</Text>
-									{/* </Text> */}
-									<Text style={styles.partyText}><Text style={[styles.bold]}>PAN Number:</Text> {companyDetails?.pan}</Text>
-								</View>
-							</View>
-							<View style={[styles.flexCol, { width: '40%', padding: 10, justifyContent: 'center' }, styles.textSmall]}>
-								<Text style={styles.partyText}><Text style={styles.bold}>{billname} No: </Text>{
-									billData?.quotationNumber || billData?.proformaNumber || billData?.poNumber || billData?.purchaseInvoiceNumber ||
-									billData?.purchaseReturnNumber || billData?.debitNoteNumber ||
-									billData?.salesInvoiceNumber || billData?.salesReturnNumber || billData?.creditNoteNumber ||
-									billData?.deliveryChalanNumber
-								}</Text>
-								<Text style={styles.partyText}><Text style={styles.bold}>{billname} Date: </Text>  {
-									new Date(
-										billData?.estimateDate || billData?.invoiceDate || billData?.debitNoteDate ||
-										billData?.returnDate || billData?.poDate || billData?.purchaseInvoiceDate
-										|| billData?.creditNoteDate || billData?.purchaseReturnDate
-										|| billData?.chalanDate
-									).toLocaleDateString()
-								}
-								</Text>
-							</View>
-						</View>
-
-						{/* Party Details */}
-						<View style={{ padding: 10 }}>
-							<Text style={[styles.textSmall, styles.partyText]}>TO</Text>
-							<Text style={[styles.bold, styles.textSmall, styles.partyText]}>{billData?.party.name?.toUpperCase()}</Text>
-							<Text style={[styles.textSmall, styles.partyText, { flexWrap: 'wrap' }]}>
-								<Text>Address:</Text> {billData?.party.address}
-							</Text>
-							<Text style={[styles.textSmall, styles.partyText, { textTransform: 'uppercase' }]}>
-								<Text>GSTIN:</Text> {billData?.party.gst}
-								<Text> State:</Text> {billData?.party.state}
-							</Text>
-						</View>
-					</View>
-				</View>
-
-				{/* Items Table */}
-				<View style={[styles.table, { borderTop: "1px solid black", borderRight: "1px solid black" }]}>
-					<View style={[styles.tableRow, styles.header]}>
-						{['S.NO.', 'ITEM', 'HSN/SAC', 'QTY.', 'RATE', 'DISCOUNT', 'TAX', 'AMOUNT'].map((header, i) => (
-							<View key={i} style={[styles.tableCol, { width: i === 1 ? '30%' : '10%' }]}>
-								<Text style={styles.textSmall}>{header}</Text>
-							</View>
-						))}
-					</View>
-					{billData?.items.map((data, index) => (
-						<View style={[styles.tableRow]} key={data._id}>
-							<View style={[styles.tableCol, { width: '10%' }]}><Text style={styles.textSmall}>{index + 1}</Text></View>
-							<View style={[styles.tableCol, { width: '30%' }]}><Text style={styles.textSmall}>{data.itemName}</Text></View>
-							<View style={[styles.tableCol, { width: '10%' }]}><Text style={styles.textSmall}>{data.hsn}</Text></View>
-							<View style={[styles.tableCol, { width: '10%' }]}><Text style={styles.textSmall}>{data.qun}</Text></View>
-							<View style={[styles.tableCol, { width: '10%' }]}><Text style={styles.textSmall}>{data.price}</Text></View>
-							<View style={[styles.tableCol, { width: '10%' }]}>
-								<Text style={styles.textSmall}>{data.discountPerAmount || "0.00"}</Text>
-								<Text style={[styles.textSmall, { color: '#666' }]}>
-									{isNaN(parseFloat(data.discountPerAmount) / (parseFloat(data.price) * parseFloat(data.qun)) * 100)
-										? "(0.00%)"
-										: `(${((parseFloat(data.discountPerAmount) / (parseFloat(data.price) * parseFloat(data.qun))) * 100).toFixed(2)}%)`}
-								</Text>
-							</View>
-							<View style={[styles.tableCol, { width: '10%' }]}>
-								<Text style={styles.textSmall}>{((data.qun * data.price) / 100 * data.tax).toFixed(2)}</Text>
-								<Text style={[styles.textSmall, { color: '#666' }]}>{`(${data.tax || '0.00'}%)`}</Text>
-							</View>
-							<View style={[styles.tableCol, { width: '10%' }]}>
-								<Text style={styles.textSmall}>
-									{(parseFloat(data.price) * parseFloat(data.qun) - parseFloat(data.discountPerAmount || 0) + ((data.qun * data.price) / 100 * data.tax)).toFixed(2)}
-								</Text>
-							</View>
-						</View>
-					))}
-					<View style={[styles.tableRow, styles.bold, { backgroundColor: '#F3F4F6' }]}>
-						<View style={[styles.tableCol, { width: '50%' }]}><Text style={styles.textSmall}>TOTAL</Text></View>
-						<View style={[styles.tableCol, { width: '10%' }]}><Text style={styles.textSmall}>{billDetails.qun}</Text></View>
-						<View style={[styles.tableCol, { width: '10%' }]}><Text style={styles.textSmall}></Text></View>
-						<View style={[styles.tableCol, { width: '10%' }]}><Text style={styles.textSmall}>INR. {billDetails.discount}</Text></View>
-						<View style={[styles.tableCol, { width: '10%' }]}><Text style={styles.textSmall}>INR. {billDetails.taxAmount}</Text></View>
-						<View style={[styles.tableCol, { width: '10%' }]}><Text style={styles.textSmall}>INR. {billDetails.amount}</Text></View>
-					</View>
-				</View>
-
-				{/* HSN Table */}
-				<View style={[styles.table, { marginTop: 10, borderTop: "1px solid black", borderRight: "1px solid black" }]}>
-					<View style={[styles.tableRow, styles.header]}>
-						{['HSN Code', 'Tax Type', 'Rate', 'Amount', 'Total Tax Amount'].map((header, i) => (
-							<View key={i} style={[styles.tableCol, { width: '20%' }]}>
-								<Text style={styles.textSmall}>{header}</Text>
-							</View>
-						))}
-					</View>
-					{hsnData && [...new Map(hsnData.map(item => [item.hsn, item]))].map(([hsn, data], i) => (
-						<React.Fragment key={data._id}>
-							<View style={styles.tableRow} key={data._id}>
-								<View style={[styles.tableCol, { width: '20%', borderBottom: '0' }]}>
-									<Text style={styles.textSmall}>{data.hsn}</Text>
-								</View>
-								<View style={[styles.tableCol, { width: '20%' }]}>
-									<Text style={styles.textSmall}>SGST</Text>
-								</View>
-								<View style={[styles.tableCol, { width: '20%' }]}>
-									<Text style={styles.textSmall}>{data.rate / 2}%</Text>
-								</View>
-								<View style={[styles.tableCol, { width: '20%' }]}>
-									<Text style={styles.textSmall}>{data.price}</Text>
-								</View>
-								<View style={[styles.tableCol, { width: '20%' }]}>
-									<Text style={styles.textSmall}>{(data.taxAmount).toFixed(2)}</Text>
-								</View>
-							</View>
-							<View style={styles.tableRow} key={`${i}-cgst`}>
-								<View style={[styles.tableCol, { width: '20%' }]}>
-									<Text style={styles.textSmall}></Text>
-								</View>
-								<View style={[styles.tableCol, { width: '20%' }]}>
-									<Text style={styles.textSmall}>CGST</Text>
-								</View>
-								<View style={[styles.tableCol, { width: '20%' }]}>
-									<Text style={styles.textSmall}>{data.rate / 2}%</Text>
-								</View>
-								<View style={[styles.tableCol, { width: '20%' }]}>
-									<Text style={styles.textSmall}>{data.price}</Text>
-								</View>
-								<View style={[styles.tableCol, { width: '20%' }]}>
-									<Text style={styles.textSmall}>{(data.taxAmount).toFixed(2)}</Text>
-								</View>
-							</View>
-						</React.Fragment>
-					))}
-				</View>
-
-				{/* Footer */}
-				<View style={[styles.border, { marginTop: 10 }]}>
-					<View style={{ borderBottom: '1px solid black', padding: 3 }}>
-						<Text style={styles.textSmall}>
-							<Text style={styles.bold}>Total Amount (in words) :</Text> {totalAmountInText}
-						</Text>
-					</View>
-					<View style={styles.flexRow}>
-						<View style={{ width: '50%', padding: 5 }}>
-							<Text style={styles.textSmall}>Note:</Text>
-							<Text style={styles.textSmall}>{billData?.note}</Text>
-
-							<Text style={[styles.textSmall, { marginTop: '10px' }]}>Terms:</Text>
-							<Text style={styles.textSmall}>{billData?.terms}</Text>
-						</View>
-						<View style={{ width: '50%', borderLeft: '1px solid black', textAlign: 'center', padding: 5 }}>
-							<Image src={companyDetails?.signature} style={{ height: 30, marginBottom: 10 }} />
-							<Text style={styles.textSmall}>Authorised Signatory For</Text>
-							<Text style={styles.textSmall}>{companyDetails?.name}</Text>
-						</View>
-					</View>
-				</View>
-			</Page>
-		</Document>
-	)
-}
-
-
-export {
-	InvoicePdf
-}
 export default Invoice

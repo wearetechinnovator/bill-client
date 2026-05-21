@@ -14,6 +14,7 @@ import { Icons } from '../../helper/icons';
 import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
 import ContextMenu from '../../components/ContextMenu';
+import TableNoData from '../../components/TableNoData';
 
 
 
@@ -59,56 +60,57 @@ const Party = () => {
 
 
 	// Get Party data;
-	useEffect(() => {
-		(async () => {
-			try {
-				const data = {
-					token,
-					all: tableStatusData === "all" ? true : false,
-					searchText: searchText
-				}
-				const url = process.env.REACT_APP_API_URL + `/party/get?page=${activePage}&limit=${dataLimit}`;
-				const req = await fetch(url, {
-					method: "POST",
-					headers: {
-						"Content-Type": 'application/json'
-					},
-					body: JSON.stringify(data)
-				});
-				const res = await req.json();
-
-				if (selectedTab === TOTAL_COLLECT) {
-					const party = res.data?.reduce((acc, i) => {
-						const getBalance = partyBalance.find((pb, _) => pb.partyId === i._id);
-						if (getBalance.balance > 0 && i.type === CUSTOMER) {
-							acc.push(i);
-						}
-
-						return acc;
-					}, [])
-					setPartyData([...party]);
-				}
-				else if (selectedTab === TOTAL_PAY) {
-					const party = res.data?.reduce((acc, i) => {
-						const getBalance = partyBalance.find((pb, _) => pb.partyId === i._id);
-						if (getBalance.balance > 0 && i.type === SUPPLIER) {
-							acc.push(i);
-						}
-
-						return acc;
-					}, [])
-					setPartyData([...party]);
-				}
-				else {
-					setTotalData(res.totalData)
-					setPartyData([...res.data]);
-				}
-
-			} catch (error) {
-				console.log(error);
-				return toast("Party data not get", "error")
+	const getPartyData = async () => {
+		try {
+			const data = {
+				token,
+				all: tableStatusData === "all" ? true : false,
+				searchText: searchText
 			}
-		})()
+			const url = process.env.REACT_APP_API_URL + `/party/get?page=${activePage}&limit=${dataLimit}`;
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify(data)
+			});
+			const res = await req.json();
+
+			if (selectedTab === TOTAL_COLLECT) {
+				const party = res.data?.reduce((acc, i) => {
+					const getBalance = partyBalance.find((pb, _) => pb.partyId === i._id);
+					if (getBalance.balance > 0 && i.type === CUSTOMER) {
+						acc.push(i);
+					}
+
+					return acc;
+				}, [])
+				setPartyData([...party]);
+			}
+			else if (selectedTab === TOTAL_PAY) {
+				const party = res.data?.reduce((acc, i) => {
+					const getBalance = partyBalance.find((pb, _) => pb.partyId === i._id);
+					if (getBalance.balance > 0 && i.type === SUPPLIER) {
+						acc.push(i);
+					}
+
+					return acc;
+				}, [])
+				setPartyData([...party]);
+			}
+			else {
+				setTotalData(res.totalData)
+				setPartyData([...res.data]);
+			}
+
+		} catch (error) {
+			console.log(error);
+			return toast("Party data not get", "error")
+		}
+	}
+	useEffect(() => {
+		getPartyData();
 	}, [tableStatusData, dataLimit, activePage, selectedTab, searchText]);
 
 
@@ -149,7 +151,7 @@ const Party = () => {
 				setLoading(false);
 			}
 		})()
-	}, [])
+	}, [partyData.length]);
 
 
 	const selectAll = (e) => {
@@ -249,6 +251,7 @@ const Party = () => {
 					fun={() => {
 						removeData();
 						setOpenConfirm(false);
+						getPartyData();
 					}}
 				/>
 				<ContextMenu
@@ -327,7 +330,7 @@ const Party = () => {
 						</div>
 					</div>
 					{
-						!loading ? partyData.length > 0 ? <div className='content__body__main view'>
+						!loading ? (totalData > 0) ? <div className='content__body__main view'>
 							<div className='flex flex-col md:flex-row justify-between items-center mb-5 gap-8'>
 								<div
 									onClick={() => setSelectedTab(TOTAL_PARTY)}
@@ -373,7 +376,7 @@ const Party = () => {
 									</thead>
 									<tbody>
 										{
-											partyData.map((data, i) => {
+											partyData.length > 0 ? partyData.map((data, i) => {
 												const balance = partyBalance?.find((p, _) => p.partyId.toString() === data._id.toString());
 
 												return <tr key={i} onClick={() => navigate("/admin/party/details/" + data._id)} className='cursor-pointer hover:bg-gray-100'>
@@ -419,7 +422,9 @@ const Party = () => {
 														</Whisper>
 													</td>
 												</tr>
-											})
+											}) : (
+												<TableNoData />
+											)
 										}
 									</tbody>
 								</table>
