@@ -3,7 +3,7 @@ import { IoIosAdd, IoMdMore } from 'react-icons/io';
 import { MdFilterList } from "react-icons/md";
 import { MdDeleteOutline } from "react-icons/md";
 import { BiPrinter } from "react-icons/bi";
-import { FaRegCopy, FaRegEdit } from "react-icons/fa";
+import { FaBalanceScaleRight, FaRegCopy, FaRegEdit } from "react-icons/fa";
 import { FaRegFilePdf, FaRegFileExcel } from "react-icons/fa";
 import { FiMoreHorizontal } from 'react-icons/fi';
 import { IoMdInformationCircleOutline } from "react-icons/io";
@@ -103,6 +103,7 @@ export const Icons = {
   CANCEL: MdOutlineCancel,
   CASH_IN: GiReceiveMoney,
   CASH_OUT: GiPayMoney,
-  BARCODE: CiBarcode
+  BARCODE: CiBarcode,
+  BALANCE_SHEET: FaBalanceScaleRight
 };
 

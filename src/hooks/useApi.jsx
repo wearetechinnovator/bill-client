@@ -1,10 +1,13 @@
 import Cookies from 'js-cookie';
 
 const useApi = () => {
-  const getApiData = async (model, id) => {
+  const getApiData = async (model, id, barCode) => {
     let payload = { token: Cookies.get("token") };
     if (id) {
       payload = { ...payload, id };
+    }
+    if (barCode) {
+      payload = { ...payload, barCode };
     }
 
     try {

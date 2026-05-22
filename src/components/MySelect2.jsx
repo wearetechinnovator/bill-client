@@ -196,7 +196,7 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 						setSearchText(e.target.value);
 						searchData(e.target.value);
 					}}
-					placeholder='Search...'
+					placeholder={model === Constants.ITEM ? 'Search Item or Scan Barcode...' : 'Search...'}
 				/>
 				{selectedValue ?
 					<IoClose

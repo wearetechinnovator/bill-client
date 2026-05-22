@@ -95,7 +95,6 @@ const Unit = () => {
         });
     }
 
-
     const selectAll = (e) => {
         if (e.target.checked) {
             setSelected(unitData.map((e, _) => e._id));
@@ -103,7 +102,6 @@ const Unit = () => {
             setSelected([]);
         }
     };
-
 
     const handleCheckboxChange = (id) => {
         setSelected((prevSelected) => {
@@ -114,7 +112,6 @@ const Unit = () => {
             }
         });
     };
-
 
     const exportTable = async (whichType) => {
         if (whichType === "copy") {
@@ -131,7 +128,6 @@ const Unit = () => {
             downloadPdf(document)
         }
     }
-
 
     const removeData = async () => {
         if (selected.length === 0 || tableStatusData !== 'active') {
@@ -166,7 +162,6 @@ const Unit = () => {
             toast("Something went wrong", "error")
         }
     }
-
 
     const restoreData = async () => {
         if (selected.length === 0 || tableStatusData !== "trash") {

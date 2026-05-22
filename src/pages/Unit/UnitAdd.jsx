@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Nav from '../../components/Nav';
-import SideNav from '../../components/SideNav'
-import { FaRegCheckCircle } from "react-icons/fa";
-import { LuRefreshCcw } from "react-icons/lu";
+import SideNav from '../../components/SideNav';
 import useMyToaster from '../../hooks/useMyToaster';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';

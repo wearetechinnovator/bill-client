@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { SelectPicker, Button } from 'rsuite';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
@@ -73,6 +73,7 @@ const SalesInvoice = ({ mode }) => {
 	const [party, setParty] = useState([]);
 	// Account
 	const [account, setAccount] = useState([]);
+	const activeRowIndexRef = useRef(null); // For tracking active row index
 
 
 	// store label and value pair for dropdown
@@ -86,6 +87,101 @@ const SalesInvoice = ({ mode }) => {
 	} = useFormHandle();
 
 
+
+	// Barcode Scan function;
+	useEffect(() => {
+		let buffer = "";
+		let lastTime = 0;
+
+		const handler = (e) => {
+			const now = Date.now();
+			const diff = now - lastTime;
+
+			if (diff > 80) buffer = "";
+			lastTime = now;
+
+			if (e.key.length === 1) buffer += e.key;
+
+			if (e.key === "Enter" && buffer.length > 0) {
+				const scannedCode = buffer;
+				buffer = "";
+				console.log("SCANNER:", scannedCode);
+
+				(async () => {
+					const data = await getApiData("item", null, scannedCode);
+
+					if (!data?.data?._id) {
+						console.log("Item not found for scanned code:", scannedCode);
+						return;
+					} // item not found
+
+					const scannedId = data.data._id;
+
+					// 1️⃣ Check if item already exists → increase qty
+					const existIndex = ItemRows.findIndex(
+						(row) => String(row.itemId) === String(scannedId)
+					);
+
+					if (existIndex !== -1) {
+						setItemRows((prev) => {
+							const updated = [...prev];
+							updated[existIndex].qun = Number(updated[existIndex].qun || 0) + 1;
+							return updated;
+						});
+
+						activeRowIndexRef.current = existIndex;
+						return;
+					}
+
+					// 2️⃣ If first row is empty (default row), USE it instead of adding new row
+					const firstEmpty =
+						ItemRows.length === 1 &&
+						(!ItemRows[0].itemId || ItemRows[0].itemId === "");
+
+					if (firstEmpty) {
+						activeRowIndexRef.current = 0;
+
+						onItemChange(
+							scannedId,
+							0,           // first row
+							tax,
+							ItemRows,
+							setItemRows,
+							setItems,
+						);
+
+
+						return; // important → prevent adding new row
+					}
+
+					// 3️⃣ Otherwise add new row + fill item
+					const newRow = {
+						...itemRowSet,
+						rowItem: ItemRows.length + 1,
+					};
+
+					const newRows = [...ItemRows, newRow];
+					const newIndex = newRows.length - 1;
+
+					setItemRows(newRows);
+					activeRowIndexRef.current = newIndex;
+
+					onItemChange(
+						scannedId,
+						newIndex,
+						tax,
+						newRows,       // use newRows (not old ItemRows)
+						setItemRows,
+						setItems,
+						"sale"
+					);
+				})();
+			}
+		};
+
+		document.addEventListener("keydown", handler);
+		return () => document.removeEventListener("keydown", handler);
+	}, [ItemRows, tax, getApiData, onItemChange]);
 
 
 	// Get bill data for edit and CONVERT mode
@@ -523,7 +619,11 @@ const SalesInvoice = ({ mode }) => {
 								</thead>
 								<tbody>
 									{ItemRows.map((i, index) => (
-										<tr key={i.rowItem} className='border-b'>
+										<tr key={i.rowItem} className='border-b'
+											onClick={(e) => {
+												activeRowIndexRef.current = index;
+											}}
+										>
 
 											{/* Item name and description */}
 											<td>
@@ -532,7 +632,13 @@ const SalesInvoice = ({ mode }) => {
 														model={Constants.ITEM}
 														onType={(v) => {
 															if (v === ItemRows[index].itemId) return;
-															onItemChange(v, index, tax, ItemRows, setItemRows, setItems)
+															onItemChange(v, index, tax, ItemRows, setItemRows, setItems);
+
+															setItemRows((p) => {
+																const prevItems = [...p];
+																prevItems[index].itemInvoice = []
+																return prevItems;
+															})
 														}}
 														value={ItemRows[index].itemId}
 													/>

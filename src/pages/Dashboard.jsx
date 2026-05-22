@@ -121,52 +121,36 @@ const Dashboard = () => {
 		}
 	}
 
-	const getTotalCollect = async () => {
+	const getTotalPayAndTotalCollect = async () => {
 		try {
-			const url = process.env.REACT_APP_API_URL + `/salesinvoice/get-total-collect`;
+			const url = process.env.REACT_APP_API_URL + `/ladger/get-all-party-balance`;
 			const req = await fetch(url, {
-				method: "POST",
+				method: 'POST',
 				headers: {
 					"Content-Type": 'application/json'
 				},
-				body: JSON.stringify({ token: Cookies.get('token') })
+				body: JSON.stringify({ token })
 			});
 			const res = await req.json();
-			if (req.status === 200) {
-				if (res.length > 0) {
-					setTotalCollect(res[0].totalAmount)
-				} else {
-					setTotalCollect(0)
-				}
+			if (req.status !== 200) {
+				return toast("Balance not get", 'error');
 			}
 
-		} catch (error) {
-			console.log(error)
-		}
-	}
-
-	const getTotalPay = async () => {
-		try {
-			const url = process.env.REACT_APP_API_URL + `/purchaseinvoice/get-total-pay`;
-			const req = await fetch(url, {
-				method: "POST",
-				headers: {
-					"Content-Type": 'application/json'
-				},
-				body: JSON.stringify({ token: Cookies.get('token') })
-			});
-			const res = await req.json();
-
-			if (req.status === 200) {
-				if (res.length > 0) {
-					setTotalPay(res[0].totalAmount)
-				} else {
-					setTotalPay(0)
+			const { totalCollect, totalPayment } = res.data.reduce((acc, i) => {
+				if (i.balance > 0) {
+					acc.totalCollect += Number(i.balance);
 				}
-			}
+				else if (i.balance < 0) {
+					acc.totalPayment += Number(i.balance);
+				}
+				return acc;
+			}, { totalCollect: 0, totalPayment: 0 });
 
-		} catch (error) {
-			console.log(error)
+			setTotalCollect((Math.abs(totalCollect)).toFixed(2));
+			setTotalPay((Math.abs(totalPayment)).toFixed(2));
+
+		} catch (err) {
+			return toast("Party Balance not get", "error");
 		}
 	}
 
@@ -197,9 +181,8 @@ const Dashboard = () => {
 			await getCashInAndCashOut();
 			await getTotalSaleAmount();
 			await getTotalPurchaseAmount();
-			await getTotalCollect();
-			await getTotalPay();
 			await getTotalIncomeExpense();
+			await getTotalPayAndTotalCollect();
 			setInsightLoading(false);
 		})()
 	}, [])
@@ -579,10 +562,10 @@ const Dashboard = () => {
 
 															return (
 																<tr key={i}>
-																	<td className="flex items-center gap-[5px] w-[100%] font-(family-name:--heading-font) text-[#333333]">
+																	<td className="flex items-center gap-[5px] w-[90%] font-(family-name:--heading-font) text-[#333333]">
 																		{i + 1}. {rs.party.name}
 																	</td>
-																	<td className="text-end">
+																	<td className="text-end text-[10px] w-[20%]" >
 																		<span className={`${paymentStatus === Constants.PAID ? 'green-badge' : paymentStatus === Constants.PARTIAL_PAID ? 'yellow-badge' : 'red-badge'} badge capitalize`}>
 																			{paymentStatus}
 																		</span>

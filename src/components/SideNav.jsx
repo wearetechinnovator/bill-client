@@ -159,6 +159,14 @@ const links = {
       submenu: null
     },
   ],
+  "Report": [
+    {
+      name: 'Balance Sheet',
+      icon: <Icons.BALANCE_SHEET />,
+      link: '/admin/balance-sheet',
+      submenu: null
+    },
+  ],
   "Office": [
     // {
     //   name: 'Manage User',
@@ -309,6 +317,20 @@ const SideNav = () => {
           <h3 className='text-[16px] my-5'>Office Solution</h3>
           <ul className=''>
             {links.Office.map((link, index) => (
+              <Link key={index} to={link.link} data-tooltip-id="sideBarItemToolTip">
+                <li className={`flex items-center ${activePath.search(link.link) >= 0 ? 'active__link' : ''}`}>
+                  <span className='mr-3'>{link.icon}</span>
+                  <span >{link.name}</span>
+                </li>
+              </Link>
+            ))}
+          </ul>
+        </div>
+
+        <div className="side__nav__link__group">
+          <h3 className='text-[16px] my-5'>Report</h3>
+          <ul className=''>
+            {links.Report.map((link, index) => (
               <Link key={index} to={link.link} data-tooltip-id="sideBarItemToolTip">
                 <li className={`flex items-center ${activePath.search(link.link) >= 0 ? 'active__link' : ''}`}>
                   <span className='mr-3'>{link.icon}</span>

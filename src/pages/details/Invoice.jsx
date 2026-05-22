@@ -191,6 +191,7 @@ const Invoice = () => {
 
 			obj['hsn'] = b.hsn;
 			obj['rate'] = b.tax;
+			obj['qun'] = b.qun;
 
 			if (data.length > 0) {
 				for (let i = 0; i < data.length; i++) {
@@ -704,10 +705,11 @@ const Invoice = () => {
 													<thead className='bg-gray-100'>
 														<tr>
 															<td>HSN Code</td>
+															<td>Taxable Value</td>
 															<td>Tax Type</td>
 															<td>Rate</td>
 															<td>Amount</td>
-															<td>Total Tax Amount</td>
+															<td align='center'>Total Tax Amount</td>
 														</tr>
 													</thead>
 													<tbody>
@@ -717,30 +719,31 @@ const Invoice = () => {
 																	return <React.Fragment key={`${i}-igst`}>
 																		<tr>
 																			<td rowSpan={1}>{data.hsn}</td>
+																			<td rowSpan={2}>{data.price * Number(data.qun)}</td>
 																			<td>IGST</td>
 																			<td>{data.rate}%</td>
 																			<td>{data.price}</td>
-																			<td>{(data.taxAmount).toFixed(2)}</td>
+																			<td rowSpan={2} align='center'>{(data.taxAmount).toFixed(2)}</td>
 																		</tr>
 																	</React.Fragment>
 																})
 															)
 														}
-														{hsnData && companyDetails?.state === billData?.party.state &&(
+														{hsnData && companyDetails?.state === billData?.party.state && (
 															[...new Map(hsnData.map(item => [item.hsn, item]))].map(([hsn, data], i) => {
 																return <React.Fragment key={`${i}-cgst`}>
 																	<tr>
 																		<td rowSpan={2}>{data.hsn}</td>
+																		<td rowSpan={2}>{Number(data.price) * Number(data.qun)}</td>
 																		<td>SGST</td>
 																		<td>{data.rate / 2}%</td>
-																		<td>{data.price / 2}</td>
-																		<td>{(data.taxAmount).toFixed(2)}</td>
+																		<td>{Number(data.price) * Number(data.rate) / 100}</td>
+																		<td rowSpan={2} align='center'>{(data.taxAmount).toFixed(2)}</td>
 																	</tr>
 																	<tr>
 																		<td>CGST</td>
 																		<td>{data.rate / 2}%</td>
-																		<td>{data.price / 2}</td>
-																		<td>{(data.taxAmount).toFixed(2)}</td>
+																		<td>{Number(data.price) * Number(data.rate) / 100}</td>
 																	</tr>
 																</React.Fragment>
 															})

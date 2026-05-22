@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import { addCompany } from '../../store/userDetailSlice';
 import { Icons } from '../../helper/icons';
 import Loading from '../../components/Loading';
+import { checkNumber } from '../../helper/validation';
 
 
 const AddCompany = () => {
@@ -303,32 +304,46 @@ const AddCompany = () => {
 										</tr>
 										<tr>
 											<td className='min-w-[150px]'>
-												<input type="text" onChange={(e) => setCompanyData({ ...companyData, poNextCount: e.target.value })}
-													value={companyData.poNextCount} />
+												<input type="text"
+													onChange={(e) => setCompanyData({ ...companyData, poNextCount: checkNumber(e.target.value) })}
+													value={companyData.poNextCount}
+												/>
 											</td>
 											<td className='min-w-[150px]'>
-												<input type="text" onChange={(e) => setCompanyData({ ...companyData, invoiceNextCount: e.target.value })}
-													value={companyData.invoiceNextCount} />
+												<input type="text"
+													onChange={(e) => setCompanyData({ ...companyData, invoiceNextCount: checkNumber(e.target.value) })}
+													value={companyData.invoiceNextCount}
+												/>
 											</td>
 											<td className='min-w-[150px]'>
-												<input type="text" onChange={(e) => setCompanyData({ ...companyData, proformaNextCount: e.target.value })}
-													value={companyData.proformaNextCount} />
+												<input type="text"
+													onChange={(e) => setCompanyData({ ...companyData, proformaNextCount: checkNumber(e.target.value) })}
+													value={companyData.proformaNextCount}
+												/>
 											</td>
 											<td className='min-w-[150px]'>
-												<input type="text" onChange={(e) => setCompanyData({ ...companyData, quotationCount: e.target.value })}
-													value={companyData.quotationCount} />
+												<input type="text"
+													onChange={(e) => setCompanyData({ ...companyData, quotationCount: checkNumber(e.target.value) })}
+													value={companyData.quotationCount}
+												/>
 											</td>
 											<td className='min-w-[150px]'>
-												<input type="text" onChange={(e) => setCompanyData({ ...companyData, creditNoteCount: e.target.value })}
-													value={companyData.creditNoteCount} />
+												<input type="text"
+													onChange={(e) => setCompanyData({ ...companyData, creditNoteCount: checkNumber(e.target.value) })}
+													value={companyData.creditNoteCount}
+												/>
 											</td>
 											<td className='min-w-[150px]'>
-												<input type="text" onChange={(e) => setCompanyData({ ...companyData, salesReturnCount: e.target.value })}
-													value={companyData.salesReturnCount} />
+												<input type="text"
+													onChange={(e) => setCompanyData({ ...companyData, salesReturnCount: checkNumber(e.target.value) })}
+													value={companyData.salesReturnCount}
+												/>
 											</td>
 											<td className='min-w-[150px]'>
-												<input type="text" onChange={(e) => setCompanyData({ ...companyData, deliveryChalanCount: e.target.value })}
-													value={companyData.deliveryChalanCount} />
+												<input type="text"
+													onChange={(e) => setCompanyData({ ...companyData, deliveryChalanCount: checkNumber(e.target.value) })}
+													value={companyData.deliveryChalanCount}
+												/>
 											</td>
 										</tr>
 									</tfoot>
