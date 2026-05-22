@@ -5,7 +5,7 @@ import ProtectCP from "./components/ProtectCP";
 
 const Login = React.lazy(() => import("./pages/Auth/Login"));
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
-const AddQutation = React.lazy(() => import("./pages/Quotation/AddQuotation"));
+const AddQuotation = React.lazy(() => import("./pages/Quotation/AddQuotation"));
 const Quotation = React.lazy(() => import("./pages/Quotation/Quotation"));
 const Profile = React.lazy(() => import("./pages/Auth/Profile"));
 const Signup = React.lazy(() => import("./pages/Auth/Signup"));
@@ -34,28 +34,28 @@ const Otp = React.lazy(() => import("./pages/Auth/Otp"));
 const ChangePassword = React.lazy(() => import("./pages/Auth/ChangePassword"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const Invoice = React.lazy(() => import("./pages/Details/Invoice"));
-const AddPaymentOut = React.lazy(() => import("./pages/Paymentout/AddPayment"));
-const AddPaymentIn = React.lazy(() => import("./pages/Paymentin/AddPayment"));
-const PaymentIn = React.lazy(() => import("./pages/Paymentin/PaymentIn"));
-const PaymentOut = React.lazy(() => import("./pages/Paymentout/PaymentOut"));
+const AddPaymentOut = React.lazy(() => import("./pages/PaymentOut/AddPayment"));
+const AddPaymentIn = React.lazy(() => import("./pages/PaymentIn/AddPayment"));
+const PaymentIn = React.lazy(() => import("./pages/PaymentIn/PaymentIn"));
+const PaymentOut = React.lazy(() => import("./pages/PaymentOut/PaymentOut"));
 const AddProforma = React.lazy(() => import("./pages/Proforma/AddProforma"));
 const Proforma = React.lazy(() => import("./pages/Proforma/Proforma"));
 const Po = React.lazy(() => import("./pages/PO/Po"));
 const AddPo = React.lazy(() => import("./pages/PO/AddPo"));
-const PurchaseInvoice = React.lazy(() => import("./pages/Purchaseinvoice/PurchaseInvoice"));
-const AddPurchaseInvoice = React.lazy(() => import("./pages/Purchaseinvoice/AddPurchaseInvoice"));
-const PurchaseReturn = React.lazy(() => import("./pages/Purchasereturn/PurchaseReturn"));
-const AddPurchaseReturn = React.lazy(() => import("./pages/Purchasereturn/AddPurchaseReturn"));
-const DebitNote = React.lazy(() => import("./pages/Debitnote/DebitNote"));
-const AddDebitNote = React.lazy(() => import("./pages/Debitnote/AddDebitNote"));
-const SalesInvoice = React.lazy(() => import("./pages/Salesinvoice/SalesInvoice"));
-const AddSalesInvoice = React.lazy(() => import("./pages/Salesinvoice/AddSalesInvoice"));
-const SalesReturn = React.lazy(() => import("./pages/Salesreturn/SalesReturn"));
-const AddSalesReturn = React.lazy(() => import("./pages/Salesreturn/AddSalesReturn"));
-const CreditNote = React.lazy(() => import("./pages/Creditnote/CreditNote"));
-const AddCreditNote = React.lazy(() => import("./pages/Creditnote/AddCreditNote"));
-const DeliveryChalan = React.lazy(() => import("./pages/Deliverychalan/DeliveryChalan"));
-const AddDeliveryChalan = React.lazy(() => import("./pages/Deliverychalan/AddDeliveryChalan"));
+const PurchaseInvoice = React.lazy(() => import("./pages/PurchaseInvoice/PurchaseInvoice"));
+const AddPurchaseInvoice = React.lazy(() => import("./pages/PurchaseInvoice/AddPurchaseInvoice"));
+const PurchaseReturn = React.lazy(() => import("./pages/PurchaseReturn/PurchaseReturn"));
+const AddPurchaseReturn = React.lazy(() => import("./pages/PurchaseReturn/AddPurchaseReturn"));
+const DebitNote = React.lazy(() => import("./pages/DebitNote/DebitNote"));
+const AddDebitNote = React.lazy(() => import("./pages/DebitNote/AddDebitNote"));
+const SalesInvoice = React.lazy(() => import("./pages/SalesInvoice/SalesInvoice"));
+const AddSalesInvoice = React.lazy(() => import("./pages/SalesInvoice/AddSalesInvoice"));
+const SalesReturn = React.lazy(() => import("./pages/SalesReturn/SalesReturn"));
+const AddSalesReturn = React.lazy(() => import("./pages/SalesReturn/AddSalesReturn"));
+const CreditNote = React.lazy(() => import("./pages/CreditNote/CreditNote"));
+const AddCreditNote = React.lazy(() => import("./pages/CreditNote/AddCreditNote"));
+const DeliveryChalan = React.lazy(() => import("./pages/DeliveryChalan/DeliveryChalan"));
+const AddDeliveryChalan = React.lazy(() => import("./pages/DeliveryChalan/AddDeliveryChalan"));
 const Ladger = React.lazy(() => import("./pages/Party/Ladger"));
 const PartyDetails = React.lazy(() => import("./pages/Party/Details"));
 const ItemDetails = React.lazy(() => import("./pages/Items/Details"));
@@ -108,8 +108,8 @@ const App = () => {
 
         {/* Quotatin route */}
         <Route path="/admin/quotation-estimate" element={<ProtectRoute><Quotation /></ProtectRoute>} />
-        <Route path="/admin/quotation-estimate/add/:id?" element={<ProtectRoute><AddQutation /></ProtectRoute>} />
-        <Route path="/admin/quotation-estimate/edit/:id" element={<ProtectRoute><AddQutation mode={"edit"} /></ProtectRoute>} />
+        <Route path="/admin/quotation-estimate/add/:id?" element={<ProtectRoute><AddQuotation /></ProtectRoute>} />
+        <Route path="/admin/quotation-estimate/edit/:id" element={<ProtectRoute><AddQuotation mode={"edit"} /></ProtectRoute>} />
 
 
         {/* Proforma route */}

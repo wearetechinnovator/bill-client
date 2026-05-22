@@ -80,7 +80,7 @@ const Party = () => {
 			if (selectedTab === TOTAL_COLLECT) {
 				const party = res.data?.reduce((acc, i) => {
 					const getBalance = partyBalance.find((pb, _) => pb.partyId === i._id);
-					if (getBalance.balance > 0 && i.type === CUSTOMER) {
+					if (getBalance?.balance > 0) {
 						acc.push(i);
 					}
 
@@ -91,7 +91,7 @@ const Party = () => {
 			else if (selectedTab === TOTAL_PAY) {
 				const party = res.data?.reduce((acc, i) => {
 					const getBalance = partyBalance.find((pb, _) => pb.partyId === i._id);
-					if (getBalance.balance > 0 && i.type === SUPPLIER) {
+					if (getBalance?.balance < 0) {
 						acc.push(i);
 					}
 
@@ -114,45 +114,45 @@ const Party = () => {
 	}, [tableStatusData, dataLimit, activePage, selectedTab, searchText]);
 
 
-	// Get Party Balance & [Set `Total Pay` and `Total Collect`]
+	// Get Party balance
 	useEffect(() => {
-		setLoading(true);
 		(async () => {
 			try {
-				const url = process.env.REACT_APP_API_URL + `/party/get-party-balance`;
+				setLoading(true);
+				const url = process.env.REACT_APP_API_URL + `/ladger/get-all-party-balance`;
 				const req = await fetch(url, {
-					method: "POST",
+					method: 'POST',
 					headers: {
 						"Content-Type": 'application/json'
 					},
 					body: JSON.stringify({ token })
 				});
 				const res = await req.json();
-				if (req.status === 200) {
-					setPartyBalance(res.data);
-
-					const { totalCollect, totalPayment } = res.data.reduce((acc, i) => {
-						if (i.type === CUSTOMER) {
-							acc.totalCollect += Number(i.balance);
-						}
-						else if (i.type === SUPPLIER) {
-							acc.totalPayment += Number(i.balance);
-						}
-						return acc;
-					}, { totalCollect: 0, totalPayment: 0 });
-
-					setTotalCollection((totalCollect).toFixed(2));
-					setTotalPay((totalPayment).toFixed(2));
+				if (req.status !== 200) {
+					return toast("Balance not get", 'error');
 				}
 
+				const { totalCollect, totalPayment } = res.data.reduce((acc, i) => {
+					if (i.balance > 0) {
+						acc.totalCollect += Number(i.balance);
+					}
+					else if (i.balance < 0) {
+						acc.totalPayment += Number(i.balance);
+					}
+					return acc;
+				}, { totalCollect: 0, totalPayment: 0 });
+
+				setTotalCollection((Math.abs(totalCollect)).toFixed(2));
+				setTotalPay((Math.abs(totalPayment)).toFixed(2));
+
+				setPartyBalance(res.data);
 			} catch (err) {
 				return toast("Party Balance not get", "error");
 			} finally {
 				setLoading(false);
 			}
 		})()
-	}, [partyData.length]);
-
+	}, [])
 
 	const selectAll = (e) => {
 		if (e.target.checked) {
@@ -377,7 +377,7 @@ const Party = () => {
 									<tbody>
 										{
 											partyData.length > 0 ? partyData.map((data, i) => {
-												const balance = partyBalance?.find((p, _) => p.partyId.toString() === data._id.toString());
+												const balance = partyBalance?.find((p, _) => p?.partyId.toString() === data._id.toString());
 
 												return <tr key={i} onClick={() => navigate("/admin/party/details/" + data._id)} className='cursor-pointer hover:bg-gray-100'>
 													<td className='py-2' align='center'>
@@ -396,7 +396,7 @@ const Party = () => {
 													</td>
 													<td className='px-4'>
 														<Icons.RUPES className='inline' />
-														{balance.balance}
+														{balance?.balance || 0}
 													</td>
 													<td className='px-4'>
 														<Whisper

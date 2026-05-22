@@ -59,6 +59,11 @@ const Ladger = ({ partyId }) => {
 		pay_out: {
 			inv: "paymentOutNumber",
 			title: "Payment Out"
+		},
+
+		opening_balance: {
+			inv: "openingBalance",
+			title: "Opening Balance"
 		}
 	};
 
@@ -143,8 +148,8 @@ const Ladger = ({ partyId }) => {
 					<p className='font-bold text-xs leading-[0px]'>{partyData?.name}</p>
 					<p className='text-xs text-gray-600'>Phone: {partyData?.contactNumber || "--"}</p>
 				</div>
-				<div className='w-[200px] h-[90px] rounded border p-2'>
-					<p className='text-xs text-gray-600 text-right border-b w-full pb-1'>Date - Date</p>
+				<div className='w-[200px] h-[65px] rounded border p-2'>
+					{/* <p className='text-xs text-gray-600 text-right border-b w-full pb-1'>Date - Date</p> */}
 					<p className='text-xs text-gray-600 text-right'>
 						Total {partyBalance < 0 ? 'Payable' : 'Receivable'}
 					</p>
@@ -171,7 +176,14 @@ const Ladger = ({ partyId }) => {
 								return <tr className='border-b'>
 									<td className='p-2'>{new Date(l.date).toLocaleDateString()}</td>
 									<td>{voucherInv[l.voucher].title}</td>
-									<td>{l['voucherId'][voucherInv[l.voucher].inv]}</td>
+									<td>
+										{
+											l.voucher !== "opening_balance" ?
+											l['voucherId'][voucherInv[l.voucher].inv]
+											:"--"
+										}
+										
+									</td>
 									<td>{l.credit}</td>
 									<td>{l.debit}</td>
 								</tr>
