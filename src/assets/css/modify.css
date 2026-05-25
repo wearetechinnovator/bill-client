@@ -106,10 +106,6 @@
    background-color: white !important;
  }
 
- .rs-picker-default .rs-picker-toggle.rs-btn .rs-picker-toggle-indicator .rs-picker-clean {
-   /* display: none; */
- }
-
  a:active,
  a:focus,
  a:hover {
@@ -165,4 +161,9 @@
  input[type="radio"] {
    width: 20px !important;
    height: 13px !important;
+ }
+
+ hr {
+   margin-bottom: 8px !important;
+   margin-top: 8px !important;
  }

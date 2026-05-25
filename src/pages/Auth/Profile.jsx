@@ -115,7 +115,7 @@ const Profile = () => {
 
 
 	}
-	
+
 
 	const clear = (which) => {
 		if (which === 1) {
@@ -179,7 +179,11 @@ const Profile = () => {
 									</div>
 									<p className='ml-1 mt-2'>Password</p>
 									<div className='relative  '>
-										<input type={profilePasswordField ? "text" : "password"} onChange={(e) => setData({ ...data, password: e.target.value })} value={data.password} />
+										<input
+											type={profilePasswordField ? "text" : "password"}
+											onChange={(e) => setData({ ...data, password: e.target.value })}
+											value={data.password}
+										/>
 										<div className='absolute top-2 right-3 cursor-pointer' onClick={() => setProfilePasswordField(!profilePasswordField)} >
 											{profilePasswordField ? <Icons.EYE /> : <Icons.EYE_CLOSE />}
 										</div>

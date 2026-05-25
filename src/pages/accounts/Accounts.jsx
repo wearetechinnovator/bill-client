@@ -317,7 +317,7 @@ const Account = () => {
 					</div>
 
 					{
-						!loading ? billData.length > 0 ? <div className='content__body__main view'>
+						!loading ? <div className='content__body__main view'>
 							{/* Table start */}
 							<div className='overflow-x-auto list__table'>
 								<table className='min-w-full bg-white' id='listQuotation' ref={tableRef}>
@@ -395,7 +395,6 @@ const Account = () => {
 								{/* pagination end */}
 							</div>
 						</div>
-							: <AddNew title={"Account"} link={"/admin/account/add"} />
 							: <DataShimmer />
 					}
 				</div>

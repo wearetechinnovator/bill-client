@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
 import { Icons } from '../../helper/icons';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import useApi from '../../hooks/useApi';
 import { toggleBarCodeModal } from '../../store/barcodeModalSlice';
 import { useDispatch } from 'react-redux';
@@ -16,6 +16,7 @@ const Details = () => {
 	const { getApiData } = useApi();
 	const [tax, setTax] = useState();
 	const navigate = useNavigate();
+	const location = useLocation();
 
 
 	useEffect(() => {
@@ -27,6 +28,7 @@ const Details = () => {
 			setData(item.data);
 		})()
 	}, [])
+
 
 
 	return (
@@ -109,6 +111,7 @@ const Details = () => {
 
 						</div>
 					</div>
+
 				</div>
 			</main>
 		</>

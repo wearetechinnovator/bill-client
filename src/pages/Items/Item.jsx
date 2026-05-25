@@ -318,7 +318,6 @@ const Item = ({ mode }) => {
 														return currentStock < alertThreshold && alertThreshold > 0;
 													});
 												}
-												console.log("------")
 
 												return (
 													<tr
