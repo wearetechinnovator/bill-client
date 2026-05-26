@@ -48,12 +48,12 @@ const Details = () => {
             >
               <Icons.BOOK /> Ledger
             </button>
-            <button
+            {/* <button
               className={tab === "logs" ? "active" : ""}
               onClick={() => handleTabClick("logs")}
             >
               <Icons.FILE /> Logs
-            </button>
+            </button> */}
           </div>
 
           {renderTabContent()}
