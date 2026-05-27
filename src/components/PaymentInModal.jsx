@@ -80,7 +80,7 @@ const PaymentInModal = ({ invoice, openModal, openStatus }) => {
 
             // Tds
             const tdsRate = await getApiData("tds-rate");
-            const tdsData = tdsRate.map(d => ({ label: d.title, value: d._id, rate: d.rate }));
+            const tdsData = tdsRate?.map(d => ({ label: d.title, value: d._id, rate: d.rate }));
             setTdsRate([...tdsData]);
             setTdsData(tdsRate);
         })()

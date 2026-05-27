@@ -469,7 +469,7 @@ const Setting = () => {
 
                     {/* ==================== Party Category  ===================*/}
                     {/* ========================================================*/}
-                    <div className="content__body__main bg-white">
+                    {/* <div className="content__body__main bg-white">
                         <div className='flex justify-between items-center'>
                             <p className='font-bold'>Party Category</p>
                             <button
@@ -478,7 +478,7 @@ const Setting = () => {
                                     dispatch(toggle(true))
                                 }}
                                 className='bg-green-500 hover:bg-green-400 text-md text-white 
-                rounded w-[70px] flex items-center justify-center gap-1 py-2'>
+                                    rounded w-[70px] flex items-center justify-center gap-1 py-2'>
                                 <FaAddressBook />
                                 Add
                             </button>
@@ -523,8 +523,7 @@ const Setting = () => {
                                 </tbody>
                             </table>
                         </div>
-                        {/* table close */}
-                    </div>
+                    </div> */}
                 </div>
             </main>
 
