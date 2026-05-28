@@ -406,7 +406,7 @@ const Invoice = () => {
                 />
 
                 <div className="content__body">
-                    <div className='content__body__main w-[100%] min-h-[100vh] bg-gray-100 flex justify-center'>
+                    <div className='content__body__main w-[100%] min-h-[100vh] bg-[#C4E9F7] flex justify-center'>
                         <div className='bg-white /*w-[190mm]*/ w-[80%]  p-5'>
 
                             {/* Action buttons */}
@@ -437,11 +437,11 @@ const Invoice = () => {
                                                             sendViaMail()
                                                             setShareDrpdwn(false)
                                                         }}
-                                                        className='flex items-center gap-2 w-[120px] p-1 cursor-pointer hover:bg-gray-100 rounded'>
+                                                        className='flex items-center gap-2 w-[120px] p-1 cursor-pointer hover:bg-[#C4E9F7] rounded'>
                                                         <HiOutlineMail className='text-[16px]' />
                                                         Email
                                                     </div>
-                                                    <div className='flex items-center gap-2 w-[120px] p-1 cursor-pointer hover:bg-gray-100 rounded'>
+                                                    <div className='flex items-center gap-2 w-[120px] p-1 cursor-pointer hover:bg-[#C4E9F7] rounded'>
                                                         <MdOutlineWhatsapp className='text-[16px]' />
                                                         WhatsApp
                                                     </div>
@@ -550,109 +550,436 @@ const Invoice = () => {
                                                     )
                                                 }
 
-                                                <div className='flex w-full border-b'>
-                                                    <div className='p-3 flex items-center gap-5 border-r' style={{ width: "60%" }}>
-                                                        <div style={{width:"25%"}}>
-                                                            {
-                                                                companyDetails?.invoiceLogo && (
-                                                                    <img src={companyDetails?.invoiceLogo} className='w-auto h-auto'/>
-                                                                )
-                                                            }
+                                                <table style={{ width: '100%', borderCollapse: 'collapse' }} className='invoice__header'>
+                                                    <tbody>
+                                                        <tr>
+                                                            {/* Left: Company Info */}
+                                                            <td style={{ width: '50%', padding: '12px', verticalAlign: 'middle' }}>
+                                                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            {/* Logo */}
+                                                                            <td style={{ width: '25%', verticalAlign: 'middle' }}>
+                                                                                {companyDetails?.invoiceLogo && (
+                                                                                    <img
+                                                                                        src={companyDetails?.invoiceLogo}
+                                                                                        style={{ width: 'auto', height: 'auto' }}
+                                                                                    />
+                                                                                )}
+                                                                            </td>
+
+                                                                            {/* Company Details */}
+                                                                            <td
+                                                                                style={{
+                                                                                    width: '75%',
+                                                                                    fontSize: '12px',
+                                                                                    verticalAlign: 'middle',
+                                                                                    paddingLeft: '20px'
+                                                                                }}
+                                                                            >
+                                                                                <p
+                                                                                    style={{
+                                                                                        fontSize: '15px',
+                                                                                        color: 'black',
+                                                                                        fontWeight: '600',
+                                                                                        textTransform: 'uppercase',
+                                                                                        margin: '0 0 4px 0'
+                                                                                    }}
+                                                                                >
+                                                                                    {companyDetails?.name}
+                                                                                </p>
+
+                                                                                <p
+                                                                                    style={{
+                                                                                        margin: '0 0 4px 0',
+                                                                                        textTransform: 'capitalize'
+                                                                                    }}
+                                                                                >
+                                                                                    {companyDetails?.address}, {companyDetails?.city},{' '}
+                                                                                    {companyDetails?.state}, {companyDetails?.country}
+                                                                                    {companyDetails?.pin && `, ${companyDetails?.pin}`}
+                                                                                </p>
+
+                                                                                <table style={{ borderCollapse: 'collapse' }}>
+                                                                                    <tbody>
+                                                                                        <tr>
+                                                                                            {companyDetails?.gst && (
+                                                                                                <td
+                                                                                                    style={{
+                                                                                                        paddingRight: '16px',
+                                                                                                        fontSize: '11px'
+                                                                                                    }}
+                                                                                                >
+                                                                                                    <span
+                                                                                                        style={{
+                                                                                                            fontWeight: '600',
+                                                                                                            color: 'black'
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        GSTIN
+                                                                                                    </span>{' '}
+                                                                                                    :&nbsp;&nbsp;
+                                                                                                    {companyDetails?.gst}
+                                                                                                </td>
+                                                                                            )}
+
+                                                                                            {companyDetails?.pan && (
+                                                                                                <td style={{ fontSize: '11px' }}>
+                                                                                                    <span
+                                                                                                        style={{
+                                                                                                            fontWeight: '600',
+                                                                                                            color: 'black'
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        PAN
+                                                                                                    </span>{' '}
+                                                                                                    :&nbsp;
+                                                                                                    {companyDetails?.pan}
+                                                                                                </td>
+                                                                                            )}
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+
+                                                                                {companyDetails?.phone && (
+                                                                                    <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>
+                                                                                        <span
+                                                                                            style={{
+                                                                                                fontWeight: '600',
+                                                                                                color: 'black'
+                                                                                            }}
+                                                                                        >
+                                                                                            Mobile
+                                                                                        </span>{' '}
+                                                                                        :&nbsp;
+                                                                                        {companyDetails?.phone}
+                                                                                    </p>
+                                                                                )}
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+
+                                                            {/* Right: Bill Info */}
+                                                            <td
+                                                                style={{
+                                                                    width: '50%',
+                                                                    padding: '12px',
+                                                                    fontSize: '12px',
+                                                                    verticalAlign: 'top'
+                                                                }}
+                                                            >
+                                                                <table
+                                                                    style={{
+                                                                        borderCollapse: 'collapse',
+                                                                        width: '100%'
+                                                                    }}
+                                                                >
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td
+                                                                                width={'45%'}
+                                                                                style={{
+                                                                                    padding: '0 0 4px 0',
+                                                                                    fontWeight: '600',
+                                                                                    color: 'black'
+                                                                                }}
+                                                                            >
+                                                                                {billName} No:
+                                                                            </td>
+
+                                                                            <td
+                                                                                style={{
+                                                                                    padding: '0 0 4px 0',
+                                                                                    fontWeight: '600'
+                                                                                }}
+                                                                            >
+                                                                                {billNumber}
+                                                                            </td>
+                                                                        </tr>
+
+                                                                        <tr>
+                                                                            <td
+                                                                                style={{
+                                                                                    padding: '0 0 4px 0',
+                                                                                    fontWeight: '600',
+                                                                                    color: 'black'
+                                                                                }}
+                                                                            >
+                                                                                {billName} Date:
+                                                                            </td>
+
+                                                                            <td
+                                                                                style={{
+                                                                                    padding: '0 0 4px 0',
+                                                                                    fontWeight: '600'
+                                                                                }}
+                                                                            >
+                                                                                {new Date(billDate).toLocaleDateString()}
+                                                                            </td>
+                                                                        </tr>
+
+                                                                        {/* Quotation */}
+                                                                        {billName === 'Quotation' && (
+                                                                            <>
+                                                                                {billData?.enqNumber && (
+                                                                                    <tr>
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600',
+                                                                                                color: 'black'
+                                                                                            }}
+                                                                                        >
+                                                                                            Enquiry Number:
+                                                                                        </td>
+
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600'
+                                                                                            }}
+                                                                                        >
+                                                                                            {billData?.enqNumber}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                )}
+
+                                                                                {billData?.deliveryTime && (
+                                                                                    <tr>
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600',
+                                                                                                color: 'black'
+                                                                                            }}
+                                                                                        >
+                                                                                            Delivery Time:
+                                                                                        </td>
+
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600'
+                                                                                            }}
+                                                                                        >
+                                                                                            {billData?.deliveryTime}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                )}
+                                                                            </>
+                                                                        )}
+
+                                                                        {/* Proforma */}
+                                                                        {billName === 'Proforma' && (
+                                                                            <>
+                                                                                {billData?.poNumber && (
+                                                                                    <tr>
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600',
+                                                                                                color: 'black'
+                                                                                            }}
+                                                                                        >
+                                                                                            PO Number:
+                                                                                        </td>
+
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600'
+                                                                                            }}
+                                                                                        >
+                                                                                            {billData?.poNumber}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                )}
+
+                                                                                {billData?.poDate && (
+                                                                                    <tr>
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600',
+                                                                                                color: 'black'
+                                                                                            }}
+                                                                                        >
+                                                                                            PO Date:
+                                                                                        </td>
+
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600'
+                                                                                            }}
+                                                                                        >
+                                                                                            {new Date(
+                                                                                                billData.poDate
+                                                                                            ).toLocaleDateString()}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                )}
+
+                                                                                {billData?.deliveryTime && (
+                                                                                    <tr>
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600',
+                                                                                                color: 'black'
+                                                                                            }}
+                                                                                        >
+                                                                                            Delivery Time:
+                                                                                        </td>
+
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600'
+                                                                                            }}
+                                                                                        >
+                                                                                            {billData?.deliveryTime}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                )}
+                                                                            </>
+                                                                        )}
+
+                                                                        {/* Sales Invoice */}
+                                                                        {billName === 'Sales Invoice' && (
+                                                                            <>
+                                                                                {billData?.poNumber && (
+                                                                                    <tr>
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600',
+                                                                                                color: 'black'
+                                                                                            }}
+                                                                                        >
+                                                                                            PO Number:
+                                                                                        </td>
+
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600'
+                                                                                            }}
+                                                                                        >
+                                                                                            {billData?.poNumber}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                )}
+
+                                                                                {billData?.poDate && (
+                                                                                    <tr>
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600',
+                                                                                                color: 'black'
+                                                                                            }}
+                                                                                        >
+                                                                                            PO Date:
+                                                                                        </td>
+
+                                                                                        <td
+                                                                                            style={{
+                                                                                                padding: '0 0 4px 0',
+                                                                                                fontWeight: '600'
+                                                                                            }}
+                                                                                        >
+                                                                                            {new Date(
+                                                                                                billData.poDate
+                                                                                            ).toLocaleDateString()}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                )}
+                                                                            </>
+                                                                        )}
+
+                                                                        {/* Purchase Order */}
+                                                                        {billName === 'Purchase Order' &&
+                                                                            billData?.deliveryTime && (
+                                                                                <tr>
+                                                                                    <td
+                                                                                        style={{
+                                                                                            padding: '0 0 4px 0',
+                                                                                            fontWeight: '600',
+                                                                                            color: 'black'
+                                                                                        }}
+                                                                                    >
+                                                                                        Delivery Time:
+                                                                                    </td>
+
+                                                                                    <td
+                                                                                        style={{
+                                                                                            padding: '0 0 4px 0',
+                                                                                            fontWeight: '600'
+                                                                                        }}
+                                                                                    >
+                                                                                        {billData?.deliveryTime}
+                                                                                    </td>
+                                                                                </tr>
+                                                                            )}
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <div className='w-full flex items-start justify-between border-t'>
+                                                    <div className='p-3 w-full'>
+                                                        <p style={{ fontSize: '12px', fontWeight: "600", color: "black", textTransform: 'uppercase' }}>Billing Address</p>
+                                                        <p className='capitalize' style={{ fontSize: '12px', fontWeight: "600" }}>
+                                                            {billData?.party.name}
+                                                        </p>
+                                                        <div style={{ fontSize: '12px', maxWidth: '600px' }}>
+                                                            <span className='capitalize'>{billData?.party.billingAddress}</span>,
+                                                            <span className='capitalize'>{billData?.party?.state}</span>,
+                                                            <span className='capitalize'>{billData?.party?.country}</span>
+                                                            {billData?.party?.postalCode && ","} {billData?.party?.postalCode}
                                                         </div>
-                                                        <div className='flex flex-col gap-1' style={{ fontSize: '12px', width:"75%"}}>
-                                                            <p className='text-blue-700 font-bold' style={{ fontSize: '12px' }}>
-                                                                {companyDetails?.name}
-                                                            </p>
-                                                            <p style={{ width: '280px' }}>
-                                                                <span className='text-black font-semibold'>Address: </span>
-                                                                {companyDetails?.address}
-                                                            </p>
-                                                            <p style={{ marginTop: "-2px" }}>
-                                                                <span className='text-black font-semibold'>Country: </span>
-                                                                {companyDetails?.country.toUpperCase()}
-                                                            </p>
-                                                            <p style={{ marginTop: "-2px" }}>
-                                                                <span className='text-black font-semibold'>State: </span>
-                                                                {companyDetails?.state.toUpperCase()}
-                                                            </p>
-                                                            <p style={{ lineHeight: '0' }}>
-                                                                <span className='font-semibold text-black'>GSTIN</span>:  {companyDetails?.gst}
-                                                            </p>
-                                                            <p><span className='font-semibold text-black'>PAN</span>: {companyDetails?.pan}</p>
-                                                            <p style={{ lineHeight: '0' }}>
-                                                                <span className='font-semibold text-black'>Mobile</span>:  {companyDetails?.phone}
-                                                            </p>
+                                                        <p style={{ fontSize: '12px' }}>
+                                                            <span className='text-black font-semibold'>Mobile:</span> {billData?.party.contactNumber}
+                                                        </p>
+                                                        <div className='uppercase text-black' style={{ fontSize: '12px' }}>
+                                                            {billData?.party?.gst && (
+                                                                <>
+                                                                    <span className='font-semibold'>GSTIN:</span> {billData.party.gst}
+                                                                </>
+                                                            )}
+
+                                                            {billData?.party?.pan && (
+                                                                <>
+                                                                    <span className='font-semibold ml-2'>PAN:</span> {billData.party.pan}
+                                                                </>
+                                                            )}
                                                         </div>
                                                     </div>
-                                                    <div className='flex flex-col justify-center px-3' style={{ fontSize: '12px', width: '40%' }}>
-                                                        <p className='font-bold'>{billName} No: {billNumber}</p>
-                                                        <p className='font-bold'>{billName} Date: {new Date(billDate).toLocaleDateString()}</p>
 
-                                                        {
-                                                            billName === "Quotation" && (
-                                                                <>
-                                                                    {billData?.enqNumber && <p className='font-bold'>Enquiry Number: {billData?.enqNumber}</p>}
-                                                                    {billData?.deliveryTime && <p className='font-bold'>Delivery Time: {billData?.deliveryTime}</p>}
-                                                                </>
-                                                            )
-                                                        }
-
-                                                        {
-                                                            billName === "Proforma" && (
-                                                                <>
-                                                                    <p className='font-bold'>PO Number: {billData?.poNumber}</p>
-                                                                    {billData?.poDate && <p className='font-bold'>PO Date: {new Date(billData.poDate).toLocaleDateString()}</p>}
-                                                                    <p className='font-bold'>Delivery Time: {billData?.deliveryTime}</p>
-                                                                </>
-                                                            )
-                                                        }
-
-                                                        {
-                                                            billName === "Sales Invoice" && (
-                                                                <>
-                                                                    <p className='font-bold'>PO Number: {billData?.poNumber}</p>
-                                                                    {billData?.poDate && <p className='font-bold'>PO Date: {new Date(billData.poDate).toLocaleDateString()}</p>}
-                                                                </>
-                                                            )
-                                                        }
-
-                                                        {
-                                                            billName === "Purchase Order" && billData?.deliveryTime && (
-                                                                <p className='font-bold'>Delivery Time: {billData?.deliveryTime}</p>
-                                                            )
-                                                        }
-
+                                                    <div className='p-3 w-full'>
+                                                        <p style={{ fontSize: '12px', fontWeight: "600", color: "black", textTransform: 'uppercase' }}>Shipping Address</p>
+                                                        <p style={{ fontSize: '12px', maxWidth: '600px' }}>
+                                                            <span className='capitalize'>{billData?.party.shippingAddress}</span>,
+                                                            <span className='capitalize'>{billData?.party?.state}</span>,
+                                                            <span className='capitalize'>{billData?.party?.country}</span>
+                                                            {billData?.party?.postalCode && ","} {billData?.party?.postalCode}
+                                                        </p>
                                                     </div>
-                                                </div>
 
-                                                <div className='p-3'>
-                                                    <p style={{ fontSize: '12px' }}>TO</p>
-                                                    <p className='text-black font-semibold uppercase' style={{ fontSize: '12px' }}>
-                                                        {billData?.party.name}
-                                                    </p>
-                                                    <p style={{ fontSize: '12px', maxWidth: '600px' }}>
-                                                        <span className='text-black font-semibold'>Address:</span>
-                                                        <span className='capitalize'>{billData?.party.billingAddress}</span>,
-                                                        <span className='capitalize'>{billData?.party?.state}</span>,
-                                                        <span className='capitalize'>{billData?.party?.country}</span>
-                                                        {billData?.party?.postalCode && ","} {billData?.party?.postalCode}
-                                                    </p>
-                                                    <p style={{ fontSize: '12px' }}>
-                                                        <span className='text-black font-semibold'>Mobile:</span> {billData?.party.contactNumber}
-                                                    </p>
-                                                    <p className='uppercase text-black' style={{ fontSize: '12px' }}>
-                                                        <span className='font-semibold'>GSTIN:</span> {billData?.party.gst}
-                                                        <span className='font-semibold ml-2'>PAN:</span> {billData?.party.pan}
-                                                    </p>
                                                 </div>
                                             </div>
                                             <div className='table__wrapper items-page'>
                                                 <table className='w-full border item__table' style={{ fontSize: '12px' }}>
-                                                    <thead className='bg-gray-100'>
+                                                    <thead className='bg-[#C4E9F7]' style={{ background: "#C4E9F7" }}>
                                                         <tr>
                                                             <td align='center' valign='center' className='p-2' width={"5%"}>SL.NO</td>
                                                             <td align='center' width={"49%"}>ITEM</td>
-                                                            <td align='center' width={"7%"}>HSN/SAC</td>
+                                                            <td align='center' width={"7%"}>HSN</td>
                                                             <td align='center' width={"7%"}>QTY.</td>
                                                             <td align='center' width={"7%"}>RATE</td>
                                                             <td align='center' width={"8%"}>DISCOUNT</td>
@@ -669,10 +996,10 @@ const Invoice = () => {
                                                                         {data.itemName}
                                                                         {data.description && <p className='text-gray-500 text-[10px] mt-1'>{data.description}</p>}
                                                                     </td>
-                                                                    <td valign='top' align='right'>{data.hsn}</td>
-                                                                    <td valign='top' align='right'>{data.qun} <sub>{data.selectedUnit}</sub></td>
-                                                                    <td valign='top' align='right'>{data.price}</td>
-                                                                    <td valign='top' align='right'>
+                                                                    <td valign='top' align='center'>{data.hsn}</td>
+                                                                    <td valign='top' align='center'>{data.qun} <sub>{data.selectedUnit}</sub></td>
+                                                                    <td valign='top' align='center'>{data.price}</td>
+                                                                    <td valign='top' align='center'>
                                                                         {data.discountPerAmount || "0.00"}
                                                                         <div className='discount-font text-gray-500'>
                                                                             {
@@ -682,11 +1009,11 @@ const Invoice = () => {
                                                                             }
                                                                         </div>
                                                                     </td>
-                                                                    <td valign='top' align='right'>
+                                                                    <td valign='top' align='center'>
                                                                         {((data.qun * data.price) / 100 * data.tax).toFixed(2)}
                                                                         <div className='text-gray-500 discount-font'>{`(${data.tax || '0.00'}%)`}</div>
                                                                     </td>
-                                                                    <td valign='top' align='right'> {
+                                                                    <td valign='top' align='center'> {
                                                                         (parseFloat(data.price) * parseFloat(data.qun) - parseFloat(data.discountPerAmount || 0) + ((data.qun * data.price) / 100 * data.tax)).toFixed(2)
                                                                     }</td>
                                                                 </tr>
@@ -694,7 +1021,7 @@ const Invoice = () => {
                                                         }
                                                     </tbody>
                                                     <tfoot className='w-full'>
-                                                        <tr className='font-bold' style={{ background: "#F3F4F6" }}>
+                                                        <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
                                                             <td colSpan={3} align='right'>TOTAL</td>
                                                             <td>{billDetails.qun}</td>
                                                             <td></td>
@@ -702,7 +1029,7 @@ const Invoice = () => {
                                                             <td><Icons.RUPES className='inline' />{billDetails.taxAmount}</td>
                                                             <td><Icons.RUPES className='inline' />{billDetails.amount}</td>
                                                         </tr>
-                                                        {billData?.roundOffAmount && <tr className='font-semibold' style={{ background: "#F3F4F6" }}>
+                                                        {billData?.roundOffAmount && <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
                                                             <td colSpan={7} align='right' className='italic'>Round Off</td>
                                                             <td><Icons.RUPES className='inline' />
                                                                 {
@@ -713,7 +1040,7 @@ const Invoice = () => {
                                                             </td>
                                                         </tr>}
                                                         {billData?.roundOffAmount && (
-                                                            <tr className='font-semibold' style={{ background: "#F3F4F6" }}>
+                                                            <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
                                                                 <td colSpan={7} align='right'>SUB TOTAL</td>
                                                                 <td><Icons.RUPES className='inline' />
                                                                     {
@@ -743,7 +1070,7 @@ const Invoice = () => {
                                             {/* ================================================================================= */}
                                             <div className="print-page-break mt-2 ">
                                                 <table className='w-full' style={{ fontSize: '12px' }}>
-                                                    <thead className='bg-gray-100'>
+                                                    <thead className='bg-[#C4E9F7]' style={{ background: "#C4E9F7" }}>
                                                         <tr>
                                                             <td>HSN Code</td>
                                                             <td>Taxable Value</td>
@@ -871,8 +1198,8 @@ const Invoice = () => {
                                                     }
                                                 </div>
                                                 <div className='w-full flex'>
-                                                    <div className='w-[60%] p-2'>
-                                                        <p className='font-semibold text-md'>Notes:</p>
+                                                    <div className='p-2' style={{ width: "70%" }}>
+                                                        {billData?.note && <p className='font-semibold text-md'>Notes:</p>}
                                                         <p className='text-xs text-gray-500'>{billData?.note}</p>
                                                         <br />
 
@@ -888,7 +1215,7 @@ const Invoice = () => {
                                                             }
                                                         </ul>
                                                     </div>
-                                                    <div className='border-l w-[40%] text-center p-2 flex flex-col justify-center items-center'>
+                                                    <div className='border-l text-center p-2 flex flex-col justify-center items-center' style={{ width: "30%" }}>
                                                         {
                                                             companyDetails?.signature && (
                                                                 <img src={companyDetails?.signature} alt="signature" className='mx-auto' style={{ height: '60px' }} />

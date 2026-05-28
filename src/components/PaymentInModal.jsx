@@ -75,7 +75,7 @@ const PaymentInModal = ({ invoice, openModal, openStatus }) => {
     useEffect(() => {
         (async () => {
             const data = await getApiData("account");
-            const account = data.data.map(d => ({ label: d.accountName, value: d._id }));
+            const account = data?.data?.map(d => ({ label: d.accountName, value: d._id }));
             setAccount([...account]);
 
             // Tds

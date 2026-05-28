@@ -378,7 +378,7 @@ select {
   @apply rounded w-[70px] flex items-center justify-center gap-1 py-2 text-xs;
 }
 
-#invoice tr td {
+#invoice tr td:not(.invoice__header tr td) {
   border: 1px solid #c5c5c5;
   padding: 3px;
   color: black;
