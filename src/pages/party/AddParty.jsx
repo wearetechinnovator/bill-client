@@ -138,7 +138,7 @@ const PartyComponent = ({ mode, save, getRes }) => {
 
 	return (
 		<div className="content__body__main ">
-			<div className='grid grid-cols-1 lg:grid-cols-2 lg:gap-4 gap-0'>
+			<div className='grid grid-cols-1 lg:grid-cols-2 lg:gap-4 gap-0 mt-3'>
 				{/* First Column */}
 				<div className='flex flex-col gap-2'>
 					<div>
@@ -220,8 +220,8 @@ const PartyComponent = ({ mode, save, getRes }) => {
 						<div className='w-full'>
 							<p className='mb-1'>Postal Code</p>
 							<input type="text"
-								onChange={(e) => setPartyData({ ...partyData, pin: e.target.value })}
-								value={partyData.pin}
+								onChange={(e) => setPartyData({ ...partyData, postalCode: e.target.value })}
+								value={partyData.postalCode}
 							/>
 						</div>
 					</div>

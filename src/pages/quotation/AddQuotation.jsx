@@ -30,7 +30,7 @@ const Quotation = ({ mode }) => {
 	const getItemModalState = useSelector((store) => store.itemModalSlice.show);
 	const navigate = useNavigate();
 	const { id } = useParams()
-    const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const getBillPrefix = useBillPrefix("quotation");
 	const { getApiData } = useApi();
 	const itemRowSet = {
@@ -45,9 +45,17 @@ const Quotation = ({ mode }) => {
 	const [additionalRows, setAdditionalRow] = useState([additionalRowSet]); //{ additionalRowsItem: 1 }
 	const [formData, setFormData] = useState({
 		party: '', quotationNumber: '', estimateDate: new Date().toISOString().split('T')[0], validDate: '',
-		items: ItemRows, additionalCharge: additionalRows, note: '', terms: '', discountType: '',
+		items: ItemRows, additionalCharge: additionalRows, note: '', terms: `1.	Shipping: Buyer bears shipping costs unless stated otherwise.
+2.	Order Changes & Cancellations: Allowed before shipment. Extra charges will apply post-
+3.	Warranties & Returns: Warranty for defects; defective returns accepted within an
+4.	Intellectual Property: Seller retains IP rights unless otherwise agreed.
+5.	Force Majeure: Seller not liable for delays caused by uncontrollable events (e.g., natural disasters).
+6.	Confidentiality: Both parties must keep shared information private.
+7.	Dispute Resolution: Arbitration in Navi Mumbai, India, under Indian law.
+8.	Indemnity: Buyer indemnifies seller against misuse-related claims.
+9.	Governing Law: Governed by Indian law, jurisdiction in Navi Mumbai.`, discountType: '',
 		discountAmount: '', discountPercentage: '', finalAmount: '', autoRoundOff: false, roundOffType: '0',
-		roundOffAmount: ''
+		roundOffAmount: '', enqNumber: '', deliveryTime: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -346,10 +354,10 @@ const Quotation = ({ mode }) => {
 			toast('Quotation add successfully', 'success');
 			navigate('/admin/quotation-estimate')
 			return
-			
+
 		} catch (error) {
 			return toast('Something went wrong', 'error')
-		}finally{
+		} finally {
 			setLoading(false);
 		}
 
@@ -454,6 +462,26 @@ const Quotation = ({ mode }) => {
 										setFormData({ ...formData, validDate: e.target.value })
 									}}
 									value={formData.validDate}
+								/>
+							</div>
+							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
+								<p className='text-xs'>ENQ Number</p>
+								<input
+									type='text'
+									onChange={(e) => {
+										setFormData({ ...formData, enqNumber: e.target.value })
+									}}
+									value={formData.enqNumber}
+								/>
+							</div>
+							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
+								<p className='text-xs'>Delivery Time</p>
+								<input
+									type='text'
+									onChange={(e) => {
+										setFormData({ ...formData, deliveryTime: e.target.value })
+									}}
+									value={formData.deliveryTime}
 								/>
 							</div>
 						</div>
@@ -766,6 +794,7 @@ const Quotation = ({ mode }) => {
 								<div>
 									<p>Terms:</p>
 									<textarea
+										rows={10}
 										onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
 										value={formData.terms}
 									></textarea>

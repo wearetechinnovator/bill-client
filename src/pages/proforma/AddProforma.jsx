@@ -43,8 +43,20 @@ const Proforma = ({ mode }) => {
 	const [additionalRows, setAdditionalRow] = useState([additionalRowSet]); //{ additionalRowsItem: 1 }
 	const [formData, setFormData] = useState({
 		party: '', proformaNumber: '', estimateDate: new Date().toISOString().split('T')[0], validDate: '', items: ItemRows,
-		additionalCharge: additionalRows, note: '', terms: '', discountType: '', discountAmount: '', discountPercentage: '',
-		finalAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: ''
+		additionalCharge: additionalRows, note: '', terms: `1.	Invoice Validity: Proforma invoice is valid for 30 days; prices and terms may change afterwards
+2.	Pricing: Prices are in INR, exclusive of GST and other taxes, to be borne by the buyer
+3.	P&T: Full payment before dispatch; payment via specified modes as mentioned in the invoice
+4.	Delivery: Goods will be delivered within 2–4 days/weeks after payment, subject to changes
+5.	Shipping: Buyer bears shipping costs and risks; insurance recommended
+6.	Taxes and Duties: Taxes are added to the final invoice, based on current rates
+7.	Customs Clearance: Buyer handles international customs duties and compliance
+8.	Warranty: Warranty covers manufacturing defects for 6/12 months; misuse and wear not covered
+9.	Returns/Cancellations: Returns accepted for defective goods within 7/14 days; cancellation incurs co
+10.	Force Majeure: We’re not liable for delays caused by uncontrollable circumstances
+11.	Liability: Liability is limited to the value of goods; indirect damages not covered
+12.	Law & Jurisdiction: Governed by Indian laws; disputes resolved in Navi Mumbai courts
+13.	Acceptance: Payment and order confirmation signify buyer’s agreement to terms`, discountType: '', discountAmount: '', discountPercentage: '',
+		finalAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: '', poNumber: '', poDate: '', deliveryTime:''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -105,6 +117,9 @@ const Proforma = ({ mode }) => {
 			estimateDate: res.data.estimateDate
 				? new Date(res.data.estimateDate).toISOString().split("T")[0]
 				: "",
+			poDate: res.data.poDate
+					? new Date(res.data.poDate).toISOString().split("T")[0]
+					: "",
 		};
 
 		setFormData(prev => ({
@@ -375,7 +390,7 @@ const Proforma = ({ mode }) => {
 			toast('Proforma add successfully', 'success');
 			navigate('/admin/proforma-invoice');
 			return;
-			
+
 		} catch (error) {
 			return toast('Something went wrong', 'error')
 		} finally {
@@ -479,6 +494,33 @@ const Proforma = ({ mode }) => {
 										setFormData({ ...formData, validDate: e.target.value })
 									}}
 									value={formData.validDate}
+								/>
+							</div>
+							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+								<p className='text-xs'>PO Number</p>
+								<input type="text"
+									onChange={(e) => {
+										setFormData({ ...formData, poNumber: e.target.value })
+									}}
+									value={formData.poNumber}
+								/>
+							</div>
+							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+								<p className='text-xs'>PO Date</p>
+								<input type="date"
+									onChange={(e) => {
+										setFormData({ ...formData, poDate: e.target.value })
+									}}
+									value={formData.poDate}
+								/>
+							</div>
+							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+								<p className='text-xs'>Delivery Time</p>
+								<input type="text"
+									onChange={(e) => {
+										setFormData({ ...formData, deliveryTime: e.target.value })
+									}}
+									value={formData.deliveryTime}
 								/>
 							</div>
 						</div>
@@ -790,6 +832,7 @@ const Proforma = ({ mode }) => {
 								<div>
 									<p>Terms:</p>
 									<textarea
+										rows={10}
 										onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
 										value={formData.terms}
 									></textarea>

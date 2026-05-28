@@ -552,14 +552,14 @@ const Invoice = () => {
 
                                                 <div className='flex w-full border-b'>
                                                     <div className='p-3 flex items-center gap-5 border-r' style={{ width: "60%" }}>
-                                                        <div>
+                                                        <div style={{width:"25%"}}>
                                                             {
                                                                 companyDetails?.invoiceLogo && (
-                                                                    <img src={companyDetails?.invoiceLogo} style={{ height: "100px", width: '100px' }} />
+                                                                    <img src={companyDetails?.invoiceLogo} className='w-auto h-auto'/>
                                                                 )
                                                             }
                                                         </div>
-                                                        <div className='flex flex-col gap-1' style={{ fontSize: '12px' }}>
+                                                        <div className='flex flex-col gap-1' style={{ fontSize: '12px', width:"75%"}}>
                                                             <p className='text-blue-700 font-bold' style={{ fontSize: '12px' }}>
                                                                 {companyDetails?.name}
                                                             </p>
@@ -585,9 +585,43 @@ const Invoice = () => {
                                                         </div>
                                                     </div>
                                                     <div className='flex flex-col justify-center px-3' style={{ fontSize: '12px', width: '40%' }}>
-                                                        <p><span className='font-semibold'>{billName} No: </span>{billNumber}</p>
-                                                        <p><span className='font-semibold'>{billName} Date: </span>{new Date(billDate).toLocaleDateString()}
-                                                        </p>
+                                                        <p className='font-bold'>{billName} No: {billNumber}</p>
+                                                        <p className='font-bold'>{billName} Date: {new Date(billDate).toLocaleDateString()}</p>
+
+                                                        {
+                                                            billName === "Quotation" && (
+                                                                <>
+                                                                    {billData?.enqNumber && <p className='font-bold'>Enquiry Number: {billData?.enqNumber}</p>}
+                                                                    {billData?.deliveryTime && <p className='font-bold'>Delivery Time: {billData?.deliveryTime}</p>}
+                                                                </>
+                                                            )
+                                                        }
+
+                                                        {
+                                                            billName === "Proforma" && (
+                                                                <>
+                                                                    <p className='font-bold'>PO Number: {billData?.poNumber}</p>
+                                                                    {billData?.poDate && <p className='font-bold'>PO Date: {new Date(billData.poDate).toLocaleDateString()}</p>}
+                                                                    <p className='font-bold'>Delivery Time: {billData?.deliveryTime}</p>
+                                                                </>
+                                                            )
+                                                        }
+
+                                                        {
+                                                            billName === "Sales Invoice" && (
+                                                                <>
+                                                                    <p className='font-bold'>PO Number: {billData?.poNumber}</p>
+                                                                    {billData?.poDate && <p className='font-bold'>PO Date: {new Date(billData.poDate).toLocaleDateString()}</p>}
+                                                                </>
+                                                            )
+                                                        }
+
+                                                        {
+                                                            billName === "Purchase Order" && billData?.deliveryTime && (
+                                                                <p className='font-bold'>Delivery Time: {billData?.deliveryTime}</p>
+                                                            )
+                                                        }
+
                                                     </div>
                                                 </div>
 
@@ -597,15 +631,11 @@ const Invoice = () => {
                                                         {billData?.party.name}
                                                     </p>
                                                     <p style={{ fontSize: '12px' }}>
-                                                        <span className='text-black font-semibold'>Address:</span> {billData?.party.billingAddress}
-                                                    </p>
-                                                    <p>
-                                                        <span className='text-black font-semibold'>Country: </span>
-                                                        {billData?.party?.country.toUpperCase()}
-                                                    </p>
-                                                    <p>
-                                                        <span className='text-black font-semibold'>State: </span>
-                                                        {billData?.party?.state.toUpperCase()}
+                                                        <span className='text-black font-semibold'>Address:</span>
+                                                        <span className='capitalize'>{billData?.party.billingAddress}</span>,
+                                                        <span className='capitalize'>{billData?.party?.state}</span>,
+                                                        <span className='capitalize'>{billData?.party?.country}</span>
+                                                        {billData?.party?.postalCode && ","} {billData?.party?.postalCode}
                                                     </p>
                                                     <p style={{ fontSize: '12px' }}>
                                                         <span className='text-black font-semibold'>Mobile:</span> {billData?.party.contactNumber}
@@ -805,13 +835,13 @@ const Invoice = () => {
                                                             <div className='w-full p-2'>
                                                                 <p className='font-bold text-md'>Bank Details</p>
                                                                 <div className='w-full flex items-center mt-2' style={{ fontSize: '12px' }}>
-                                                                    <div style={{ width: "30%" }}>
+                                                                    <div style={{ width: "10%" }}>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>Name :</p>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>IFC Code :</p>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>Account No :</p>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>Bank Name:</p>
                                                                     </div>
-                                                                    <div style={{ width: "70%" }}>
+                                                                    <div style={{ width: "90%" }}>
                                                                         <p style={{ lineHeight: '11px' }}>{accountDetails?.accountHolderName}</p>
                                                                         <p style={{ lineHeight: '11px' }}>{accountDetails?.ifscCode}</p>
                                                                         <p style={{ lineHeight: '11px' }}>{accountDetails?.accountNumber}</p>
@@ -841,15 +871,24 @@ const Invoice = () => {
                                                     }
                                                 </div>
                                                 <div className='w-full flex'>
-                                                    <div className='w-full p-2'>
+                                                    <div className='w-[70%] p-2'>
                                                         <p className='font-semibold text-md'>Notes:</p>
                                                         <p className='text-xs text-gray-500'>{billData?.note}</p>
                                                         <br />
 
                                                         <p className='font-semibold text-md'>Terms & Conditions:</p>
-                                                        <p className='text-xs text-gray-500'>{billData?.terms}</p>
+                                                        <ul className='text-xs text-gray-500 space-y-1'>
+                                                            {billData?.terms
+                                                                ?.replace(/(\d{1,2}\.)/g, '||$1')   // add separator before each number
+                                                                .split('||')
+                                                                .filter(t => t.trim())
+                                                                .map((term, i) => (
+                                                                    <li key={i}>{term.trim()}</li>
+                                                                ))
+                                                            }
+                                                        </ul>
                                                     </div>
-                                                    <div className='border-l w-full text-center p-2'>
+                                                    <div className='border-l w-[30%] text-center p-2'>
                                                         {
                                                             companyDetails?.signature && (
                                                                 <img src={companyDetails?.signature} alt="signature" className='mx-auto' style={{ height: '30px' }} />

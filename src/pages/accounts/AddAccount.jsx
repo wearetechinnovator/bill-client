@@ -124,15 +124,15 @@ const AddAccount = ({ mode }) => {
                 <SideNav />
                 <div className='content__body'>
                     <div className='content__body__main bg-white '>
-                        <div className='w-full text-right border-b pb-2'>
-                            <div className='flex items-center'>
-                                <p>Add Bank Details</p>
-                                <Toggle
-                                    size={'sm'}
-                                    checked={form.isBankDetails}
-                                    onChange={(v) => setForm({ ...form, isBankDetails: v })}
-                                />
-                            </div>
+                        <div className='w-full text-right border-b pb-2 flex items-center gap-2'>
+                            <p>Add Bank Details</p>
+                            <Toggle
+                                size={'sm'}
+                                checked={form.isBankDetails}
+                                onChange={(v) => setForm({ ...form, isBankDetails: v })}
+                                className='w-0 mt-[-20px]'
+                            />
+
                         </div>
                         <div className='flex justify-between flex-col lg:flex-row gap-4 mt-3'>
                             <div className="w-full">

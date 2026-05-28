@@ -47,8 +47,23 @@ const PO = ({ mode }) => {
     const [additionalRows, setAdditionalRow] = useState([additionalRowSet]); //{ additionalRowsItem: 1 }
     const [formData, setFormData] = useState({
         party: '', poNumber: '', poDate: new Date().toISOString().split('T')[0], validDate: '', items: ItemRows,
-        additionalCharge: additionalRows, note: '', terms: '', discountType: '', discountAmount: '',
-        discountPercentage: '', finalAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: ''
+        additionalCharge: additionalRows, note: '', terms: `1. Price: Rates are firm and final as per PO. No extra charges will be accepted unless approved
+in writing.
+2. Delivery: Material must be delivered within the agreed schedule. Delays must be informed in
+advance. Yantra reserves the right to cancel delayed orders.
+3. Quality: Goods must be as per specifications. Defective or non-conforming material will be
+rejected or replaced at supplier’s cost.
+4. Packing: Supplier is responsible for proper packaging to avoid transit damage.
+5. Warranty: Minimum 12 months warranty from supply date unless otherwise agreed.
+6. Payment: As per PO terms and after acceptance of material. Invoice discrepancies may delay
+payment.
+7. Risk: Supply remains at supplier’s risk until received and accepted by Yantra.
+8. Confidentiality: All documents, drawings, and information are confidential and cannot be
+shared without written approval.
+9. Force Majeure: Delays due to uncontrollable events must be communicated immediately.
+10. Jurisdiction: Any dispute will fall under Mumbai jurisdiction.`, discountType: '', discountAmount: '',
+        discountPercentage: '', finalAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: '',
+        deliveryTime: ''
     })
 
     const [perPrice, setPerPrice] = useState(null);
@@ -444,6 +459,15 @@ const PO = ({ mode }) => {
                                     value={formData.validDate}
                                 />
                             </div>
+                            <div className='flex flex-col gap-2 w-full lg:w-1/3'>
+                                <p className='text-xs'>Delivery Time</p>
+                                <input type="text"
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, deliveryTime: e.target.value })
+                                    }}
+                                    value={formData.deliveryTime}
+                                />
+                            </div>
                         </div>
 
                         <div className='overflow-x-auto rounded'>
@@ -751,6 +775,7 @@ const PO = ({ mode }) => {
                                 <div>
                                     <p>Terms:</p>
                                     <textarea
+                                        rows={10}
                                         onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
                                         value={formData.terms}
                                     ></textarea>
