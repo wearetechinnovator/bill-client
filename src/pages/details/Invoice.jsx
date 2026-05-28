@@ -563,7 +563,7 @@ const Invoice = () => {
                                                             <p className='text-blue-700 font-bold' style={{ fontSize: '12px' }}>
                                                                 {companyDetails?.name}
                                                             </p>
-                                                            <p style={{ width: '350px' }}>
+                                                            <p style={{ width: '280px' }}>
                                                                 <span className='text-black font-semibold'>Address: </span>
                                                                 {companyDetails?.address}
                                                             </p>
@@ -630,7 +630,7 @@ const Invoice = () => {
                                                     <p className='text-black font-semibold uppercase' style={{ fontSize: '12px' }}>
                                                         {billData?.party.name}
                                                     </p>
-                                                    <p style={{ fontSize: '12px' }}>
+                                                    <p style={{ fontSize: '12px', maxWidth: '600px' }}>
                                                         <span className='text-black font-semibold'>Address:</span>
                                                         <span className='capitalize'>{billData?.party.billingAddress}</span>,
                                                         <span className='capitalize'>{billData?.party?.state}</span>,
@@ -871,7 +871,7 @@ const Invoice = () => {
                                                     }
                                                 </div>
                                                 <div className='w-full flex'>
-                                                    <div className='w-[70%] p-2'>
+                                                    <div className='w-[60%] p-2'>
                                                         <p className='font-semibold text-md'>Notes:</p>
                                                         <p className='text-xs text-gray-500'>{billData?.note}</p>
                                                         <br />
@@ -888,13 +888,13 @@ const Invoice = () => {
                                                             }
                                                         </ul>
                                                     </div>
-                                                    <div className='border-l w-[30%] text-center p-2'>
+                                                    <div className='border-l w-[40%] text-center p-2 flex flex-col justify-center items-center'>
                                                         {
                                                             companyDetails?.signature && (
-                                                                <img src={companyDetails?.signature} alt="signature" className='mx-auto' style={{ height: '30px' }} />
+                                                                <img src={companyDetails?.signature} alt="signature" className='mx-auto' style={{ height: '60px' }} />
                                                             )
                                                         }
-                                                        <p className='mt-5' style={{ fontSize: '10px', lineHeight: '0' }}>
+                                                        <p className='mt-2' style={{ fontSize: '10px' }}>
                                                             Authorised Signatory For
                                                         </p>
                                                         <p style={{ fontSize: '10px' }}>{companyDetails?.name}</p>

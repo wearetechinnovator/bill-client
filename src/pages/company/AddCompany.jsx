@@ -31,7 +31,7 @@ const AddCompany = () => {
 	})
 
 	const fileUpload = async (e, field) => {
-		const validatefile = await checkfile(e.target.files[0]);
+		const validatefile = await checkfile(e.target.files[0], ["jpg", "png", 'jpeg'], 1);
 		if (typeof (validatefile) !== "boolean") {
 			return toast(validatefile, 'warning');
 		}
@@ -196,7 +196,15 @@ const AddCompany = () => {
 								{/* Second col */}
 								<div className='flex flex-col gap-2'>
 									<div>
-										<p>Bill/Invoice Logo</p>
+										<p>
+											Bill/Invoice Logo
+											<span className='text-[10px] ml-2'>
+												Only JPG, PNG and JPEG file supported,
+											</span>
+											<span className='text-[10px] ml-2'>
+												Maximum file size 1MB
+											</span>
+										</p>
 										<div className='file__uploader__div'>
 											<span className='file__name'>{companyData.logoFileName}</span>
 											<div className="flex gap-2">
@@ -212,7 +220,15 @@ const AddCompany = () => {
 										</div>
 									</div>
 									<div>
-										<p>Authority Signature</p>
+										<p>
+											Authority Signature
+											<span className='text-[10px] ml-2'>
+												Only JPG, PNG and JPEG file supported,
+											</span>
+											<span className='text-[10px] ml-2'>
+												Maximum file size 1MB
+											</span>
+										</p>
 										<div className='file__uploader__div'>
 											<span className='file__name'>{companyData.signatureFileName}</span>
 											<div className="flex gap-2">

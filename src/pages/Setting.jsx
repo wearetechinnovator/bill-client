@@ -13,12 +13,14 @@ import AddPartyModal from '../components/AddPartyModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggle } from '../store/partyModalSlice';
 import { Icons } from '../helper/icons';
+import Loading from '../components/Loading';
 
 
 
 const Setting = () => {
     const toast = useMyToaster();
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
     const [siteData, setSiteData] = useState({
         title: '', moto: '', email: '', allEmail: '', contactNumber: '',
         alternativeContact: "", helplineNumber: '', emergencyNumber: '',
@@ -57,8 +59,6 @@ const Setting = () => {
                     body: JSON.stringify({ token: Cookies.get("token") })
                 });
                 const res = await req.json();
-
-                console.log(res.address)
                 setCompanyData({ ...res })
 
             } catch (error) {
@@ -86,7 +86,6 @@ const Setting = () => {
                     return toast(res.err, 'error')
                 }
                 setPartyCategory(res);
-                console.log([...res])
             } catch (error) {
                 console.log(error)
             }
@@ -97,7 +96,7 @@ const Setting = () => {
 
 
     const fileUpload = async (e, field) => {
-        const validatefile = await checkfile(e.target.files[0]);
+        const validatefile = await checkfile(e.target.files[0], ["jpg", "png", 'jpeg'], 1);
         if (typeof (validatefile) !== "boolean") {
             return toast(validatefile, 'warning');
         }
@@ -162,6 +161,7 @@ const Setting = () => {
         }
 
         try {
+            setLoading(true);
             const updateCompanyData = { ...companyData, update: true, token: Cookies.get("token") };
             // const formData = new FormData();
             // Object.keys(updateCompanyData).forEach((el, _) => {
@@ -186,6 +186,8 @@ const Setting = () => {
 
         } catch (error) {
             return toast("Something went wrong", "warning")
+        } finally {
+            setLoading(false);
         }
 
     }
@@ -268,7 +270,15 @@ const Setting = () => {
                                 {/* Second col */}
                                 <div className='flex flex-col gap-2'>
                                     <div>
-                                        <p>Bill/Invoice Logo</p>
+                                        <p>
+                                            Bill/Invoice Logo
+                                            <span className='text-[10px] ml-2'>
+                                                Only JPG, PNG and JPEG file supported,
+                                            </span>
+                                            <span className='text-[10px] ml-2'>
+                                                Maximum file size 1MB
+                                            </span>
+                                        </p>
                                         <div className='file__uploader__div'>
                                             <span className='file__name'>{companyData.logoFileName}</span>
                                             <div className="flex gap-2">
@@ -284,7 +294,15 @@ const Setting = () => {
                                         </div>
                                     </div>
                                     <div>
-                                        <p>Authority Signature</p>
+                                        <p>
+                                            Authority Signature
+                                            <span className='text-[10px] ml-2'>
+                                                Only JPG, PNG and JPEG file supported,
+                                            </span>
+                                            <span className='text-[10px] ml-2'>
+                                                Maximum file size 1MB
+                                            </span>
+                                        </p>
                                         <div className='file__uploader__div'>
                                             <span className='file__name'>{companyData.signatureFileName}</span>
                                             <div className="flex gap-2">
@@ -454,9 +472,8 @@ const Setting = () => {
                             <div className='w-full flex justify-center gap-3 my-3'>
                                 <button
                                     onClick={updateCompany}
-                                    className='bg-green-500 hover:bg-green-400 text-md text-white rounded w-[80px] flex items-center justify-center gap-1 py-2
-                  '>
-                                    <Icons.CHECK />
+                                    className='add-bill-btn'>
+                                    {loading ? <Loading /> : <Icons.CHECK />}
                                     Update
                                 </button>
                                 <button className='bg-blue-800 hover:bg-blue-700 text-md text-white rounded w-[70px] flex items-center justify-center gap-1 py-2'>

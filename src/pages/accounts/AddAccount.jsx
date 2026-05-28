@@ -11,6 +11,20 @@ import { Icons } from '../../helper/icons';
 
 
 const AddAccount = ({ mode }) => {
+    return (
+        <>
+            <Nav title={mode ? "Update Account" : "Add Account"} />
+            <main id='main'>
+                <SideNav />
+                <div className='content__body'>
+                    <AddAccountComponent mode={mode} />
+                </div>
+            </main>
+        </>
+    )
+}
+
+const AddAccountComponent = ({ mode, onSave }) => {
     const token = Cookies.get("token");
     const toast = useMyToaster();
     const { id } = useParams();
@@ -97,6 +111,11 @@ const AddAccount = ({ mode }) => {
                 navigate("/admin/account");
                 return
             }
+            
+            if(onSave) {
+                onSave(true);
+                return;
+            }
 
             toast("Account created successfully", 'success')
             navigate("/admin/account")
@@ -119,127 +138,124 @@ const AddAccount = ({ mode }) => {
 
     return (
         <>
-            <Nav title={"Account"} />
-            <main id='main'>
-                <SideNav />
-                <div className='content__body'>
-                    <div className='content__body__main bg-white '>
-                        <div className='w-full text-right border-b pb-2 flex items-center gap-2'>
-                            <p>Add Bank Details</p>
-                            <Toggle
-                                size={'sm'}
-                                checked={form.isBankDetails}
-                                onChange={(v) => setForm({ ...form, isBankDetails: v })}
-                                className='w-0 mt-[-20px]'
+            <div className='content__body__main bg-white '>
+                <div className='w-full text-right border-b pb-2 flex items-center gap-2'>
+                    <p>Add Bank Details</p>
+                    <Toggle
+                        size={'sm'}
+                        checked={form.isBankDetails}
+                        onChange={(v) => setForm({ ...form, isBankDetails: v })}
+                        className='w-0 mt-[-20px]'
+                    />
+
+                </div>
+                <div className='flex justify-between flex-col lg:flex-row gap-4 mt-3'>
+                    <div className="w-full">
+                        <div>
+                            <p>Account Name <span className='required__text'>*</span></p>
+                            <input type='text'
+                                onChange={(e) => setForm({ ...form, accountName: e.target.value })}
+                                value={form.accountName}
                             />
-
                         </div>
-                        <div className='flex justify-between flex-col lg:flex-row gap-4 mt-3'>
-                            <div className="w-full">
-                                <div>
-                                    <p>Account Name <span className='required__text'>*</span></p>
-                                    <input type='text'
-                                        onChange={(e) => setForm({ ...form, accountName: e.target.value })}
-                                        value={form.accountName}
-                                    />
-                                </div>
-                            </div>
-                            <div className="w-full flex items-center gap-4">
-                                <div className='w-full'>
-                                    <p>Opening Balance</p>
-                                    <input type="text"
-                                        onChange={(e) => {
-                                            setForm({ ...form, openingBalance: checkNumber(e.target.value) })
-                                        }}
-                                        value={form.openingBalance}
-                                    />
-                                </div>
-                                <div className='w-full'>
-                                    <p>As of Date</p>
-                                    <input type="date"
-                                        onChange={(e) => setForm({ ...form, asOfDate: e.target.value })}
-                                        value={form.asOfDate}
-                                    />
-                                </div>
-                            </div>
+                    </div>
+                    <div className="w-full flex items-center gap-4">
+                        <div className='w-full'>
+                            <p>Opening Balance</p>
+                            <input type="text"
+                                onChange={(e) => {
+                                    setForm({ ...form, openingBalance: checkNumber(e.target.value) })
+                                }}
+                                value={form.openingBalance}
+                            />
                         </div>
-
-                        {/* =======================[Bank Details]=================== */}
-                        {/* ======================================================== */}
-                        {
-                            form.isBankDetails && (
-                                <div className='flex justify-between flex-col lg:flex-row mt-2 gap-4'>
-                                    <div className="w-full flex flex-col">
-                                        <div>
-                                            <p>Bank Account Number <span className='required__text'>*</span></p>
-                                            <input type='text'
-                                                onChange={(e) => setForm({
-                                                    ...form, accountNumber: checkNumber(e.target.value)
-                                                })}
-                                                value={form.accountNumber}
-                                            />
-                                        </div>
-                                        <div className='mt-2'>
-                                            <p>IFSC Code <span className='required__text'>*</span></p>
-                                            <input type='text'
-                                                onChange={(e) => setForm({ ...form, ifscCode: e.target.value })}
-                                                value={form.ifscCode}
-                                            />
-                                        </div>
-                                        <div className='mt-2'>
-                                            <p>Account Holder Name <span className='required__text'>*</span></p>
-                                            <input type='text'
-                                                onChange={(e) => setForm({ ...form, accountHolderName: e.target.value })}
-                                                value={form.accountHolderName}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="w-full flex flex-col">
-                                        <div>
-                                            <p>Re-Enter Bank Account Number <span className='required__text'>*</span></p>
-                                            <input type='text'
-                                                onChange={(e) => setForm({
-                                                    ...form, reEnterAccountNumber: checkNumber(e.target.value)
-                                                })}
-                                                value={form.reEnterAccountNumber}
-                                            />
-                                        </div>
-                                        <div className='mt-2'>
-                                            <p>Bank & Branch Name <span className='required__text'>*</span></p>
-                                            <input type='text'
-                                                onChange={(e) => setForm({ ...form, branchName: e.target.value })}
-                                                value={form.branchName}
-                                            />
-                                        </div>
-                                        <div className='mt-2'>
-                                            <p>UPI ID</p>
-                                            <input type='text'
-                                                onChange={(e) => setForm({ ...form, upiId: e.target.value })}
-                                                value={form.upiId}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            )
-                        }
-                        <div className='w-full flex justify-center gap-3 my-3 mt-5'>
-                            <button className='add-bill-btn'
-                                onClick={saveData}>
-                                <Icons.CHECK />
-                                {mode ? "Update" : "Save"}
-                            </button>
-
-                            <button className='reset-bill-btn'
-                                onClick={clearData}>
-                                <Icons.RESET />
-                                Reset
-                            </button>
+                        <div className='w-full'>
+                            <p>As of Date</p>
+                            <input type="date"
+                                onChange={(e) => setForm({ ...form, asOfDate: e.target.value })}
+                                value={form.asOfDate}
+                            />
                         </div>
                     </div>
                 </div>
-            </main>
+
+                {/* =======================[Bank Details]=================== */}
+                {/* ======================================================== */}
+                {
+                    form.isBankDetails && (
+                        <div className='flex justify-between flex-col lg:flex-row mt-2 gap-4'>
+                            <div className="w-full flex flex-col">
+                                <div>
+                                    <p>Bank Account Number <span className='required__text'>*</span></p>
+                                    <input type='text'
+                                        onChange={(e) => setForm({
+                                            ...form, accountNumber: checkNumber(e.target.value)
+                                        })}
+                                        value={form.accountNumber}
+                                    />
+                                </div>
+                                <div className='mt-2'>
+                                    <p>IFSC Code <span className='required__text'>*</span></p>
+                                    <input type='text'
+                                        onChange={(e) => setForm({ ...form, ifscCode: e.target.value })}
+                                        value={form.ifscCode}
+                                    />
+                                </div>
+                                <div className='mt-2'>
+                                    <p>Account Holder Name <span className='required__text'>*</span></p>
+                                    <input type='text'
+                                        onChange={(e) => setForm({ ...form, accountHolderName: e.target.value })}
+                                        value={form.accountHolderName}
+                                    />
+                                </div>
+                            </div>
+                            <div className="w-full flex flex-col">
+                                <div>
+                                    <p>Re-Enter Bank Account Number <span className='required__text'>*</span></p>
+                                    <input type='text'
+                                        onChange={(e) => setForm({
+                                            ...form, reEnterAccountNumber: checkNumber(e.target.value)
+                                        })}
+                                        value={form.reEnterAccountNumber}
+                                    />
+                                </div>
+                                <div className='mt-2'>
+                                    <p>Bank & Branch Name <span className='required__text'>*</span></p>
+                                    <input type='text'
+                                        onChange={(e) => setForm({ ...form, branchName: e.target.value })}
+                                        value={form.branchName}
+                                    />
+                                </div>
+                                <div className='mt-2'>
+                                    <p>UPI ID</p>
+                                    <input type='text'
+                                        onChange={(e) => setForm({ ...form, upiId: e.target.value })}
+                                        value={form.upiId}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+                <div className='w-full flex justify-center gap-3 my-3 mt-5'>
+                    <button className='add-bill-btn'
+                        onClick={saveData}>
+                        <Icons.CHECK />
+                        {mode ? "Update" : "Save"}
+                    </button>
+
+                    <button className='reset-bill-btn'
+                        onClick={clearData}>
+                        <Icons.RESET />
+                        Reset
+                    </button>
+                </div>
+            </div>
         </>
     )
 }
 
+export {
+    AddAccountComponent
+}
 export default AddAccount
