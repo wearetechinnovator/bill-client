@@ -47,6 +47,9 @@ import { FaArrowUp } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa";
 import { IoWarningOutline } from "react-icons/io5";
 import { CiBarcode } from "react-icons/ci";
+import { MdOutlineContactPhone } from "react-icons/md";
+import { PiPhonePlusFill } from "react-icons/pi";
+import { BsTelephonePlus } from "react-icons/bs";
 
 
 
@@ -104,6 +107,8 @@ export const Icons = {
   CASH_IN: GiReceiveMoney,
   CASH_OUT: GiPayMoney,
   BARCODE: CiBarcode,
-  BALANCE_SHEET: FaBalanceScaleRight
+  BALANCE_SHEET: FaBalanceScaleRight,
+  PARTY_CONTACT: MdOutlineContactPhone,
+  PHONE_ADD: BsTelephonePlus,
 };
 

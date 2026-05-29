@@ -4,6 +4,7 @@ import useApi from '../../hooks/useApi';
 import Cookies from 'js-cookie';
 import Pagination from '../../components/Pagination';
 import useMyToaster from '../../hooks/useMyToaster';
+import DataShimmer from '../../components/DataShimmer';
 
 
 
@@ -20,6 +21,7 @@ const Ladger = ({ partyId }) => {
 	const [dataLimit, setDataLimit] = useState(50);
 	const [totalData, setTotalData] = useState();
 	const [partyBalance, setPartyBalance] = useState(0);
+	const [loading, setLoading] = useState(false);
 	const voucherInv = {
 		sales: {
 			inv: "salesInvoiceNumber",
@@ -92,19 +94,26 @@ const Ladger = ({ partyId }) => {
 	// Get party ladger details;
 	useEffect(() => {
 		(async () => {
-			const url = process.env.REACT_APP_API_URL + `/ladger/get?page=${activePage}&limit=${dataLimit}`;
-			const token = Cookies.get("token");
+			try {
+				setLoading(true);
 
-			const req = await fetch(url, {
-				method: 'POST',
-				headers: {
-					"Content-Type": 'application/json'
-				},
-				body: JSON.stringify({ partyId, token })
-			});
-			const res = await req.json();
-			setLadgers([...res.data]);
-			setTotalData(res.totalData)
+				const URL = `${process.env.REACT_APP_API_URL}/ladger/get?page=${activePage}&limit=${dataLimit}`;
+				const token = Cookies.get("token");
+				const req = await fetch(URL, {
+					method: 'POST',
+					headers: {
+						"Content-Type": 'application/json'
+					},
+					body: JSON.stringify({ partyId, token })
+				});
+				const res = await req.json();
+				setLadgers([...res.data]);
+				setTotalData(res.totalData)
+			} catch (err) {
+				return toast("Something went wrong", "error")
+			} finally {
+				setLoading(false);
+			}
 		})()
 	}, [])
 
@@ -159,46 +168,55 @@ const Ladger = ({ partyId }) => {
 				</div>
 			</div>
 
-			<div className='table__responsive mb-3'>
-				<table className='w-full border mt-2'>
-					<thead className='bg-[#F6F7FB]'>
-						<tr>
-							<td className='p-2'>Date</td>
-							<td>Voucher</td>
-							<td>Voucher No.</td>
-							<td>Credit</td>
-							<td>Debit</td>
-						</tr>
-					</thead>
-					<tbody className='text-xs'>
-						{
-							ladgers.map((l, _) => {
-								return <tr className='border-b'>
-									<td className='p-2'>{new Date(l.date).toLocaleDateString()}</td>
-									<td>{voucherInv[l.voucher].title}</td>
-									<td>
-										{
-											l.voucher !== "opening_balance" ?
-											l['voucherId'][voucherInv[l.voucher].inv]
-											:"--"
-										}
-										
-									</td>
-									<td>{l.credit}</td>
-									<td>{l.debit}</td>
-								</tr>
-							})
-						}
-					</tbody>
-				</table>
-			</div>
-			{/* table end; */}
-			<Pagination
-				activePage={activePage}
-				dataLimit={dataLimit}
-				setActivePage={setActivePage}
-				totalData={totalData}
-			/>
+			{
+				!loading ? (
+					<>
+						<div className='table__responsive mb-3'>
+							<table className='w-full border mt-2'>
+								<thead className='bg-[#F6F7FB]'>
+									<tr>
+										<td className='p-2'>Date</td>
+										<td>Voucher</td>
+										<td>Voucher No.</td>
+										<td>Credit</td>
+										<td>Debit</td>
+									</tr>
+								</thead>
+								<tbody className='text-xs'>
+									{
+										ladgers.map((l, _) => {
+											return <tr className='border-b'>
+												<td className='p-2'>{new Date(l.date).toLocaleDateString()}</td>
+												<td>{voucherInv[l.voucher].title}</td>
+												<td>
+													{
+														l.voucher !== "opening_balance" ?
+															l['voucherId'][voucherInv[l.voucher].inv]
+															: "--"
+													}
+
+												</td>
+												<td>{l.credit}</td>
+												<td>{l.debit}</td>
+											</tr>
+										})
+									}
+								</tbody>
+							</table>
+						</div>
+						{/* table end; */}
+						<Pagination
+							activePage={activePage}
+							dataLimit={dataLimit}
+							setActivePage={setActivePage}
+							totalData={totalData}
+						/>
+					</>
+				) : (
+					<DataShimmer />
+				)
+			}
+
 		</div>
 	)
 }

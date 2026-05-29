@@ -554,19 +554,19 @@ const Invoice = () => {
                                                     <tbody>
                                                         <tr>
                                                             {/* Left: Company Info */}
-                                                            <td style={{ width: '50%', padding: '12px', verticalAlign: 'middle' }}>
+                                                            <td style={{ width: '50%', padding: '12px', paddingLeft: '0' }}>
                                                                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                                                     <tbody>
                                                                         <tr>
                                                                             {/* Logo */}
-                                                                            <td style={{ width: '25%', verticalAlign: 'middle' }}>
+                                                                            {/* <td style={{ width: '25%', verticalAlign: 'middle' }}>
                                                                                 {companyDetails?.invoiceLogo && (
                                                                                     <img
                                                                                         src={companyDetails?.invoiceLogo}
                                                                                         style={{ width: 'auto', height: 'auto' }}
                                                                                     />
                                                                                 )}
-                                                                            </td>
+                                                                            </td> */}
 
                                                                             {/* Company Details */}
                                                                             <td
@@ -574,10 +574,17 @@ const Invoice = () => {
                                                                                     width: '75%',
                                                                                     fontSize: '12px',
                                                                                     verticalAlign: 'middle',
-                                                                                    paddingLeft: '20px'
+                                                                                    paddingLeft: '13px',
+                                                                                    minWidth: '200px'
                                                                                 }}
                                                                             >
-                                                                                <p
+                                                                                {companyDetails?.invoiceLogo && (
+                                                                                    <img
+                                                                                        src={companyDetails?.invoiceLogo}
+                                                                                        style={{ width: '110px', height: '90px' }}
+                                                                                    />
+                                                                                )}
+                                                                                {/* <p
                                                                                     style={{
                                                                                         fontSize: '15px',
                                                                                         color: 'black',
@@ -587,12 +594,13 @@ const Invoice = () => {
                                                                                     }}
                                                                                 >
                                                                                     {companyDetails?.name}
-                                                                                </p>
+                                                                                </p> */}
 
                                                                                 <p
                                                                                     style={{
                                                                                         margin: '0 0 4px 0',
-                                                                                        textTransform: 'capitalize'
+                                                                                        textTransform: 'capitalize',
+                                                                                        maxWidth: "400px"
                                                                                     }}
                                                                                 >
                                                                                     {companyDetails?.address}, {companyDetails?.city},{' '}
@@ -623,7 +631,7 @@ const Invoice = () => {
                                                                                                 </td>
                                                                                             )}
 
-                                                                                            {companyDetails?.pan && (
+                                                                                            {/* {companyDetails?.pan && (
                                                                                                 <td style={{ fontSize: '11px' }}>
                                                                                                     <span
                                                                                                         style={{
@@ -636,10 +644,25 @@ const Invoice = () => {
                                                                                                     :&nbsp;
                                                                                                     {companyDetails?.pan}
                                                                                                 </td>
-                                                                                            )}
+                                                                                            )} */}
                                                                                         </tr>
                                                                                     </tbody>
                                                                                 </table>
+
+                                                                                {companyDetails?.pan && (
+                                                                                    <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>
+                                                                                        <span
+                                                                                            style={{
+                                                                                                fontWeight: '600',
+                                                                                                color: 'black'
+                                                                                            }}
+                                                                                        >
+                                                                                            PAN
+                                                                                        </span>{' '}
+                                                                                        :&nbsp;
+                                                                                        {companyDetails?.pan}
+                                                                                    </p>
+                                                                                )}
 
                                                                                 {companyDetails?.phone && (
                                                                                     <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>
@@ -664,22 +687,24 @@ const Invoice = () => {
                                                             {/* Right: Bill Info */}
                                                             <td
                                                                 style={{
-                                                                    width: '50%',
+                                                                    width: '20%',
                                                                     padding: '12px',
                                                                     fontSize: '12px',
-                                                                    verticalAlign: 'top'
+                                                                    verticalAlign: 'top',  // ← align to top
+                                                                    // textAlign: 'right',
                                                                 }}
                                                             >
                                                                 <table
                                                                     style={{
                                                                         borderCollapse: 'collapse',
-                                                                        width: '100%'
+                                                                        width: '100%',
+                                                                        margin: 'auto'
                                                                     }}
                                                                 >
                                                                     <tbody>
                                                                         <tr>
                                                                             <td
-                                                                                width={'45%'}
+                                                                                width={'65%'}
                                                                                 style={{
                                                                                     padding: '0 0 4px 0',
                                                                                     fontWeight: '600',
@@ -931,19 +956,19 @@ const Invoice = () => {
                                                     </tbody>
                                                 </table>
 
-                                                <div className='w-full flex items-start justify-between border-t'>
-                                                    <div className='p-3 w-full'>
+                                                <div className='w-full flex items-start gap-6 border-t'>
+                                                    <div className='p-3' style={{ width: '60%' }}>
                                                         <p style={{ fontSize: '12px', fontWeight: "600", color: "black", textTransform: 'uppercase' }}>Billing Address</p>
                                                         <p className='capitalize' style={{ fontSize: '12px', fontWeight: "600" }}>
                                                             {billData?.party.name}
                                                         </p>
-                                                        <div style={{ fontSize: '12px', maxWidth: '600px' }}>
+                                                        <div style={{ fontSize: '12px', maxWidth: '400px', marginTop: '5px' }}>
                                                             <span className='capitalize'>{billData?.party.billingAddress}</span>,
                                                             <span className='capitalize'>{billData?.party?.state}</span>,
                                                             <span className='capitalize'>{billData?.party?.country}</span>
                                                             {billData?.party?.postalCode && ","} {billData?.party?.postalCode}
                                                         </div>
-                                                        <p style={{ fontSize: '12px' }}>
+                                                        <p style={{ fontSize: '12px', marginTop: '5px', marginBottom: '5px' }}>
                                                             <span className='text-black font-semibold'>Mobile:</span> {billData?.party.contactNumber}
                                                         </p>
                                                         <div className='uppercase text-black' style={{ fontSize: '12px' }}>
@@ -961,8 +986,8 @@ const Invoice = () => {
                                                         </div>
                                                     </div>
 
-                                                    <div className='p-3 w-full'>
-                                                        <p style={{ fontSize: '12px', fontWeight: "600", color: "black", textTransform: 'uppercase' }}>Shipping Address</p>
+                                                    <div className='p-3' style={{ width: '40%' }}>
+                                                        <p style={{ fontSize: '12px', fontWeight: "600", color: "black", textTransform: 'uppercase', textAlign: 'left' }}>Shipping Address</p>
                                                         <p style={{ fontSize: '12px', maxWidth: '600px' }}>
                                                             <span className='capitalize'>{billData?.party.shippingAddress}</span>,
                                                             <span className='capitalize'>{billData?.party?.state}</span>,
@@ -978,11 +1003,11 @@ const Invoice = () => {
                                                     <thead className='bg-[#C4E9F7]' style={{ background: "#C4E9F7" }}>
                                                         <tr>
                                                             <td align='center' valign='center' className='p-2' width={"5%"}>SL.NO</td>
-                                                            <td align='center' width={"49%"}>ITEM</td>
+                                                            <td align='center' width={"47%"}>ITEMS</td>
                                                             <td align='center' width={"7%"}>HSN</td>
-                                                            <td align='center' width={"7%"}>QTY.</td>
+                                                            <td align='center' width={"6%"}>QTY.</td>
                                                             <td align='center' width={"7%"}>RATE</td>
-                                                            <td align='center' width={"8%"}>DISCOUNT</td>
+                                                            <td align='center' width={"10%"}>DISCOUNT</td>  {/* was 8%, increase */}
                                                             <td align='center' width={"8%"}>TAX</td>
                                                             <td align='center' width={"10%"}>AMOUNT</td>
                                                         </tr>
@@ -1019,19 +1044,33 @@ const Invoice = () => {
                                                                 </tr>
                                                             })
                                                         }
+                                                        {/* blank space row */}
+                                                        <tr>
+                                                            <td
+                                                                colSpan={8}
+                                                                style={{
+                                                                    height: `${Math.max(
+                                                                        0,
+                                                                        210 - (billData?.items.length * 38)
+                                                                    )}px`,
+                                                                    border: 'none',
+                                                                    padding: 0
+                                                                }}
+                                                            />
+                                                        </tr>
                                                     </tbody>
                                                     <tfoot className='w-full'>
                                                         <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
-                                                            <td colSpan={3} align='right'>TOTAL</td>
-                                                            <td>{billDetails.qun}</td>
-                                                            <td></td>
-                                                            <td><Icons.RUPES className='inline' />{billDetails.discount}</td>
-                                                            <td><Icons.RUPES className='inline' />{billDetails.taxAmount}</td>
-                                                            <td><Icons.RUPES className='inline' />{billDetails.amount}</td>
+                                                            <td align='right' colSpan={3}>TOTAL</td>
+                                                            <td align='center'>{billDetails.qun}</td>
+                                                            <td align='center'></td>
+                                                            <td align='center'><Icons.RUPES className='inline' />{billDetails.discount}</td>
+                                                            <td align='center'><Icons.RUPES className='inline' />{billDetails.taxAmount}</td>
+                                                            <td align='center'><Icons.RUPES className='inline' />{billDetails.amount}</td>
                                                         </tr>
                                                         {billData?.roundOffAmount && <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
-                                                            <td colSpan={7} align='right' className='italic'>Round Off</td>
-                                                            <td><Icons.RUPES className='inline' />
+                                                            <td colSpan={7} align='center' className='italic'>Round Off</td>
+                                                            <td align='center'><Icons.RUPES className='inline' />
                                                                 {
                                                                     billData.roundOffType === "0" ?
                                                                         "-" + billData?.roundOffAmount :
@@ -1041,8 +1080,8 @@ const Invoice = () => {
                                                         </tr>}
                                                         {billData?.roundOffAmount && (
                                                             <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
-                                                                <td colSpan={7} align='right'>SUB TOTAL</td>
-                                                                <td><Icons.RUPES className='inline' />
+                                                                <td colSpan={7} align='center'>SUB TOTAL</td>
+                                                                <td align='center'><Icons.RUPES className='inline' />
                                                                     {
                                                                         billData.roundOffType === "0" ?
                                                                             (Number(billDetails.amount) - Number(billData?.roundOffAmount)) :
@@ -1053,11 +1092,11 @@ const Invoice = () => {
                                                         )}
                                                         <tr className='font-semibold' style={{ background: "#F3F4F6" }}>
                                                             <td colSpan={7} align='right'>Received Amount</td>
-                                                            <td><Icons.RUPES className='inline' />{billData?.paymentAmount || "0.00"}</td>
+                                                            <td align='center'><Icons.RUPES className='inline' />{billData?.paymentAmount || "0.00"}</td>
                                                         </tr>
                                                         <tr className='font-semibold' style={{ background: "#F3F4F6" }}>
                                                             <td colSpan={7} align='right'>Balance Due</td>
-                                                            <td>
+                                                            <td align='center'>
                                                                 <Icons.RUPES className='inline' />
                                                                 {((Number(billData?.finalAmount) - Number(billData?.paymentAmount)) || 0).toFixed(2)}
                                                             </td>
@@ -1072,12 +1111,12 @@ const Invoice = () => {
                                                 <table className='w-full' style={{ fontSize: '12px' }}>
                                                     <thead className='bg-[#C4E9F7]' style={{ background: "#C4E9F7" }}>
                                                         <tr>
-                                                            <td>HSN Code</td>
-                                                            <td>Taxable Value</td>
-                                                            <td>Tax Type</td>
-                                                            <td>Rate</td>
+                                                            <td align='center'>HSN Code</td>
+                                                            <td align='center'>Taxable Value</td>
+                                                            <td align='center'>Tax Type</td>
+                                                            <td align='center'>Rate</td>
                                                             {companyDetails?.state === billData?.party.state && (
-                                                                <td>Amount</td>
+                                                                <td align='center'>Amount</td>
                                                             )}
                                                             <td align='center'>Total Tax Amount</td>
                                                         </tr>
@@ -1087,8 +1126,6 @@ const Invoice = () => {
                                                         {hsnData && companyDetails?.state !== billData?.party.state && (() => {
                                                             const rows = [];
                                                             const seen = {};
-                                                            console.log(hsnData);
-
 
                                                             for (let i = 0; i < hsnData.length; i++) {
                                                                 const data = hsnData[i];
@@ -1103,10 +1140,10 @@ const Invoice = () => {
 
                                                                 rows.push(
                                                                     <tr key={`${i}-igst`}>
-                                                                        <td>{data.hsn}</td>
-                                                                        <td>{taxableValue.toFixed(2)}</td>
-                                                                        <td>IGST</td>
-                                                                        <td>{data.rate}%</td>
+                                                                        <td align='center'>{data.hsn}</td>
+                                                                        <td align='center'>{taxableValue.toFixed(2)}</td>
+                                                                        <td align='center'>IGST</td>
+                                                                        <td align='center'>{data.rate}%</td>
                                                                         <td align='center'>{igstAmount}</td>
                                                                     </tr>
                                                                 );
@@ -1127,17 +1164,17 @@ const Invoice = () => {
                                                                 return (
                                                                     <React.Fragment key={`${i}-cgst`}>
                                                                         <tr>
-                                                                            <td rowSpan={2}>{data.hsn}</td>
-                                                                            <td rowSpan={2}>{taxableValue.toFixed(2)}</td>
-                                                                            <td>SGST</td>
-                                                                            <td>{halfRate}%</td>
-                                                                            <td>{sgstAmount}</td>
-                                                                            <td rowSpan={2} align='center'>{totalTax}</td>
+                                                                            <td align='center' rowSpan={2}>{data.hsn}</td>
+                                                                            <td align='center' rowSpan={2}>{taxableValue.toFixed(2)}</td>
+                                                                            <td align='center'>SGST</td>
+                                                                            <td align='center'>{halfRate}%</td>
+                                                                            <td align='center'>{sgstAmount}</td>
+                                                                            <td align='center' rowSpan={2} align='center'>{totalTax}</td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td>CGST</td>
-                                                                            <td>{halfRate}%</td>
-                                                                            <td>{cgstAmount}</td>
+                                                                            <td align='center'>CGST</td>
+                                                                            <td align='center'>{halfRate}%</td>
+                                                                            <td align='center'>{cgstAmount}</td>
                                                                         </tr>
                                                                     </React.Fragment>
                                                                 );
@@ -1162,13 +1199,13 @@ const Invoice = () => {
                                                             <div className='w-full p-2'>
                                                                 <p className='font-bold text-md'>Bank Details</p>
                                                                 <div className='w-full flex items-center mt-2' style={{ fontSize: '12px' }}>
-                                                                    <div style={{ width: "10%" }}>
+                                                                    <div style={{ width: "20%" }}>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>Name :</p>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>IFC Code :</p>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>Account No :</p>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>Bank Name:</p>
                                                                     </div>
-                                                                    <div style={{ width: "90%" }}>
+                                                                    <div style={{ width: "80%" }}>
                                                                         <p style={{ lineHeight: '11px' }}>{accountDetails?.accountHolderName}</p>
                                                                         <p style={{ lineHeight: '11px' }}>{accountDetails?.ifscCode}</p>
                                                                         <p style={{ lineHeight: '11px' }}>{accountDetails?.accountNumber}</p>
@@ -1200,11 +1237,11 @@ const Invoice = () => {
                                                 <div className='w-full flex'>
                                                     <div className='p-2' style={{ width: "70%" }}>
                                                         {billData?.note && <p className='font-semibold text-md'>Notes:</p>}
-                                                        <p className='text-xs text-gray-500'>{billData?.note}</p>
+                                                        <p style={{ fontSize: '10px' }}>{billData?.note}</p>
                                                         <br />
 
                                                         <p className='font-semibold text-md'>Terms & Conditions:</p>
-                                                        <ul className='text-xs text-gray-500 space-y-1'>
+                                                        <ul className='space-y-1' style={{ fontSize: '10px' }}>
                                                             {billData?.terms
                                                                 ?.replace(/(\d{1,2}\.)/g, '||$1')   // add separator before each number
                                                                 .split('||')
@@ -1215,16 +1252,16 @@ const Invoice = () => {
                                                             }
                                                         </ul>
                                                     </div>
-                                                    <div className='border-l text-center p-2 flex flex-col justify-center items-center' style={{ width: "30%" }}>
+                                                    <div className='border-l text-center p-2 flex flex-col justify-end' style={{ width: "30%" }}>
                                                         {
                                                             companyDetails?.signature && (
                                                                 <img src={companyDetails?.signature} alt="signature" className='mx-auto' style={{ height: '60px' }} />
                                                             )
                                                         }
                                                         <p className='mt-2' style={{ fontSize: '10px' }}>
-                                                            Authorised Signatory For
+                                                            Authorised Signatory
                                                         </p>
-                                                        <p style={{ fontSize: '10px' }}>{companyDetails?.name}</p>
+                                                        {/* <p style={{ fontSize: '10px' }}>{companyDetails?.name}</p> */}
                                                     </div>
                                                 </div>
                                             </div>

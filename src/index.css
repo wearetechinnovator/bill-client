@@ -889,7 +889,7 @@ input[type="checkbox"]:checked::before {
   border-collapse: collapse;
 }
 
-.party__details__header {
+/* .party__details__header {
   @apply flex items-center gap-4 border-b border-gray-200;
 }
 
@@ -904,7 +904,54 @@ input[type="checkbox"]:checked::before {
   font-weight: 600;
   --tw-text-opacity: 1;
   color: rgb(0 62 50);
+} */
+
+.party__details__header {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  background: rgb(243, 243, 243);
+  padding: 8px 8px 0;
+  border-radius: 10px;
+  /* border-end-start-radius: 0;
+  border-end-end-radius: 0; */
 }
+
+.party__details__header button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #666;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  margin-right: 1px;
+  min-width: 80px;
+  transition: background 0.1s, color 0.1s;
+  z-index: 0;
+}
+
+.party__details__header button:hover:not(.active) {
+  background: #d5d5d5;
+  color: #333;
+}
+
+.party__details__header .active {
+  background: #fff;
+  color: rgb(0 62 50);
+  font-weight: 500;
+  z-index: 2;
+  box-shadow: -1px 0 0 #ccc, 1px 0 0 #ccc;
+}
+
+
+
 
 .item__details__table {
   @apply overflow-x-auto mt-3 rounded;
