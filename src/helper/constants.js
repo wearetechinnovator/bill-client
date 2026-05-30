@@ -43,5 +43,8 @@ export const Constants = {
     LOAN_RECEIVED: 'loan_received',
     ADVANCE_PAYMENT: 'advance_payment',
     BONUS: 'bonus',
-    SALARY: 'salary'
+    SALARY: 'salary',
+    PROFILE: 'profile',
+    LADGER: 'ladger',
+    CONTACT: 'contact'
 }

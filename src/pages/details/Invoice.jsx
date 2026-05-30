@@ -24,7 +24,6 @@ import ConfirmModal from '../../components/ConfirmModal';
 
 
 
-
 const Invoice = () => {
     const token = Cookies.get("token");
     const navigate = useNavigate();
@@ -45,6 +44,7 @@ const Invoice = () => {
     const [route, setRoute] = useState('');
     const [drawerOpen, setDrawerOpen] = useState(false);
     const downloadRef = useRef(null);
+    const mainBillRef = useRef(null);
     const [downloadLoading, setDownloadLoading] = useState(false);
     const [billNumber, setBillNumber] = useState('');
     const [billDate, setBillDate] = useState('');
@@ -540,7 +540,7 @@ const Invoice = () => {
 
                             {
                                 !loading ? (
-                                    <div id='mainBill' className='border border-slate-600 rounded p-4'>
+                                    <div id='mainBill' ref={mainBillRef} className='border border-slate-600 rounded p-4'>
                                         <div ref={downloadRef} id='invoice'>
                                             <p className='font-bold text-center uppercase'>{billName}</p>
                                             <div className='border border-b-0 w-full mt-3 relative'>
@@ -987,7 +987,9 @@ const Invoice = () => {
                                                     </div>
 
                                                     <div className='p-3' style={{ width: '40%' }}>
-                                                        <p style={{ fontSize: '12px', fontWeight: "600", color: "black", textTransform: 'uppercase', textAlign: 'left' }}>Shipping Address</p>
+                                                        <p style={{ fontSize: '12px', fontWeight: "600", color: "black", textTransform: 'uppercase', textAlign: 'left' }}>
+                                                            Shipping Address
+                                                        </p>
                                                         <p style={{ fontSize: '12px', maxWidth: '600px' }}>
                                                             <span className='capitalize'>{billData?.party.shippingAddress}</span>,
                                                             <span className='capitalize'>{billData?.party?.state}</span>,
@@ -995,9 +997,11 @@ const Invoice = () => {
                                                             {billData?.party?.postalCode && ","} {billData?.party?.postalCode}
                                                         </p>
                                                     </div>
-
                                                 </div>
                                             </div>
+
+                                            {/* ========================= [ITEMS TABLE] ===================== */}
+                                            {/* ===============================================================*/}
                                             <div className='table__wrapper items-page'>
                                                 <table className='w-full border item__table' style={{ fontSize: '12px' }}>
                                                     <thead className='bg-[#C4E9F7]' style={{ background: "#C4E9F7" }}>
@@ -1012,11 +1016,11 @@ const Invoice = () => {
                                                             <td align='center' width={"10%"}>AMOUNT</td>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
+                                                    <tbody className='item__table__body'>
                                                         {
                                                             billData && billData.items.map((data, index) => {
-                                                                return <tr key={data._id}>
-                                                                    <td valign='top' align='center' className='p-2 border'>{index + 1}</td>
+                                                                return <tr key={data._id} className='item__row'>
+                                                                    <td valign='top' align='center' className='p-2'>{index + 1}</td>
                                                                     <td valign='top' align='left'>
                                                                         {data.itemName}
                                                                         {data.description && <p className='text-gray-500 text-[10px] mt-1'>{data.description}</p>}
@@ -1058,6 +1062,7 @@ const Invoice = () => {
                                                                 }}
                                                             />
                                                         </tr>
+
                                                     </tbody>
                                                     <tfoot className='w-full'>
                                                         <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
@@ -1105,8 +1110,8 @@ const Invoice = () => {
                                                 </table>
                                             </div>
 
-                                            {/* ===============================[HSN AND TAX TYPES TABLE] ======================== */}
-                                            {/* ================================================================================= */}
+                                            {/* ===================[HSN AND TAX TYPES TABLE] ================= */}
+                                            {/* ===============================================================*/}
                                             <div className="print-page-break mt-2 ">
                                                 <table className='w-full' style={{ fontSize: '12px' }}>
                                                     <thead className='bg-[#C4E9F7]' style={{ background: "#C4E9F7" }}>
@@ -1199,13 +1204,13 @@ const Invoice = () => {
                                                             <div className='w-full p-2'>
                                                                 <p className='font-bold text-md'>Bank Details</p>
                                                                 <div className='w-full flex items-center mt-2' style={{ fontSize: '12px' }}>
-                                                                    <div style={{ width: "20%" }}>
+                                                                    <div style={{ width: "30%" }}>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>Name :</p>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>IFC Code :</p>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>Account No :</p>
                                                                         <p className='font-semibold' style={{ lineHeight: '11px' }}>Bank Name:</p>
                                                                     </div>
-                                                                    <div style={{ width: "80%" }}>
+                                                                    <div style={{ width: "70%" }}>
                                                                         <p style={{ lineHeight: '11px' }}>{accountDetails?.accountHolderName}</p>
                                                                         <p style={{ lineHeight: '11px' }}>{accountDetails?.ifscCode}</p>
                                                                         <p style={{ lineHeight: '11px' }}>{accountDetails?.accountNumber}</p>

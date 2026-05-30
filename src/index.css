@@ -387,6 +387,12 @@ select {
   line-height: 10px;
 }
 
+.item__table__body .item__row td {
+  border: none !important;
+  background-color: rgba(245, 245, 245, 0.438);
+  border-top: 1px solid rgb(236, 235, 235) !important;
+}
+
 #invoice thead td {
   font-weight: 500;
 }
@@ -1338,20 +1344,6 @@ input {
   text-align: center;
 }
 
-.confirm__modal button:hover {
-  background-color: #e7f5f3;
-}
-
-.confirm__modal button.cancel {
-  border: 1px solid #cfd0d3;
-}
-
-.confirm__modal button.yes {
-  border: 1px solid red;
-  color: red;
-  margin-left: 10px;
-}
-
 .add_account__section {
   @apply w-full bg-gray-50 border-gray-200 p-2 rounded;
 }
@@ -1529,4 +1521,42 @@ input {
 .context__menu {
   @apply w-[150px] h-[auto] z-[999999] rounded border absolute bg-white flex-col justify-evenly hidden p-1;
   box-shadow: 0px 0px 10px rgb(153, 153, 153);
+}
+
+
+/* Confirm Modal */
+.confirm__modal button:hover {
+  background-color: #e7f5f3;
+}
+
+/* .confirm__modal button.cancel {
+  border: 1px solid #cfd0d3;
+} */
+
+.confirm__modal button.yes {
+  border: 1px solid red;
+  color: red;
+  margin-left: 10px;
+}
+
+.confirm__modal .rs-modal-content {
+  border-radius: 4px;
+  border: 1px solid #dcdcdc;
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.confirm__modal .rs-modal-body {
+  padding: 22px;
+}
+
+.confirm__modal button {
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.confirm__modal button:focus {
+  outline: 1px solid #2563eb;
+  outline-offset: 1px;
 }
