@@ -171,7 +171,6 @@ shared without written approval.
 			{
 				const data = await getApiData("item");
 				setItems([...data.data]);
-				console.log(data.data);
 
 				const newItemData = data.data.map(d => ({ label: d.title, value: d.title }));
 				setItemData(newItemData);

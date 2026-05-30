@@ -9,7 +9,7 @@ import useMyToaster from '../../hooks/useMyToaster';
 import useApi from '../../hooks/useApi';
 import useBillPrefix from '../../hooks/useBillPrefix';
 import Cookies from 'js-cookie';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import AddPartyModal from '../../components/AddPartyModal';
 import { useDispatch, useSelector } from 'react-redux';
 import AddItemModal from '../../components/AddItemModal';
@@ -25,9 +25,11 @@ import Loading from '../../components/Loading';
 
 const Quotation = ({ mode }) => {
 	const toast = useMyToaster();
+	const token = Cookies.get("token");
 	const dispatch = useDispatch();
 	const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
 	const getItemModalState = useSelector((store) => store.itemModalSlice.show);
+	const location = useLocation();
 	const navigate = useNavigate();
 	const { id } = useParams()
 	const [loading, setLoading] = useState(false);
@@ -45,15 +47,17 @@ const Quotation = ({ mode }) => {
 	const [additionalRows, setAdditionalRow] = useState([additionalRowSet]); //{ additionalRowsItem: 1 }
 	const [formData, setFormData] = useState({
 		party: '', quotationNumber: '', estimateDate: new Date().toISOString().split('T')[0], validDate: '',
-		items: ItemRows, additionalCharge: additionalRows, note: '', terms: `1.	Shipping: Buyer bears shipping costs unless stated otherwise.
-2.	Order Changes & Cancellations: Allowed before shipment. Extra charges will apply post-
-3.	Warranties & Returns: Warranty for defects; defective returns accepted within an
-4.	Intellectual Property: Seller retains IP rights unless otherwise agreed.
-5.	Force Majeure: Seller not liable for delays caused by uncontrollable events (e.g., natural disasters).
-6.	Confidentiality: Both parties must keep shared information private.
-7.	Dispute Resolution: Arbitration in Navi Mumbai, India, under Indian law.
-8.	Indemnity: Buyer indemnifies seller against misuse-related claims.
-9.	Governing Law: Governed by Indian law, jurisdiction in Navi Mumbai.`, discountType: '',
+		items: ItemRows, additionalCharge: additionalRows, note: '',
+		terms: `1.	Shipping: Buyer bears shipping costs unless stated otherwise.
+		2.	Order Changes & Cancellations: Allowed before shipment. Extra charges will apply post-
+		3.	Warranties & Returns: Warranty for defects; defective returns accepted within an
+		4.	Intellectual Property: Seller retains IP rights unless otherwise agreed.
+		5.	Force Majeure: Seller not liable for delays caused by uncontrollable events (e.g., natural disasters).
+		6.	Confidentiality: Both parties must keep shared information private.
+		7.	Dispute Resolution: Arbitration in Navi Mumbai, India, under Indian law.
+		8.	Indemnity: Buyer indemnifies seller against misuse-related claims.
+		9.	Governing Law: Governed by Indian law, jurisdiction in Navi Mumbai.`,
+		discountType: '',
 		discountAmount: '', discountPercentage: '', finalAmount: '', autoRoundOff: false, roundOffType: '0',
 		roundOffAmount: '', enqNumber: '', deliveryTime: ''
 	})
@@ -69,13 +73,9 @@ const Quotation = ({ mode }) => {
 
 	// Store all items without filter
 	const [items, setItems] = useState([]);
-	// Store units
 	const [unit, setUnit] = useState([]);
-	// Store taxes
 	const [tax, setTax] = useState([]);
-	// Store party
 	const [party, setParty] = useState([]);
-
 
 	// store item label and value pair for dropdown
 	const [itemData, setItemData] = useState([])
@@ -89,18 +89,19 @@ const Quotation = ({ mode }) => {
 
 
 
+
+
 	// Get data when mode is update
 	const get = async () => {
-		const url = process.env.REACT_APP_API_URL + "/quotation/get";
-		const cookie = Cookies.get("token");
+		const URL = process.env.REACT_APP_API_URL + "/quotation/get";
 
 		try {
-			const req = await fetch(url, {
+			const req = await fetch(URL, {
 				method: "POST",
 				headers: {
 					"Content-Type": 'application/json'
 				},
-				body: JSON.stringify({ token: cookie, id: id })
+				body: JSON.stringify({ token, id: id })
 			})
 			const res = await req.json();
 			setFormData({
@@ -247,9 +248,13 @@ const Quotation = ({ mode }) => {
 		);
 		setFormData((prevData) => ({
 			...prevData,
-			finalAmount
+			finalAmount,
+			quotationNumber: getBillPrefix[0] + getBillPrefix[1]
 		}));
-	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType, formData.discountAmount, formData.discountType]);
+	}, [ItemRows, additionalRows,
+		formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType,
+		formData.discountAmount, formData.discountType
+	]);
 
 
 
@@ -364,6 +369,22 @@ const Quotation = ({ mode }) => {
 	}
 
 
+	// CONVERT: Enquiry to Qut;
+	useEffect(() => {
+		if(!location.state) return;
+		const data = location.state;
+
+		setFormData({
+			...formData, party: data.party._id,
+			enqNumber: data.enqNo, deliveryTime: data.deliveryDate.split("T")[0]
+		});
+		setItemRows([{
+			...itemRowSet, qun: data.qty, itemId: data.item._id,
+			hsn: data.item.hsn, price: data.item.salePrice,
+			unit: data.item.unit.map((u) => u.unit)
+		}]);
+	}, [location])
+
 	// *Clear form values;
 	const clearForm = () => {
 		setItemRows([itemRowSet]);
@@ -397,34 +418,6 @@ const Quotation = ({ mode }) => {
 
 				<div className='content__body'>
 					<div className='content__body__main bg-white' id='addQuotationTable'>
-						{/* <div className='top__btn__grp'>
-							<div className='extra__btns'>
-								{mode && <button onClick={() => {
-									swal({
-										title: "Are you sure?",
-										icon: "warning",
-										buttons: true,
-									})
-										.then((cnv) => {
-											if (cnv) {
-												swal("Quotation successfully duplicate", {
-													icon: "success",
-												});
-												navigate(`/admin/quotation-estimate/add/${id}`)
-											}
-										});
-								}}>
-									<Icons.COPY />Duplicate invoice
-								</button>}
-
-								<button onClick={saveBill}><Icons.CHECK />{mode ? "Update" : "Save"}</button>
-							</div>
-
-							<div className='flex justify-end w-full'>
-								<IoSettingsOutline />
-							</div>
-						</div> */}
-
 						<div className='flex flex-col lg:flex-row items-center justify-around gap-4'>
 							<div className='flex flex-col gap-2 w-full'>
 								<p className='text-xs'>Select Party <span className='required__text'>*</span></p>
@@ -438,14 +431,14 @@ const Quotation = ({ mode }) => {
 								/>
 							</div>
 							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
-								<p className='text-xs'>Quotation / Estimate Number <span className='required__text'>*</span></p>
+								<p className='text-xs'>Quotation / Est. Number <span className='required__text'>*</span></p>
 								<input type="text"
 									onChange={(e) => setFormData({ ...formData, quotationNumber: e.target.value })}
 									value={formData.quotationNumber}
 								/>
 							</div>
 							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
-								<p className='text-xs'>Quotation / Estimate Date <span className='required__text'>*</span></p>
+								<p className='text-xs'>Quotation / Est. Date <span className='required__text'>*</span></p>
 								<input
 									type='date'
 									onChange={(e) => {
@@ -566,7 +559,7 @@ const Quotation = ({ mode }) => {
 													value={ItemRows[index].selectedUnit}
 												>
 													{
-														ItemRows[index].unit.map((u, _) => {
+														ItemRows[index].unit?.map((u, _) => {
 															return <option key={_} value={u}>{u}</option>
 														})
 													}

@@ -50,10 +50,12 @@ import { CiBarcode } from "react-icons/ci";
 import { MdOutlineContactPhone } from "react-icons/md";
 import { PiPhonePlusFill } from "react-icons/pi";
 import { BsTelephonePlus } from "react-icons/bs";
+import { TfiHeadphoneAlt } from "react-icons/tfi";
 
 
 
 export const Icons = {
+  ENQUIRY: TfiHeadphoneAlt,
   WARNING: IoWarningOutline,
   ARROW_UP: FaArrowUp,
   ARROW_DOWN: FaArrowDown,

@@ -11,7 +11,12 @@ const useApi = () => {
     }
 
     try {
-      const url = process.env.REACT_APP_API_URL + `/${model}/get`;
+      let route = 'get';
+      if(model === 'party-contacts'){
+        route = 'get-all';
+      }
+
+      const url = process.env.REACT_APP_API_URL + `/${model}/${route}`;
       const req = await fetch(url, {
         method: "POST",
         headers: {

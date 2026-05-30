@@ -64,6 +64,11 @@ const StaffAttendance = React.lazy(() => import("./pages/StaffAttendance/StaffAt
 const AddStaffAttendance = React.lazy(() => import("./pages/StaffAttendance/AddStaffAttendance"));
 const AttendanceDetails = React.lazy(() => import("./pages/StaffAttendance/AttendanceDetails"));
 const SalarySlip = React.lazy(() => import("./pages/StaffAttendance/SalarySlip"));
+const Enquiry = React.lazy(() => import("./pages/Enquiry/Enquiry"));
+const AddEnquiry = React.lazy(() => import("./pages/Enquiry/AddEnquiry"));
+
+
+
 
 const App = () => {
   const navigate = useNavigate();
@@ -177,6 +182,9 @@ const App = () => {
         <Route path="/admin/account/edit/:id" element={<ProtectRoute><AddAccount mode="edit" /></ProtectRoute>} />
         <Route path="admin/account" element={<ProtectRoute><Accounts /></ProtectRoute>} />
 
+        <Route path="/admin/enquiry" element={<ProtectRoute><Enquiry /></ProtectRoute>} />
+        <Route path="/admin/enquiry/add" element={<ProtectRoute><AddEnquiry /></ProtectRoute>} />
+        <Route path="/admin/enquiry/edit/:id" element={<ProtectRoute><AddEnquiry mode={"edit"} /></ProtectRoute>} />
 
         <Route path="/admin/party" element={<ProtectRoute><Party /></ProtectRoute>} />
         <Route path="/admin/party/add" element={<ProtectRoute><AddParty /></ProtectRoute>} />
@@ -215,8 +223,8 @@ const App = () => {
         <Route path="/admin/role/add" element={<ProtectRoute><RoleAdd /></ProtectRoute>} />
         <Route path="/admin/role/edit" element={<ProtectRoute><RoleAdd mode="edit" /></ProtectRoute>} />
         <Route path="/admin/role" element={<ProtectRoute> <Role /> </ProtectRoute>} />
-        <Route path="/admin/user-profile/add" element={<ProtectRoute> < UserProfileAdd /></ProtectRoute>} />
-        <Route path="/admin/user-profile/edit" element={<ProtectRoute> < UserProfileAdd mode="edit" /></ProtectRoute>} />
+        {/* <Route path="/admin/user-profile/add" element={<ProtectRoute> <UserProfileAdd /></ProtectRoute>} /> */}
+        <Route path="/admin/user-profile/edit" element={<ProtectRoute> <UserProfileAdd mode="edit" /></ProtectRoute>} />
         <Route path="/admin/user-profile" element={<ProtectRoute><UserProfile /></ProtectRoute>} />
 
         <Route path="/admin/payment-out/add" element={<ProtectRoute><AddPaymentOut /></ProtectRoute>} />
@@ -227,11 +235,11 @@ const App = () => {
         <Route path="/admin/payment-in/edit/:id" element={<ProtectRoute><AddPaymentIn mode={"edit"} /></ProtectRoute>} />
         <Route path="/admin/payment-in" element={<ProtectRoute><PaymentIn /></ProtectRoute>} />
 
-        <Route path="/admin/staff-attendance" element={<ProtectRoute><StaffAttendance /></ProtectRoute>} />
+        {/* <Route path="/admin/staff-attendance" element={<ProtectRoute><StaffAttendance /></ProtectRoute>} />
         <Route path="/admin/staff-attendance/add" element={<ProtectRoute><AddStaffAttendance /></ProtectRoute>} />
         <Route path="/admin/staff-attendance/edit/:id" element={<ProtectRoute><AddStaffAttendance mode="edit" /></ProtectRoute>} />
         <Route path="/admin/staff-attendance/details/:id" element={<ProtectRoute><AttendanceDetails /></ProtectRoute>} />
-        <Route path="/admin/staff-attendance/salary-slip" element={<ProtectRoute><SalarySlip /></ProtectRoute>} />
+        <Route path="/admin/staff-attendance/salary-slip" element={<ProtectRoute><SalarySlip /></ProtectRoute>} /> */}
 
         <Route path="*" element={<NotFound />} />
       </Routes>

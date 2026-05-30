@@ -1055,7 +1055,7 @@ const Invoice = () => {
                                                                 style={{
                                                                     height: `${Math.max(
                                                                         0,
-                                                                        210 - (billData?.items.length * 38)
+                                                                        195 - (billData?.items.length * 38)
                                                                     )}px`,
                                                                     border: 'none',
                                                                     padding: 0

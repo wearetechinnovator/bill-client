@@ -68,6 +68,12 @@ const links = {
       link: '/admin/item',
       submenu: null
     },
+    {
+      name: 'Enquiry',
+      icon: <Icons.ENQUIRY />,
+      link: '/admin/enquiry',
+      submenu: null
+    },
   ],
   "sales": [
     {
@@ -299,6 +305,17 @@ const SideNav = () => {
           }
         </div>
 
+         <div className="side__nav__link__group">
+          <ul>
+            <Link to={'/admin/user-profile'} data-tooltip-id="sideBarItemToolTip">
+                <li className={`flex items-center ${"/admin/user-profile" === activePath ? 'active__link' : ''}`} >
+                  <span className='mr-3'><Icons.USERS/></span>
+                  <span>Users</span>
+                </li>
+              </Link>
+          </ul>
+        </div>
+
         <div className="side__nav__link__group">
           <h3 className='text-[16px] my-5'>Accounting Solution</h3>
           <ul className=''>
@@ -313,7 +330,7 @@ const SideNav = () => {
           </ul>
         </div>
 
-        <div className="side__nav__link__group">
+        {/* <div className="side__nav__link__group">
           <h3 className='text-[16px] my-5'>Office Solution</h3>
           <ul className=''>
             {links.Office.map((link, index) => (
@@ -325,7 +342,7 @@ const SideNav = () => {
               </Link>
             ))}
           </ul>
-        </div>
+        </div> */}
 
         <div className="side__nav__link__group">
           <h3 className='text-[16px] my-5'>Report</h3>

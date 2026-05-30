@@ -1,8 +1,8 @@
+import Cookies from 'js-cookie';
+import { Drawer } from 'rsuite';
 import React, { useEffect, useState } from 'react'
 import { Icons } from '../../helper/icons';
 import useMyToaster from '../../hooks/useMyToaster';
-import Cookies from 'js-cookie';
-import { Drawer } from 'rsuite';
 import Loading from '../../components/Loading';
 import DataShimmer from '../../components/DataShimmer';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -54,7 +54,6 @@ const Contacts = ({ partyId }) => {
 
     // Get Editable Contact, if data is successfully get, then open drawer;
     useEffect(() => {
-        console.log("id is", contactId);
         if (!contactId) return;
 
         (async () => {
@@ -89,7 +88,7 @@ const Contacts = ({ partyId }) => {
     const saveContact = async () => {
         const validations = [
             { field: contactData.name, msg: "Contact name is required" },
-            { field: contactData.designation, msg: "Designation is required" },
+            { field: contactData.email, msg: "Email is required" },
             { field: contactData.phone, msg: "Phone is required" },
         ];
 
@@ -136,7 +135,7 @@ const Contacts = ({ partyId }) => {
     const updateContact = async () => {
         const validations = [
             { field: contactData.name, msg: "Contact name is required" },
-            { field: contactData.designation, msg: "Designation is required" },
+            { field: contactData.email, msg: "Email is required" },
             { field: contactData.phone, msg: "Phone is required" },
         ];
 
@@ -170,11 +169,10 @@ const Contacts = ({ partyId }) => {
             setDrawerOpen(false);
             setContactId(null);
             clear();
-            
+
             return;
 
         } catch (err) {
-            console.log(err);
             return toast("Something went wrong", 'error');
         } finally {
             setLoading(false)
@@ -279,7 +277,6 @@ const Contacts = ({ partyId }) => {
                                                     <div className="flex items-center gap-2">
                                                         <button
                                                             onClick={() => {
-                                                                console.log(c._id);
                                                                 setContactId(c._id);
                                                                 setDrawerOpen(true);
                                                             }}
@@ -326,7 +323,6 @@ const Contacts = ({ partyId }) => {
                     )
                 }
 
-
                 {/* =============================[Add Update Drawer]======================= */}
                 {/* ======================================================================== */}
                 <Drawer
@@ -352,7 +348,7 @@ const Contacts = ({ partyId }) => {
                                 />
                             </div>
                             <div>
-                                <p className='mb-1'>Designation <span className='required__text'>*</span></p>
+                                <p className='mb-1'>Designation</p>
                                 <input type="text"
                                     onChange={(e) => setContactData({ ...contactData, designation: e.target.value })}
                                     value={contactData.designation}
@@ -371,7 +367,7 @@ const Contacts = ({ partyId }) => {
                                 />
                             </div>
                             <div>
-                                <p className='mb-1'>Email</p>
+                                <p className='mb-1'>Email <span className='required__text'>*</span></p>
                                 <input type="text"
                                     onChange={(e) => setContactData({ ...contactData, email: e.target.value })}
                                     value={contactData.email}
