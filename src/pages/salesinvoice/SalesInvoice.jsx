@@ -17,12 +17,15 @@ import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import ContextMenu from '../../components/ContextMenu';
 import TableNoData from '../../components/TableNoData';
+import { useSelector } from 'react-redux';
 
 
 
 
 const SalesInvoice = () => {
 	const toast = useMyToaster();
+	const userData = useSelector((store) => store.userDetail);
+	const isAdmin = !userData?.role || userData?.role === "admin";
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
 	const [activePage, setActivePage] = useState(1);
 	const [dataLimit, setDataLimit] = useState(10);
@@ -298,13 +301,6 @@ const SalesInvoice = () => {
 								</select>
 							</div>
 							<div className='listing__btn_grp'>
-								{/* <div className='flex w-full flex-col lg:w-[300px]'>
-									<input type='search'
-										placeholder='Search...'
-										onChange={searchTable}
-										className='p-[6px]'
-									/>
-								</div> */}
 								<button
 									onClick={() => {
 										setFilterToggle(!filterToggle);
@@ -454,46 +450,51 @@ const SalesInvoice = () => {
 					</div>
 					{
 						!loading ? totalBills?.all > 0 ? <div className='content__body__main view'>
-							<div className='flex flex-col md:flex-row justify-between items-center mb-5 gap-8'>
-								<div onClick={() => setSelectedTab(Constants.TOTAL_SALE)}
-									className={`party__data ${selectedTab === Constants.TOTAL_SALE ? 'active' : ''}`}
-								>
-									<div className='w-full flex items-center justify-between'>
-										<h6><Icons.INVOICE /> Total Sale</h6>
-										<p>{totalBills?.all}</p>
-									</div>
-									<p><Icons.RUPES />{totalSaleAmount}</p>
-								</div>
-								<div onClick={() => setSelectedTab(Constants.PAID)}
-									className={`party__data ${selectedTab === Constants.PAID ? 'active' : ''}`}
-								>
-									<div className='w-full flex items-center justify-between'>
-										<h6><Icons.TREDING_UP />Paid</h6>
-										<p>{totalBills.paid}</p>
-									</div>
-									<p><Icons.RUPES />{totalPaymentIn}</p>
-								</div>
+							{
+								isAdmin && (
+									<div className='flex flex-col md:flex-row justify-between items-center mb-5 gap-8'>
+										<div onClick={() => setSelectedTab(Constants.TOTAL_SALE)}
+											className={`party__data ${selectedTab === Constants.TOTAL_SALE ? 'active' : ''}`}
+										>
+											<div className='w-full flex items-center justify-between'>
+												<h6><Icons.INVOICE /> Total Sale</h6>
+												<p>{totalBills?.all}</p>
+											</div>
+											<p><Icons.RUPES />{totalSaleAmount}</p>
+										</div>
+										<div onClick={() => setSelectedTab(Constants.PAID)}
+											className={`party__data ${selectedTab === Constants.PAID ? 'active' : ''}`}
+										>
+											<div className='w-full flex items-center justify-between'>
+												<h6><Icons.TREDING_UP />Paid</h6>
+												<p>{totalBills.paid}</p>
+											</div>
+											<p><Icons.RUPES />{totalPaymentIn}</p>
+										</div>
 
-								<div onClick={() => setSelectedTab(Constants.UNPAID)}
-									className={`party__data ${selectedTab === Constants.UNPAID ? 'active' : ''}`}
-								>
-									<div className='w-full flex items-center justify-between'>
-										<h6><Icons.TREDING_DOWN />Unpaid</h6>
-										<p>{totalBills.unpaid}</p>
-									</div>
-									<p><Icons.RUPES /> {totalDuePayment} </p>
-								</div>
+										<div onClick={() => setSelectedTab(Constants.UNPAID)}
+											className={`party__data ${selectedTab === Constants.UNPAID ? 'active' : ''}`}
+										>
+											<div className='w-full flex items-center justify-between'>
+												<h6><Icons.TREDING_DOWN />Unpaid</h6>
+												<p>{totalBills.unpaid}</p>
+											</div>
+											<p><Icons.RUPES /> {totalDuePayment} </p>
+										</div>
 
-								<div onClick={() => setSelectedTab(Constants.CANCEL)}
-									className={`party__data ${selectedTab === Constants.CANCEL ? 'active' : ''}`}
-								>
-									<div className='w-full flex items-center justify-between'>
-										<h6><Icons.CANCEL />Cancel</h6>
-										<p>{totalBills.cancel}</p>
+										<div onClick={() => setSelectedTab(Constants.CANCEL)}
+											className={`party__data ${selectedTab === Constants.CANCEL ? 'active' : ''}`}
+										>
+											<div className='w-full flex items-center justify-between'>
+												<h6><Icons.CANCEL />Cancel</h6>
+												<p>{totalBills.cancel}</p>
+											</div>
+											<p><Icons.RUPES /> {totalCancelAmount} </p>
+										</div>
 									</div>
-									<p><Icons.RUPES /> {totalCancelAmount} </p>
-								</div>
-							</div>
+								)
+							}
+							
 
 							{/* Table start */}
 							<div className='overflow-x-auto list__table'>

@@ -57,9 +57,9 @@ const Quotation = ({ mode }) => {
 		7.	Dispute Resolution: Arbitration in Navi Mumbai, India, under Indian law.
 		8.	Indemnity: Buyer indemnifies seller against misuse-related claims.
 		9.	Governing Law: Governed by Indian law, jurisdiction in Navi Mumbai.`,
-		discountType: '',
-		discountAmount: '', discountPercentage: '', finalAmount: '', autoRoundOff: false, roundOffType: '0',
-		roundOffAmount: '', enqNumber: '', deliveryTime: ''
+		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '', 
+		autoRoundOff: false, roundOffType: '0', roundOffAmount: '', enqNumber: '', deliveryTime: '', 
+		enquiryId: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -240,6 +240,7 @@ const Quotation = ({ mode }) => {
 
 	// Calculate Final Amount
 	useEffect(() => {
+		if (!getBillPrefix) return;
 		const finalAmount = calculateFinalAmount(
 			additionalRows, formData, subTotal,
 			formData.autoRoundOff,
@@ -371,19 +372,29 @@ const Quotation = ({ mode }) => {
 
 	// CONVERT: Enquiry to Qut;
 	useEffect(() => {
-		if(!location.state) return;
+		if (!location.state) return;
 		const data = location.state;
 
 		setFormData({
-			...formData, party: data.party._id,
-			enqNumber: data.enqNo, deliveryTime: data.deliveryDate.split("T")[0]
+			...formData,
+			party: data.party._id,
+			enqNumber: data.enqNo,
+			deliveryTime: data.deliveryDate.split("T")[0],
+			enquiryId: data._id
 		});
-		setItemRows([{
-			...itemRowSet, qun: data.qty, itemId: data.item._id,
-			hsn: data.item.hsn, price: data.item.salePrice,
-			unit: data.item.unit.map((u) => u.unit)
-		}]);
-	}, [location])
+
+		setItemRows(
+			data.items.map((item) => ({
+				...itemRowSet,
+				itemName: item.item.title,
+				qun: item.qty,
+				itemId: item.item._id,
+				hsn: item.item.hsn,
+				price: item.item.salePrice,
+				unit: item.item.unit.map((u) => u.unit)
+			}))
+		);
+	}, [location]);
 
 	// *Clear form values;
 	const clearForm = () => {

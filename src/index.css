@@ -168,7 +168,7 @@ h6 {
 
 }
 
-.side__nav__links a:hover,
+.side__nav__links a span:hover,
 .side__nav__links:focus {
   text-decoration: none;
   /* color: white; */
@@ -180,6 +180,10 @@ h6 {
   background-color: white;
   color: #003628;
   font-weight: 600;
+}
+
+.side__nav .active__link a span{
+  color: #003628 !important;
 }
 
 .side__nav .active__link svg {
@@ -200,6 +204,9 @@ h6 {
 }
 
 .side__nav__links li:hover svg {
+  color: #003628;
+}
+.side__nav__links li:hover a span{
   color: #003628;
 }
 

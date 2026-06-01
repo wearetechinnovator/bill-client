@@ -21,10 +21,11 @@ const Profile = () => {
 	const [currentPasswordField, setCurrentPasswordField] = useState(false);
 	const [newPasswordField, setNewPasswordField] = useState(false);
 	const [data, setData] = useState({
-		name: '', email: '', profile: '', password: '', filename: ''
+		name: '', email: '', profile: '', filename: ''
 	});
 	const [cPassword, setCPassword] = useState({ currentPassword: '', newPassword: '' });
 	const userData = useSelector((state) => state.userDetail);
+	const isAdmin = !userData?.role || userData?.role === "admin";
 	const [visible, setVisible] = useState(1); // 1=profile | 2=password;
 	const [loading, setLoading] = useState(false);
 
@@ -50,8 +51,7 @@ const Profile = () => {
 
 
 	const updateProfile = async (e) => {
-
-		if (data.name === "" || data.email === "" || data.password === "") {
+		if (data.name === "" || data.email === "") {
 			return toast("fill the blank", "error");
 		}
 
@@ -119,7 +119,7 @@ const Profile = () => {
 
 	const clear = (which) => {
 		if (which === 1) {
-			setData({ name: '', email: '', profile: '', password: '' })
+			setData({ name: '', email: '', profile: '' })
 		} else {
 			setCPassword({ currentPassword: '', newPassword: '' })
 		}
@@ -152,12 +152,17 @@ const Profile = () => {
 											onChange={(e) => setData({ ...data, name: e.target.value })}
 											value={data.name} />
 									</div>
-									<div>
-										<p className='ml-1 mt-2'>Email</p>
-										<input type="email" className=' mb-2'
-											onChange={(e) => setData({ ...data, email: e.target.value })}
-											value={data.email} />
-									</div>
+									{
+										isAdmin && (
+											<div>
+												<p className='ml-1 mt-2'>Email</p>
+												<input type="email" className=' mb-2'
+													onChange={(e) => setData({ ...data, email: e.target.value })}
+													value={data.email} />
+											</div>
+										)
+									}
+
 								</div>
 								<div className='w-full'>
 									<div>
@@ -175,17 +180,6 @@ const Profile = () => {
 													}} />
 												}
 											</div>
-										</div>
-									</div>
-									<p className='ml-1 mt-2'>Password</p>
-									<div className='relative  '>
-										<input
-											type={profilePasswordField ? "text" : "password"}
-											onChange={(e) => setData({ ...data, password: e.target.value })}
-											value={data.password}
-										/>
-										<div className='absolute top-2 right-3 cursor-pointer' onClick={() => setProfilePasswordField(!profilePasswordField)} >
-											{profilePasswordField ? <Icons.EYE /> : <Icons.EYE_CLOSE />}
 										</div>
 									</div>
 								</div>

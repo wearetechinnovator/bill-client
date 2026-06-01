@@ -11,6 +11,7 @@ import { Constants } from '../../helper/constants';
 import MySelect2 from '../../components/MySelect2';
 import useApi from '../../hooks/useApi';
 import AddContactDrawer from '../../components/AddContactDrawer';
+import { useSelector } from 'react-redux';
 
 
 
@@ -30,13 +31,16 @@ const AddEnquiry = ({ mode }) => {
 
 const AddEnquiryComponent = ({ mode, onSave }) => {
     const token = Cookies.get("token");
+    const userData = useSelector((store) => store.userDetail);
+    const isAdmin = !userData?.role || userData?.role === "admin";
     const toast = useMyToaster();
     const navigate = useNavigate();
     const { getApiData } = useApi();
     const { id } = useParams();
+    const itemData = { item: '', qty: '' };
     const [formData, setFormData] = useState({
-        party: '', contactPerson: '', item: '', deliveryDate: '', enqNo: '',
-        message: '', qty: ''
+        party: '', contactPerson: '', items: [itemData], deliveryDate: '', enqNo: '',
+        message: '',
     })
     const [party, setParty] = useState([]);
     const [items, setItems] = useState([]);
@@ -48,17 +52,48 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
 
 
     // Get Party and Item
+    const getAssignParties = async () => {
+        try {
+            const url = process.env.REACT_APP_API_URL + `/party/get-assign-party`;
+            const req = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": 'application/json'
+                },
+                body: JSON.stringify({ token })
+            });
+            const res = await req.json();
+            if (req.status !== 200 || res.err) {
+                toast(res.err, "error");
+                return [];
+            }
+
+            return res;
+
+        } catch (error) {
+            return toast("Party data not get", "error")
+        }
+    }
     useEffect(() => {
         (async () => {
-            const partyData = await getApiData("party");
+            let partyData;
+            if (isAdmin) {
+                partyData = await getApiData("party");
+            } else {
+                partyData = await getAssignParties();
+            }
+
             const party = partyData.data.map(d => ({ label: d.name, value: d._id }));
             setParty([...party]);
+
 
             const itemData = await getApiData("item");
             const item = itemData.data.map(d => ({ label: d.title, value: d._id }));
             setItems([...item]);
         })()
-    }, [])
+    }, [isAdmin])
+
+
 
     // Get Party Contacts;
     const getParyContact = async () => {
@@ -133,10 +168,12 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                 const res = await req.json();
                 setFormData({
                     ...formData, ...res.data,
-                    deliveryDate: res.data.deliveryDate.split("T")[0]
+                    deliveryDate: res.data.deliveryDate.split("T")[0],
+                    party: res.data.party._id, contactPerson: res.data.contactPerson._id
                 });
                 setSelectedParty(res.data.party);
             } catch (er) {
+                console.log(er);
                 return toast("Data not fetch", 'error');
             }
         })()
@@ -146,17 +183,19 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
     const saveData = async (e) => {
         const validations = [
             { field: formData.party, msg: "Select party" },
-            { field: formData.item, msg: "Select item" },
             { field: formData.enqNo, msg: "Contact personal is required" },
             { field: formData.contactPerson, msg: "Contact personal is required" },
             { field: formData.deliveryDate, msg: "Delivery date is required" },
-            { field: formData.item, msg: "Email is required" },
         ];
 
         for (const item of validations) {
             if (!item.field || item.field.trim() === "") {
                 return toast(item.msg, "error");
             }
+        }
+
+        if (formData.items.length === 0 || formData.items.some(i => !i.item || !i.qty)) {
+            return toast("Please add item with quantity", "error");
         }
 
         try {
@@ -187,18 +226,21 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
     const updateData = async (e) => {
         const validations = [
             { field: formData.party, msg: "Select party" },
-            { field: formData.item, msg: "Select item" },
             { field: formData.enqNo, msg: "Contact personal is required" },
             { field: formData.contactPerson, msg: "Contact personal is required" },
             { field: formData.deliveryDate, msg: "Delivery date is required" },
-            { field: formData.item, msg: "Email is required" },
         ];
 
         for (const item of validations) {
-            if (!item.field || item.field.trim() === "") {
+            if (!item.field) {
                 return toast(item.msg, "error");
             }
         }
+
+        if (formData.items.length === 0 || formData.items.some(i => !i.item || !i.qty)) {
+            return toast("Please add item with quantity", "error");
+        }
+
 
         try {
             const url = process.env.REACT_APP_API_URL + "/enquiry/update";
@@ -244,22 +286,48 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
             />
             <div className='content__body__main bg-white '>
                 <div className='justify-between grid grid-cols-1 md:grid-cols-2 gr gap-4 mt-3'>
-                    <div>
-                        <p>Select Party <span className='required__text'>*</span></p>
-                        <SelectPicker
-                            className='w-full'
-                            menuMaxHeight={200}
-                            data={party}
-                            onChange={(v) => {
-                                setFormData({ ...formData, party: v });
-                                setSelectedParty(v);
-                            }}
-                            onClean={() => {
-                                setContactPerson([]);
-                                setSelectedParty(null);
-                            }}
-                            value={formData.party}
-                        />
+                    <div className='flex items-center gap-4'>
+                        <div className='w-full'>
+                            <p>Select Party <span className='required__text'>*</span></p>
+                            <SelectPicker
+                                className='w-full'
+                                menuMaxHeight={200}
+                                data={party}
+                                onChange={(v) => {
+                                    setFormData({ ...formData, party: v });
+                                    setSelectedParty(v);
+                                }}
+                                onClean={() => {
+                                    setContactPerson([]);
+                                    setSelectedParty(null);
+                                }}
+                                value={formData.party}
+                            />
+                        </div>
+
+                        <div className='w-full'>
+                            <div className='w-full flex items-center justify-between mb-1'>
+                                <p>Contact Person <span className='required__text'>*</span></p>
+                                {
+                                    selectedParty && (
+                                        <button
+                                            onClick={() => setContactDrawer(true)}
+                                            className='bg-blue-400 rounded py-[2px] text-white px-1 text-[10px]'>
+                                            <Icons.ADD className='inline' /> Add Contact
+                                        </button>
+                                    )
+                                }
+                            </div>
+                            <SelectPicker
+                                className='w-full'
+                                menuMaxHeight={200}
+                                data={contactPerson}
+                                onChange={(v) => {
+                                    setFormData({ ...formData, contactPerson: v })
+                                }}
+                                value={formData.contactPerson}
+                            />
+                        </div>
                     </div>
                     <div className='flex items-center gap-4'>
                         <div className='w-full'>
@@ -282,56 +350,68 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                             />
                         </div>
                     </div>
-                    <div>
-                        <div className='w-full flex items-center justify-between mb-1'>
-                            <p>Contact Person <span className='required__text'>*</span></p>
-                            {
-                                selectedParty && (
-                                    <button
-                                        onClick={() => setContactDrawer(true)}
-                                        className='bg-blue-400 rounded py-[2px] text-white px-1 text-[10px]'>
-                                        <Icons.ADD className='inline' /> Add Contact
-                                    </button>
-                                )
-                            }
-                        </div>
-                        <SelectPicker
-                            className='w-full'
-                            menuMaxHeight={200}
-                            data={contactPerson}
-                            onChange={(v) => {
-                                setFormData({ ...formData, contactPerson: v })
-                            }}
-                            value={formData.contactPerson}
-                        />
-                    </div>
-                    <div className='w-full flex items-center gap-4'>
-                        <div className='w-full'>
-                            <p>Select Item <span className='required__text'>*</span></p>
-                            <SelectPicker
-                                className='w-full'
-                                menuMaxHeight={200}
-                                data={items}
-                                onChange={(v) => {
-                                    setFormData({ ...formData, item: v })
-                                }}
-                                value={formData.item}
-                            />
-                        </div>
-                        <div className='w-full'>
-                            <p>Quntity <span className='required__text'>*</span></p>
-                            <input type="text"
-                                onChange={(e) => {
-                                    const val = e.target.value;
-                                    if (val !== "" && !/^\d+$/.test(val)) return;
-                                    setFormData({ ...formData, qty: val })
-                                }}
-                                value={formData.qty}
-                            />
-                        </div>
-                    </div>
                 </div>
-                <div className='mt-3'>
+                <div className="bg-gray-50 p-1 mt-2 rounded">
+                    <button
+                        onClick={() => {
+                            setFormData({ ...formData, items: [...formData.items, itemData] })
+                        }}
+                        className="font-semibold text-[11px] bg-blue-500 cursor-pointer px-2 py-[2px] rounded text-white mx-1">
+                        Add New +
+                    </button>
+                    {
+                        formData?.items?.map ? formData.items.map((d, i) => (
+                            <div key={i} className='w-full flex items-center gap-4 mb-2 mt-1 px-1'>
+                                <div className='w-full'>
+                                    <MySelect2
+                                        model={Constants.ITEM}
+                                        onType={(v) => {
+                                            console.log(v);
+                                            setFormData((pv) => {
+                                                const newItems = [...pv.items];
+                                                newItems[i].item = v;
+                                                return { ...pv, items: newItems }
+                                            })
+                                        }}
+
+                                        value={formData.items[i].item}
+                                    />
+                                </div>
+                                <div className='w-full'>
+                                    <input type="text"
+                                        placeholder='Quantity'
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val !== "" && !/^\d+$/.test(val)) return;
+                                            const newItem = formData.items.map((item, index) => {
+                                                if (index === i) {
+                                                    return { ...item, qty: val }
+                                                }
+                                                return item;
+                                            })
+                                            setFormData({ ...formData, items: newItem })
+                                        }}
+                                        value={d.qty}
+                                    />
+                                </div>
+                                <div>
+                                    <button className='bg-red-500 p-1 rounded text-white'
+                                        onClick={() => {
+                                            if (formData.items.length === 1) {
+                                                setFormData({ ...formData, items: [{ item: '', qty: '' }] })
+                                                return;
+                                            }
+                                            const newItem = formData.items.filter((item, index) => index !== i);
+                                            setFormData({ ...formData, items: newItem })
+                                        }}>
+                                        <Icons.DELETE size={17} />
+                                    </button>
+                                </div>
+                            </div>
+                        )) : null
+                    }
+                </div>
+                <div className='mt-2'>
                     <p>Message</p>
                     <textarea rows={3}
                         onChange={(e) => {

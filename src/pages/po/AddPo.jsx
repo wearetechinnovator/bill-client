@@ -388,38 +388,6 @@ shared without written approval.
 
                 <div className='content__body'>
                     <div className='content__body__main bg-white' id='addQuotationTable'>
-
-                        {/* <div className='top__btn__grp'>
-                            <div className='add__btns'>
-                                <button onClick={() => {
-                                    dispatch(toggle(!getPartyModalState))
-                                }}><MdOutlineAdd /> Add Party</button>
-
-                                <button onClick={() => {
-                                    dispatch(itemToggle(!getItemModalState))
-                                }}><MdOutlineAdd /> Add Item</button>
-                            </div>
-
-                            <div className='extra__btns'>
-                                {mode && <button onClick={() => {
-                                    swal({
-                                        title: "Are you sure?",
-                                        icon: "warning",
-                                        buttons: true,
-                                    })
-                                        .then((cnv) => {
-                                            if (cnv) {
-                                                swal("Quotation successfully duplicate", {
-                                                    icon: "success",
-                                                });
-                                                navigate(`/admin/purchase-order/add/${id}`)
-                                            }
-                                        });
-                                }}><Icons.COPY />Duplicate invoice</button>}
-                                <button onClick={saveBill}><Icons.CHECK />{mode ? "Update" : "Save"}</button>
-                            </div>
-                        </div> */}
-
                         <div className='flex flex-col lg:flex-row items-center justify-around gap-4'>
                             <div className='flex flex-col gap-2 w-full'>
                                 <p className='text-xs'>Select Party <span className='required__text'>*</span></p>

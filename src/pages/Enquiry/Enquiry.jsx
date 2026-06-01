@@ -43,7 +43,7 @@ const Enquiry = () => {
 			"Enq No.": e.enqNo,
 			"Party": e.party.name,
 			"Contact person": e.contactPerson.name,
-			"Item": e.item.title,
+			// "Item": e.item.title,
 			"Delivery Date": e.deliveryDate.split("T")[0]
 		}));
 	}, [enquiryData]);
@@ -86,7 +86,12 @@ const Enquiry = () => {
 
 	const selectAll = (e) => {
 		if (e.target.checked) {
-			setSelected(enquiryData.map(data => data._id));
+			setSelected(enquiryData.map(data => {
+				if (data.isConverted) {
+					return null;
+				}
+				return data._id;
+			}));
 		} else {
 			setSelected([]);
 		}
@@ -200,13 +205,6 @@ const Enquiry = () => {
 								</select>
 							</div>
 							<div className='flex items-center gap-2'>
-								{/* <div className='flex w-full flex-col lg:w-[300px]'>
-									<input type='search'
-										placeholder='Search Account Name...'
-										onChange={searchData}
-										className='p-[6px] text-xs'
-									/>
-								</div> */}
 								<button
 									onClick={() => {
 										if (selected.length === 0 || tableStatusData !== 'active') return;
@@ -258,85 +256,125 @@ const Enquiry = () => {
 					</div>
 
 					{
-						!loading ? <div className='content__body__main view'>
-							{/* Table start */}
-							<div className='overflow-x-auto list__table'>
-								<table className='min-w-full bg-white' id='listQuotation' ref={tableRef}>
-									<thead className='list__table__head'>
-										<tr>
-											<th className='py-2 px-4 border-b'>
-												<input type='checkbox'
-													onChange={selectAll}
-													checked={enquiryData.length > 0 && selected.length === enquiryData.length}
-												/>
-											</th>
-											<th align='left'>ENQ No.</th>
-											<th align='left'>Party</th>
-											<th align='left'>Contact Person</th>
-											<th align='left'>Item</th>
-											<th align='left'>Delivery Date</th>
-											<th>Action</th>
-										</tr>
-									</thead>
-									<tbody>
-										{
-											enquiryData.map((data, i) => {
-												return <tr key={i}>
-													<td className='py-2' align='center'>
-														<input type='checkbox'
-															checked={selected.includes(data._id)}
-															onChange={() => handleCheckboxChange(data._id)}
-														/>
-													</td>
-													<td align='left'>{data.enqNo}</td>
-													<td align='left'>{data.party.name}</td>
-													<td align='left'>{data.contactPerson.name}</td>
-													<td align='left'>{data.item.title}</td>
-													<td align='left'>{data.deliveryDate?.split("T")[0]}</td>
-													<td>
-														<Whisper
-															placement='leftStart'
-															trigger={"click"}
-															speaker={<Popover full>
-																<div
-																	className='table__list__action__icon'
-																	onClick={() => navigate(`/admin/enquiry/edit/${data._id}`)}
-																>
-																	<FaRegEdit className='text-[16px]' />
-																	Edit
-																</div>
-																<div
-																	className='table__list__action__icon'
-																	onClick={() => navigate(`/admin/quotation-estimate/add`, {
-																		state: { ...data }
-																	})}
-																>
-																	<Icons.CONVERT className='text-[16px]' />
-																	Convert to Quotation
-																</div>
-															</Popover>}
-														>
-															<div className='table__list__action' >
-																<FiMoreHorizontal />
-															</div>
-														</Whisper>
-													</td>
-												</tr>
-											})
-										}
-									</tbody>
-								</table>
-								<p className='py-4'>Showing {enquiryData.length} of {totalData} entries</p>
-								<Pagination
-									activePage={activePage}
-									totalData={totalData}
-									dataLimit={dataLimit}
-									setActivePage={setActivePage}
-								/>
-								{/* pagination end */}
-							</div>
-						</div>
-							: <DataShimmer />
+						!loading ? (
+							enquiryData.length > 0 ? (
+								<>
+									<div className='content__body__main view'>
+										{/* Table start */}
+										<div className='overflow-x-auto list__table'>
+											<table className='min-w-full bg-white' id='listQuotation' ref={tableRef}>
+												<thead className='list__table__head'>
+													<tr>
+														<th className='py-2 px-4 border-b'>
+															<input type='checkbox'
+																onChange={selectAll}
+																checked={enquiryData.length > 0 && selected.length === enquiryData.length}
+															/>
+														</th>
+														<th align='left'>ENQ No.</th>
+														<th align='left'>Party</th>
+														<th align='left'>Contact Person</th>
+														<th align='left'>Delivery Date</th>
+														<th align='left'>Status</th>
+														<th>Item</th>
+														<th>Action</th>
+													</tr>
+												</thead>
+												<tbody>
+													{
+														enquiryData.map((data, i) => {
+															return <tr key={i}>
+																<td className='py-2' align='center'>
+																	<input type='checkbox'
+																		checked={selected.includes(data._id)}
+																		onChange={() => handleCheckboxChange(data._id)}
+																		disabled={data.isConverted}
+																	/>
+																</td>
+																<td align='left'>{data.enqNo}</td>
+																<td align='left'>{data.party.name}</td>
+																<td align='left'>{data.contactPerson.name}</td>
+																<td align='left'>{data.deliveryDate?.split("T")[0]}</td>
+																<td align='left'>
+																	{
+																		data.isConverted ? (
+																			<span className='bg-green-100 text-green-800 px-2 rounded-full text-[11px]'>Converted</span>
+																		) : (
+																			<span className='bg-yellow-100 text-yellow-800 px-2 rounded-full text-[11px]'>Active</span>
+																		)
+																	}
+																</td>
+																<td>
+																	<Whisper
+																		placement='leftStart'
+																		trigger={"hover"}
+																		speaker={<Popover full>
+																			{
+																				data.items.map((d, i) => {
+																					return <div key={i} className='p-1 px-3 border-b last:border-0'>
+																						<div><strong>Item:</strong> {d.item.title}</div>
+																						<div><strong>Qty:</strong> {d.qty}</div>
+																					</div>
+																				})
+																			}
+																		</Popover>}
+																	>
+																		<div className='table__list__action' >
+																			<Icons.INFO_DETAILS />
+																		</div>
+																	</Whisper>
+																</td>
+																<td>
+																	<Whisper
+																		placement='leftStart'
+																		trigger={"click"}
+																		speaker={<Popover full>
+																			{
+																				!data.isConverted && (
+																					<div
+																						className='table__list__action__icon'
+																						onClick={() => navigate(`/admin/enquiry/edit/${data._id}`)}
+																					>
+																						<FaRegEdit className='text-[16px]' />
+																						Edit
+																					</div>
+																				)
+																			}
+
+																			<div
+																				className='table__list__action__icon'
+																				onClick={() => navigate(`/admin/quotation-estimate/add`, {
+																					state: { ...data }
+																				})}
+																			>
+																				<Icons.CONVERT className='text-[16px]' />
+																				Convert to Quotation
+																			</div>
+																		</Popover>}
+																	>
+																		<div className='table__list__action' >
+																			<FiMoreHorizontal />
+																		</div>
+																	</Whisper>
+																</td>
+															</tr>
+														})
+													}
+												</tbody>
+											</table>
+											<p className='py-4'>Showing {enquiryData.length} of {totalData} entries</p>
+											<Pagination
+												activePage={activePage}
+												totalData={totalData}
+												dataLimit={dataLimit}
+												setActivePage={setActivePage}
+											/>
+											{/* pagination end */}
+										</div>
+									</div>
+								</>
+							) : <AddNew title={"Enquiry"} link={"/admin/enquiry/add"} />
+						) : <DataShimmer />
 					}
 				</div>
 			</main>

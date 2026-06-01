@@ -16,6 +16,7 @@ const CompanyList = ({ isOpen, getCompanyName }) => {
   const storeVal = useSelector((state) => state.companyListModal.show);
   const userData = useSelector((state) => state.userDetail);
   const companies = Object.keys(userData).length === 0 ? [] : userData.companies;
+  const isAdmin = !userData?.role || userData?.role === "admin";
   const navigate = useNavigate();
 
 
@@ -55,7 +56,7 @@ const CompanyList = ({ isOpen, getCompanyName }) => {
 
   }
 
-  
+
   return (
     <div id='companyList'>
       <Modal open={storeVal} onClose={() => dispatch(toggleModal(false))} size={300} >
@@ -79,17 +80,22 @@ const CompanyList = ({ isOpen, getCompanyName }) => {
             ))
           }
         </Modal.Body>
-        <Modal.Footer>
-          <button
-            onClick={() => {
-              dispatch(toggleModal(false))
-              navigate("/admin/company")
-            }}
-            className='flex items-center gap-1 w-full rounded bg-[#003628] hover:bg-[#003628d7] active:bg-blue-700 text-white justify-center p-1'>
-            <IoIosAddCircle />
-            Create
-          </button>
-        </Modal.Footer>
+        {
+          isAdmin && (
+            <Modal.Footer>
+              <button
+                onClick={() => {
+                  dispatch(toggleModal(false))
+                  navigate("/admin/company")
+                }}
+                className='flex items-center gap-1 w-full rounded bg-[#003628] hover:bg-[#003628d7] active:bg-blue-700 text-white justify-center p-1'>
+                <IoIosAddCircle />
+                Create
+              </button>
+            </Modal.Footer>
+          )
+        }
+
       </Modal>
     </div>
   )

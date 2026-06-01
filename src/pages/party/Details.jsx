@@ -8,6 +8,9 @@ import Ladger from './Ladger';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Contacts from './Contacts';
 import { Constants } from '../../helper/constants';
+import { useSelector } from 'react-redux';
+
+
 
 const Details = () => {
 	const { id } = useParams();
@@ -15,6 +18,8 @@ const Details = () => {
 	const navigate = useNavigate();
 	const query = new URLSearchParams(location.search);
 	const tab = query.get("tab") || Constants.PROFILE;
+	const userData = useSelector((store) => store.userDetail);
+	const isAdmin = !userData?.role || userData?.role === "admin";
 
 	// Update URL when tab button is clicked
 	const handleTabClick = (tabName) => {
@@ -44,12 +49,17 @@ const Details = () => {
 						>
 							<Icons.USER /> Profile
 						</button>
-						<button
-							className={tab === Constants.LADGER ? "active" : ""}
-							onClick={() => handleTabClick(Constants.LADGER)}
-						>
-							<Icons.BOOK /> Ledger
-						</button>
+						{
+							isAdmin && (
+								<button
+									className={tab === Constants.LADGER ? "active" : ""}
+									onClick={() => handleTabClick(Constants.LADGER)}
+								>
+									<Icons.BOOK /> Ledger
+								</button>
+							)
+						}
+
 						<button
 							className={tab === Constants.CONTACT ? "active" : ""}
 							onClick={() => handleTabClick(Constants.CONTACT)}

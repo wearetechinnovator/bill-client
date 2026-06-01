@@ -35,7 +35,7 @@ const UserProfile = () => {
 		(async () => {
 			try {
 				setLoading(true);
-				const URL = `${process.env.REACT_APP_API_URL}/role-user/get-all`;
+				const URL = `${process.env.REACT_APP_API_URL}/user/get-all`;
 				const req = await fetch(URL, {
 					method: "POST",
 					headers: {
@@ -48,7 +48,8 @@ const UserProfile = () => {
 					return toast(res.err, "error");
 				}
 
-				setUserData([...res.data])
+				console.log(res);
+				setUserData([...res])
 
 			} catch (error) {
 				console.log(error)
@@ -76,25 +77,25 @@ const UserProfile = () => {
 									<thead className='list__table__head'>
 										<tr>
 											<th align='left' className='py-2'>Name</th>
-											<th align='left'>Phone</th>
+											<th align='left'>Role</th>
 											<th align='left'>Email</th>
 											<th>Status</th>
-											<th>Actoun</th>
+											<th>Actions</th>
 										</tr>
 									</thead>
 									<tbody>
 										{
 											userData.map((data, i) => {
 												return <tr key={i}>
-													<td align='left' className='py-2 w-[20%]'>{data.name}</td>
-													<td align='left' className='w-[20%]'>{data.phone}</td>
-													<td align='left' className='w-[20%]'>{data.email}</td>
-													<td align='left' className='w-[20%]'>
+													<td align='left' className='py-2 w-[30%]'>{data.name}</td>
+													<td align='left' className='w-[20%] capitalize'>{data.role}</td>
+													<td align='left' className='w-[30%]'>{data.email}</td>
+													<td align='center' className='w-[30%]'>
 														{
 															data.isDisable ? (
-																<span className='rounded-full px-2 py-[1px] text-white bg-red-500'>Inactive</span>
+																<span className='rounded-full px-2 text-[11px] text-white bg-red-500'>Inactive</span>
 															) : (
-																<span className='rounded-full px-2 py-[2px] text-white bg-green-500'>Active</span>
+																<span className='rounded-full px-2 text-[11px] text-white bg-green-500'>Active</span>
 															)
 														}
 													</td>
@@ -105,7 +106,7 @@ const UserProfile = () => {
 															speaker={<Popover full>
 																<div
 																	className='table__list__action__icon'
-																	onClick={() => navigate(`/admin/enquiry/edit/${data._id}`)}
+																	onClick={() => navigate(`/admin/user-profile/edit/${data._id}`)}
 																>
 																	<FaRegEdit className='text-[16px]' />
 																	Edit

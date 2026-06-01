@@ -44,22 +44,23 @@ const SalesInvoice = ({ mode }) => {
 	const [additionalRows, setAdditionalRow] = useState([additionalRowSet]); //{ additionalRowsItem: 1 }
 	const [formData, setFormData] = useState({
 		party: '', salesInvoiceNumber: '', invoiceDate: new Date().toISOString().split('T')[0], DueDate: '',
-		items: ItemRows, additionalCharge: additionalRows, note: '', terms: `1.	Payment Terms: Payment is due within [7/15] days of the invoice date; late payments incur 2% weekly interest.
-2.	Taxes & Duties: Prices exclude GST and other taxes unless stated; buyers bear additional taxes imposed by authorities
-3.	Delivery: Goods are delivered as per order terms; delays beyond our control are not our responsibility
-4.	Shipping & Handling: Buyers pay shipping unless specified; goods are dispatched at their risk, and insurance is recommended
-5.	Goods Condition: Buyers must inspect goods upon receipt and report issues within 3 days, or they are considered accepted
-6.	Warranty: Warranty covers manufacturing defects for 6/12 months; misuse and wear not covered
-7.	Returns & Replacements: Defective goods can be returned within [3/5] days in original condition; buyers cover return shipping unless agreed otherwise
-8.	Cancellation: Confirmed orders require written consent for cancellation and may incur a fee
-9.	Liability: Our liability is limited to the value of supplied goods; we are not responsible for indirect or consequential damages
-10.	Force Majeure: We are not liable for delays due to uncontrollable events like natural disasters or strikes
-12. Dispute Resolution: Disputes will first be resolved amicably; if unresolved, arbitration under
-11. Law & Jurisdiction: Governed by Indian laws; disputes resolved in Navi Mumbai courts
-12. Acceptance: Payment and order confirmation signify buyer’s agreement to terms`, discountType: '',
-		discountAmount: '', discountPercentage: '', paymentStatus: false, paymentType: Constants.CASH,
-		paymentAccount: '', paymentAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: '',
-		finalAmount: '', poNumber: '', poDate: ''
+		items: ItemRows, additionalCharge: additionalRows, note: '', 
+		terms: `1.	Payment Terms: Payment is due within [7/15] days of the invoice date; late payments incur 2% weekly interest.
+		2.	Taxes & Duties: Prices exclude GST and other taxes unless stated; buyers bear additional taxes imposed by authorities
+		3.	Delivery: Goods are delivered as per order terms; delays beyond our control are not our responsibility
+		4.	Shipping & Handling: Buyers pay shipping unless specified; goods are dispatched at their risk, and insurance is recommended
+		5.	Goods Condition: Buyers must inspect goods upon receipt and report issues within 3 days, or they are considered accepted
+		6.	Warranty: Warranty covers manufacturing defects for 6/12 months; misuse and wear not covered
+		7.	Returns & Replacements: Defective goods can be returned within [3/5] days in original condition; buyers cover return shipping unless agreed otherwise
+		8.	Cancellation: Confirmed orders require written consent for cancellation and may incur a fee
+		9.	Liability: Our liability is limited to the value of supplied goods; we are not responsible for indirect or consequential damages
+		10.	Force Majeure: We are not liable for delays due to uncontrollable events like natural disasters or strikes
+		12. Dispute Resolution: Disputes will first be resolved amicably; if unresolved, arbitration under
+		11. Law & Jurisdiction: Governed by Indian laws; disputes resolved in Navi Mumbai courts
+		12. Acceptance: Payment and order confirmation signify buyer’s agreement to terms`,
+		discountType: '', discountAmount: '', discountPercentage: '', paymentStatus: false, 
+		paymentType: Constants.CASH, paymentAccount: '', paymentAmount: '', autoRoundOff: false, 
+		roundOffType: '0', roundOffAmount: '', finalAmount: '', poNumber: '', poDate: ''
 	})
 	const location = useLocation();
 	const fromWhichBill = location.state?.fromWhichBill || null;

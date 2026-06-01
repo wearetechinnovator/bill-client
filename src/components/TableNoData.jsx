@@ -26,7 +26,7 @@ const TableNoData = () => {
                         No Data Found
                     </h3>
 
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-2 text-sm text-gray-500">
                         There are no records available right now.
                     </p>
                 </div>

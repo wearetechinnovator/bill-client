@@ -30,6 +30,9 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 	const debounceTime = useRef(null);
 	const [loading, setLoading] = useState(false);
 
+	const userData = useSelector((store) => store.userDetail);
+	const isAdmin = !userData?.role || userData?.role === "admin";
+
 
 	useEffect(() => {
 		if (selectedData) {
@@ -192,11 +195,11 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 						setShowDropDown(false);
 					}}
 					onChange={(e) => {
-						setSelectedValue(""); 
+						setSelectedValue("");
 						setSearchText(e.target.value);
 						searchData(e.target.value);
 					}}
-					placeholder={model === Constants.ITEM ? 'Search Item or Scan Barcode...' : 'Search...'}
+					placeholder="Search..."
 				/>
 				{selectedValue ?
 					<IoClose
@@ -229,29 +232,36 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 							})
 						}
 					</ul>
-					<button
-						onMouseDown={() => {
-							switch (model) {
-								case "party":
-									setPartyDrawer(true);
-									break;
-								case "item":
-									setItemDrawer(true);
-									break;
-								case "category":
-									setCategoryDrawer(true);
-									break;
-								case "partycategory":
-									dispatch(toggle(true));
-									break;
-							}
-						}}
-						className='select__add__button z-50'
-					>
-						<IoAddCircleSharp className='text-lg' />
-						Add New
-						<FaArrowRight className='text-[15px]' />
-					</button>
+					{
+						!isAdmin && model === "party" ? (
+							null
+						) : (
+							<button
+								onMouseDown={() => {
+									switch (model) {
+										case "party":
+											setPartyDrawer(true);
+											break;
+										case "item":
+											setItemDrawer(true);
+											break;
+										case "category":
+											setCategoryDrawer(true);
+											break;
+										case "partycategory":
+											dispatch(toggle(true));
+											break;
+									}
+								}}
+								className='select__add__button z-50'
+							>
+								<IoAddCircleSharp className='text-lg' />
+								Add New
+								<FaArrowRight className='text-[15px]' />
+							</button>
+						)
+					}
+
 				</div>}
 			</div>
 		</>

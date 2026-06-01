@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Icons } from '../../helper/icons'
 import useApi from '../../hooks/useApi'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 
 const Profile = () => {
@@ -9,6 +10,8 @@ const Profile = () => {
 	const { id } = useParams();
 	const [data, setData] = useState();
 	const navigate = useNavigate();
+	const userData = useSelector((store) => store.userDetail);
+	const isAdmin = !userData?.role || userData?.role === "admin";
 
 
 	useEffect(() => {
@@ -28,9 +31,14 @@ const Profile = () => {
 						General Details
 					</p>
 
-					<Icons.PENCIL
-						className='pencil'
-						onClick={() => navigate(`/admin/party/edit/${id}`)} />
+					{
+						isAdmin && (
+							<Icons.PENCIL
+								className='pencil'
+								onClick={() => navigate(`/admin/party/edit/${id}`)}
+							/>
+						)
+					}
 				</div>
 
 				<div className='flex gap-2 pl-4 mt-2'>
@@ -52,9 +60,9 @@ const Profile = () => {
 							<p className='flex items-center gap-1'>
 								<Icons.RUPES /> {data?.openingBalance || 0.00}
 								<span className='bg-gray-50 rounded-full px-[7px] py-[1px] uppercase border text-[9px]'>
-									{data?.openingBalanceType }
+									{data?.openingBalanceType}
 								</span>
-								
+
 							</p>
 						</div>
 					</div>
@@ -86,9 +94,14 @@ const Profile = () => {
 						<Icons.BUSINESS />
 						Buisness Details
 					</p>
-					<Icons.PENCIL
-						className='pencil'
-						onClick={() => navigate(`/admin/party/edit/${id}`)} />
+					{
+						isAdmin && (
+							<Icons.PENCIL
+								className='pencil'
+								onClick={() => navigate(`/admin/party/edit/${id}`)}
+							/>
+						)
+					}
 				</div>
 
 				<div className='pl-4 mt-2'>
