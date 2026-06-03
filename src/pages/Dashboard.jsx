@@ -13,6 +13,7 @@ import { Constants } from "../helper/constants";
 import { Icons } from "../helper/icons";
 import DashboardInSighnShimmer from "../components/DashboardInSighnShimmer";
 import DataShimmer from "../components/DataShimmer";
+import { useSelector } from "react-redux";
 
 
 
@@ -24,6 +25,16 @@ const data = [
 	{ name: "Group D", value: 200, fill: "#FF8042" }
 ];
 
+const COLORS = [
+	"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
+	"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
+	"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
+	"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
+	"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
+	"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
+	"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
+	"#00C49F", "#0088FE", "#FF8042", "#FFBB28"
+];
 const Dashboard = () => {
 	const token = Cookies.get("token");
 	const toast = useMyToaster();
@@ -31,19 +42,8 @@ const Dashboard = () => {
 	const [recentPurchase, setRecentPurchase] = useState([]);
 	const [recentSales, setRecentSales] = useState([]);
 	const [cashFlowData, setCashFlowData] = useState([]);
-	const COLORS = [
-		"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
-		"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
-		"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
-		"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
-		"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
-		"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
-		"#00C49F", "#0088FE", "#FF8042", "#FFBB28",
-		"#00C49F", "#0088FE", "#FF8042", "#FFBB28"
-	];
 	const [insighnLoading, setInsightLoading] = useState(true);
 	const [recentInvoiceLoading, setRecentInvoiceLoading] = useState(true);
-
 	const [balanceAmount, setBalanceAmount] = useState({});
 	const [cashInAmount, setCashInAmount] = useState(0);
 	const [cashOutAmount, setCashOutAmount] = useState(0);
@@ -53,6 +53,17 @@ const Dashboard = () => {
 	const [totalPay, setTotalPay] = useState(null);
 	const [totalOtherExpense, setTotalOtherExpense] = useState(0);
 	const [totalOtherIncome, setTotalOtherIncome] = useState(0);
+
+	// For Sales person
+	const [noOfEnq, setNoOfEnq] = useState({ total: 0, today: 0 });
+	const [noOfProforma, setNoOfProforma] = useState({ total: 0, today: 0 });
+	const [noOfSales, setNoOfSales] = useState({ total: 0, today: 0 });
+	const [noOfQuotation, setNoOfQuotation] = useState({ total: 0, today: 0 });
+
+	const userData = useSelector((store) => store.userDetail);
+	const isAdmin = !userData?.role || userData?.role === "admin";
+	const isSales = !userData?.role || userData?.role === "sales";
+
 
 
 
@@ -79,7 +90,6 @@ const Dashboard = () => {
 			setCashOutAmount(cashOut[0]?.totalCashOut || 0)
 
 		} catch (err) {
-			console.log(err);
 			return toast("Something went wrong", "error")
 		}
 	}
@@ -98,7 +108,6 @@ const Dashboard = () => {
 			if (req.status !== 200) return toast(res.err, "error");
 			setTotalSaleAmount(res[0]?.totalAmount || 0)
 		} catch (err) {
-			console.log(err);
 			return toast("Something went wrong", "error")
 		}
 	}
@@ -169,13 +178,13 @@ const Dashboard = () => {
 			setTotalOtherIncome(res.totalIncome)
 			setTotalOtherExpense(res.totalExpense)
 		} catch (err) {
-			console.log(err);
 			return toast("Something went wrong", "error")
 		}
 	}
 
-	// Dashboard Insights Function Calls;
+	// Dashboard Insights Function Calls; For Admin;
 	useEffect(() => {
+		if (isSales) return;
 		(async () => {
 			setInsightLoading(true);
 			await getCashInAndCashOut();
@@ -189,6 +198,8 @@ const Dashboard = () => {
 
 	// Get Payments, Create CashFlow;
 	useEffect(() => {
+		if (isSales) return;
+
 		const cashFlowData = [
 			{ name: "Jan" },
 			{ name: "Feb" },
@@ -233,9 +244,9 @@ const Dashboard = () => {
 		})()
 	}, []);
 
-
 	// Get Balance
 	useEffect(() => {
+		if (isSales) return;
 		(async () => {
 			try {
 				const url = process.env.REACT_APP_API_URL + `/account/get-balance`;
@@ -255,9 +266,9 @@ const Dashboard = () => {
 		})()
 	}, [])
 
-
 	// Get Account Details;
 	useEffect(() => {
+		if (isSales) return;
 		if (!balanceAmount) return;
 		if (Object.keys(balanceAmount).length === 0) return;
 
@@ -288,7 +299,6 @@ const Dashboard = () => {
 		})()
 	}, [balanceAmount])
 
-
 	// Get Recent Purchase Invoice
 	useEffect(() => {
 		(async () => {
@@ -313,7 +323,6 @@ const Dashboard = () => {
 			}
 		})()
 	}, [])
-
 
 	// Get Recent Sales Invoice
 	useEffect(() => {
@@ -344,251 +353,501 @@ const Dashboard = () => {
 	}, [])
 
 
+	// =======================================
+	// For Sales person get dashboard insight
+	// =======================================
+	const getNoOfSales = async () => {
+		try {
+			const url = process.env.REACT_APP_API_URL + `/dashboard/get-no-sales`;
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify({ token })
+			});
+			const res = await req.json();
+			if (req.status !== 200) return toast(res.err, "error");
+
+			setNoOfSales({ today: res.today, total: res.total });
+
+		} catch (err) {
+			return toast("No of sales no fetch", "error");
+		}
+	}
+
+	const getNoOfProforma = async () => {
+		try {
+			const url = process.env.REACT_APP_API_URL + `/dashboard/get-no-proforma`;
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify({ token })
+			});
+			const res = await req.json();
+			if (req.status !== 200) return toast(res.err, "error");
+
+			setNoOfProforma({ today: res.today, total: res.total });
+
+		} catch (err) {
+			return toast("No of Proforma no fetch", "error");
+		}
+	}
+
+	const getNoOfQuotation = async () => {
+		try {
+			const url = process.env.REACT_APP_API_URL + `/dashboard/get-no-quotation`;
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify({ token })
+			});
+			const res = await req.json();
+			if (req.status !== 200) return toast(res.err, "error");
+
+			setNoOfQuotation({ today: res.today, total: res.total });
+
+		} catch (err) {
+			return toast("No of Proforma no fetch", "error");
+		}
+	}
+
+	const getNoOfEnquiry = async () => {
+		try {
+			const url = process.env.REACT_APP_API_URL + `/dashboard/get-no-enquiry`;
+			const req = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify({ token })
+			});
+			const res = await req.json();
+			if (req.status !== 200) return toast(res.err, "error");
+
+			setNoOfEnq({ today: res.today, total: res.total });
+		} catch (err) {
+			return toast("No of Proforma no fetch", "error");
+		}
+	}
+	// Call this no of functions;
+	useEffect(() => {
+		(async () => {
+			setInsightLoading(true);
+			await getNoOfSales();
+			await getNoOfProforma();
+			await getNoOfQuotation();
+			await getNoOfEnquiry();
+			setInsightLoading(false);
+		})()
+	}, [])
+
 	return (
 		<>
 			<Nav title={"Dashboard"} />
 			<main id="main">
 				<SideNav />
 				<div className="content__body p-4">
-					<div className="dashboard-main-content glow-shape">
-						{/* Summary Cards */}
-						<div className="grid md:grid-cols-3 gap-6 mb-6">
-							<div className="dashboard-main-box col-span-2 shadow">
-								<h1 className="2xl:text-[20px] xl:text-[20px] text-[#333333] font-[600] mb-[10px] text-left">
-									Insights
-								</h1>
-								{
-									insighnLoading === false ? (
-										<div className="grid grid-cols-4 gap-4">
-											<div className="bg-[#E3EAFF] rounded-[10px] p-4 border shadow">
-												<div className="flex content-between">
-													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Cash In</h2>
-														<p className="text-[14px] text-[#333333]">
-															<Icons.RUPES className="inline" />{cashInAmount}
-														</p>
+					{
+						!isSales && (
+							<div className="dashboard-main-content glow-shape">
+								{/* Summary Cards */}
+								<div className="grid md:grid-cols-3 gap-6 mb-6">
+									<div className="dashboard-main-box col-span-2 shadow">
+										<h1 className="2xl:text-[20px] xl:text-[20px] text-[#333333] font-[600] mb-[10px] text-left">
+											Insights
+										</h1>
+										{
+											insighnLoading === false ? (
+												<div className="grid grid-cols-4 gap-4">
+													<div className="bg-[#E3EAFF] rounded-[10px] p-4 border shadow">
+														<div className="flex content-between">
+															<div className="interaction-left-box w-[85%]">
+																<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Cash In</h2>
+																<p className="text-[14px] text-[#333333]">
+																	<Icons.RUPES className="inline" />{cashInAmount}
+																</p>
+															</div>
+															<div className="interaction-right-box text-end w-[15%]">
+																<div className="round-stroke w-[30px] h-[30px] flex items-center content-center mx-auto">
+																	<Icons.CASH_IN size={25} color="#000" className="flex mx-auto" />
+																</div>
+															</div>
+														</div>
 													</div>
-													<div className="interaction-right-box text-end w-[15%]">
-														<div className="round-stroke w-[30px] h-[30px] flex items-center content-center mx-auto">
-															<Icons.CASH_IN size={25} color="#000" className="flex mx-auto" />
+													<div className="bg-[#E0F8FF] rounded-[10px] p-4 border shadow">
+														<div className="flex content-between">
+															<div className="interaction-left-box w-[85%]">
+																<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Cash Out</h2>
+																<p className=" text-[14px] text-[#333333]">
+																	<Icons.RUPES className="inline" />{cashOutAmount}
+																</p>
+															</div>
+															<div className="interaction-right-box text-end w-[15%]">
+																<div className="round-stroke w-[30px] h-[30px] flex items-center content-center mx-auto">
+																	<Icons.CASH_OUT size={25} color="#000" className="flex mx-auto" />
+																</div>
+															</div>
+														</div>
+													</div>
+													<div className="bg-[#E9E9E9] rounded-[10px] p-4 border shadow">
+														<div className="flex content-between">
+															<div className="interaction-left-box w-[85%]">
+																<h2 className="text-[#333333] font-[700] text-[14px] mb-2">To Collect</h2>
+																<p className="text-[14px] text-[#333333]">
+																	<Icons.RUPES className="inline" />{totalCollect}
+																</p>
+															</div>
+															<div className="interaction-right-box text-end w-[15%]">
+																<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
+															</div>
+														</div>
+													</div>
+													<div className="bg-[#E3FFFA] rounded-[10px] p-4 border shadow">
+														<div className="flex content-between">
+															<div className="interaction-left-box w-[85%]">
+																<h2 className="text-[#333333] font-[700] text-[14px] mb-2">To Pay</h2>
+																<p className="text-[14px] text-[#333333]">
+																	<Icons.RUPES className="inline" />{totalPay}
+																</p>
+															</div>
+															<div className="interaction-right-box text-end w-[15%]">
+																<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
+															</div>
+														</div>
+													</div>
+													<div className="bg-[#FFFEEF] rounded-[10px] p-4 border shadow">
+														<div className="flex content-between">
+															<div className="interaction-left-box w-[85%]">
+																<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Sales</h2>
+																<p className="text-[14px] text-[#333333]">
+																	<Icons.RUPES className="inline" />{totalSaleAmount}
+																</p>
+															</div>
+															<div className="interaction-right-box text-end w-[15%]">
+																<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
+															</div>
+														</div>
+													</div>
+													<div className="bg-[#E2FFED] rounded-[10px] p-4 border shadow">
+														<div className="flex content-between">
+															<div className="interaction-left-box w-[85%]">
+																<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Purchase</h2>
+																<p className="text-[14px] text-[#333333]">
+																	<Icons.RUPES className="inline" />{totalPurchaseAmount}
+																</p>
+															</div>
+															<div className="interaction-right-box text-end w-[15%]">
+																<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
+															</div>
+														</div>
+													</div>
+													<div className="bg-[#FEF2FF] rounded-[10px] p-4 border shadow">
+														<div className="flex content-between">
+															<div className="interaction-left-box w-[85%]">
+																<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Other Expenses</h2>
+																<p className="text-[14px] text-[#333333]">
+																	<Icons.RUPES className="inline" />{totalOtherExpense}
+																</p>
+															</div>
+															<div className="interaction-right-box text-end w-[15%]">
+																<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
+															</div>
+														</div>
+													</div>
+													<div className="bg-[#FFD9DA] rounded-[10px] p-4 border shadow">
+														<div className="flex content-between">
+															<div className="interaction-left-box w-[85%]">
+																<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Other Income</h2>
+																<p className="text-[14px] text-[#333333]">
+																	<Icons.RUPES className="inline" />{totalOtherIncome}
+																</p>
+															</div>
+															<div className="interaction-right-box text-end w-[15%]">
+																<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
+															</div>
 														</div>
 													</div>
 												</div>
-											</div>
-											<div className="bg-[#E0F8FF] rounded-[10px] p-4 border shadow">
-												<div className="flex content-between">
-													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Cash Out</h2>
-														<p className=" text-[14px] text-[#333333]">
-															<Icons.RUPES className="inline" />{cashOutAmount}
-														</p>
-													</div>
-													<div className="interaction-right-box text-end w-[15%]">
-														<div className="round-stroke w-[30px] h-[30px] flex items-center content-center mx-auto">
-															<Icons.CASH_OUT size={25} color="#000" className="flex mx-auto" />
-														</div>
-													</div>
-												</div>
-											</div>
-											<div className="bg-[#E9E9E9] rounded-[10px] p-4 border shadow">
-												<div className="flex content-between">
-													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">To Collect</h2>
-														<p className="text-[14px] text-[#333333]">
-															<Icons.RUPES className="inline" />{totalCollect}
-														</p>
-													</div>
-													<div className="interaction-right-box text-end w-[15%]">
-														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
-													</div>
-												</div>
-											</div>
-											<div className="bg-[#E3FFFA] rounded-[10px] p-4 border shadow">
-												<div className="flex content-between">
-													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">To Pay</h2>
-														<p className="text-[14px] text-[#333333]">
-															<Icons.RUPES className="inline" />{totalPay}
-														</p>
-													</div>
-													<div className="interaction-right-box text-end w-[15%]">
-														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
-													</div>
-												</div>
-											</div>
-											<div className="bg-[#FFFEEF] rounded-[10px] p-4 border shadow">
-												<div className="flex content-between">
-													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Sales</h2>
-														<p className="text-[14px] text-[#333333]">
-															<Icons.RUPES className="inline" />{totalSaleAmount}
-														</p>
-													</div>
-													<div className="interaction-right-box text-end w-[15%]">
-														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
-													</div>
-												</div>
-											</div>
-											<div className="bg-[#E2FFED] rounded-[10px] p-4 border shadow">
-												<div className="flex content-between">
-													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Purchase</h2>
-														<p className="text-[14px] text-[#333333]">
-															<Icons.RUPES className="inline" />{totalPurchaseAmount}
-														</p>
-													</div>
-													<div className="interaction-right-box text-end w-[15%]">
-														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
-													</div>
-												</div>
-											</div>
-											<div className="bg-[#FEF2FF] rounded-[10px] p-4 border shadow">
-												<div className="flex content-between">
-													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Other Expenses</h2>
-														<p className="text-[14px] text-[#333333]">
-															<Icons.RUPES className="inline" />{totalOtherExpense}
-														</p>
-													</div>
-													<div className="interaction-right-box text-end w-[15%]">
-														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
-													</div>
-												</div>
-											</div>
-											<div className="bg-[#FFD9DA] rounded-[10px] p-4 border shadow">
-												<div className="flex content-between">
-													<div className="interaction-left-box w-[85%]">
-														<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Other Income</h2>
-														<p className="text-[14px] text-[#333333]">
-															<Icons.RUPES className="inline" />{totalOtherIncome}
-														</p>
-													</div>
-													<div className="interaction-right-box text-end w-[15%]">
-														<div className="round-stroke w-[30px] h-[30px] rounded-[100px] border border-[#000] flex items-center content-center mx-auto"><BsArrowRight size={20} color="#000" className="flex mx-auto" /></div>
-													</div>
-												</div>
-											</div>
+											) : <DashboardInSighnShimmer />
+										}
+
+									</div>
+									<div className="dashboard-main-box shadow">
+										<h1 className="2xl:text-[20px] xl:text-[20px] text-[#333333] font-[600] mb-[0px] text-left">
+											Account Wise Balance
+										</h1>
+										<div style={{ width: "100%", height: "185px" }}>
+											<ResponsiveContainer width="100%" height="100%">
+												<PieChart width={400} height={400}>
+													<Pie
+														data={accountBalanceData}
+														cx="40%"
+														cy="50%"
+														innerRadius={30}
+														outerRadius={70}
+														fill="#8884d8"
+														paddingAngle={0}
+														dataKey="value"
+													>
+													</Pie>
+													<Tooltip
+														formatter={(value, name) => [`₹ ${value}`, name]}
+														contentStyle={{ backgroundColor: "#f5f5f5", borderRadius: "8px", zIndex: "99999" }}
+													/>
+													<Legend
+														layout="vertical"
+														align="right"
+														verticalAlign="middle"
+														wrapperStyle={{
+															right: 30,
+															top: "30%",
+															maxHeight: 120,
+															overflowY: "auto"
+														}}
+													/>
+												</PieChart>
+											</ResponsiveContainer>
 										</div>
-									) : <DashboardInSighnShimmer />
-								}
-
-							</div>
-							<div className="dashboard-main-box shadow">
-								<h1 className="2xl:text-[20px] xl:text-[20px] text-[#333333] font-[600] mb-[0px] text-left">
-									Account Wise Balance
-								</h1>
-								<div style={{ width: "100%", height: "185px" }}>
-									<ResponsiveContainer width="100%" height="100%">
-										<PieChart width={400} height={400}>
-											<Pie
-												data={accountBalanceData}
-												cx="40%"
-												cy="50%"
-												innerRadius={30}
-												outerRadius={70}
-												fill="#8884d8"
-												paddingAngle={0}
-												dataKey="value"
-											>
-											</Pie>
-											<Tooltip
-												formatter={(value, name) => [`₹ ${value}`, name]}
-												contentStyle={{ backgroundColor: "#f5f5f5", borderRadius: "8px", zIndex: "99999" }}
-											/>
-											<Legend
-												layout="vertical"
-												align="right"
-												verticalAlign="middle"
-												wrapperStyle={{
-													right: 30,
-													top: "30%",
-													maxHeight: 120,
-													overflowY: "auto"
-												}}
-											// formatter={(value, entry) => {
-											// 	return `${value.slice(0,6)}... : ₹ ${entry.payload.value}`;
-											// }}
-											/>
-										</PieChart>
-									</ResponsiveContainer>
+									</div>
 								</div>
-							</div>
-						</div>
 
-						{/* Charts */}
-						<div className="flex gap-6 mb-6 w-full">
-							{/* Bar Chart */}
-							<div className="dashboard-main-box w-[60%] shadow">
-								<h1 className="2xl:text-[20px] xl:text-[20px] text-[#333333] font-[700] mb-[0px] text-left">
-									Cash Flow
-								</h1>
-								<ResponsiveContainer width="100%" height={270}>
-									<BarChart data={cashFlowData}>
-										<XAxis dataKey="name" />
-										<YAxis />
-										<Tooltip />
-										<Legend />
-										<Bar dataKey="Collect" fill="#00C49F" />
-										<Bar dataKey="Pay" fill="#FF5A5F" />
-									</BarChart>
-								</ResponsiveContainer>
-							</div>
+								{/* Charts */}
+								<div className="flex gap-6 mb-6 w-full">
+									{/* Bar Chart */}
+									<div className="dashboard-main-box w-[60%] shadow">
+										<h1 className="2xl:text-[20px] xl:text-[20px] text-[#333333] font-[700] mb-[0px] text-left">
+											Cash Flow
+										</h1>
+										<ResponsiveContainer width="100%" height={270}>
+											<BarChart data={cashFlowData}>
+												<XAxis dataKey="name" />
+												<YAxis />
+												<Tooltip />
+												<Legend />
+												<Bar dataKey="Collect" fill="#00C49F" />
+												<Bar dataKey="Pay" fill="#FF5A5F" />
+											</BarChart>
+										</ResponsiveContainer>
+									</div>
 
-							{/* Pie Chart */}
-							<div className="dashboard-main-box w-[40%] shadow">
-								<h1 className="2xl:text-[20px] xl:text-[20px] text-[#333333] font-[600] mb-[10px] text-left">
-									Recent Invoices
-								</h1>
-								<div className="products-status">
-									<table className="table-fixed w-[100%]">
-										<tbody>
-											{
-												recentInvoiceLoading === false ? (
-													recentSales.length > 0 ? (
-														recentSales.map((rs, i) => {
-															let paymentStatus = Constants.UNPAID;
-															const paymentAmount = Number(rs.paymentAmount) || 0;
+									{/* Pie Chart */}
+									<div className="dashboard-main-box w-[40%] shadow">
+										<h1 className="2xl:text-[20px] xl:text-[20px] text-[#333333] font-[600] mb-[10px] text-left">
+											Recent Invoices
+										</h1>
+										<div className="products-status">
+											<table className="table-fixed w-[100%]">
+												<tbody>
+													{
+														recentInvoiceLoading === false ? (
+															recentSales.length > 0 ? (
+																recentSales.map((rs, i) => {
+																	let paymentStatus = Constants.UNPAID;
+																	const paymentAmount = Number(rs.paymentAmount) || 0;
 
-															if (rs.finalAmount === paymentAmount) {
-																paymentStatus = Constants.PAID;
-															}
-															else if (paymentAmount > 0 && paymentAmount < rs.finalAmount) {
-																paymentStatus = Constants.PARTIAL_PAID;
-															}
+																	if (rs.finalAmount === paymentAmount) {
+																		paymentStatus = Constants.PAID;
+																	}
+																	else if (paymentAmount > 0 && paymentAmount < rs.finalAmount) {
+																		paymentStatus = Constants.PARTIAL_PAID;
+																	}
 
-															if (rs.isCancel) {
-																return;
-															}
+																	if (rs.isCancel) {
+																		return;
+																	}
 
-															return (
-																<tr key={i}>
-																	<td className="flex items-center gap-[5px] w-[90%] font-(family-name:--heading-font) text-[#333333]">
-																		{i + 1}. {rs.party.name}
-																	</td>
-																	<td className="text-end text-[10px] w-[20%]" >
-																		<span className={`${paymentStatus === Constants.PAID ? 'green-badge' : paymentStatus === Constants.PARTIAL_PAID ? 'yellow-badge' : 'red-badge'} badge capitalize`}>
-																			{paymentStatus}
-																		</span>
+																	return (
+																		<tr key={i}>
+																			<td className="flex items-center gap-[5px] w-[90%] font-(family-name:--heading-font) text-[#333333]">
+																				{i + 1}. {rs.party.name}
+																			</td>
+																			<td className="text-end text-[10px] w-[20%]" >
+																				<span className={`${paymentStatus === Constants.PAID ? 'green-badge' : paymentStatus === Constants.PARTIAL_PAID ? 'yellow-badge' : 'red-badge'} badge capitalize`}>
+																					{paymentStatus}
+																				</span>
+																			</td>
+																		</tr>
+																	)
+																})
+															) : (
+																<tr>
+																	<td colSpan="2" className="text-center text-gray-500 py-4">
+																		No invoices found
 																	</td>
 																</tr>
 															)
-														})
-													) : (
-														<tr>
-															<td colSpan="2" className="text-center text-gray-500 py-4">
-																No invoices found
-															</td>
-														</tr>
-													)
-												) : <DataShimmer />
-											}
-										</tbody>
-									</table>
+														) : <DataShimmer />
+													}
+												</tbody>
+											</table>
 
+										</div>
+									</div>
 								</div>
 							</div>
-						</div>
-					</div>
+						)
+					}
+
+
+
+					{/* =========================[SALES PERSON] ================ */}
+					{/* ======================================================== */}
+					{
+						isSales && (
+							<div className="grid md:grid-cols-3 gap-6 mb-6">
+								<div className="dashboard-main-box col-span-2 shadow">
+									<h1 className="2xl:text-[20px] xl:text-[20px] text-[#333333] font-[600] mb-[10px] text-left">
+										Insights
+									</h1>
+									{
+										insighnLoading === false ? (
+											<div className="grid grid-cols-4 gap-4">
+												<div className="bg-[#E3EAFF] rounded-[10px] p-4 border shadow">
+													<div className="flex content-between">
+														<div className="interaction-left-box w-[85%]">
+															<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Enquiry</h2>
+															<p className="text-[20px] text-[#333333]">
+																{noOfEnq.total}
+															</p>
+														</div>
+													</div>
+												</div>
+												<div className="bg-[#E0F8FF] rounded-[10px] p-4 border shadow">
+													<div className="flex content-between">
+														<div className="interaction-left-box w-[85%]">
+															<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Quotation</h2>
+															<p className=" text-[20px] text-[#333333]">
+																{noOfQuotation.total}
+															</p>
+														</div>
+													</div>
+												</div>
+												<div className="bg-[#E9E9E9] rounded-[10px] p-4 border shadow">
+													<div className="flex content-between">
+														<div className="interaction-left-box w-[85%]">
+															<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Proforma</h2>
+															<p className="text-[20px] text-[#333333]">
+																{noOfProforma.total}
+															</p>
+														</div>
+													</div>
+												</div>
+												<div className="bg-[#E3FFFA] rounded-[10px] p-4 border shadow">
+													<div className="flex content-between">
+														<div className="interaction-left-box w-[85%]">
+															<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Sales</h2>
+															<p className="text-[20px] text-[#333333]">
+																{noOfSales.total}
+															</p>
+														</div>
+													</div>
+												</div>
+												<div className="bg-[#FFFEEF] rounded-[10px] p-4 border shadow">
+													<div className="flex content-between">
+														<div className="interaction-left-box w-[85%]">
+															<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Today Enquiry</h2>
+															<p className="text-[20px] text-[#333333]">
+																{noOfEnq.today}
+															</p>
+														</div>
+													</div>
+												</div>
+												<div className="bg-[#E2FFED] rounded-[10px] p-4 border shadow">
+													<div className="flex content-between">
+														<div className="interaction-left-box w-[85%]">
+															<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Today Quotation</h2>
+															<p className="text-[20px] text-[#333333]">
+																{noOfQuotation.today}
+															</p>
+														</div>
+													</div>
+												</div>
+												<div className="bg-[#FEF2FF] rounded-[10px] p-4 border shadow">
+													<div className="flex content-between">
+														<div className="interaction-left-box w-[85%]">
+															<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Today Proforma</h2>
+															<p className="text-[20px] text-[#333333]">
+																{noOfProforma.today}
+															</p>
+														</div>
+													</div>
+												</div>
+												<div className="bg-[#FFD9DA] rounded-[10px] p-4 border shadow">
+													<div className="flex content-between">
+														<div className="interaction-left-box w-[85%]">
+															<h2 className="text-[#333333] font-[700] text-[14px] mb-2">Today Sales</h2>
+															<p className="text-[20px] text-[#333333]">
+																{noOfSales.today}
+															</p>
+														</div>
+													</div>
+												</div>
+											</div>
+										) : <DashboardInSighnShimmer />
+									}
+
+								</div>
+								<div className="dashboard-main-box w-full shadow">
+									<h1 className="2xl:text-[20px] xl:text-[20px] text-[#333333] font-[600] mb-[10px] text-left">
+										Recent Invoices
+									</h1>
+									<div className="products-status">
+										<table className="table-fixed w-[100%]">
+											<tbody>
+												{
+													recentInvoiceLoading === false ? (
+														recentSales.length > 0 ? (
+															recentSales.map((rs, i) => {
+																let paymentStatus = Constants.UNPAID;
+																const paymentAmount = Number(rs.paymentAmount) || 0;
+
+																if (rs.finalAmount === paymentAmount) {
+																	paymentStatus = Constants.PAID;
+																}
+																else if (paymentAmount > 0 && paymentAmount < rs.finalAmount) {
+																	paymentStatus = Constants.PARTIAL_PAID;
+																}
+
+																if (rs.isCancel) {
+																	return;
+																}
+
+																return (
+																	<tr key={i}>
+																		<td className="flex items-center gap-[5px] w-[90%] font-(family-name:--heading-font) text-[#333333]">
+																			{i + 1}. {rs.party.name}
+																		</td>
+																		<td className="text-end text-[10px] w-[20%]" >
+																			<span className={`${paymentStatus === Constants.PAID ? 'green-badge' : paymentStatus === Constants.PARTIAL_PAID ? 'yellow-badge' : 'red-badge'} badge capitalize`}>
+																				{paymentStatus}
+																			</span>
+																		</td>
+																	</tr>
+																)
+															})
+														) : (
+															<tr>
+																<td colSpan="2" className="text-center text-gray-500 py-4">
+																	No invoices found
+																</td>
+															</tr>
+														)
+													) : <DataShimmer />
+												}
+											</tbody>
+										</table>
+
+									</div>
+								</div>
+							</div>
+						)
+					}
+
 				</div>
 			</main>
 		</>

@@ -8,6 +8,14 @@ import { useSelector } from 'react-redux';
 import { Icons } from '../helper/icons.js'
 
 
+
+const ROLE = {
+  ADMIN: 'admin',
+  SALES: 'sales',
+  MANAGER: 'manager',
+  ACCOUNT: 'accountant'
+};
+
 const salesPath = [
   "/admin/quotation-estimate",
   "/admin/quotation-estimate/add",
@@ -79,23 +87,24 @@ const links = {
     { name: 'Other Transactions', icon: <Icons.OTHERTRANSACTION />, link: '/admin/other-transaction' },
   ],
   "Report": [
-    { name: 'Balance Sheet', icon: <Icons.BALANCE_SHEET />, link: '/admin/balance-sheet' },
+    { name: 'Day Book', icon: <Icons.BOOK />, link: '/report/daybook' },
+    { name: 'Party Statement', icon: <Icons.BALANCE_SHEET />, link: '/report/party-statement' },
   ],
 };
 
-const nonAdminAllowedLinks = [
+const salesAllowLinks = [
   "/admin/dashboard",
   "/admin/assigned-party",
 
   // Unit
-  "/admin/unit",
-  "/admin/unit/add",
-  "/admin/unit/edit",
+  // "/admin/unit",
+  // "/admin/unit/add",
+  // "/admin/unit/edit",
 
   // Tax
-  "/admin/tax",
-  "/admin/tax/add",
-  "/admin/tax/edit",
+  // "/admin/tax",
+  // "/admin/tax/add",
+  // "/admin/tax/edit",
 
   // Item Category
   "/admin/item-category",
@@ -152,17 +161,36 @@ const nonAdminAllowedLinks = [
   "/admin/enquiry/edit",
 ];
 
+const managerNotAllowLinks = [
+  "/admin/account",
+  "/admin/account/add",
+  "/admin/account/edit/",
+  "/admin/other-transaction/add",
+  "/admin/other-transaction/edit",
+  "/admin/other-transaction",
+  "/admin/balance-sheet",
+  "/admin/assigned-party",
+  "/admin/user-profile",
+  "/admin/user-profile/edit/"
+]
+
+
+
 const SideNav = () => {
   const userData = useSelector((store) => store.userDetail);
   const { pathname: activePath } = useLocation();
   const [salesOpen, setSalesOpen] = useState(false);
   const [purshaseOpen, setPurshaseOpen] = useState(false);
-
-  const isAdmin = !userData?.role || userData?.role === "admin";
+  const isAdmin = !userData?.role || userData?.role === ROLE.ADMIN;
 
   const canSee = (link) => {
+    const role = userData?.role;
+
     if (isAdmin) return true;
-    return nonAdminAllowedLinks.some(allowed => link.startsWith(allowed));
+    else if (role == ROLE.SALES)
+      return salesAllowLinks.some(allowed => link.startsWith(allowed));
+    else if (role === ROLE.MANAGER)
+      return !managerNotAllowLinks.some(allowed => link.startsWith(allowed));
   };
 
   useEffect(() => {

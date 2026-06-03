@@ -68,6 +68,9 @@ const SalarySlip = React.lazy(() => import("./pages/StaffAttendance/SalarySlip")
 const Enquiry = React.lazy(() => import("./pages/Enquiry/Enquiry"));
 const AddEnquiry = React.lazy(() => import("./pages/Enquiry/AddEnquiry"));
 
+// reports
+const DayBook = React.lazy(() => import("./pages/Report/DayBook"));
+
 
 
 
@@ -110,7 +113,6 @@ const App = () => {
 
         {/* Print part */}
         <Route path="/admin/bill/details/:bill/:id" element={<ProtectRoute><Invoice /></ProtectRoute>} />
-
 
         {/* Quotatin route */}
         <Route path="/admin/quotation-estimate" element={<ProtectRoute><Quotation /></ProtectRoute>} />
@@ -237,6 +239,11 @@ const App = () => {
         <Route path="/admin/staff-attendance/edit/:id" element={<ProtectRoute><AddStaffAttendance mode="edit" /></ProtectRoute>} />
         <Route path="/admin/staff-attendance/details/:id" element={<ProtectRoute><AttendanceDetails /></ProtectRoute>} />
         <Route path="/admin/staff-attendance/salary-slip" element={<ProtectRoute><SalarySlip /></ProtectRoute>} /> */}
+
+
+        {/* ============================[Reports]======================= */}
+        {/* ============================================================ */}
+        <Route path="/report/daybook" element={<ProtectRoute><DayBook /></ProtectRoute >} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

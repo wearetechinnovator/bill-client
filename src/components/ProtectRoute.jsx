@@ -5,12 +5,21 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 
+const ROLE = {
+    ADMIN: 'admin',
+    SALES: 'sales',
+    MANAGER: 'manager',
+    ACCOUNT: 'accountant'
+};
 const ProtectRoute = ({ children }) => {
-    const { pathname } = useLocation()
+    const { pathname } = useLocation();
     const toast = useMyToaster();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const userData = useSelector(state => state.userDetail);
+
+
+    // Sales person Access this routes;
     const nonAdminRoutes = [
         "/admin/bill/details/",
         "/admin/dashboard",
@@ -19,14 +28,14 @@ const ProtectRoute = ({ children }) => {
         "/admin/party/details/",
 
         // Unit
-        "/admin/unit",
-        "/admin/unit/add",
-        "/admin/unit/edit",
+        // "/admin/unit",
+        // "/admin/unit/add",
+        // "/admin/unit/edit",
 
         // Tax
-        "/admin/tax",
-        "/admin/tax/add",
-        "/admin/tax/edit",
+        // "/admin/tax",
+        // "/admin/tax/add",
+        // "/admin/tax/edit",
 
         // Item Category
         "/admin/item-category",
@@ -83,6 +92,20 @@ const ProtectRoute = ({ children }) => {
         "/admin/enquiry/edit",
     ];
 
+    // Manager not access this routes;
+    const managerRoutes = [
+        "/admin/account",
+        "/admin/account/add",
+        "/admin/account/edit/",
+        "/admin/other-transaction/add",
+        "/admin/other-transaction/edit",
+        "/admin/other-transaction",
+        "/admin/balance-sheet",
+        "/admin/assigned-party",
+        "/admin/user-profile",
+        "/admin/user-profile/edit"
+    ];
+
 
 
     useEffect(() => {
@@ -122,15 +145,20 @@ const ProtectRoute = ({ children }) => {
         // =======================[ROLE BASED ACCESSED]=======================
         // ===================================================================
         let role = userData.role;
-        if (role && role !== "admin") {
+        if (role && role !== ROLE.ADMIN && role === ROLE.SALES) {
             if (!nonAdminRoutes.some(route => pathname.includes(route))) {
+                return navigate("/notfound");
+            }
+        }
+
+        if (role && role !== ROLE.ADMIN && role === ROLE.MANAGER) {
+            if (managerRoutes.some(route => pathname.includes(route))) {
                 return navigate("/notfound");
             }
         }
 
 
         checkToken();
-
     }, [navigate, toast, userData])
 
 
@@ -147,7 +175,6 @@ const ProtectRoute = ({ children }) => {
             {loading ? <p></p> : children}
         </>
     )
-
 }
 
 
