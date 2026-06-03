@@ -52,6 +52,8 @@ const AssignedParty = () => {
     const [selectedTab, setSelectedTab] = useState(TOTAL_PARTY);
     const [searchText, setSearchText] = useState("");
     let debounceRef = useRef(null);
+    const [copiedData, setCopiedData] = useState({ index: null, type: "" });
+
 
 
 
@@ -86,6 +88,14 @@ const AssignedParty = () => {
         getPartyData();
     }, [tableStatusData, selectedTab, searchText]);
 
+    useEffect(() => {
+        if (copiedData.index !== null) {
+            const timer = setTimeout(() => {
+                setCopiedData({ index: null, type: "" });
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [copiedData])
 
 
     const searchData = (e) => {
@@ -139,8 +149,10 @@ const AssignedParty = () => {
                                     <thead className='list__table__head'>
                                         <tr>
                                             <th className='py-2 w-[40%]' align='left'>Name</th>
-                                            <th className='py-2 w-[40%]' align='left'>Mobile Number</th>
+                                            <th className='py-2 w-[20%]' align='left'>Mobile Number</th>
+                                            <th className='py-2 w-[20%]' align='left'>Email</th>
                                             <th className='py-2 w-[20%]' align='left'>Party Type</th>
+                                            <th className='py-2 w-[10%]' align='center'>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -150,11 +162,64 @@ const AssignedParty = () => {
 
                                                 return <tr key={i} onClick={() => navigate("/admin/party/details/" + data._id)} className='cursor-pointer hover:bg-gray-100'>
                                                     <td className='py-2'>{data.name}</td>
-                                                    <td>{data.contactNumber}</td>
+                                                    <td>
+                                                        {
+                                                            data.contactNumber && (
+                                                                <div className='flex items-center gap-2'>
+                                                                    {data.contactNumber}
+                                                                    <button
+                                                                        className='w-[25px] h-[25px] flex items-center justify-center rounded bg-green-100 text-green-500'
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setCopiedData({ index: i, type: "contactNumber" });
+                                                                            navigator.clipboard.writeText(data.contactNumber)
+                                                                        }}>
+                                                                        {
+                                                                            copiedData.index === i && copiedData.type === "contactNumber" ? (
+                                                                                <Icons.CHECK2 />
+                                                                            ) : (
+                                                                                <Icons.COPY />
+                                                                            )
+                                                                        }
+                                                                    </button>
+                                                                </div>
+                                                            )
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        {
+                                                            data.email && (
+                                                                <div className='flex items-center gap-2'>
+                                                                    {data.email}
+                                                                    <button
+                                                                        className='w-[25px] h-[25px] flex items-center justify-center rounded bg-green-100 text-green-500'
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setCopiedData({ index: i, type: "email" });
+                                                                            navigator.clipboard.writeText(data.email)
+                                                                        }}>
+                                                                        {
+                                                                            copiedData.index === i && copiedData.type === "email" ? (
+                                                                                <Icons.CHECK2 />
+                                                                            ) : (
+                                                                                <Icons.COPY />
+                                                                            )
+                                                                        }
+
+                                                                    </button>
+                                                                </div>
+                                                            )
+                                                        }
+                                                    </td>
                                                     <td>
                                                         <span className='badge green-badge capitalize'>
                                                             {data.type}
                                                         </span>
+                                                    </td>
+                                                    <td align='center'>
+                                                        <button className='w-[30px] h-[30px] flex items-center justify-center rounded-full bg-gray-100'>
+                                                            <Icons.EYE />
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             }) : (

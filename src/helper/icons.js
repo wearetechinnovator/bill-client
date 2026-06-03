@@ -51,10 +51,12 @@ import { MdOutlineContactPhone } from "react-icons/md";
 import { PiPhonePlusFill } from "react-icons/pi";
 import { BsTelephonePlus } from "react-icons/bs";
 import { TfiHeadphoneAlt } from "react-icons/tfi";
+import { FiCheck } from "react-icons/fi";
 
 
 
 export const Icons = {
+  CHECK2: FiCheck ,
   ENQUIRY: TfiHeadphoneAlt,
   WARNING: IoWarningOutline,
   ARROW_UP: FaArrowUp,

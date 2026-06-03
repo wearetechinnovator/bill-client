@@ -85,6 +85,7 @@ const Contacts = ({ partyId }) => {
         })()
     }, [contactId])
 
+    
     const saveContact = async () => {
         const validations = [
             { field: contactData.name, msg: "Contact name is required" },
@@ -124,7 +125,6 @@ const Contacts = ({ partyId }) => {
             return;
 
         } catch (err) {
-            console.log(err);
             return toast("Something went wrong", 'error');
         } finally {
             setLoading(false)
@@ -336,7 +336,11 @@ const Contacts = ({ partyId }) => {
                     <Drawer.Header>
                         <Drawer.Title>
                         </Drawer.Title>
-                        <p className='text-[17px] font-semibold'>Add Contacts</p>
+                        <p className='text-[17px] font-semibold'>
+                            {
+                                contactId ? "Update Contact" : "Add Contact"
+                            }
+                        </p>
                     </Drawer.Header>
                     <Drawer.Body>
                         <div className='grid grid-cols-1 md:grid-cols-2 p-4 gap-4'>
