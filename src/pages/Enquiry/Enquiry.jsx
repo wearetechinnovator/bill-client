@@ -298,9 +298,9 @@ const Enquiry = () => {
 																<td align='left'>
 																	{
 																		data.isConverted ? (
-																			<span className='bg-green-100 text-green-800 px-2 rounded-full text-[11px]'>Converted</span>
+																			<span className='badge green-badge'>Converted</span>
 																		) : (
-																			<span className='bg-yellow-100 text-yellow-800 px-2 rounded-full text-[11px]'>Active</span>
+																			<span className='badge yellow-badge'>Active</span>
 																		)
 																	}
 																</td>

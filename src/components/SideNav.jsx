@@ -88,7 +88,7 @@ const links = {
   ],
   "Report": [
     { name: 'Day Book', icon: <Icons.BOOK />, link: '/report/daybook' },
-    { name: 'Party Statement', icon: <Icons.BALANCE_SHEET />, link: '/report/party-statement' },
+    { name: 'Party Statement', icon: <Icons.LADGER_USER />, link: '/report/party-statement' },
   ],
 };
 

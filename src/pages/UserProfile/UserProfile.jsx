@@ -93,9 +93,9 @@ const UserProfile = () => {
 													<td align='center' className='w-[30%]'>
 														{
 															data.isDisable ? (
-																<span className='rounded-full px-2 text-[11px] text-white bg-red-500'>Inactive</span>
+																<span className='badge red-badge'>Inactive</span>
 															) : (
-																<span className='rounded-full px-2 text-[11px] text-white bg-green-500'>Active</span>
+																<span className='badge green-badge'>Active</span>
 															)
 														}
 													</td>

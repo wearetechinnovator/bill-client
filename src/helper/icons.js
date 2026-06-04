@@ -52,10 +52,13 @@ import { PiPhonePlusFill } from "react-icons/pi";
 import { BsTelephonePlus } from "react-icons/bs";
 import { TfiHeadphoneAlt } from "react-icons/tfi";
 import { FiCheck } from "react-icons/fi";
+import { LuBookUser } from "react-icons/lu";
+
 
 
 
 export const Icons = {
+  LADGER_USER: LuBookUser,
   CHECK2: FiCheck ,
   ENQUIRY: TfiHeadphoneAlt,
   WARNING: IoWarningOutline,

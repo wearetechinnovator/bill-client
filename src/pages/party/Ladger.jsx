@@ -19,7 +19,7 @@ const Ladger = ({ partyId }) => {
 	const [ladgers, setLadgers] = useState([])
 	const [activePage, setActivePage] = useState(1);
 	const [dataLimit, setDataLimit] = useState(50);
-	const [totalData, setTotalData] = useState();
+	const [totalData, setTotalData] = useState(0);
 	const [partyBalance, setPartyBalance] = useState(0);
 	const [loading, setLoading] = useState(false);
 	const voucherInv = {
@@ -96,7 +96,6 @@ const Ladger = ({ partyId }) => {
 		(async () => {
 			try {
 				setLoading(true);
-
 				const URL = `${process.env.REACT_APP_API_URL}/ladger/get?page=${activePage}&limit=${dataLimit}`;
 				const token = Cookies.get("token");
 				const req = await fetch(URL, {
