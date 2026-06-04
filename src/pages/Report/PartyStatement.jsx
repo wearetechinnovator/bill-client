@@ -15,8 +15,9 @@ import { useMemo } from 'react';
 import DataShimmer from '../../components/DataShimmer'
 
 
-
-const DayBook = () => {
+// ***** Party Wise Ladger *****
+// =============================
+const PartyStatement = () => {
     let Moment = moment();
     const token = Cookies.get("token");
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -41,8 +42,21 @@ const DayBook = () => {
             }
         });
     }, [data]);
+    const [partyList, setPartyList] = useState([]);
 
 
+
+
+    useEffect(() => {
+        (async () => {
+            try{
+                
+
+            }catch(err){
+                return toast("Parties not fetch, Something went wrong", "error");
+            }
+        })()
+    }, [])
 
 
     useEffect(() => {
@@ -76,7 +90,7 @@ const DayBook = () => {
                     temp.voucher = "Payment In";
                     temp.voucherNo = p.paymentInNumber;
                     temp.moneyIn = p.amount;
-                    temp.invoiceNo = p.sattleInvoice.map((s)=>s.salesInvoiceNumber)
+                    temp.invoiceNo = p.sattleInvoice.map((s) => s.salesInvoiceNumber)
 
                     totalMoneyIn += Number(p.amount);
                     allData.push(temp);
@@ -89,7 +103,7 @@ const DayBook = () => {
                     temp.voucher = "Payment Out";
                     temp.voucherNo = p.paymentOutNumber;
                     temp.moneyOut = p.amount;
-                    temp.invoiceNo = p.sattleInvoice.map((s)=>s.purchaseInvoiceNumber)
+                    temp.invoiceNo = p.sattleInvoice.map((s) => s.purchaseInvoiceNumber)
 
                     totalMoneyOut += Number(p.amount);
                     allData.push(temp);
@@ -139,17 +153,22 @@ const DayBook = () => {
 
     return (
         <>
-            <Nav title={"Day Book"} />
+            <Nav title={"Party Statement (Ladger)"} />
             <main id='main'>
                 <SideNav />
                 <div className='content__body'>
-
                     <div className="content__body__main">
                         <div className='w-full flex items-start justify-end mb-2 gap-3 '>
                             <SelectPicker
-                                placeholder="Filter Daybook"
+                                className='w-[120px]'
+                                searchable={true}
+                                placeholder={"Select Party"}
+
+                            />
+                            <SelectPicker
+                                placeholder="Filter"
                                 searchable={false}
-                                className='w-[140px]'
+                                className='w-[120px]'
                                 menuMaxHeight={"250px"}
                                 onChange={async (v) => {
                                     if (v === Constants.CUSTOM) {
@@ -188,7 +207,6 @@ const DayBook = () => {
                                 <Icons.EXCEL className='inline' /> Export Excel
                             </button>
                         </div>
-
                         {
                             !loading ? (
                                 <div className='w-full flex items-center flex-col md:flex-row gap-1'>
@@ -197,12 +215,10 @@ const DayBook = () => {
                                             <thead>
                                                 <tr className='bg-[#F6F9FF] border-b'>
                                                     <th className='text-left p-2 px-4 font-medium'>Date</th>
-                                                    <th className='text-left p-2 px-4 font-medium'>Voucher Type</th>
+                                                    <th className='text-left p-2 px-4 font-medium'>Voucher</th>
                                                     <th className='text-left p-2 px-4 font-medium'>Voucher No.</th>
-                                                    <th className='text-left p-2 px-4 font-medium'>Party Name</th>
-                                                    <th className='text-left p-2 px-4 font-medium'>Invoice No</th>
-                                                    <th className='text-left p-2 px-4 font-medium'>Money In</th>
-                                                    <th className='text-left p-2 px-4 font-medium'>Money Out</th>
+                                                    <th className='text-left p-2 px-4 font-medium'>Credit</th>
+                                                    <th className='text-left p-2 px-4 font-medium'>Debit</th>
                                                 </tr>
                                             </thead>
                                             <tbody className='text-[13px]'>
@@ -211,41 +227,15 @@ const DayBook = () => {
                                                         <tr key={_} className='odd:bg-gray-50'>
                                                             <td className='p-2 px-4 text-gray-500'>{d.date}</td>
                                                             <td className='p-2 px-4'>
-                                                                {d.voucher} {d.transactionCategory && "- "+ d.transactionCategory}
+                                                                {d.voucher} {d.transactionCategory && "- " + d.transactionCategory}
                                                             </td>
                                                             <td className='p-2 px-4'>{d.voucherNo}</td>
                                                             <td className='p-2 px-4'>{d.partyName || "--"}</td>
                                                             <td className='p-2 px-4'>{d.invoiceNo?.join(",") || "--"}</td>
-                                                            <td className='p-2 px-4  text-green-600'>
-                                                                {d.moneyIn && <Icons.RUPES className='inline' />} {d.moneyIn || "--"}
-                                                            </td>
-                                                            <td className='p-2 px-4  text-red-600'>
-                                                                {d.moneyOut && <Icons.RUPES className='inline' />} {d.moneyOut || "--"}
-                                                            </td>
                                                         </tr>
                                                     ))
                                                 }
                                             </tbody>
-                                            <tfoot className='border-t'>
-                                                <tr className='border-b'>
-                                                    <td colSpan={5} align='right' className='text-[13px] font-semibold'>TOTAL</td>
-                                                    <td left="left" className='font-semibold py-2 px-4 text-green-600'>
-                                                        <Icons.RUPES className='inline' />{totalIncome}
-                                                    </td>
-                                                    <td align='left' className='font-semibold py-2 px-4 text-red-600'>
-                                                        <Icons.RUPES className='inline' />{totalExpenses}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colSpan={5} align='right' className='text-[13px] font-semibold'>CURRENT BALANCE</td>
-                                                    <td align='left' className='font-semibold py-2 px-4'>
-                                                        <span className={`font-bold ${(totalIncome - totalExpenses) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                            <Icons.RUPES className='inline' />{totalIncome - totalExpenses}
-                                                        </span>
-                                                    </td>
-
-                                                </tr>
-                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>
@@ -261,4 +251,4 @@ const DayBook = () => {
     )
 }
 
-export default DayBook;
+export default PartyStatement;

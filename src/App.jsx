@@ -70,6 +70,7 @@ const AddEnquiry = React.lazy(() => import("./pages/Enquiry/AddEnquiry"));
 
 // reports
 const DayBook = React.lazy(() => import("./pages/Report/DayBook"));
+const PartyStatement = React.lazy(() => import("./pages/Report/PartyStatement"));
 
 
 
@@ -244,6 +245,7 @@ const App = () => {
         {/* ============================[Reports]======================= */}
         {/* ============================================================ */}
         <Route path="/report/daybook" element={<ProtectRoute><DayBook /></ProtectRoute >} />
+        <Route path="/report/party-statement" element={<ProtectRoute><PartyStatement /></ProtectRoute >} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -120,10 +120,17 @@ const Invoice = () => {
                     const res = await req.json();
                     if (req.status === 200) {
                         setBillData(res.data)
-                        setBillNumber(res.data?.quotationNumber || res.data?.proformaNumber || res.data?.poNumber ||
-                            res.data?.purchaseInvoiceNumber || res.data?.purchaseReturnNumber || res.data?.debitNoteNumber
-                            || res.data?.salesInvoiceNumber || res.data?.salesReturnNumber || res.data?.creditNoteNumber
-                            || res.data?.deliveryChalanNumber
+                        setBillNumber(
+                            res.data?.quotationNumber ||
+                            res.data?.proformaNumber ||
+                            res.data?.purchaseInvoiceNumber ||
+                            res.data?.purchaseReturnNumber ||
+                            res.data?.debitNoteNumber ||
+                            res.data?.salesInvoiceNumber ||
+                            res.data?.salesReturnNumber ||
+                            res.data?.creditNoteNumber ||
+                            res.data?.deliveryChalanNumber ||
+                            res.data?.poNumber
                         );
                         setBillDate(
                             res.data?.estimateDate || res.data?.invoiceDate || res.data?.debitNoteDate ||
@@ -691,7 +698,6 @@ const Invoice = () => {
                                                                     padding: '12px',
                                                                     fontSize: '12px',
                                                                     verticalAlign: 'top',  // ← align to top
-                                                                    // textAlign: 'right',
                                                                 }}
                                                             >
                                                                 <table
