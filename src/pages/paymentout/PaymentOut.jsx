@@ -441,7 +441,7 @@ const PaymentOut = () => {
 										{
 											billData.map((data, i) => {
 												return <tr key={i}>
-													<td className='py-2 px-4 border-b max-w-[10px]'>
+													<td className='py-2 px-4 border-b max-w-[10px]' align='center'>
 														<input type='checkbox'
 															checked={selected.includes(data._id)}
 															onChange={() => handleCheckboxChange(data._id)}

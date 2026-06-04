@@ -46,7 +46,7 @@ const AddPayment = ({ mode }) => {
 	useEffect(() => {
 		if (mode) return;
 		(async () => {
-			const url = process.env.REACT_APP_API_URL + "/paymentout/get";
+			const url = process.env.REACT_APP_API_URL + "/paymentout/get-payment-no";
 			const req = await fetch(url, {
 				method: "POST",
 				headers: {
@@ -55,7 +55,7 @@ const AddPayment = ({ mode }) => {
 				body: JSON.stringify({ token })
 			});
 			const res = await req.json();
-			setFormData(p => ({ ...p, paymentOutNumber: res.totalData + 1 }));
+			setFormData(p => ({ ...p, paymentOutNumber: res.count }));
 		})();
 	}, [])
 
