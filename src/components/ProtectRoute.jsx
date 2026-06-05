@@ -9,7 +9,7 @@ const ROLE = {
     ADMIN: 'admin',
     SALES: 'sales',
     MANAGER: 'manager',
-    ACCOUNT: 'accountant'
+    ACCOUNTANT: 'accountant'
 };
 const ProtectRoute = ({ children }) => {
     const { pathname } = useLocation();
@@ -103,7 +103,17 @@ const ProtectRoute = ({ children }) => {
         "/admin/balance-sheet",
         "/admin/assigned-party",
         "/admin/user-profile",
-        "/admin/user-profile/edit"
+        "/admin/user-profile/edit",
+        "/report/daybook",
+        "/report/party-statement",
+    ];
+
+    // Accountant Access this routes;
+    const accountantRotues = [
+        "/admin/dashboard",
+        "/report/daybook",
+        "/report/party-statement",
+        "/admin/profile",
     ];
 
 
@@ -150,8 +160,12 @@ const ProtectRoute = ({ children }) => {
                 return navigate("/notfound");
             }
         }
-
-        if (role && role !== ROLE.ADMIN && role === ROLE.MANAGER) {
+        else if (role && role !== ROLE.ADMIN && role === ROLE.ACCOUNTANT) {
+            if (!accountantRotues.some(route => pathname.includes(route))) {
+                return navigate("/notfound");
+            }
+        }
+        else if (role && role !== ROLE.ADMIN && role === ROLE.MANAGER) {
             if (managerRoutes.some(route => pathname.includes(route))) {
                 return navigate("/notfound");
             }

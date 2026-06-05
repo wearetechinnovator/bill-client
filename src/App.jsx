@@ -78,7 +78,6 @@ const PartyStatement = React.lazy(() => import("./pages/Report/PartyStatement"))
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {

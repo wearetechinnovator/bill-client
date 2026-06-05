@@ -13,7 +13,7 @@ const ROLE = {
   ADMIN: 'admin',
   SALES: 'sales',
   MANAGER: 'manager',
-  ACCOUNT: 'accountant'
+  ACCOUNTANT: 'accountant'
 };
 
 const salesPath = [
@@ -92,6 +92,8 @@ const links = {
   ],
 };
 
+
+// Role Links
 const salesAllowLinks = [
   "/admin/dashboard",
   "/admin/assigned-party",
@@ -171,8 +173,16 @@ const managerNotAllowLinks = [
   "/admin/balance-sheet",
   "/admin/assigned-party",
   "/admin/user-profile",
-  "/admin/user-profile/edit/"
+  "/admin/user-profile/edit/",
+  "/report/daybook",
+  "/report/party-statement",
 ]
+
+const accountantAllowRotues = [
+  "/admin/dashboard",
+  "/report/daybook",
+  "/report/party-statement"
+];
 
 
 
@@ -189,6 +199,8 @@ const SideNav = () => {
     if (isAdmin) return true;
     else if (role == ROLE.SALES)
       return salesAllowLinks.some(allowed => link.startsWith(allowed));
+    else if (role == ROLE.ACCOUNTANT)
+      return accountantAllowRotues.some(allowed => link.startsWith(allowed));
     else if (role === ROLE.MANAGER)
       return !managerNotAllowLinks.some(allowed => link.startsWith(allowed));
   };

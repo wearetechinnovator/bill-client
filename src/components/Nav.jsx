@@ -32,7 +32,6 @@ const Nav = ({ title }) => {
 
     useEffect(() => {
         getUserData();
-
     }, [])
 
 
