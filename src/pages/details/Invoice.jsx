@@ -1027,12 +1027,12 @@ const Invoice = () => {
                                                     <thead className='bg-[#C4E9F7]' style={{ background: "#C4E9F7" }}>
                                                         <tr>
                                                             <td align='center' valign='center' className='p-2' width={"5%"}>SL.NO</td>
-                                                            <td align='center' width={"47%"}>ITEMS</td>
+                                                            <td align='center' width={"44%"}>ITEMS</td>
                                                             <td align='center' width={"7%"}>HSN</td>
                                                             <td align='center' width={"6%"}>QTY.</td>
-                                                            <td align='center' width={"7%"}>RATE</td>
+                                                            <td align='center' width={"8%"}>RATE</td>
                                                             <td align='center' width={"10%"}>DISCOUNT</td>  {/* was 8%, increase */}
-                                                            <td align='center' width={"8%"}>TAX</td>
+                                                            <td align='center' width={"10%"}>TAX</td>
                                                             <td align='center' width={"10%"}>AMOUNT</td>
                                                         </tr>
                                                     </thead>
@@ -1047,7 +1047,7 @@ const Invoice = () => {
                                                                     </td>
                                                                     <td valign='top' align='center'>{data.hsn}</td>
                                                                     <td valign='top' align='center'>{data.qun} <sub>{data.selectedUnit}</sub></td>
-                                                                    <td valign='top' align='center'>{data.price}</td>
+                                                                    <td valign='top' align='center'> {data.price}</td>
                                                                     <td valign='top' align='center'>
                                                                         {data.discountPerAmount || "0.00"}
                                                                         <div className='discount-font text-gray-500'>
@@ -1086,9 +1086,9 @@ const Invoice = () => {
                                                     </tbody>
                                                     <tfoot className='w-full'>
                                                         <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
-                                                            <td align='right' colSpan={3}>TOTAL</td>
-                                                            <td align='center'>{billDetails.qun}</td>
-                                                            <td align='center'></td>
+                                                            <td align='right' colSpan={5}>TOTAL</td>
+                                                            {/* <td align='center'>{billDetails.qun}</td> */}
+                                                            {/* <td align='center'></td> */}
                                                             <td align='center'><Icons.RUPES className='inline' />{billDetails.discount}</td>
                                                             <td align='center'><Icons.RUPES className='inline' />{billDetails.taxAmount}</td>
                                                             <td align='center'><Icons.RUPES className='inline' />{billDetails.amount}</td>

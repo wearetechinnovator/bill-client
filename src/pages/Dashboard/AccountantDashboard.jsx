@@ -290,7 +290,7 @@ const AccountantDashboard = () => {
                                             <div className="interaction-left-box w-[85%]">
                                                 <h2 className="text-[#333333] font-[700] text-[14px] mb-2">Cash In</h2>
                                                 <p className="text-[14px] text-[#333333]">
-                                                    <Icons.RUPES className="inline" />{cashInAmount}
+                                                    <Icons.RUPES className="inline" />{Number(cashInAmount).toFixed(2)}
                                                 </p>
                                             </div>
                                             <div className="interaction-right-box text-end w-[15%]">
@@ -305,7 +305,7 @@ const AccountantDashboard = () => {
                                             <div className="interaction-left-box w-[85%]">
                                                 <h2 className="text-[#333333] font-[700] text-[14px] mb-2">Cash Out</h2>
                                                 <p className=" text-[14px] text-[#333333]">
-                                                    <Icons.RUPES className="inline" />{cashOutAmount}
+                                                    <Icons.RUPES className="inline" />{Number(cashOutAmount).toFixed(2)}
                                                 </p>
                                             </div>
                                             <div className="interaction-right-box text-end w-[15%]">
@@ -320,7 +320,7 @@ const AccountantDashboard = () => {
                                             <div className="interaction-left-box w-[85%]">
                                                 <h2 className="text-[#333333] font-[700] text-[14px] mb-2">To Collect</h2>
                                                 <p className="text-[14px] text-[#333333]">
-                                                    <Icons.RUPES className="inline" />{totalCollect}
+                                                    <Icons.RUPES className="inline" />{Number(totalCollect).toFixed(2)}
                                                 </p>
                                             </div>
                                             <div className="interaction-right-box text-end w-[15%]">
@@ -333,7 +333,7 @@ const AccountantDashboard = () => {
                                             <div className="interaction-left-box w-[85%]">
                                                 <h2 className="text-[#333333] font-[700] text-[14px] mb-2">To Pay</h2>
                                                 <p className="text-[14px] text-[#333333]">
-                                                    <Icons.RUPES className="inline" />{totalPay}
+                                                    <Icons.RUPES className="inline" />{Number(totalPay).toFixed(2)}
                                                 </p>
                                             </div>
                                             <div className="interaction-right-box text-end w-[15%]">
@@ -346,7 +346,7 @@ const AccountantDashboard = () => {
                                             <div className="interaction-left-box w-[85%]">
                                                 <h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Sales</h2>
                                                 <p className="text-[14px] text-[#333333]">
-                                                    <Icons.RUPES className="inline" />{totalSaleAmount}
+                                                    <Icons.RUPES className="inline" />{Number(totalSaleAmount).toFixed(2)}
                                                 </p>
                                             </div>
                                             <div className="interaction-right-box text-end w-[15%]">
@@ -359,7 +359,7 @@ const AccountantDashboard = () => {
                                             <div className="interaction-left-box w-[85%]">
                                                 <h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Purchase</h2>
                                                 <p className="text-[14px] text-[#333333]">
-                                                    <Icons.RUPES className="inline" />{totalPurchaseAmount}
+                                                    <Icons.RUPES className="inline" />{Number(totalPurchaseAmount).toFixed(2)}
                                                 </p>
                                             </div>
                                             <div className="interaction-right-box text-end w-[15%]">
@@ -372,7 +372,7 @@ const AccountantDashboard = () => {
                                             <div className="interaction-left-box w-[85%]">
                                                 <h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Other Expenses</h2>
                                                 <p className="text-[14px] text-[#333333]">
-                                                    <Icons.RUPES className="inline" />{totalOtherExpense}
+                                                    <Icons.RUPES className="inline" />{Number(totalOtherExpense).toFixed(2)}
                                                 </p>
                                             </div>
                                             <div className="interaction-right-box text-end w-[15%]">
@@ -385,7 +385,7 @@ const AccountantDashboard = () => {
                                             <div className="interaction-left-box w-[85%]">
                                                 <h2 className="text-[#333333] font-[700] text-[14px] mb-2">Total Other Income</h2>
                                                 <p className="text-[14px] text-[#333333]">
-                                                    <Icons.RUPES className="inline" />{totalOtherIncome}
+                                                    <Icons.RUPES className="inline" />{Number(totalOtherIncome).toFixed(2)}
                                                 </p>
                                             </div>
                                             <div className="interaction-right-box text-end w-[15%]">

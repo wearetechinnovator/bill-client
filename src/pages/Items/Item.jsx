@@ -50,7 +50,7 @@ const Item = ({ mode }) => {
 				"Name": data.title,
 				"HSN": data.category?.hsn || data.hsn || "--",
 				"Sale Price": data.salePrice,
-				"STOCK": stockStr
+				//"STOCK": stockStr
 			}
 		});
 	}, [itemData]);
@@ -287,7 +287,7 @@ const Item = ({ mode }) => {
 											<th align='left'>Name</th>
 											<th align='left'>HSN</th>
 											<th align='left'>Sale Price</th>
-											<th align='left'>STOCK</th>
+											{/* <th align='left'>STOCK</th> */}
 											<th className='w-[100px]'>Action</th>
 										</tr>
 									</thead>
@@ -312,7 +312,6 @@ const Item = ({ mode }) => {
 												let isBelowAlert = false;
 												if (Array.isArray(unitConfig) && unitConfig.length > 0) {
 													isBelowAlert = unitConfig.some((config, idx) => {
-														console.log(config, idx);
 														const alertThreshold = Number(config.alert) || 0;
 														const currentStock = Number(stockValues[idx]) || 0;
 														return currentStock < alertThreshold && alertThreshold > 0;
@@ -343,7 +342,7 @@ const Item = ({ mode }) => {
 														</td>
 														<td>{data.category?.hsn || data.hsn || "--"}</td>
 														<td>{data.salePrice || 0.00}</td>
-														<td className={`${isOutOfStock ? 'text-orange-600' : ''}`}>{stockStr}</td>
+														{/* <td className={`${isOutOfStock ? 'text-orange-600' : ''}`}>{stockStr}</td> */}
 
 														<td className='px-4 text-center'>
 															<Whisper
