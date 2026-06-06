@@ -442,7 +442,7 @@ shared without written approval.
 								<SelectPicker
 									data={purchaseInvoice?.map((inv, i) => {
 										return {
-											label: `${inv.purchaseInvoiceNumber} | ${new Date(inv.invoiceDate).toLocaleDateString()} | ${inv.dueAmount}`,
+											label: `${inv.purchaseInvoiceNumber} | ${new Date(inv.invoiceDate).toLocaleDateString()}`,
 											value: inv.purchaseInvoiceNumber
 										}
 									})}

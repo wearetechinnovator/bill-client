@@ -120,6 +120,12 @@ const Invoice = () => {
                     const res = await req.json();
                     if (req.status === 200) {
                         setBillData(res.data)
+                        console.log("Payment Amount", res.data.paymentAmount);
+                        console.log("isCancel", res.data.isCancel);
+                        console.log("final");
+                        console.log(billData?.paymentAmount !== undefined &&
+                            billData?.isCancel !== undefined &&
+                            Number(billData?.paymentAmount || 0) <= 0 && billData?.isCancel === false)
                         setBillNumber(
                             res.data?.quotationNumber ||
                             res.data?.proformaNumber ||
@@ -129,7 +135,7 @@ const Invoice = () => {
                             res.data?.salesInvoiceNumber ||
                             res.data?.salesReturnNumber ||
                             res.data?.creditNoteNumber ||
-                            res.data?.deliveryChalanNumber ||
+                            res.data?.chalanNumber ||
                             res.data?.poNumber
                         );
                         setBillDate(
@@ -482,9 +488,17 @@ const Invoice = () => {
                                                     trigger={"click"}
                                                     speaker={<Popover full>
                                                         {
-                                                            Number(billData?.paymentAmount || 0) <= 0 && billData?.isCancel === false && (
-                                                                <div className='download__menu w-[120px]'
-                                                                    title='Edit Bill'
+                                                            (
+                                                                billData?.paymentAmount === undefined ||
+                                                                billData?.isCancel === undefined ||
+                                                                (
+                                                                    Number(billData.paymentAmount) <= 0 &&
+                                                                    billData.isCancel === false
+                                                                )
+                                                            ) && (
+                                                                <div
+                                                                    className="download__menu w-[120px]"
+                                                                    title="Edit Bill"
                                                                     onClick={() => navigate(`/admin/${route}/edit/${id}`)}
                                                                 >
                                                                     <Icons.EDIT className="text-[15px]" />

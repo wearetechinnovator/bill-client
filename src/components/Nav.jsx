@@ -88,16 +88,16 @@ const Nav = ({ title }) => {
                                     placement='bottomEnd'
                                     speaker={<Popover>
                                         <div className='create__drpdwn'>
-                                            <Link to={"/admin/sales-invoice/add"}>Sales Invoice</Link>
-                                            <Link to={"/admin/purchase-invoice/add"}>Purchase Invoice</Link>
-                                            <Link to={'/admin/quotation-estimate/add'}>Quotation</Link>
-                                            <Link to={"/admin/proforma-invoice/add"}>Proforma</Link>
-                                            <Link to={'/admin/purchase-order/add'}>Purchase Order</Link>
-                                            <Link to={'/admin/purchase-return/add'}>Purchase Return</Link>
-                                            <Link to={'/admin/sales-return/add'}>Sales Return</Link>
-                                            <Link to={'/admin/delivery-chalan/add'}>Delivery Chalan</Link>
-                                            <Link to={'/admin/credit-note/add'}>Credit Note</Link>
-                                            <Link to={"/admin/debit-note/add"}>Debit Note</Link>
+                                            <a href="/admin/sales-invoice/add">Sales Invoice</a>
+                                            <a href="/admin/purchase-invoice/add">Purchase Invoice</a>
+                                            <a href="/admin/quotation-estimate/add">Quotation</a>
+                                            <a href="/admin/proforma-invoice/add">Proforma</a>
+                                            <a href="/admin/purchase-order/add">Purchase Order</a>
+                                            <a href="/admin/purchase-return/add">Purchase Return</a>
+                                            <a href="/admin/sales-return/add">Sales Return</a>
+                                            <a href="/admin/delivery-chalan/add">Delivery Chalan</a>
+                                            <a href="/admin/credit-note/add">Credit Note</a>
+                                            <a href="/admin/debit-note/add">Debit Note</a>
                                         </div>
                                     </Popover>}
                                 >

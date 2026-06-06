@@ -470,7 +470,7 @@ shared without written approval.
 								<SelectPicker
 									data={salesInvoice?.map((inv, i) => {
 										return {
-											label: `${inv.salesInvoiceNumber} | ${new Date(inv.invoiceDate).toLocaleDateString()} | ${inv.dueAmount}`,
+											label: `${inv.salesInvoiceNumber} | ${new Date(inv.invoiceDate).toLocaleDateString()} `,
 											value: inv.salesInvoiceNumber
 										}
 									})}
