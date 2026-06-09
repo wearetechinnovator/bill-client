@@ -239,13 +239,14 @@ const Invoice = () => {
             taxAmount += (parseInt(b.qun) * parseInt(b.price)) / 100 * b.tax;
             discount += parseInt(b.discountPerAmount || 0);
 
-            let a = ((parseInt(b.qun) * parseInt(b.price)) + (parseInt(b.qun) * parseInt(b.price)) / 100 * b.tax);
-            amount += a - parseInt(b.discountPerAmount || 0);
+            let a = ((Number(b.qun) * Number(b.price)) + (Number(b.qun) * Number(b.price)) / 100 * b.tax);
+            amount += a - Number(b.discountPerAmount || 0);
         })
 
         setBillDetails({
             ...billDetails, qun, taxAmount: (taxAmount).toFixed(2), discount, amount: (amount).toFixed(2)
         })
+
 
         setTotalAmountInText(toWords(amount || 0));
 
@@ -1087,12 +1088,11 @@ const Invoice = () => {
                                                     <tfoot className='w-full'>
                                                         <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
                                                             <td align='right' colSpan={5}>TOTAL</td>
-                                                            {/* <td align='center'>{billDetails.qun}</td> */}
-                                                            {/* <td align='center'></td> */}
                                                             <td align='center'><Icons.RUPES className='inline' />{billDetails.discount}</td>
                                                             <td align='center'><Icons.RUPES className='inline' />{billDetails.taxAmount}</td>
                                                             <td align='center'><Icons.RUPES className='inline' />{billDetails.amount}</td>
                                                         </tr>
+
                                                         {billData?.roundOffAmount && <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
                                                             <td colSpan={7} align='center' className='italic'>Round Off</td>
                                                             <td align='center'><Icons.RUPES className='inline' />
@@ -1115,6 +1115,7 @@ const Invoice = () => {
                                                                 </td>
                                                             </tr>
                                                         )}
+
                                                         <tr className='font-semibold' style={{ background: "#F3F4F6" }}>
                                                             <td colSpan={7} align='right'>Received Amount</td>
                                                             <td align='center'><Icons.RUPES className='inline' />{billData?.paymentAmount || "0.00"}</td>

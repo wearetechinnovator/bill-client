@@ -53,11 +53,21 @@ import { BsTelephonePlus } from "react-icons/bs";
 import { TfiHeadphoneAlt } from "react-icons/tfi";
 import { FiCheck } from "react-icons/fi";
 import { LuBookUser } from "react-icons/lu";
+import { TbReportAnalytics } from "react-icons/tb";
+import { MdHistory } from "react-icons/md";
+import { FaWhatsapp } from "react-icons/fa";
+import { LuMessageCircleMore } from "react-icons/lu";
+import { CgMail } from "react-icons/cg";
 
 
 
 
 export const Icons = {
+  EMAIL: CgMail,
+  MESSAGE: LuMessageCircleMore,
+  WHATSAPP: FaWhatsapp,
+  HISTORY: MdHistory,
+  DAILY_REPORT: TbReportAnalytics,
   LADGER_USER: LuBookUser,
   CHECK2: FiCheck ,
   ENQUIRY: TfiHeadphoneAlt,

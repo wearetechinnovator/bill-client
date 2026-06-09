@@ -285,7 +285,7 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                 }}
             />
             <div className='content__body__main bg-white '>
-                <div className='justify-between grid grid-cols-1 md:grid-cols-2 gr gap-4 mt-3'>
+                <div className='justify-between grid grid-cols-1 md:grid-cols-2 gr gap-4'>
                     <div className='flex items-center gap-4'>
                         <div className='w-full'>
                             <p>Select Party <span className='required__text'>*</span></p>

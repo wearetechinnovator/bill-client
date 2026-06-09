@@ -67,8 +67,11 @@ const AttendanceDetails = React.lazy(() => import("./pages/StaffAttendance/Atten
 const SalarySlip = React.lazy(() => import("./pages/StaffAttendance/SalarySlip"));
 const Enquiry = React.lazy(() => import("./pages/Enquiry/Enquiry"));
 const AddEnquiry = React.lazy(() => import("./pages/Enquiry/AddEnquiry"));
+const Dar = React.lazy(() => import("./pages/Dar/Dar"));
+const AddDar = React.lazy(() => import("./pages/Dar/AddDar"));
+const DarHistoryView = React.lazy(() => import("./pages/Dar/HistoryView"));
 
-// reports
+// Reports
 const DayBook = React.lazy(() => import("./pages/Report/DayBook"));
 const PartyStatement = React.lazy(() => import("./pages/Report/PartyStatement"));
 
@@ -189,6 +192,11 @@ const App = () => {
         <Route path="/admin/enquiry/add" element={<ProtectRoute><AddEnquiry /></ProtectRoute>} />
         <Route path="/admin/enquiry/edit/:id" element={<ProtectRoute><AddEnquiry mode={"edit"} /></ProtectRoute>} />
 
+        <Route path="/admin/dar" element={<ProtectRoute><Dar/></ProtectRoute>} />
+        <Route path="/admin/dar/history/:id" element={<ProtectRoute><DarHistoryView/></ProtectRoute>} />
+        <Route path="/admin/dar/add" element={<ProtectRoute><AddDar /></ProtectRoute>} />
+        <Route path="/admin/dar/edit/:id" element={<ProtectRoute><AddDar mode={"edit"} /></ProtectRoute>} />
+
         <Route path="/admin/party" element={<ProtectRoute><Party /></ProtectRoute>} />
         <Route path="/admin/assigned-party" element={<ProtectRoute><AssignedParty /></ProtectRoute>} />
         <Route path="/admin/party/add" element={<ProtectRoute><AddParty /></ProtectRoute>} />
@@ -233,6 +241,7 @@ const App = () => {
         <Route path="/admin/payment-in/add" element={<ProtectRoute><AddPaymentIn /></ProtectRoute>} />
         <Route path="/admin/payment-in/edit/:id" element={<ProtectRoute><AddPaymentIn mode={"edit"} /></ProtectRoute>} />
         <Route path="/admin/payment-in" element={<ProtectRoute><PaymentIn /></ProtectRoute>} />
+
 
         {/* <Route path="/admin/staff-attendance" element={<ProtectRoute><StaffAttendance /></ProtectRoute>} />
         <Route path="/admin/staff-attendance/add" element={<ProtectRoute><AddStaffAttendance /></ProtectRoute>} />

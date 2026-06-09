@@ -65,6 +65,7 @@ const links = {
     { name: 'Party', icon: <FaUsers />, link: '/admin/assigned-party' },
     { name: 'Item', icon: <Icons.ITEMS />, link: '/admin/item' },
     { name: 'Enquiry', icon: <Icons.ENQUIRY />, link: '/admin/enquiry' },
+    { name: 'DAR', icon: <Icons.DAILY_REPORT />, link: '/admin/dar' },
   ],
   "sales": [
     { name: 'Quotation / Estimate', icon: <Icons.SMAEICON />, link: '/admin/quotation-estimate' },

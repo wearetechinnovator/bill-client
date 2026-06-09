@@ -24,10 +24,8 @@ import ContextMenu from '../../components/ContextMenu';
 
 
 
-
-const DEBOUNCE_TIME = 300;
 const Enquiry = () => {
-	const token = Cookies.get("token")
+	const token = Cookies.get("token");
 	const toast = useMyToaster();
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
 	const [activePage, setActivePage] = useState(1);
@@ -158,18 +156,6 @@ const Enquiry = () => {
 		}
 	}
 
-
-	// const searchData = (e) => {
-	// 	const value = e.target.value;
-
-	// 	if (debounceRef.current) {
-	// 		clearTimeout(debounceRef.current);
-	// 	}
-
-	// 	debounceRef.current = setTimeout(() => {
-	// 		setSearchText(value);
-	// 	}, DEBOUNCE_TIME);
-	// };
 
 	return (
 		<>
