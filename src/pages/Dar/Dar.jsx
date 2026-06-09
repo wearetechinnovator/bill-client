@@ -117,39 +117,7 @@ const Enquiry = () => {
         }
     }
 
-    const removeData = async () => {
-        if (selected.length === 0 || tableStatusData !== 'active') {
-            return;
-        }
-        const url = process.env.REACT_APP_API_URL + "/enquiry/delete";
-        try {
-            const req = await fetch(url, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ ids: selected })
-            });
-            const res = await req.json();
 
-            if (req.status !== 200 || res.err) {
-                return toast(res.err, 'error');
-            }
-
-            selected.forEach((id, _) => {
-                setDarData((prevData) => {
-                    return prevData.filter((data, _) => data._id !== id)
-                })
-            });
-
-            setSelected([]);
-            return toast(res.msg, 'success');
-
-        } catch (error) {
-            console.log(error)
-            toast("Something went wrong", "error")
-        }
-    }
 
 
     return (
@@ -159,15 +127,6 @@ const Enquiry = () => {
             <main id='main'>
                 <SideNav />
                 <Tooltip id='accoutnTooltip' />
-                <ConfirmModal
-                    openConfirm={openConfirm}
-                    openStatus={(status) => { setOpenConfirm(status) }}
-                    title={"Are you sure you want to delete the selected Accounts?"}
-                    fun={() => {
-                        removeData();
-                        setOpenConfirm(false);
-                    }}
-                />
                 <ContextMenu
                     print={() => exportTable('print')}
                     copy={() => exportTable('copy')}
@@ -186,15 +145,6 @@ const Enquiry = () => {
                                 </select>
                             </div>
                             <div className='flex items-center gap-2'>
-                                <button
-                                    onClick={() => {
-                                        if (selected.length === 0 || tableStatusData !== 'active') return;
-                                        setOpenConfirm(true);
-                                    }}
-                                    className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
-                                    <MdDeleteOutline className='text-lg' />
-                                    Delete
-                                </button>
                                 <button
                                     onClick={() => navigate("/admin/dar/add")}
                                     className='bg-[#003E32] text-white '>
@@ -278,7 +228,7 @@ const Enquiry = () => {
                                         </div>
                                     </div>
                                 </>
-                            ) : <AddNew title={"Enquiry"} link={"/admin/enquiry/add"} />
+                            ) : <AddNew title={"Dar"} link={"/admin/dar/add"} />
                         ) : <DataShimmer />
                     }
                 </div>
