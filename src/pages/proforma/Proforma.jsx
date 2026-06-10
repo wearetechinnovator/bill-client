@@ -17,6 +17,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import ContextMenu from '../../components/ContextMenu';
+import { useSelector } from 'react-redux';
 
 
 
@@ -49,6 +50,9 @@ const Proforma = () => {
 	const [openConfirm, setOpenConfirm] = useState(false);
 	const [applyFilter, setApplyFilter] = useState(null);
 	const [isCustomDate, setIsCustomDate] = useState(false);
+	const userData = useSelector((store) => store.userDetail);
+	const role = userData.role;
+
 
 
 	// Get data;
@@ -236,18 +240,11 @@ const Proforma = () => {
 								</select>
 							</div>
 							<div className='flex items-center gap-2 listing__btn_grp'>
-								{/* <div className='flex w-full flex-col lg:w-[300px]'>
-									<input type='text'
-										placeholder='Search...'
-										onChange={searchTable}
-										className='p-[6px]'
-									/>
-								</div> */}
 								<button onClick={() => {
 									setFilterToggle(!filterToggle)
 								}}
 									className={`${filterToggle ? 'bg-gray-200 border-gray-300' : 'bg-gray-100'} border`}>
-									<Icons.FILTER className='text-xl' />
+									<Icons.FILTER size={17}/>
 									Filter
 								</button>
 								<button
@@ -259,12 +256,17 @@ const Proforma = () => {
 									<Icons.DELETE className='text-lg' />
 									Delete
 								</button>
-								<button
-									onClick={() => navigate("/admin/proforma-invoice/add")}
-									className='bg-[#003E32] text-white '>
-									<Icons.ADD className='text-xl text-white' />
-									Add New
-								</button>
+								{
+									role !== "sales" && (
+										<button
+											onClick={() => navigate("/admin/proforma-invoice/add")}
+											className='bg-[#003E32] text-white '>
+											<Icons.ADD className='text-xl text-white' />
+											Add New
+										</button>
+									)
+								}
+								
 								{
 									billData?.length > 0 && (
 										<div className='flex justify-end'>

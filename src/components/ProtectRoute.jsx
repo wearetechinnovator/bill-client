@@ -26,6 +26,9 @@ const ProtectRoute = ({ children }) => {
         "/admin/profile",
         "/admin/assigned-party",
         "/admin/party/details/",
+        "/admin/dar",
+        "/admin/dar/add",
+        "/admin/dar/history/",
 
         // Unit
         // "/admin/unit",
@@ -90,6 +93,10 @@ const ProtectRoute = ({ children }) => {
         "/admin/enquiry",
         "/admin/enquiry/add",
         "/admin/enquiry/edit",
+
+        "/admin/po-client",
+        "/admin/po-client/add",
+        "/admin/po-client/edit"
     ];
 
     // Manager not access this routes;

@@ -16,6 +16,7 @@ import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
 import { Constants } from '../../helper/constants';
 import ContextMenu from '../../components/ContextMenu';
+import { useSelector } from 'react-redux';
 
 
 
@@ -36,7 +37,7 @@ const Quotation = () => {
             "Quotation Number": quotationNumber,
             "Party": party.name,
             "Valid Date": validDate?.split("T")[0],
-            "Status" : billStatus === Constants.CONVERT ? "converted" : billStatus
+            "Status": billStatus === Constants.CONVERT ? "converted" : billStatus
         }));
     }, [billData]);
     const [loading, setLoading] = useState(true);
@@ -48,6 +49,8 @@ const Quotation = () => {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [applyFilter, setApplyFilter] = useState(null);
     const [isCustomDate, setIsCustomDate] = useState(false);
+    const userData = useSelector((store) => store.userDetail);
+    const role = userData.role;
 
 
 
@@ -202,11 +205,11 @@ const Quotation = () => {
                     }}
                 />
                 <ContextMenu
-					print={() => exportTable('print')}
-					copy={() => exportTable('copy')}
-					pdf={() => exportTable('pdf')}
-					excel={() => exportTable('excel')}
-				/>
+                    print={() => exportTable('print')}
+                    copy={() => exportTable('copy')}
+                    pdf={() => exportTable('pdf')}
+                    excel={() => exportTable('excel')}
+                />
                 <div className='content__body'>
                     {/* top section */}
                     <div className={`add_new_compnent`}>
@@ -220,19 +223,12 @@ const Quotation = () => {
                                 </select>
                             </div>
                             <div className='listing__btn_grp'>
-                                {/* <div className='flex w-full flex-col lg:w-[300px]'>
-                                    <input type='text'
-                                        placeholder='Search...'
-                                        onChange={searchTable}
-                                        className='p-[6px]'
-                                    />
-                                </div> */}
                                 <button
                                     onClick={() => {
                                         setFilterToggle(!filterToggle)
                                     }}
                                     className={`${filterToggle ? 'bg-gray-200 border-gray-300' : 'bg-gray-100'} border`}>
-                                    <Icons.FILTER className='text-xl' />
+                                    <Icons.FILTER size={17}/>
                                     Filter
                                 </button>
                                 <button
@@ -244,12 +240,17 @@ const Quotation = () => {
                                     <Icons.DELETE className='text-lg' />
                                     Delete
                                 </button>
-                                <button
-                                    onClick={() => navigate("/admin/quotation-estimate/add")}
-                                    className='bg-[#003E32] text-white '>
-                                    <Icons.ADD className='text-xl text-white' />
-                                    Add New
-                                </button>
+                                {
+                                    role !== "sales" && (
+                                        <button
+                                            onClick={() => navigate("/admin/quotation-estimate/add")}
+                                            className='bg-[#003E32] text-white '>
+                                            <Icons.ADD className='text-xl text-white' />
+                                            Add New
+                                        </button>
+                                    )
+                                }
+
                                 {
                                     billData?.length > 0 && (
                                         <div className='flex justify-end'>
@@ -464,7 +465,7 @@ const Quotation = () => {
                                                                         }}
                                                                     >
                                                                         <Icons.CONVERT className='text-[14px]' />
-                                                                        Convert to proforma
+                                                                        Convert to Proforma
                                                                     </div>
                                                                     <div
                                                                         className='table__list__action__icon'
@@ -478,7 +479,7 @@ const Quotation = () => {
                                                                         }}
                                                                     >
                                                                         <Icons.CONVERT className='text-[14px]' />
-                                                                        Convert to invoice
+                                                                        Convert to Invoice
                                                                     </div>
                                                                 </div>
                                                             </Popover>}

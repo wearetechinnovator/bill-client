@@ -6,7 +6,7 @@ import useMyToaster from '../../hooks/useMyToaster';
 import useApi from '../../hooks/useApi';
 import useBillPrefix from '../../hooks/useBillPrefix';
 import Cookies from 'js-cookie';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import swal from 'sweetalert';
 import { useDispatch, useSelector } from 'react-redux';
 import AddPartyModal from '../../components/AddPartyModal';
@@ -30,6 +30,7 @@ const Proforma = ({ mode }) => {
 	const { getApiData } = useApi();
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const location = useLocation();
 	const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
 	const getItemModalState = useSelector((store) => store.itemModalSlice.show);
 	const itemRowSet = {
@@ -58,8 +59,8 @@ const Proforma = ({ mode }) => {
 		11.	Liability: Liability is limited to the value of goods; indirect damages not covered
 		12.	Law & Jurisdiction: Governed by Indian laws; disputes resolved in Navi Mumbai courts
 		13.	Acceptance: Payment and order confirmation signify buyer’s agreement to terms`,
-		discountType: '', discountAmount: '', discountPercentage: '',
-		finalAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: '', poNumber: '', poDate: '', deliveryTime: ''
+		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '', autoRoundOff: false,
+		roundOffType: '0', roundOffAmount: '', poNumber: '', poDate: '', deliveryTime: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -396,6 +397,22 @@ const Proforma = ({ mode }) => {
 	}
 
 
+	useEffect(() => {
+		if (!location.state?.poClientData) return;
+
+		const data = location.state.poClientData;
+
+		setFormData(prev => ({
+			...prev,
+			party: data.party,
+			poNumber: data.poNumber,
+			poDate: data.poDate?.split("T")[0] || "",
+		}));
+
+		setItemRows(data.items || []);
+	}, [location.state]);
+
+
 	// *Clear form values;
 	const clearForm = () => {
 		setItemRows([itemRowSet]);
@@ -428,32 +445,6 @@ const Proforma = ({ mode }) => {
 
 				<div className='content__body'>
 					<div className='content__body__main bg-white' id='addQuotationTable'>
-
-						{/* <div className='top__btn__grp'>
-						{
-							<div className='extra__btns'>
-							{mode === "edit" && <button onClick={() => {
-								swal({
-								title: "Are you sure?",
-								icon: "warning",
-								buttons: true,
-								})
-								.then((cnv) => {
-									if (cnv) {
-									swal("Proforma successfully duplicate", {
-										icon: "success",
-									});
-									navigate(`/admin/proforma-invoice/add/${id}`)
-									}
-								});
-							}}><Icons.COPY />Duplicate invoice</button>}
-							<button onClick={saveBill}>
-								<Icons.CHECK />{mode === "edit" ? "Update" : "Save"}
-							</button>
-							</div>
-						}
-						</div> */}
-
 						<div className='flex flex-col lg:flex-row items-center justify-around gap-4'>
 							<div className='flex flex-col gap-2 w-full'>
 								<p className='text-xs'>Select Party <span className='required__text'>*</span></p>

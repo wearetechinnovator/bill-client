@@ -1,8 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-// import MyBreadCrumb from '../../components/BreadCrumb';
 import { Popover, SelectPicker, Whisper } from 'rsuite';
+import { BiPrinter } from "react-icons/bi";
+import { FaRegCopy, FaRegEdit } from "react-icons/fa";
+import { MdFilterList, MdOutlineArrowDropDown } from "react-icons/md";
+import { FaRegFilePdf } from "react-icons/fa";
+import { FaRegFileExcel } from "react-icons/fa";
+import { MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 import useExportTable from '../../hooks/useExportTable';
 import useMyToaster from '../../hooks/useMyToaster';
@@ -10,18 +15,22 @@ import Cookies from 'js-cookie';
 import downloadPdf from '../../helper/downloadPdf';
 import DataShimmer from '../../components/DataShimmer';
 import { Tooltip } from 'react-tooltip';
+import { IoIosAdd, IoMdInformationCircleOutline, IoMdMore } from 'react-icons/io';
 import AddNew from '../../components/AddNew';
-import { Icons } from '../../helper/icons';
-import ConfirmModal from '../../components/ConfirmModal';
+import { FiMoreHorizontal } from 'react-icons/fi';
+import { RiArrowDropUpFill } from "react-icons/ri";
 import Pagination from '../../components/Pagination';
+import ConfirmModal from '../../components/ConfirmModal';
+import { Icons } from '../../helper/icons';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
-import PrintPaymentInModal from '../../components/PrintPaymentInModal';
 import ContextMenu from '../../components/ContextMenu';
 
 
-const PaymentIn = () => {
-    const token = Cookies.get("token")
+
+
+
+const PoClient = () => {
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
     const [activePage, setActivePage] = useState(1);
@@ -33,32 +42,30 @@ const PaymentIn = () => {
     const tableRef = useRef(null);
     const [tableStatusData, setTableStatusData] = useState('active');
     const exportData = useMemo(() => {
-        return billData && billData.map(data => ({
-            "Payment In Date": data.paymentInDate.split("T")[0],
-            "Payment In Number": data.paymentInNumber,
-            "Party": data.party.name,
-            Amount: data.amount
+        return billData && billData.map(({ estimateData, poNumber, party, validDate }) => ({
+            "Estimate Data": estimateData,
+            "PO Number": poNumber,
+            "Party": party.name,
+            "Valid Date": validDate
         }));
     }, [billData]);
     const [loading, setLoading] = useState(true);
-    const [ascending, setAscending] = useState(true);
-    const [openConfirm, setOpenConfirm] = useState(false);
     const [filterToggle, setFilterToggle] = useState(false);
     const [filter, setFilter] = useState({
         startDate: '', endDate: '', billNo: '', party: '',
     })
+    const [ascending, setAscending] = useState(true);
+    const [openConfirm, setOpenConfirm] = useState(false);
     const [applyFilter, setApplyFilter] = useState(null);
     const [isCustomDate, setIsCustomDate] = useState(false);
-    const [printModalOpen, setPrintModalOpen] = useState(false);
-    const [printPaymentId, setPrintPaymentId] = useState(null);
 
 
 
 
     // Get data;
-    useEffect(() => {
-        const getData = async () => {
-            setLoading(true);
+    const getData = async () => {
+        setLoading(true);
+        try {
             let data = {
                 token: Cookies.get("token"),
                 all: tableStatusData === "all" ? true : false
@@ -72,61 +79,39 @@ const PaymentIn = () => {
                     billNo: filter.billNo,
                 }
             }
+            const url = process.env.REACT_APP_API_URL + `/po-client/get?page=${activePage}&limit=${dataLimit}`;
+            const req = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const res = await req.json();
+            setTotalData(res.totalData)
+            setBillData([...res.data]);
+            setLoading(false);
 
-            try {
-                const url = process.env.REACT_APP_API_URL + `/paymentin/get?page=${activePage}&limit=${dataLimit}`;
-                const req = await fetch(url, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-                const res = await req.json();
-                setTotalData(res.totalData)
-                setBillData([...res.data]);
-            } catch (error) {
-                console.log(error)
-                return toast("Something went wrong", "error");
-            } finally {
-                setLoading(false);
-            }
+        } catch (error) {
+            console.log(error)
+            return toast("Something went wrong", "error");
+        } finally {
+            setLoading(false);
         }
+    }
+    useEffect(() => {
         getData();
-    }, [tableStatusData, dataLimit, activePage, applyFilter])
-
+    }, [tableStatusData, dataLimit, activePage, applyFilter]);
 
     const sortByDate = () => {
         const sorted = [...billData].sort((a, b) => {
-            const dateA = new Date(a.paymentInDate);
-            const dateB = new Date(b.paymentInDate);
+            const dateA = new Date(a.poDate);
+            const dateB = new Date(b.poDate);
             return ascending ? dateA - dateB : dateB - dateA;
         });
         setBillData(sorted);
         setAscending(!ascending);
     };
-
-
-    const searchTable = (e) => {
-        const value = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('.list__table tbody tr');
-
-        rows.forEach(row => {
-            const cols = row.querySelectorAll('td');
-            let found = false;
-            cols.forEach((col, index) => {
-                if (index !== 0 && col.innerHTML.toLowerCase().includes(value)) {
-                    found = true;
-                }
-            });
-            if (found) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-        });
-    }
-
 
     const selectAll = (e) => {
         if (e.target.checked) {
@@ -135,7 +120,6 @@ const PaymentIn = () => {
             setSelected([]);
         }
     };
-
 
     const handleCheckboxChange = (id) => {
         setSelected((prevSelected) => {
@@ -147,29 +131,28 @@ const PaymentIn = () => {
         });
     };
 
-
     const exportTable = async (whichType) => {
         if (whichType === "copy") {
             copyTable("listQuotation"); // Pass tableid
         }
         else if (whichType === "excel") {
-            downloadExcel(exportData, 'payment-in.xlsx') // Pass data and filename
+            downloadExcel(exportData, 'PO-list.xlsx') // Pass data and filename
         }
         else if (whichType === "print") {
-            printTable(tableRef, "Payment In List"); // Pass table ref and title
+            printTable(tableRef, "PO List"); // Pass table ref and title
         }
         else if (whichType === "pdf") {
-            let document = exportPdf('Payment In List', exportData);
+            let document = exportPdf('PO List', exportData);
             downloadPdf(document)
         }
     }
-
 
     const removeData = async () => {
         if (selected.length === 0 || tableStatusData !== 'active') {
             return;
         }
-        const url = process.env.REACT_APP_API_URL + "/paymentin/delete";
+
+        const url = process.env.REACT_APP_API_URL + "/po-client/delete";
         try {
             const req = await fetch(url, {
                 method: "DELETE",
@@ -199,7 +182,6 @@ const PaymentIn = () => {
         }
     }
 
-
     const clearFilterData = () => {
         setFilter({
             startDate: '', endDate: '', billNo: '', party: '',
@@ -208,36 +190,32 @@ const PaymentIn = () => {
     }
 
 
+
+
     return (
         <>
-            <Nav title={"Payment in"} />
+            <Nav title={"PO"} />
             <main id='main'>
                 <SideNav />
-                <Tooltip id='payInTooltip' />
-                <PrintPaymentInModal
-                    paymentId={printPaymentId}
-                    open={printModalOpen}
-                    onClose={() => {
-                        setPrintModalOpen(false);
-                        setPrintPaymentId(null);
-                    }}
-                />
+                <Tooltip id='poTooltip' />
                 <ConfirmModal
                     openConfirm={openConfirm}
                     openStatus={(status) => { setOpenConfirm(status) }}
-                    title={"Are you sure you want to delete the selected Payment?"}
+                    title={"Are you sure you want to delete the selected PO?"}
                     fun={() => {
                         removeData();
                         setOpenConfirm(false);
                     }}
                 />
                 <ContextMenu
-					print={() => exportTable('print')}
-					copy={() => exportTable('copy')}
-					pdf={() => exportTable('pdf')}
-					excel={() => exportTable('excel')}
-				/>
+                    print={() => exportTable('print')}
+                    copy={() => exportTable('copy')}
+                    pdf={() => exportTable('pdf')}
+                    excel={() => exportTable('excel')}
+                />
+
                 <div className='content__body'>
+                    {/* top section */}
                     <div className={`add_new_compnent`}>
                         <div className='flex justify-between items-center'>
                             <div className='flex flex-col'>
@@ -253,7 +231,7 @@ const PaymentIn = () => {
                                     setFilterToggle(!filterToggle)
                                 }}
                                     className={`${filterToggle ? 'bg-gray-200 border-gray-300' : 'bg-gray-100'} border`}>
-                                   <Icons.FILTER size={17}/>
+                                    <Icons.FILTER size={17} />
                                     Filter
                                 </button>
                                 <button
@@ -262,13 +240,13 @@ const PaymentIn = () => {
                                         setOpenConfirm(true);
                                     }}
                                     className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
-                                    <Icons.DELETE className='text-lg' />
+                                    <MdDeleteOutline className='text-lg' />
                                     Delete
                                 </button>
                                 <button
-                                    onClick={() => navigate("/admin/payment-in/add")}
+                                    onClick={() => navigate("/admin/po-client/add")}
                                     className='bg-[#003E32] text-white '>
-                                    <Icons.ADD className='text-xl text-white' />
+                                    <IoIosAdd className='text-xl text-white' />
                                     Add New
                                 </button>
                                 {
@@ -277,32 +255,34 @@ const PaymentIn = () => {
                                             <Whisper placement='leftStart' enterable
                                                 speaker={<Popover full>
                                                     <div className='download__menu' onClick={() => exportTable('print')} >
-                                                        <Icons.PRINTER className='text-[16px]' />
+                                                        <BiPrinter className='text-[16px]' />
                                                         Print Table
                                                     </div>
                                                     <div className='download__menu' onClick={() => exportTable('copy')}>
-                                                        <Icons.COPY className='text-[16px]' />
+                                                        <FaRegCopy className='text-[16px]' />
                                                         Copy Table
                                                     </div>
                                                     <div className='download__menu' onClick={() => exportTable('pdf')}>
-                                                        <Icons.PDF className="text-[16px]" />
+                                                        <FaRegFilePdf className="text-[16px]" />
                                                         Download Pdf
                                                     </div>
                                                     <div className='download__menu' onClick={() => exportTable('excel')} >
-                                                        <Icons.EXCEL className='text-[16px]' />
+                                                        <FaRegFileExcel className='text-[16px]' />
                                                         Download Excel
                                                     </div>
                                                 </Popover>}
                                             >
                                                 <div className='record__download' >
-                                                    <Icons.MORE />
+                                                    <IoMdMore />
                                                 </div>
                                             </Whisper>
                                         </div>
                                     )
                                 }
+
                             </div>
                         </div>
+
                         {
                             filterToggle && (
                                 <div>
@@ -404,67 +384,105 @@ const PaymentIn = () => {
                                 <table className='min-w-full bg-white' id='listQuotation' ref={tableRef}>
                                     <thead className='list__table__head'>
                                         <tr>
-                                            <th className='py-2'>
-                                                <input type='checkbox'
+                                            <th className='py-2 px-4 border-b'>
+                                                <input
+                                                    type='checkbox'
                                                     onChange={selectAll}
                                                     checked={billData.length > 0 && selected.length === billData.length}
                                                 />
                                             </th>
-                                            <th className='py-2 cursor-pointer' onClick={sortByDate}>
+                                            <th className='cursor-pointer' onClick={sortByDate}>
                                                 <div className='flex items-center justify-start'>
-                                                    Date {ascending ? <Icons.DROPDOWN /> : <Icons.DROPUP />}
+                                                    Date {ascending ? <MdOutlineArrowDropDown /> : <RiArrowDropUpFill />}
                                                 </div>
                                             </th>
-                                            <th align='left'>Payment In Number</th>
+                                            <th align='left'>PO Number</th>
                                             <th align='left'>Party Name</th>
-                                            <th align='left'>Amount</th>
-                                            <th>Action</th>
+                                            <th align='left'>Drive Link</th>
+                                            <th align='left'>Status</th>
+                                            <th align='center'>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {
                                             billData.map((data, i) => {
                                                 return <tr key={i}>
-                                                    <td className='py-2 px-4 border-b max-w-[10px]' align='center'>
+                                                    <td className='py-2' align='center'>
                                                         <input type='checkbox'
-                                                            onClick={(e) => e.stopPropagation()}
-                                                            onChange={() => handleCheckboxChange(data._id)}
                                                             checked={selected.includes(data._id)}
+                                                            onChange={() => handleCheckboxChange(data._id)}
+                                                            onClick={(e) => e.stopPropagation()}
                                                         />
                                                     </td>
-                                                    <td>{new Date(data.paymentInDate).toLocaleDateString()}</td>
-                                                    <td>{data.paymentInNumber}</td>
+                                                    <td>{data.poDate.split("T")[0]}</td>
+                                                    <td>{data.poNumber}</td>
                                                     <td>{data.party.name}</td>
-                                                    <td>{data.amount}</td>
+                                                    <td>
+                                                        <a href={data.driveLink} target='_blank' className='hover:text-black hover:underline'>
+                                                            Link
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        {
+                                                            data.validDate ?
+                                                                <span className={`${data.validDate ? 'green-badge' : ''} badge`}>
+                                                                    {
+                                                                        new Date(Date.parse(new Date().toLocaleDateString())).toISOString() >
+                                                                            new Date(Date.parse(data.validDate)).toISOString() ?
+                                                                            "Expired" : "Valid"
+                                                                    }
+                                                                </span>
+                                                                : "--"
+                                                        }
+                                                    </td>
 
                                                     <td className='px-4 text-center'>
                                                         <Whisper
                                                             placement='leftStart'
                                                             trigger={"click"}
-                                                            speaker={
-                                                                <Popover full className='table__list__action__parent'>
-                                                                    <div
-                                                                        className='table__list__action__icon'
-                                                                        onClick={() => navigate(`/admin/payment-in/edit/${data._id}`)}
-                                                                    >
-                                                                        <Icons.EDIT className='text-[16px]' />
-                                                                        Edit
-                                                                    </div>
-
-                                                                    <div
-                                                                        className='table__list__action__icon'
-                                                                        onClick={() => {
-                                                                            setPrintPaymentId(data._id);
-                                                                            setPrintModalOpen(true);
-                                                                        }}
-                                                                    >
-                                                                        <Icons.PRINTER className='text-[16px]' />
-                                                                        Print Bill
-                                                                    </div>
-                                                                </Popover>}
+                                                            speaker={<Popover full>
+                                                                <div
+                                                                    className='table__list__action__icon'
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        navigate(`/admin/po-client/edit/${data._id}`)
+                                                                    }}
+                                                                >
+                                                                    <FaRegEdit className='text-[16px]' />
+                                                                    Edit
+                                                                </div>
+                                                                <div
+                                                                    className='table__list__action__icon'
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        navigate(`/admin/proforma-invoice/add`, {
+                                                                            state: {
+                                                                                poClientData: data
+                                                                            }
+                                                                        })
+                                                                    }}
+                                                                >
+                                                                    <Icons.CONVERT className='text-[16px]' />
+                                                                    Convert to Proforma
+                                                                </div>
+                                                                <div
+                                                                    className='table__list__action__icon'
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        navigate(`/admin/sales-invoice/add`, {
+                                                                            state: {
+                                                                                poClientData: data
+                                                                            }
+                                                                        })
+                                                                    }}
+                                                                >
+                                                                    <Icons.CONVERT className='text-[16px]' />
+                                                                    Convert to Invoice
+                                                                </div>
+                                                            </Popover>}
                                                         >
-                                                            <div className='table__list__action' >
-                                                                <Icons.HORIZONTAL_MORE />
+                                                            <div className='table__list__action' onClick={(e) => e.stopPropagation()}>
+                                                                <FiMoreHorizontal />
                                                             </div>
                                                         </Whisper>
                                                     </td>
@@ -475,6 +493,7 @@ const PaymentIn = () => {
                                 </table>
                                 <div className='paginate__parent'>
                                     <p>Showing {billData.length} of {totalData} entries</p>
+                                    {/* ----- Paginatin ----- */}
                                     <Pagination
                                         activePage={activePage}
                                         totalData={totalData}
@@ -485,7 +504,7 @@ const PaymentIn = () => {
                                 {/* pagination end */}
                             </div>
                         </div>
-                            : <AddNew title={"Payment In"} link={"/admin/payment-in/add"} />
+                            : <AddNew title={"PO"} link={'/admin/po-client/add'} />
                             : <DataShimmer />
                     }
                 </div>
@@ -495,5 +514,5 @@ const PaymentIn = () => {
     )
 }
 
-export default PaymentIn;
+export default PoClient;
 

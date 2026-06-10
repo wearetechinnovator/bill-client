@@ -53,6 +53,8 @@ const Invoice = () => {
     const [paymentModal, setPaymentModal] = useState(false);
     const [paymentButtonShow, setPaymentButtonShow] = useState(null);
     const [openConfirm, setOpenConfirm] = useState(false);
+    const userData = useSelector((store) => store.userDetail);
+    const role = userData.role;
 
 
 
@@ -508,26 +510,31 @@ const Invoice = () => {
                                                             )
                                                         }
 
-                                                        <div className='download__menu'
-                                                            onClick={() => {
-                                                                swal({
-                                                                    title: "Are you sure?",
-                                                                    icon: "warning",
-                                                                    buttons: true,
-                                                                })
-                                                                    .then((cnv) => {
-                                                                        if (cnv) {
-                                                                            swal("Quotation successfully duplicate", {
-                                                                                icon: "success",
+                                                        {
+                                                            role !== "sales" && (
+                                                                <div className='download__menu'
+                                                                    onClick={() => {
+                                                                        swal({
+                                                                            title: "Are you sure?",
+                                                                            icon: "warning",
+                                                                            buttons: true,
+                                                                        })
+                                                                            .then((cnv) => {
+                                                                                if (cnv) {
+                                                                                    swal("Quotation successfully duplicate", {
+                                                                                        icon: "success",
+                                                                                    });
+                                                                                    navigate(`/admin/${route}/add/${id}`)
+                                                                                }
                                                                             });
-                                                                            navigate(`/admin/${route}/add/${id}`)
-                                                                        }
-                                                                    });
-                                                            }}
-                                                        >
-                                                            <Icons.COPY />
-                                                            Clone
-                                                        </div>
+                                                                    }}
+                                                                >
+                                                                    <Icons.COPY />
+                                                                    Clone
+                                                                </div>
+                                                            )
+                                                        }
+
                                                         <div className='download__menu'
                                                             onClick={printBill}
                                                         >

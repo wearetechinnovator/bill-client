@@ -38,6 +38,9 @@ const salesPath = [
   "/admin/delivery-chalan",
   "/admin/delivery-chalan/add",
   "/admin/delivery-chalan/edit",
+  "/admin/po-client",
+  "/admin/po-client/add",
+  "/admin/po-client/edit"
 ];
 
 const purshasePath = [
@@ -68,6 +71,7 @@ const links = {
     { name: 'DAR', icon: <Icons.DAILY_REPORT />, link: '/admin/dar' },
   ],
   "sales": [
+    { name: 'PO from Client', icon: <Icons.SMAEICON />, link: '/admin/po-client' },
     { name: 'Quotation / Estimate', icon: <Icons.SMAEICON />, link: '/admin/quotation-estimate' },
     { name: 'Proforma Invoice', icon: <Icons.SMAEICON />, link: '/admin/proforma-invoice' },
     { name: 'Sales Invoice', icon: <Icons.SMAEICON />, link: '/admin/sales-invoice' },
@@ -98,6 +102,9 @@ const links = {
 const salesAllowLinks = [
   "/admin/dashboard",
   "/admin/assigned-party",
+  "/admin/dar",
+  "/admin/dar/add",
+  "/admin/dar/history/",
 
   // Unit
   // "/admin/unit",
@@ -162,6 +169,10 @@ const salesAllowLinks = [
   "/admin/enquiry",
   "/admin/enquiry/add",
   "/admin/enquiry/edit",
+
+  "/admin/po-client",
+  "/admin/po-client/add",
+  "/admin/po-client/edit"
 ];
 
 const managerNotAllowLinks = [

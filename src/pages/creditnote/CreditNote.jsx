@@ -246,7 +246,7 @@ const CreditNote = () => {
 									setFilterToggle(!filterToggle)
 								}}
 									className={`${filterToggle ? 'bg-gray-200 border-gray-300' : 'bg-gray-100'} border`}>
-									<Icons.FILTER className='text-xl' />
+									<Icons.FILTER size={17}/>
 									Filter
 								</button>
 								<button

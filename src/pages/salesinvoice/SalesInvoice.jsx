@@ -25,6 +25,7 @@ import { useSelector } from 'react-redux';
 const SalesInvoice = () => {
 	const toast = useMyToaster();
 	const userData = useSelector((store) => store.userDetail);
+	const role = userData.role;
 	const isAdmin = !userData?.role || userData?.role === "admin";
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
 	const [activePage, setActivePage] = useState(1);
@@ -306,7 +307,7 @@ const SalesInvoice = () => {
 										setFilterToggle(!filterToggle);
 									}}
 									className={`${filterToggle ? 'bg-gray-200' : 'bg-gray-100'} border`}>
-									<Icons.FILTER className='text-xl' />
+									<Icons.FILTER size={17}/>
 									Filter
 								</button>
 								<button
@@ -318,12 +319,17 @@ const SalesInvoice = () => {
 									<Icons.DELETE className='text-lg' />
 									Delete
 								</button>
-								<button
-									onClick={() => navigate("/admin/sales-invoice/add")}
-									className='bg-[#003E32] text-white '>
-									<Icons.ADD className='text-xl text-white' />
-									Add New
-								</button>
+								{
+									role !== "sales" && (
+										<button
+											onClick={() => navigate("/admin/sales-invoice/add")}
+											className='bg-[#003E32] text-white '>
+											<Icons.ADD className='text-xl text-white' />
+											Add New
+										</button>
+									)
+								}
+							
 								{
 									billData?.length > 0 && (
 										<div className='flex justify-end'>
@@ -494,7 +500,7 @@ const SalesInvoice = () => {
 									</div>
 								)
 							}
-							
+
 
 							{/* Table start */}
 							<div className='overflow-x-auto list__table'>

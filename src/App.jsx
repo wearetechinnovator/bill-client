@@ -70,6 +70,8 @@ const AddEnquiry = React.lazy(() => import("./pages/Enquiry/AddEnquiry"));
 const Dar = React.lazy(() => import("./pages/Dar/Dar"));
 const AddDar = React.lazy(() => import("./pages/Dar/AddDar"));
 const DarHistoryView = React.lazy(() => import("./pages/Dar/HistoryView"));
+const PoClient = React.lazy(() => import("./pages/PoClient/PoClient"));
+const AddPoClient = React.lazy(() => import("./pages/PoClient/AddPoClient"));
 
 // Reports
 const DayBook = React.lazy(() => import("./pages/Report/DayBook"));
@@ -122,6 +124,10 @@ const App = () => {
         <Route path="/admin/quotation-estimate/add/:id?" element={<ProtectRoute><AddQuotation /></ProtectRoute>} />
         <Route path="/admin/quotation-estimate/edit/:id" element={<ProtectRoute><AddQuotation mode={"edit"} /></ProtectRoute>} />
 
+        {/* PO Client route */}
+        <Route path="/admin/po-client" element={<ProtectRoute><PoClient /></ProtectRoute>} />
+        <Route path="/admin/po-client/add" element={<ProtectRoute><AddPoClient /></ProtectRoute>} />
+        <Route path="/admin/po-client/edit/:id" element={<ProtectRoute><AddPoClient mode={"edit"} /></ProtectRoute>} />
 
         {/* Proforma route */}
         <Route path="/admin/proforma-invoice" element={<ProtectRoute><Proforma /></ProtectRoute>} />
@@ -192,10 +198,9 @@ const App = () => {
         <Route path="/admin/enquiry/add" element={<ProtectRoute><AddEnquiry /></ProtectRoute>} />
         <Route path="/admin/enquiry/edit/:id" element={<ProtectRoute><AddEnquiry mode={"edit"} /></ProtectRoute>} />
 
-        <Route path="/admin/dar" element={<ProtectRoute><Dar/></ProtectRoute>} />
-        <Route path="/admin/dar/history/:id" element={<ProtectRoute><DarHistoryView/></ProtectRoute>} />
+        <Route path="/admin/dar" element={<ProtectRoute><Dar /></ProtectRoute>} />
+        <Route path="/admin/dar/history/:id" element={<ProtectRoute><DarHistoryView /></ProtectRoute>} />
         <Route path="/admin/dar/add" element={<ProtectRoute><AddDar /></ProtectRoute>} />
-        <Route path="/admin/dar/edit/:id" element={<ProtectRoute><AddDar mode={"edit"} /></ProtectRoute>} />
 
         <Route path="/admin/party" element={<ProtectRoute><Party /></ProtectRoute>} />
         <Route path="/admin/assigned-party" element={<ProtectRoute><AssignedParty /></ProtectRoute>} />

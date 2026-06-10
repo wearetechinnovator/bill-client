@@ -44,7 +44,7 @@ const SalesInvoice = ({ mode }) => {
 	const [additionalRows, setAdditionalRow] = useState([additionalRowSet]); //{ additionalRowsItem: 1 }
 	const [formData, setFormData] = useState({
 		party: '', salesInvoiceNumber: '', invoiceDate: new Date().toISOString().split('T')[0], DueDate: '',
-		items: ItemRows, additionalCharge: additionalRows, note: '', 
+		items: ItemRows, additionalCharge: additionalRows, note: '',
 		terms: `1.	Payment Terms: Payment is due within [7/15] days of the invoice date; late payments incur 2% weekly interest.
 		2.	Taxes & Duties: Prices exclude GST and other taxes unless stated; buyers bear additional taxes imposed by authorities
 		3.	Delivery: Goods are delivered as per order terms; delays beyond our control are not our responsibility
@@ -58,8 +58,8 @@ const SalesInvoice = ({ mode }) => {
 		12. Dispute Resolution: Disputes will first be resolved amicably; if unresolved, arbitration under
 		11. Law & Jurisdiction: Governed by Indian laws; disputes resolved in Navi Mumbai courts
 		12. Acceptance: Payment and order confirmation signify buyer’s agreement to terms`,
-		discountType: '', discountAmount: '', discountPercentage: '', paymentStatus: false, 
-		paymentType: Constants.CASH, paymentAccount: '', paymentAmount: '', autoRoundOff: false, 
+		discountType: '', discountAmount: '', discountPercentage: '', paymentStatus: false,
+		paymentType: Constants.CASH, paymentAccount: '', paymentAmount: '', autoRoundOff: false,
 		roundOffType: '0', roundOffAmount: '', finalAmount: '', poNumber: '', poDate: ''
 	})
 	const location = useLocation();
@@ -559,6 +559,22 @@ const SalesInvoice = ({ mode }) => {
 		});
 
 	}
+
+	// CONVERT: PO Client to Salesinvoice;
+	useEffect(() => {
+		if (!location.state?.poClientData) return;
+
+		const data = location.state.poClientData;
+
+		setFormData(prev => ({
+			...prev,
+			party: data.party,
+			poNumber: data.poNumber,
+			poDate: data.poDate?.split("T")[0] || "",
+		}));
+
+		setItemRows(data.items || []);
+	}, [location.state]);
 
 
 	return (

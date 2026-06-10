@@ -15,7 +15,7 @@ import { useSelector } from 'react-redux';
 
 
 
-const AddDar = ({ mode }) => {
+const AddDar = () => {
     const token = Cookies.get("token");
     const userData = useSelector((store) => store.userDetail);
     const isAdmin = !userData?.role || userData?.role === "admin";
@@ -25,39 +25,9 @@ const AddDar = ({ mode }) => {
     const { id } = useParams();
     const [formData, setFormData] = useState({
         name: '', email: '', phone: '', companyName: '', designation: '', companyName: '',
-        activityType: '', feedback: '', staus: '', followUp: '', followDate: ''
+        activityType: '', feedback: '', status: '', followUp: '', followDate: ''
     })
 
-
-
-
-
-
-    // Get data for update mode
-    useEffect(() => {
-        if (!mode) return;
-        (async () => {
-            try {
-                const URL = process.env.REACT_APP_API_URL + "/enquiry/get";
-                const req = await fetch(URL, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": 'application/json'
-                    },
-                    body: JSON.stringify({ token, id: id })
-                })
-                const res = await req.json();
-                setFormData({
-                    ...formData, ...res.data,
-                    deliveryDate: res.data.deliveryDate.split("T")[0],
-                    party: res.data.party._id, contactPerson: res.data.contactPerson._id
-                });
-            } catch (er) {
-                console.log(er);
-                return toast("Data not fetch", 'error');
-            }
-        })()
-    }, [mode])
 
 
     const saveData = async (e) => {
@@ -97,60 +67,16 @@ const AddDar = ({ mode }) => {
 
     }
 
-    const updateData = async (e) => {
-        const validations = [
-            { field: formData.party, msg: "Select party" },
-            { field: formData.enqNo, msg: "Contact personal is required" },
-            { field: formData.contactPerson, msg: "Contact personal is required" },
-            { field: formData.deliveryDate, msg: "Delivery date is required" },
-        ];
-
-        for (const item of validations) {
-            if (!item.field) {
-                return toast(item.msg, "error");
-            }
-        }
-
-        if (formData.items.length === 0 || formData.items.some(i => !i.item || !i.qty)) {
-            return toast("Please add item with quantity", "error");
-        }
-
-
-        try {
-            const url = process.env.REACT_APP_API_URL + "/enquiry/update";
-            const req = await fetch(url, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ ...formData, token, id })
-            })
-
-            const res = await req.json();
-            if (req.status !== 200 || res.err) {
-                return toast(res.err, 'error');
-            }
-
-            toast(res.msg, 'success')
-            navigate("/admin/enquiry")
-            clearData()
-            return;
-        } catch (error) {
-            toast("Something went wrong", "error")
-        }
-
-    }
-
     const clearData = () => {
         setFormData({
             name: '', email: '', phone: '', companyName: '', designation: '',
-            activityType: '', feedback: '', staus: '', followUp: '', followDate: ''
+            activityType: '', feedback: '', status: '', followUp: '', followDate: ''
         })
     }
 
     return (
         <>
-            <Nav title={mode ? "Update DAR (Daily Activity Report)" : "Add DAR (Daily Activity Report)"} />
+            <Nav title={"Add DAR (Daily Activity Report)" } />
             <main id='main'>
                 <SideNav />
                 <div className='content__body'>
@@ -222,9 +148,9 @@ const AddDar = ({ mode }) => {
                                 <p>Status</p>
                                 <select
                                     onChange={(e) => {
-                                        setFormData({ ...formData, staus: e.target.value })
+                                        setFormData({ ...formData, status: e.target.value })
                                     }}
-                                    value={formData.staus}
+                                    value={formData.status}
                                 >
                                     <option value="">Select</option>
                                     <option value="warm">Warm</option>
@@ -276,9 +202,9 @@ const AddDar = ({ mode }) => {
 
                         <div className='w-full flex justify-center gap-3 my-3 mt-5'>
                             <button className='add-bill-btn'
-                                onClick={mode ? updateData : saveData}>
+                                onClick={saveData}>
                                 <Icons.CHECK />
-                                {mode ? "Update" : "Save"}
+                                Save
                             </button>
 
                             <button className='reset-bill-btn'
