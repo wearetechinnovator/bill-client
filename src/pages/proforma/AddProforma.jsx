@@ -396,23 +396,6 @@ const Proforma = ({ mode }) => {
 
 	}
 
-
-	useEffect(() => {
-		if (!location.state?.poClientData) return;
-
-		const data = location.state.poClientData;
-
-		setFormData(prev => ({
-			...prev,
-			party: data.party,
-			poNumber: data.poNumber,
-			poDate: data.poDate?.split("T")[0] || "",
-		}));
-
-		setItemRows(data.items || []);
-	}, [location.state]);
-
-
 	// *Clear form values;
 	const clearForm = () => {
 		setItemRows([itemRowSet]);

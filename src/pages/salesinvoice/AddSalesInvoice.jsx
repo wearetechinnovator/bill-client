@@ -60,7 +60,8 @@ const SalesInvoice = ({ mode }) => {
 		12. Acceptance: Payment and order confirmation signify buyer’s agreement to terms`,
 		discountType: '', discountAmount: '', discountPercentage: '', paymentStatus: false,
 		paymentType: Constants.CASH, paymentAccount: '', paymentAmount: '', autoRoundOff: false,
-		roundOffType: '0', roundOffAmount: '', finalAmount: '', poNumber: '', poDate: ''
+		roundOffType: '0', roundOffAmount: '', finalAmount: '', poNumber: '', poDate: '',
+		isPoConvert: false, poId: ''
 	})
 	const location = useLocation();
 	const fromWhichBill = location.state?.fromWhichBill || null;
@@ -69,7 +70,7 @@ const SalesInvoice = ({ mode }) => {
 	const [perPrice, setPerPrice] = useState(null);
 	const [perTax, setPerTax] = useState(null);
 	const [perDiscount, setPerDiscount] = useState(null);
-	const [perQun, setPerQun] = useState(null)
+	const [perQun, setPerQun] = useState(null);
 
 	// When change discount type;
 	const [discountToggler, setDiscountToggler] = useState(true);
@@ -197,6 +198,31 @@ const SalesInvoice = ({ mode }) => {
 	}, [ItemRows, tax, getApiData, onItemChange]);
 
 
+	// CONVERT: PO Client to Salesinvoice;
+	useEffect(() => {
+		if (!location.state?.poClientData) return;
+		const data = location.state.poClientData;
+
+
+		const filteredItems = data.items.filter((item) => Number(item.qun) > 0);
+		// setItemRows(filteredItems);
+		setItemRows(prev => ([
+			...filteredItems
+		]))
+
+		setFormData(prev => ({
+			...prev,
+			party: data.party,
+			items: data.items,
+			poNumber: data.poNumber,
+			poDate: data.poDate?.split("T")[0] || "",
+			isPoConvert: true,
+			poId: data._id
+		}));
+	}, [location.state]);
+
+
+
 	// Get bill data for edit and CONVERT mode
 	// =======================================
 	const get = async () => {
@@ -305,7 +331,6 @@ const SalesInvoice = ({ mode }) => {
 			}
 			{
 				const data = await getApiData("account")
-				console.log("Account->>", data)
 				setAccount([...data.data])
 			}
 		}
@@ -496,7 +521,6 @@ const SalesInvoice = ({ mode }) => {
 
 			clearForm();
 
-
 			// if this is converted by proforma then delete the Proforma or Quotation
 			// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 			if (mode === "convert" && fromWhichBill === "proforma") {
@@ -551,30 +575,13 @@ const SalesInvoice = ({ mode }) => {
 	// Clear form values;
 	const clearForm = () => {
 		setItemRows([itemRowSet]);
-		setAdditionalRow([additionalRowSet])
+		setAdditionalRow([additionalRowSet]);
 		setFormData({
 			party: '', salesInvoiceNumber: '', invoiceDate: '', DueDate: '', items: ItemRows,
 			additionalCharge: additionalRows, note: '', terms: '',
 			discountType: '', discountAmount: '', discountPercentage: ''
 		});
-
 	}
-
-	// CONVERT: PO Client to Salesinvoice;
-	useEffect(() => {
-		if (!location.state?.poClientData) return;
-
-		const data = location.state.poClientData;
-
-		setFormData(prev => ({
-			...prev,
-			party: data.party,
-			poNumber: data.poNumber,
-			poDate: data.poDate?.split("T")[0] || "",
-		}));
-
-		setItemRows(data.items || []);
-	}, [location.state]);
 
 
 	return (

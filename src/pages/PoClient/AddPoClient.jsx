@@ -296,7 +296,7 @@ const AddPoClient = ({ mode }) => {
                                 />
                             </div>
                             <div className='flex flex-col gap-2 w-full lg:w-1/3'>
-                                <p className='text-xs'>Drive Link <span className='required__text'>*</span></p>
+                                <p className='text-xs'>Upload PO File Source <span className='required__text'>*</span></p>
                                 <input type="text"
                                     className='text-xs'
                                     onChange={(e) => {

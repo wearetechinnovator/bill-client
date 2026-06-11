@@ -58,11 +58,12 @@ import { MdHistory } from "react-icons/md";
 import { FaWhatsapp } from "react-icons/fa";
 import { LuMessageCircleMore } from "react-icons/lu";
 import { CgMail } from "react-icons/cg";
-
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 
 
 export const Icons = {
+  EXTRANAL_LINK: FaExternalLinkAlt,
   EMAIL: CgMail,
   MESSAGE: LuMessageCircleMore,
   WHATSAPP: FaWhatsapp,

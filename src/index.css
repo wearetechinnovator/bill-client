@@ -1014,6 +1014,9 @@ input[type="checkbox"]:checked::before {
 .yellow-badge {
   @apply bg-yellow-50 text-yellow-600;
 }
+.indigo-badge{
+  @apply bg-indigo-50 text-yellow-600;
+}
 
 .item__table {
   table-layout: fixed;

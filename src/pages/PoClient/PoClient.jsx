@@ -398,14 +398,27 @@ const PoClient = () => {
                                             </th>
                                             <th align='left'>PO Number</th>
                                             <th align='left'>Party Name</th>
-                                            <th align='left'>Drive Link</th>
-                                            <th align='left'>Status</th>
+                                            <th align='center'>PO File Source</th>
+                                            <th align='center'>Status</th>
                                             <th align='center'>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {
                                             billData.map((data, i) => {
+                                                let status;
+                                                const pending = data.items.every(p => Number(p.invoice_qun) === 0);
+                                                const complete = data.items.every(p => Number(p.qun) === 0);
+                                                const partial = !pending && !complete;
+
+                                                if (pending)
+                                                    status = "pending";
+                                                else if (complete)
+                                                    status = "complete";
+                                                else
+                                                    status = "partial";
+
+                                                console.log(status);
                                                 return <tr key={i}>
                                                     <td className='py-2' align='center'>
                                                         <input type='checkbox'
@@ -417,22 +430,26 @@ const PoClient = () => {
                                                     <td>{data.poDate.split("T")[0]}</td>
                                                     <td>{data.poNumber}</td>
                                                     <td>{data.party.name}</td>
-                                                    <td>
+                                                    <td align='center'>
                                                         <a href={data.driveLink} target='_blank' className='hover:text-black hover:underline'>
-                                                            Link
+                                                            <Icons.EXTRANAL_LINK className='inline' /> Click Here
                                                         </a>
                                                     </td>
-                                                    <td>
+                                                    <td align='center'>
                                                         {
-                                                            data.validDate ?
-                                                                <span className={`${data.validDate ? 'green-badge' : ''} badge`}>
-                                                                    {
-                                                                        new Date(Date.parse(new Date().toLocaleDateString())).toISOString() >
-                                                                            new Date(Date.parse(data.validDate)).toISOString() ?
-                                                                            "Expired" : "Valid"
-                                                                    }
-                                                                </span>
-                                                                : "--"
+                                                            status === 'pending' && (
+                                                                <span className='badge yellow-badge'>Pending</span>
+                                                            )
+                                                        }
+                                                        {
+                                                            status === 'partial' && (
+                                                                <span className='badge indigo-badge'>Partial</span>
+                                                            )
+                                                        }
+                                                        {
+                                                            status === 'complete' && (
+                                                                <span className='badge green-badge'>Complete</span>
+                                                            )
                                                         }
                                                     </td>
 
@@ -441,30 +458,20 @@ const PoClient = () => {
                                                             placement='leftStart'
                                                             trigger={"click"}
                                                             speaker={<Popover full>
-                                                                <div
-                                                                    className='table__list__action__icon'
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        navigate(`/admin/po-client/edit/${data._id}`)
-                                                                    }}
-                                                                >
-                                                                    <FaRegEdit className='text-[16px]' />
-                                                                    Edit
-                                                                </div>
-                                                                <div
-                                                                    className='table__list__action__icon'
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        navigate(`/admin/proforma-invoice/add`, {
-                                                                            state: {
-                                                                                poClientData: data
-                                                                            }
-                                                                        })
-                                                                    }}
-                                                                >
-                                                                    <Icons.CONVERT className='text-[16px]' />
-                                                                    Convert to Proforma
-                                                                </div>
+                                                                {
+                                                                    !data.items.some((f) => f.invoice_qun > 0) && (
+                                                                        <div
+                                                                            className='table__list__action__icon'
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                navigate(`/admin/po-client/edit/${data._id}`)
+                                                                            }}
+                                                                        >
+                                                                            <FaRegEdit className='text-[16px]' />
+                                                                            Edit
+                                                                        </div>
+                                                                    )
+                                                                }
                                                                 <div
                                                                     className='table__list__action__icon'
                                                                     onClick={(e) => {
