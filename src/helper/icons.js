@@ -59,6 +59,9 @@ import { FaWhatsapp } from "react-icons/fa";
 import { LuMessageCircleMore } from "react-icons/lu";
 import { CgMail } from "react-icons/cg";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { MdAddCircleOutline } from "react-icons/md";
+
 
 
 
@@ -70,19 +73,20 @@ export const Icons = {
   HISTORY: MdHistory,
   DAILY_REPORT: TbReportAnalytics,
   LADGER_USER: LuBookUser,
-  CHECK2: FiCheck ,
+  CHECK2: FiCheck,
   ENQUIRY: TfiHeadphoneAlt,
   WARNING: IoWarningOutline,
   ARROW_UP: FaArrowUp,
   ARROW_DOWN: FaArrowDown,
   RESET: LuRefreshCcw,
   SEARCH: LuSearch,
+  ADD_CIRCLE: MdAddCircleOutline,
   ADD: IoIosAdd,
   EDIT: FaRegEdit,
   MORE: IoMdMore,
   HORIZONTAL_MORE: FiMoreHorizontal,
   FILTER: MdFilterList,
-  DELETE: MdDeleteOutline,
+  DELETE: RiDeleteBin6Line,
   PRINTER: BiPrinter,
   COPY: FaRegCopy,
   PDF: FaRegFilePdf,

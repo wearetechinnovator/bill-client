@@ -174,7 +174,7 @@ const HistoryView = () => {
                 </div>
             </main>
 
-            <Drawer open={openDrawer} onClose={() => setOpenDrawer(false)} size={'sm'}>
+            <Drawer open={openDrawer} onClose={() => setOpenDrawer(false)} size={'xs'}>
                 <Drawer.Header>
                     <Drawer.Title></Drawer.Title>
                     <p className='text-[16px] font-bold'>Add History</p>

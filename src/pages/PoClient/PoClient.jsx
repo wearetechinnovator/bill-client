@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-import { Popover, SelectPicker, Whisper } from 'rsuite';
+import { Drawer, Popover, SelectPicker, Whisper } from 'rsuite';
 import { BiPrinter } from "react-icons/bi";
 import { FaRegCopy, FaRegEdit } from "react-icons/fa";
 import { MdFilterList, MdOutlineArrowDropDown } from "react-icons/md";
@@ -31,6 +31,7 @@ import ContextMenu from '../../components/ContextMenu';
 
 
 const PoClient = () => {
+    const token = Cookies.get("token");
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
     const [activePage, setActivePage] = useState(1);
@@ -58,6 +59,10 @@ const PoClient = () => {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [applyFilter, setApplyFilter] = useState(null);
     const [isCustomDate, setIsCustomDate] = useState(false);
+    const [invoiceLogDrawer, setInvoiceLogDrawer] = useState(false);
+    const whisperRef = useRef();
+    const [salesInvoice, setSalesInvoice] = useState([]); // PoNumber wise set Sales Invoice;
+    const [currentPoData, setCurrentData] = useState({});// Selected PO
 
 
 
@@ -67,7 +72,7 @@ const PoClient = () => {
         setLoading(true);
         try {
             let data = {
-                token: Cookies.get("token"),
+                token,
                 all: tableStatusData === "all" ? true : false
             }
             if (applyFilter) {
@@ -189,7 +194,27 @@ const PoClient = () => {
         setApplyFilter(false);
     }
 
+    const getSalesInvoice = async (poNumber) => {
+        try {
+            const URL = process.env.REACT_APP_API_URL + `/po-client/get-sales-invoice`;
+            const req = await fetch(URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": 'application/json'
+                },
+                body: JSON.stringify({ token, poNumber })
+            });
+            const res = await req.json();
+            if (req.status !== 200) {
+                return toast(res.err, 'error');
+            }
 
+            setSalesInvoice(res);
+
+        } catch (err) {
+            return toast("Sales Invoice not fetch, Something went wrong");
+        }
+    }
 
 
     return (
@@ -240,13 +265,13 @@ const PoClient = () => {
                                         setOpenConfirm(true);
                                     }}
                                     className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
-                                    <MdDeleteOutline className='text-lg' />
+                                    <Icons.DELETE size={15} />
                                     Delete
                                 </button>
                                 <button
                                     onClick={() => navigate("/admin/po-client/add")}
                                     className='bg-[#003E32] text-white '>
-                                    <IoIosAdd className='text-xl text-white' />
+                                    <Icons.ADD_CIRCLE size={15} className='text-white' />
                                     Add New
                                 </button>
                                 {
@@ -418,8 +443,7 @@ const PoClient = () => {
                                                 else
                                                     status = "partial";
 
-                                                console.log(status);
-                                                return <tr key={i}>
+                                                return <tr key={i} className='cursor-pointer' onClick={() => navigate(`/admin/po-client/${data._id}`)}>
                                                     <td className='py-2' align='center'>
                                                         <input type='checkbox'
                                                             checked={selected.includes(data._id)}
@@ -436,25 +460,51 @@ const PoClient = () => {
                                                         </a>
                                                     </td>
                                                     <td align='center'>
-                                                        {
-                                                            status === 'pending' && (
-                                                                <span className='badge yellow-badge'>Pending</span>
-                                                            )
-                                                        }
-                                                        {
-                                                            status === 'partial' && (
-                                                                <span className='badge indigo-badge'>Partial</span>
-                                                            )
-                                                        }
-                                                        {
-                                                            status === 'complete' && (
-                                                                <span className='badge green-badge'>Complete</span>
-                                                            )
-                                                        }
+                                                        <div className='flex items-center justify-center gap-2'>
+                                                            {
+                                                                status === 'pending' && (
+                                                                    <span className='badge yellow-badge'>Pending</span>
+                                                                )
+                                                            }
+                                                            {
+                                                                status === 'partial' && (
+                                                                    <span className='badge indigo-badge'>Partial</span>
+                                                                )
+                                                            }
+                                                            {
+                                                                status === 'complete' && (
+                                                                    <span className='badge green-badge'>Complete</span>
+                                                                )
+                                                            }
+
+                                                            <Whisper
+                                                                placement='leftStart'
+                                                                trigger={"hover"}
+                                                                enterable
+                                                                speaker={<Popover full>
+                                                                    <div className='max-h-[150px] overflow-y-auto'>
+                                                                        {
+                                                                            data.items.map((d, i) => {
+                                                                                return <div key={i} className='pb-1 px-3 border-b last:border-0'>
+                                                                                    <div>{d.itemName}</div>
+                                                                                    <div className='leading-[5px] pb-1'><span className='font-semibold'>Remaining Qty: </span>{d.qun} Out of {Number(d.qun) + Number(d.invoice_qun)}</div>
+                                                                                </div>
+                                                                            })
+                                                                        }
+                                                                    </div>
+
+                                                                </Popover>}
+                                                            >
+                                                                <div className='' >
+                                                                    <Icons.INFO_DETAILS size={15} />
+                                                                </div>
+                                                            </Whisper>
+                                                        </div>
                                                     </td>
 
                                                     <td className='px-4 text-center'>
                                                         <Whisper
+                                                            ref={whisperRef}
                                                             placement='leftStart'
                                                             trigger={"click"}
                                                             speaker={<Popover full>
@@ -486,6 +536,19 @@ const PoClient = () => {
                                                                     <Icons.CONVERT className='text-[16px]' />
                                                                     Convert to Invoice
                                                                 </div>
+                                                                <div
+                                                                    className='table__list__action__icon'
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        whisperRef.current?.close();
+                                                                        getSalesInvoice(data.poNumber);
+                                                                        setCurrentData(data)
+                                                                        setInvoiceLogDrawer(true);
+                                                                    }}
+                                                                >
+                                                                    <Icons.EYE className='text-[16px]' />
+                                                                    View Log
+                                                                </div>
                                                             </Popover>}
                                                         >
                                                             <div className='table__list__action' onClick={(e) => e.stopPropagation()}>
@@ -515,6 +578,69 @@ const PoClient = () => {
                             : <DataShimmer />
                     }
                 </div>
+                <Drawer open={invoiceLogDrawer} size={'xs'} onClose={() => setInvoiceLogDrawer(false)} >
+                    <Drawer.Header>
+                        <div className='flex items-center justify-between w-full'>
+                            <p className='font-semibold text-[16px]'>Invoice Logs</p>
+                            <div className='bg-[#003E32] rounded py-1 px-1 text-white text-[10px]'>PO Number: #{currentPoData?.poNumber}</div>
+                        </div>
+                    </Drawer.Header>
+                    <Drawer.Body className='bg-[#F6F8F8]'>
+                        <div className='flex flex-col uppercase px-4'>
+                            <div className='flex items-center gap-2 text-xs my-3'>
+                                <Icons.HISTORY size={"20px"} />
+                                <p className='font-bold'>Activity History</p>
+                            </div>
+
+                            {
+                                salesInvoice.map((invoice, _) => {
+                                    return (
+                                        <div className='w-full flex gap-2' key={invoice._id}>
+                                            <div className='flex flex-col justify-center items-center'>
+                                                <div className='w-[15px] h-[17px] bg-[#003E32] rounded-full'></div>
+                                                <div className='w-[1px] h-full bg-[#003E32]'></div>
+                                            </div>
+
+                                            <div className='w-full'>
+                                                <div className='border rounded-md w-full hover:border-gray-400 bg-white'>
+                                                    <div className='w-full flex items-center justify-between border-b p-2'>
+                                                        <div>
+                                                            <p className='font-bold text-[13px]'>#{invoice.salesInvoiceNumber}</p>
+                                                            <span className='text-gray-500 text-[11px]'>{invoice.invoiceDate?.split("T")[0]}</span>
+                                                        </div>
+                                                    </div>
+                                                    <table className='w-full p-3 text-xs'>
+                                                        <thead className='bg-gray-50'>
+                                                            <tr>
+                                                                <td className='p-2 font-bold'>ITEM DESCRIPTION</td>
+                                                                <td className='font-bold'>QTY</td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className='lowercase'>
+                                                            {
+                                                                invoice.items.map((item, _) => {
+                                                                    return (
+                                                                        <tr className='border-b border-gray-50'>
+                                                                            <td className='p-2'>{item.itemName}</td>
+                                                                            <td>{item.qun}</td>
+                                                                        </tr>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div className='h-[15px]'></div>
+                                            </div>
+
+                                        </div>
+                                    )
+                                })
+                            }
+
+                        </div>
+                    </Drawer.Body>
+                </Drawer>
             </main>
 
         </>

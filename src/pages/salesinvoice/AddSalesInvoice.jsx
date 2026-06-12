@@ -66,11 +66,12 @@ const SalesInvoice = ({ mode }) => {
 	const location = useLocation();
 	const fromWhichBill = location.state?.fromWhichBill || null;
 
-
 	const [perPrice, setPerPrice] = useState(null);
 	const [perTax, setPerTax] = useState(null);
 	const [perDiscount, setPerDiscount] = useState(null);
 	const [perQun, setPerQun] = useState(null);
+	//When convert PO to invoce store all items;
+	const [poItems, setPoitems] = useState([]);
 
 	// When change discount type;
 	const [discountToggler, setDiscountToggler] = useState(true);
@@ -79,16 +80,11 @@ const SalesInvoice = ({ mode }) => {
 
 	// Store all items without filter
 	const [items, setItems] = useState([]);
-	// Store units
 	const [unit, setUnit] = useState([]);
-	// Store taxes
 	const [tax, setTax] = useState([]);
-	// Store party
 	const [party, setParty] = useState([]);
-	// Account
 	const [account, setAccount] = useState([]);
 	const activeRowIndexRef = useRef(null); // For tracking active row index
-
 
 	// store label and value pair for dropdown
 	const [itemData, setItemData] = useState([])
@@ -203,21 +199,22 @@ const SalesInvoice = ({ mode }) => {
 		if (!location.state?.poClientData) return;
 		const data = location.state.poClientData;
 
-
 		const filteredItems = data.items.filter((item) => Number(item.qun) > 0);
-		// setItemRows(filteredItems);
-		setItemRows(prev => ([
-			...filteredItems
-		]))
+		setItemRows(prev => ([ ...filteredItems ]))
+
+		// Convert JSON for remove object refarence;
+		const jsonData = JSON.stringify(filteredItems);
+		setPoitems([...JSON.parse(jsonData)]);
+
 
 		setFormData(prev => ({
 			...prev,
 			party: data.party,
-			items: data.items,
+			items: filteredItems,
 			poNumber: data.poNumber,
 			poDate: data.poDate?.split("T")[0] || "",
 			isPoConvert: true,
-			poId: data._id
+			poId: data._id,
 		}));
 	}, [location.state]);
 
@@ -424,7 +421,6 @@ const SalesInvoice = ({ mode }) => {
 	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType, formData.discountAmount, formData.discountType]);
 
 
-
 	// Return Sub-Total
 	/*
 	  Total Discount.
@@ -454,7 +450,6 @@ const SalesInvoice = ({ mode }) => {
 		}
 		return subTotal;
 	}, [ItemRows, perPrice, perTax, perDiscount, perQun])
-
 
 
 	const onDiscountAmountChange = (e) => {
@@ -561,7 +556,7 @@ const SalesInvoice = ({ mode }) => {
 				return;
 			}
 
-			navigate('/admin/sales-invoice')
+			navigate('/admin/sales-invoice', { state: {} })
 			return;
 		} catch (error) {
 			return toast('Something went wrong', 'error')
@@ -722,12 +717,22 @@ const SalesInvoice = ({ mode }) => {
 											<td>
 												<input type='text' className='input-style'
 													onChange={(e) => {
+														// ---------------------[When PoClient to Invoice convert]-------------------
+														// User can't increes quantity, jeta PO te ache tar cheye besi dite parbe na.
+														const itemId = ItemRows[index].itemId;
+														console.log(poItems);
+														const filteredItems = poItems?.find((item) => item.itemId === itemId);
+
+														if (Number(e.target.value) > Number(filteredItems?.qun)) {
+															alert(`As per PO, you can add maximum: ${filteredItems?.qun} item for ${filteredItems.itemName}`);
+															return;
+														}
+														// --------------------------------------------------------------------------
+
 														let item = [...ItemRows];
 														item[index].qun = checkNumber(e.target.value);
 														setItemRows(item);
 														setPerQun(e.target.value);
-														if (formData.discountType !== "before") {
-														}
 														onPerDiscountPercentageChange(formData.items[index].discountPerPercentage, index);
 														onPerDiscountAmountChange(formData.items[index].discountPerAmount, index);
 													}}
@@ -758,8 +763,6 @@ const SalesInvoice = ({ mode }) => {
 															item[index].price = checkNumber(e.target.value);
 															setItemRows(item);
 															setPerPrice(e.target.value);
-															if (formData.discountType !== "before") {
-															}
 															onPerDiscountPercentageChange(formData.items[index].discountPerPercentage, index);
 															onPerDiscountAmountChange(formData.items[index].discountPerAmount, index);
 														}}
@@ -779,7 +782,6 @@ const SalesInvoice = ({ mode }) => {
 																onPerDiscountAmountChange(e.target.value, index)
 															} : null}
 															value={ItemRows[index].discountPerAmount}
-														// value={calculatePerDiscountAmount(index)}
 														/>
 														<div><Icons.RUPES /></div>
 													</div>
@@ -793,7 +795,6 @@ const SalesInvoice = ({ mode }) => {
 																onPerDiscountPercentageChange(e.target.value, index)
 															} : null}
 															value={ItemRows[index].discountPerPercentage}
-														// value={calculatePerDiscountPercentage(index)}
 														/>
 														<div>%</div>
 													</div>
@@ -1216,17 +1217,6 @@ const SalesInvoice = ({ mode }) => {
 							{loading ? <Loading /> : <Icons.CHECK />}
 							{!mode || mode === "convert" ? "Save" : "Update"}
 						</button>
-						{/* {
-							!mode && (
-								<button
-									onClick={loading ? null : () => saveBill({ isNew: true })}
-									className='add-bill-btn'
-								>
-									{loading ? <Loading /> : <Icons.CHECK />}
-									Save and New
-								</button>
-							)
-						} */}
 						<button className='reset-bill-btn' onClick={clearForm}>
 							<Icons.RESET />
 							Reset

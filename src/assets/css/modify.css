@@ -166,3 +166,7 @@
    margin-bottom: 8px !important;
    margin-top: 8px !important;
  }
+
+ .rs-drawer-header .rs-drawer-header-close {
+   top: 16px !important;
+ }

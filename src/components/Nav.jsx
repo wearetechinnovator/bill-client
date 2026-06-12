@@ -28,12 +28,12 @@ const Nav = ({ title }) => {
     const userDetails = useSelector((store) => store.userDetail); //get use details from store
     const isAdmin = !userDetails?.role || userDetails?.role === "admin";
     const navigate = useNavigate();
+    const [role, setRole] = useState('');
 
 
     useEffect(() => {
         getUserData();
     }, [])
-
 
     const toggleSideBar = () => {
         convertToSmall();
@@ -103,7 +103,7 @@ const Nav = ({ title }) => {
                                 >
                                     <button
                                         className='text-[13px] flex items-center justify-between bg-[#003E32] text-white py-1
-                                px-3 rounded gap-2'
+                                        px-3 rounded gap-2'
                                     >
                                         Create
                                         <Icons.DROPDOWN />
@@ -124,7 +124,7 @@ const Nav = ({ title }) => {
                             </span>
                             <HiOutlineSwitchHorizontal className="text-[16px] ml-2 text-white" />
                         </div>
-                        <Whisper className='flex items-center overflow-hidden' trigger={'click'} placement='bottomEnd' speaker={<Popover full>
+                        <Whisper trigger={'click'} placement='bottomEnd' speaker={<Popover full>
                             {
                                 isAdmin && (
                                     <Link className='menu-link' to={"/admin/site"}>
@@ -146,10 +146,17 @@ const Nav = ({ title }) => {
                                 <span>Logout</span>
                             </Link>
                         </Popover>}>
-                            <Avatar circle children={<FaUser />} size='sm' src={userDetails.profile} className='border' />
-                            <div className='ml-2 text-gray-800 text-[13px] flex items-center gap-1'>
-                                {userDetails.name}
-                                <Icons.DROPDOWN />
+                            <div className='flex items-center overflow-hidden border-l pl-3'>
+                                <Avatar circle children={<FaUser />} size='sm' src={userDetails.profile} className='border' />
+                                <div className='ml-2 text-gray-800 text-[13px] flex items-center gap-2'>
+                                    <div>
+                                        <span className='font-bold'>{userDetails.name}</span>
+                                        <p className='text-[10px] leading-0 capitalize'>
+                                            {userDetails?.role} Account
+                                        </p>
+                                    </div>
+                                    <Icons.DROPDOWN />
+                                </div>
                             </div>
                         </Whisper>
                     </div>

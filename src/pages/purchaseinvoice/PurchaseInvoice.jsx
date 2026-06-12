@@ -269,13 +269,13 @@ const PurchaseInvoice = () => {
 										setOpenConfirm(true);
 									}}
 									className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
-									<MdDeleteOutline className='text-lg' />
+									<Icons.DELETE size={15}/>
 									Delete
 								</button>
 								<button
 									onClick={() => navigate("/admin/purchase-invoice/add")}
 									className='bg-[#003E32] text-white '>
-									<IoIosAdd className='text-xl text-white' />
+									<Icons.ADD_CIRCLE size={15} className='text-white' />
 									Add New
 								</button>
 

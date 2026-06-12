@@ -148,7 +148,7 @@ const Enquiry = () => {
                                 <button
                                     onClick={() => navigate("/admin/dar/add")}
                                     className='bg-[#003E32] text-white '>
-                                    <IoIosAdd className='text-xl text-white' />
+                                    <Icons.ADD_CIRCLE size={15} className='text-white' />
                                     Add New
                                 </button>
                                 {

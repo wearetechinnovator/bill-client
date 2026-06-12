@@ -72,6 +72,7 @@ const AddDar = React.lazy(() => import("./pages/Dar/AddDar"));
 const DarHistoryView = React.lazy(() => import("./pages/Dar/HistoryView"));
 const PoClient = React.lazy(() => import("./pages/PoClient/PoClient"));
 const AddPoClient = React.lazy(() => import("./pages/PoClient/AddPoClient"));
+const PoClientView = React.lazy(() => import("./pages/PoClient/PoClientView"));
 
 // Reports
 const DayBook = React.lazy(() => import("./pages/Report/DayBook"));
@@ -126,6 +127,7 @@ const App = () => {
 
         {/* PO Client route */}
         <Route path="/admin/po-client" element={<ProtectRoute><PoClient /></ProtectRoute>} />
+        <Route path="/admin/po-client/:id" element={<ProtectRoute><PoClientView /></ProtectRoute>} />
         <Route path="/admin/po-client/add" element={<ProtectRoute><AddPoClient /></ProtectRoute>} />
         <Route path="/admin/po-client/edit/:id" element={<ProtectRoute><AddPoClient mode={"edit"} /></ProtectRoute>} />
 
