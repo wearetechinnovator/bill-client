@@ -18,7 +18,7 @@ import { useSelector } from 'react-redux';
 const AddEnquiry = ({ mode }) => {
     return (
         <>
-            <Nav title={mode ? "Update Enquiry" : "Add Enquiry"} />
+            <Nav title={mode ? "Update Enquiry Track" : "Add Enquiry Track"} />
             <main id='main'>
                 <SideNav />
                 <div className='content__body'>
@@ -40,7 +40,8 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
     const itemData = { item: '', qty: '' };
     const [formData, setFormData] = useState({
         party: '', contactPerson: '', items: [itemData], deliveryDate: '', enqNo: '',
-        message: '',
+        message: '', enquirySource: '', enquiryStatus: '', compititor: '', followUp: 'no',
+        followUpDate: '', orderProbality: '', expectedOrderDate: '', dateReceived: '', industry: ''
     })
     const [party, setParty] = useState([]);
     const [items, setItems] = useState([]);
@@ -185,7 +186,6 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
             { field: formData.party, msg: "Select party" },
             { field: formData.enqNo, msg: "Contact personal is required" },
             { field: formData.contactPerson, msg: "Contact personal is required" },
-            { field: formData.deliveryDate, msg: "Delivery date is required" },
         ];
 
         for (const item of validations) {
@@ -228,7 +228,6 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
             { field: formData.party, msg: "Select party" },
             { field: formData.enqNo, msg: "Contact personal is required" },
             { field: formData.contactPerson, msg: "Contact personal is required" },
-            { field: formData.deliveryDate, msg: "Delivery date is required" },
         ];
 
         for (const item of validations) {
@@ -269,8 +268,9 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
 
     const clearData = (e) => {
         setFormData({
-            party: '', contactPerson: '', items: '', deliveryDate: '', enqNo: '',
-            message: '', qty: ''
+            party: '', contactPerson: '', items: [itemData], deliveryDate: '', enqNo: '',
+            message: '', enquirySource: '', enquiryStatus: '', compititor: '', followUp: 'no',
+            followUpDate: '', orderProbality: '', expectedOrderDate: '', dateReceived: '', industry: ''
         })
     }
 
@@ -331,6 +331,13 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                     </div>
                     <div className='flex items-center gap-4'>
                         <div className='w-full'>
+                            <p>Industry</p>
+                            <input type="text"
+                                onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                                value={formData.industry}
+                            />
+                        </div>
+                        <div className='w-full'>
                             <p>Enq No. <span className='required__text'>*</span></p>
                             <input type="text"
                                 onChange={(e) => {
@@ -340,13 +347,22 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                                 disabled={true}
                             />
                         </div>
-                        <div className='w-full'>
+                        {/* <div className='w-full'>
                             <p>Expected Delivery Date <span className='required__text'>*</span></p>
                             <input type="date"
                                 onChange={(e) => {
                                     setFormData({ ...formData, deliveryDate: e.target.value })
                                 }}
                                 value={formData.deliveryDate}
+                            />
+                        </div> */}
+                        <div className='w-full'>
+                            <p>Date Received <span className='required__text'>*</span></p>
+                            <input type="date"
+                                onChange={(e) => {
+                                    setFormData({ ...formData, dateReceived: e.target.value })
+                                }}
+                                value={formData.dateReceived}
                             />
                         </div>
                     </div>
@@ -411,8 +427,82 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                         )) : null
                     }
                 </div>
+                <div className='justify-between grid grid-cols-1 md:grid-cols-4 gr gap-4 mt-3'>
+                    <div className='w-full'>
+                        <p>Enquiry Source</p>
+                        <select
+                            onChange={(e) => setFormData({ ...formData, enquirySource: e.target.value })}
+                            value={formData.enquirySource}
+                        >
+                            <option value="">Select</option>
+                            <option value="indiamart">IndiaMart</option>
+                            <option value="sulekha">Sulekha</option>
+                            <option value="google">Google</option>
+                            <option value="justdial">JustDial</option>
+                            <option value="others">Others</option>
+                        </select>
+                    </div>
+                    <div className='w-full'>
+                        <p>Enquiry Status</p>
+                        <select
+                            onChange={(e) => setFormData({ ...formData, enquiryStatus: e.target.value })}
+                            value={formData.enquiryStatus}
+                        >
+                            <option value="">Select</option>
+                            <option value="open">Open</option>
+                            <option value="close">Close</option>
+                            <option value="followup">Follow Up</option>
+                            <option value="succeed">Succeed</option>
+                        </select>
+                    </div>
+
+                    <div className='w-full'>
+                        <p>Compititor</p>
+                        <input type="text"
+                            onChange={(e) => setFormData({ ...formData, compititor: e.target.value })}
+                            value={formData.compititor}
+                        />
+                    </div>
+                    <div className='w-full'>
+                        <p>Order Probablity (%)</p>
+                        <input type="text"
+                            onChange={(e) => setFormData({ ...formData, orderProbality: e.target.value })}
+                            value={formData.orderProbality}
+                        />
+                    </div>
+                    <div className='w-full'>
+                        <p>Expected Order Date</p>
+                        <input type="date"
+                            onChange={(e) => setFormData({ ...formData, expectedOrderDate: e.target.value })}
+                            value={formData.expectedOrderDate}
+                        />
+                    </div>
+                    <div className='w-full'>
+                        <p>Follow Up</p>
+                        <select
+                            onChange={(e) => setFormData({ ...formData, followUp: e.target.value })}
+                            value={formData.followUp}
+                        >
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+
+                    {
+                        formData.followUp === "yes" && (
+                            <div className='w-full'>
+                                <p>Follow Up Date</p>
+                                <input type="date"
+                                    onChange={(e) => setFormData({ ...formData, followUpDate: e.target.value })}
+                                    value={formData.followUpDate}
+                                />
+                            </div>
+                        )
+                    }
+                </div>
+
                 <div className='mt-2'>
-                    <p>Message</p>
+                    <p>Remark</p>
                     <textarea rows={3}
                         onChange={(e) => {
                             setFormData({ ...formData, message: e.target.value })

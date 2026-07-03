@@ -36,7 +36,7 @@ const PartyComponent = ({ mode, save, getRes }) => {
 		name: "", type: Constants.CUSTOMER, contactNumber: "", billingAddress: "", shippingAddress: '',
 		pan: "", gst: "", openingBalance: "0", details: '', email: '', openingBalanceType: Constants.COLLECT,
 		partyCategory: '', creditPeriod: '', creditLimit: '', dob: '', partyCategory: '',
-		country: 'india', state: '', postalCode: ''
+		country: 'india', state: '', postalCode: '', city: ''
 	})
 	const navigate = useNavigate();
 	const [shipingCheck, setShipingCheck] = useState(true);
@@ -131,7 +131,7 @@ const PartyComponent = ({ mode, save, getRes }) => {
 			pan: "", gst: "", country: "", state: "", openingBalance: "0",
 			details: '', email: '', billingAddress: '', shippingAddress: '',
 			creditPeriod: '', creditLimit: '', dob: '', partyCategory: '',
-			postalCode: ''
+			postalCode: '', city: ''
 		})
 	}
 
@@ -215,6 +215,13 @@ const PartyComponent = ({ mode, save, getRes }) => {
 								value={partyData.state}
 								onChange={(v) => setPartyData({ ...partyData, state: v })}
 								menuMaxHeight={150}
+							/>
+						</div>
+						<div className='w-full'>
+							<p className='mb-1'>City</p>
+							<input type="text"
+								onChange={(e) => setPartyData({ ...partyData, city: e.target.value })}
+								value={partyData.city}
 							/>
 						</div>
 						<div className='w-full'>

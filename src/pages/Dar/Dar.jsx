@@ -24,7 +24,10 @@ import ContextMenu from '../../components/ContextMenu';
 
 
 
-const Enquiry = () => {
+// ==========================
+// Cold Calling Tracking Page
+// ==========================
+const Dar = () => {
     const token = Cookies.get("token");
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -123,7 +126,7 @@ const Enquiry = () => {
     return (
         <>
 
-            <Nav title={"DAR (Daily Activity Report)"} />
+            <Nav title={"Cold Calling Tracking"} />
             <main id='main'>
                 <SideNav />
                 <Tooltip id='accoutnTooltip' />
@@ -228,7 +231,7 @@ const Enquiry = () => {
                                         </div>
                                     </div>
                                 </>
-                            ) : <AddNew title={"Dar"} link={"/admin/dar/add"} />
+                            ) : <AddNew title={"Cold Calling Tracking"} link={"/admin/dar/add"} />
                         ) : <DataShimmer />
                     }
                 </div>
@@ -238,5 +241,5 @@ const Enquiry = () => {
     )
 }
 
-export default Enquiry;
+export default Dar;
 

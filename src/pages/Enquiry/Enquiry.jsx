@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-import { Popover, Whisper } from 'rsuite';
+import { Modal, Popover, Whisper } from 'rsuite';
 import { BiPrinter } from "react-icons/bi";
 import { FaRegCopy, FaRegEdit } from "react-icons/fa";
 import { FaRegFilePdf } from "react-icons/fa";
@@ -40,13 +40,15 @@ const Enquiry = () => {
 			"Enq No.": e.enqNo,
 			"Party": e.party.name,
 			"Contact person": e.contactPerson.name,
-			"Delivery Date": e.deliveryDate.split("T")[0]
+			"Received Date": e.dateReceived?.split("T")[0]
 		}));
 	}, [enquiryData]);
 	const [loading, setLoading] = useState(true);
 	const [openConfirm, setOpenConfirm] = useState(false);
 	const [searchText, setSearchText] = useState("");
 	let debounceRef = useRef(null);
+	const [openEnquiryModal, setOpenEnquiryModal] = useState(false)
+	const [enquiryModalData, setEnquiryModalData] = useState({});
 
 
 
@@ -158,7 +160,7 @@ const Enquiry = () => {
 	return (
 		<>
 
-			<Nav title={"Enquiry"} />
+			<Nav title={"Enquiry Track"} />
 			<main id='main'>
 				<SideNav />
 				<Tooltip id='accoutnTooltip' />
@@ -195,7 +197,7 @@ const Enquiry = () => {
 										setOpenConfirm(true);
 									}}
 									className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
-									<Icons.DELETE size={15}/>
+									<Icons.DELETE size={15} />
 									Delete
 								</button>
 								<button
@@ -257,8 +259,10 @@ const Enquiry = () => {
 														</th>
 														<th align='left'>ENQ No.</th>
 														<th align='left'>Party</th>
+														<th align='left'>City</th>
 														<th align='left'>Contact Person</th>
-														<th align='left'>Delivery Date</th>
+														<th align='left'>Date Received</th>
+														<th align='left'>Action Taken</th>
 														<th align='left'>Status</th>
 														<th>Item</th>
 														<th>Action</th>
@@ -267,7 +271,10 @@ const Enquiry = () => {
 												<tbody>
 													{
 														enquiryData.map((data, i) => {
-															return <tr key={i}>
+															return <tr key={i} onClick={(e) => {
+																setEnquiryModalData(data);
+																setOpenEnquiryModal(true);
+															}}>
 																<td className='py-2' align='center'>
 																	<input type='checkbox'
 																		checked={selected.includes(data._id)}
@@ -277,16 +284,31 @@ const Enquiry = () => {
 																</td>
 																<td align='left'>{data.enqNo}</td>
 																<td align='left'>{data.party.name}</td>
-																<td align='left'>{data.contactPerson.name}</td>
-																<td align='left'>{data.deliveryDate?.split("T")[0]}</td>
+																<td align='left'>{data.party.city || '--'}</td>
+																<td align='left'>
+																	{data.contactPerson.name} |
+																	<span className='font-bold text-xs mx-1'>T:</span>
+																	<span className='text-[10px] text-gray-600 ml-1'>{data.contactPerson.phone}</span>
+																</td>
+																<td align='left'>{data.dateReceived?.split("T")[0] || "-"}</td>
 																<td align='left'>
 																	{
 																		data.isConverted ? (
 																			<span className='badge green-badge'>Converted</span>
 																		) : (
-																			<span className='badge yellow-badge'>Active</span>
+																			<span className='badge yellow-badge'>Enquiry Registerd</span>
 																		)
 																	}
+																</td>
+																<td align='left'>
+																	{
+																		data.enquiryStatus ?
+																			<span className='badge green-badge'>
+																				{data.enquiryStatus?.toUpperCase() || "-"}
+																			</span> :
+																			"-"
+																	}
+
 																</td>
 																<td>
 																	<Whisper
@@ -336,7 +358,9 @@ const Enquiry = () => {
 																			</div>
 																		</Popover>}
 																	>
-																		<div className='table__list__action' >
+																		<div className='table__list__action' onClick={(e) => {
+																			e.stopPropagation();
+																		}}>
 																			<FiMoreHorizontal />
 																		</div>
 																	</Whisper>
@@ -357,12 +381,108 @@ const Enquiry = () => {
 										</div>
 									</div>
 								</>
-							) : <AddNew title={"Enquiry"} link={"/admin/enquiry/add"} />
+							) : <AddNew title={"Enquiry Track"} link={"/admin/enquiry/add"} />
 						) : <DataShimmer />
 					}
 				</div>
 			</main>
 
+			{/* Enquiry Details Modal */}
+			<Modal open={openEnquiryModal} size={'sm'} onClose={() => setOpenEnquiryModal(false)}>
+				<Modal.Header>
+					<Modal.Title></Modal.Title>
+					<p className='font-bold'>Enquiry Details</p>
+				</Modal.Header>
+				<Modal.Body>
+					<table className='enquiry__modal__view'>
+						<tbody>
+							<tr>
+								<td width={'30%'}>Enquiry NO.</td>
+								<td width={'70%'}>{enquiryModalData.enqNo}</td>
+							</tr>
+							<tr>
+								<td>Received Date</td>
+								<td>{enquiryModalData.dateReceived?.split("T")[0]}</td>
+							</tr>
+							<tr>
+								<td>Enquiry Source</td>
+								<td>{enquiryModalData.enquirySource}</td>
+							</tr>
+							<tr>
+								<td>City</td>
+								<td>{enquiryModalData.party?.city || "-"}</td>
+							</tr>
+							<tr>
+								<td>Contact Person</td>
+								<td>{enquiryModalData.contactPerson?.name || "-"}</td>
+							</tr>
+							<tr>
+								<td>Designation</td>
+								<td>{enquiryModalData.contactPerson?.designation || "-"}</td>
+							</tr>
+							<tr>
+								<td>Mobile Number</td>
+								<td>{enquiryModalData.contactPerson?.phone || "-"}</td>
+							</tr>
+							<tr>
+								<td>Email Id</td>
+								<td>{enquiryModalData.contactPerson?.email || "-"}</td>
+							</tr>
+							<tr>
+								<td>Industry</td>
+								<td>{enquiryModalData.industry || "-"}</td>
+							</tr>
+							<tr>
+								<td>Enquiry Status</td>
+								<td>{enquiryModalData.enquiryStatus || "-"}</td>
+							</tr>
+							<tr>
+								<td>Follow Up</td>
+								<td>{enquiryModalData.followUp?.toUpperCase() || "-"}</td>
+							</tr>
+							<tr>
+								<td>Follow Up Date</td>
+								<td>{enquiryModalData.followUpDate?.split("T")[0] || "-"}</td>
+							</tr>
+							<tr>
+								<td>Order Probablity (%)</td>
+								<td>{enquiryModalData.orderProbality || "-"}</td>
+							</tr>
+							<tr>
+								<td>Expected Order Date</td>
+								<td>{enquiryModalData.expectedOrderDate?.split("T")[0] || "-"}</td>
+							</tr>
+							<tr>
+								<td>Remark</td>
+								<td>
+									<p className='max-w-[80%]'>{enquiryModalData.message || "-"}</p>
+								</td>
+							</tr>
+							<tr>
+								<td>Quotation Number</td>
+								<td>{enquiryModalData.enqNo || "-"}</td>
+							</tr>
+							<tr>
+								<td>PO Number</td>
+								<td>{enquiryModalData.enqNo || "-"}</td>
+							</tr>
+						</tbody>
+					</table>
+					
+					<table className='enquiry__modal__view mt-4'>
+						<tbody>
+							{
+								enquiryModalData.items?.map((data, i) => {
+									return <tr key={i}>
+										<td>{data.item?.title || "-"}</td>
+										<td>{data.qty || "-"}</td>
+									</tr>
+								})
+							}
+						</tbody>
+					</table>
+				</Modal.Body>
+			</Modal>
 		</>
 	)
 }

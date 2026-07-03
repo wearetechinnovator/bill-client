@@ -15,6 +15,9 @@ import { useSelector } from 'react-redux';
 
 
 
+// ===============================
+// Cold Calling Tracking Add Page |
+// ===============================
 const AddDar = () => {
     const token = Cookies.get("token");
     const userData = useSelector((store) => store.userDetail);
@@ -76,7 +79,7 @@ const AddDar = () => {
 
     return (
         <>
-            <Nav title={"Add DAR (Daily Activity Report)" } />
+            <Nav title={"Add Cold Calling Tracking" } />
             <main id='main'>
                 <SideNav />
                 <div className='content__body'>

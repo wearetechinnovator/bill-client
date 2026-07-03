@@ -1570,3 +1570,15 @@ input {
   outline: 1px solid #2563eb;
   outline-offset: 1px;
 }
+
+.enquiry__modal__view{
+  width: 100%;
+
+}
+.enquiry__modal__view tr td{
+  padding: 7px 5px;
+}
+
+.enquiry__modal__view tr:nth-child(odd){
+  background-color: rgba(245, 245, 245, 0.479);
+}

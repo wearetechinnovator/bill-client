@@ -67,8 +67,8 @@ const links = {
     { name: 'Party', icon: <FaUsers />, link: '/admin/party' },
     { name: 'Party', icon: <FaUsers />, link: '/admin/assigned-party' },
     { name: 'Item', icon: <Icons.ITEMS />, link: '/admin/item' },
-    { name: 'Enquiry', icon: <Icons.ENQUIRY />, link: '/admin/enquiry' },
-    { name: 'DAR', icon: <Icons.DAILY_REPORT />, link: '/admin/dar' },
+    { name: 'Enquiry Track', icon: <Icons.ENQUIRY />, link: '/admin/enquiry' },
+    { name: 'Cold Calling Track', icon: <Icons.DAILY_REPORT />, link: '/admin/dar' },
   ],
   "sales": [
     { name: 'PO from Client', icon: <Icons.SMAEICON />, link: '/admin/po-client' },
