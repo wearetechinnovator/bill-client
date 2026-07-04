@@ -169,12 +169,13 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                 const res = await req.json();
                 setFormData({
                     ...formData, ...res.data,
-                    deliveryDate: res.data.deliveryDate.split("T")[0],
+                    dateReceived: res.data.dateReceived?.split("T")[0],
+                    expectedOrderDate: res.data.expectedOrderDate?.split("T")[0],
+                    followUpDate: res.data.followUpDate?.split("T")[0],
                     party: res.data.party._id, contactPerson: res.data.contactPerson._id
                 });
                 setSelectedParty(res.data.party);
             } catch (er) {
-                console.log(er);
                 return toast("Data not fetch", 'error');
             }
         })()
@@ -382,7 +383,6 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                                     <MySelect2
                                         model={Constants.ITEM}
                                         onType={(v) => {
-                                            console.log(v);
                                             setFormData((pv) => {
                                                 const newItems = [...pv.items];
                                                 newItems[i].item = v;

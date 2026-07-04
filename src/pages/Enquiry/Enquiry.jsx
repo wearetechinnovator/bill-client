@@ -49,6 +49,8 @@ const Enquiry = () => {
 	let debounceRef = useRef(null);
 	const [openEnquiryModal, setOpenEnquiryModal] = useState(false)
 	const [enquiryModalData, setEnquiryModalData] = useState({});
+	const [allQuotations, setAllQuotations] = useState([]); //Enquiry wise Quotation;
+	const [allPO, setAllPO] = useState([]); //Enquiry wise PO;
 
 
 
@@ -81,6 +83,31 @@ const Enquiry = () => {
 		})()
 	}, [tableStatusData, dataLimit, activePage, searchText])
 
+	useEffect(() => {
+		if (!openEnquiryModal) return;
+		(async () => {
+			try {
+				const URL = `${process.env.REACT_APP_API_URL}/enquiry/get-quotation-po`;
+				const req = await fetch(URL, {
+					method: "POST",
+					headers: {
+						"Content-Type": 'application/json'
+					},
+					body: JSON.stringify({ token, enqNo: enquiryModalData.enqNo })
+				});
+				const res = await req.json();
+				if (req.status !== 200) {
+					return toast(res.err, 'error');
+				}
+				console.log(res);
+				setAllQuotations(res.quo);
+				setAllPO(res.po)
+
+			} catch (err) {
+				return toast("Something went wrong", "error");
+			}
+		})()
+	}, [openEnquiryModal])
 
 	const selectAll = (e) => {
 		if (e.target.checked) {
@@ -264,7 +291,7 @@ const Enquiry = () => {
 														<th align='left'>Date Received</th>
 														<th align='left'>Action Taken</th>
 														<th align='left'>Status</th>
-														<th>Item</th>
+														<th>Items</th>
 														<th>Action</th>
 													</tr>
 												</thead>
@@ -274,7 +301,7 @@ const Enquiry = () => {
 															return <tr key={i} onClick={(e) => {
 																setEnquiryModalData(data);
 																setOpenEnquiryModal(true);
-															}}>
+															}} className='cursor-pointer'>
 																<td className='py-2' align='center'>
 																	<input type='checkbox'
 																		checked={selected.includes(data._id)}
@@ -460,16 +487,37 @@ const Enquiry = () => {
 							</tr>
 							<tr>
 								<td>Quotation Number</td>
-								<td>{enquiryModalData.enqNo || "-"}</td>
+								<td>
+									{
+										allQuotations?.map(q => {
+											return (
+												<span className='bg-gray-100 border rounded p-1 mr-1'>
+													{q.quotationNumber}
+												</span>
+											)
+										})
+									}
+								</td>
 							</tr>
 							<tr>
 								<td>PO Number</td>
-								<td>{enquiryModalData.enqNo || "-"}</td>
+								<td>
+									{
+										allPO.map(q => {
+											return (
+												<span className='bg-gray-100 border rounded p-1 mr-1'>
+													{q.poNumber}
+												</span>
+											)
+										})
+									}
+								</td>
 							</tr>
 						</tbody>
 					</table>
-					
-					<table className='enquiry__modal__view mt-4'>
+
+					<p className='font-bold mt-4'>Enquiry Item Details</p>
+					<table className='enquiry__modal__view mt-2'>
 						<tbody>
 							{
 								enquiryModalData.items?.map((data, i) => {

@@ -304,7 +304,7 @@ const Contacts = ({ partyId }) => {
                             <div className='h-[250px] grid place-items-center'>
                                 <div className='flex flex-col items-center'>
                                     <div className='w-[40px] h-[40px] rounded-lg border bg-gray-800 text-white grid place-items-center'>
-                                        <Icons.PARTY_CONTACT className='inline mr-1' size={"20px"} />
+                                        <Icons.PARTY_CONTACT className='inline ' size={"20px"} />
                                     </div>
                                     <p className='text-lg my-[0] font-semibold'>No contacts yet</p>
                                     <div className='text-xs w-[250px] text-center'>
@@ -314,7 +314,7 @@ const Contacts = ({ partyId }) => {
                                     <button
                                         onClick={() => setDrawerOpen(true)}
                                         className='bg-[#003E32] hover:bg-[#032720] max-w-[150px] text-white rounded py-1 px-1.5 mt-3'>
-                                        <Icons.PHONE_ADD className='inline mr-1' size={"20px"} />
+                                        <Icons.PHONE_ADD className='inline mr-1' size={"18px"} />
                                         Add Contacts
                                     </button>
                                 </div>
@@ -332,6 +332,7 @@ const Contacts = ({ partyId }) => {
                         clear();
                         setContactId(null);
                     }}
+                    size={'xs'}
                 >
                     <Drawer.Header>
                         <Drawer.Title>
@@ -342,8 +343,8 @@ const Contacts = ({ partyId }) => {
                             }
                         </p>
                     </Drawer.Header>
-                    <Drawer.Body>
-                        <div className='grid grid-cols-1 md:grid-cols-2 p-4 gap-4'>
+                    <Drawer.Body className='flex flex-col justify-between'>
+                        <div className='grid grid-cols-1 p-4 gap-4'>
                             <div>
                                 <p className='mb-1'>Name <span className='required__text'>*</span></p>
                                 <input type="text"
@@ -379,7 +380,7 @@ const Contacts = ({ partyId }) => {
                             </div>
                         </div>
 
-                        <div className='w-full flex justify-center gap-3 my-3 mt-5 '>
+                        <div className='w-full flex justify-start gap-4 border-t pt-4 pl-4'>
                             <button
                                 onClick={loading ? null : (contactId ? updateContact : saveContact)}
                                 className='add-bill-btn'>

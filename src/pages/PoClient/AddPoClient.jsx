@@ -43,22 +43,19 @@ const AddPoClient = ({ mode }) => {
     const [ItemRows, setItemRows] = useState([itemRowSet]);
     const [formData, setFormData] = useState({
         party: '', poNumber: '', poDate: new Date().toISOString().split('T')[0], items: ItemRows,
-        driveLink: ''
+        driveLink: '', enqNumber: '',
     })
 
     const [perPrice, setPerPrice] = useState(null);
     const [perTax, setPerTax] = useState(null);
     const [perDiscount, setPerDiscount] = useState(null);
-    const [perQun, setPerQun] = useState(null)
-
+    const [perQun, setPerQun] = useState(null);
+    const [allOpenEnquiry, setAllOpenEnquiry] = useState([]);
 
     // Store all items without filter
     const [items, setItems] = useState([]);
-    // Store units
     const [unit, setUnit] = useState([]);
-    // Store taxes
     const [tax, setTax] = useState([]);
-    // Store party
     const [party, setParty] = useState([]);
 
 
@@ -130,6 +127,34 @@ const AddPoClient = ({ mode }) => {
 
     }, [])
 
+
+    // Get all open enquiry;
+    useEffect(() => {
+        (async () => {
+            if (!formData.party) return;
+
+            try {
+                const URL = process.env.REACT_APP_API_URL + "/enquiry/get-enquiry-by-party";
+                const req = await fetch(URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify({ token, partyId: formData.party?._id || formData.party })
+                })
+                const res = await req.json();
+                if (req.status !== 200 || res.err) {
+                    return toast(res.err, "error");
+                }
+
+                setAllOpenEnquiry(res.data);
+
+            } catch (err) {
+                return toast("Enquires not fetch", "error");
+            }
+        })()
+    }, [formData.party])
+
     const onPerDiscountAmountChange = (val, index) => {
         let item = [...ItemRows];
         let amount = parseFloat(item[index].price) * parseFloat(item[index].qun);
@@ -181,6 +206,8 @@ const AddPoClient = ({ mode }) => {
     const saveBill = async () => {
         if (formData.party === "") {
             return toast("Please select party", "error")
+        } else if (formData.enqNumber === "") {
+            return toast("Please Select Enquiry", "error")
         } else if (formData.poNumber === "") {
             return toast("Please enter purchase order number", "error")
         } else if (formData.poDate === "") {
@@ -276,6 +303,16 @@ const AddPoClient = ({ mode }) => {
                                         setFormData({ ...formData, party: v })
                                     }}
                                     value={formData.party?._id}
+                                />
+                            </div>
+                            <div className='flex flex-col gap-2 w-full lg:w-1/3'>
+                                <p className='text-xs'>Select Enquiry No.
+                                    <span className='required__text'>*</span>
+                                </p>
+                                <SelectPicker
+                                    data={allOpenEnquiry.map(e => ({ label: e.enqNo, value: e.enqNo }))}
+                                    onChange={(v) => setFormData({ ...formData, enqNumber: v })}
+                                    value={formData.enqNumber}
                                 />
                             </div>
                             <div className='flex flex-col gap-2 w-full lg:w-1/3'>

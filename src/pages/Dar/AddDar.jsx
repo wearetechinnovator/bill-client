@@ -28,7 +28,7 @@ const AddDar = () => {
     const { id } = useParams();
     const [formData, setFormData] = useState({
         name: '', email: '', phone: '', companyName: '', designation: '', companyName: '',
-        activityType: '', feedback: '', status: '', followUp: '', followDate: ''
+        activityType: '', feedback: '', status: '', followUp: 'no', followDate: ''
     })
 
 
@@ -36,7 +36,7 @@ const AddDar = () => {
     const saveData = async (e) => {
         const validations = [
             { field: formData.name, msg: "Name can't be blank" },
-            { field: formData.email, msg: "Email can't be blank" }
+            { field: formData.email, msg: "Email can't be blank" },
         ];
 
         for (const item of validations) {

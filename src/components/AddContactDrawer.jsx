@@ -76,14 +76,15 @@ const AddContactDrawer = ({ partyId, onClose, open }) => {
                     setDrawerOpen(false);
                     onClose(false);
                 }}
+                size={'xs'}
             >
                 <Drawer.Header>
                     <Drawer.Title>
                     </Drawer.Title>
                     <p className='text-[17px] font-semibold'>Add Contacts</p>
                 </Drawer.Header>
-                <Drawer.Body>
-                    <div className='grid grid-cols-1 md:grid-cols-2 p-4 gap-4'>
+                <Drawer.Body className='flex flex-col justify-between'>
+                    <div className='grid grid-cols-1 p-4 gap-4'>
                         <div>
                             <p className='mb-1'>Name <span className='required__text'>*</span></p>
                             <input type="text"
@@ -119,7 +120,7 @@ const AddContactDrawer = ({ partyId, onClose, open }) => {
                         </div>
                     </div>
 
-                    <div className='w-full flex justify-center gap-3 my-3 mt-5 '>
+                    <div className='w-full flex justify-start gap-4 border-t pt-4 pl-4'>
                         <button
                             onClick={loading ? null : saveContact}
                             className='add-bill-btn'>

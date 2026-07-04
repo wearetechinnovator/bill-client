@@ -379,7 +379,7 @@ const Quotation = ({ mode }) => {
 			...formData,
 			party: data.party._id,
 			enqNumber: data.enqNo,
-			deliveryTime: data.deliveryDate.split("T")[0],
+			// deliveryTime: data.deliveryDate.split("T")[0],
 			enquiryId: data._id
 		});
 

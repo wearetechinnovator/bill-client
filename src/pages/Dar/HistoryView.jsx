@@ -114,7 +114,7 @@ const HistoryView = () => {
                     <div className='content__body__main'>
                         <div className='w-full flex items-center justify-between border-b pb-2'>
                             <p className='font-bold'>
-                                <Icons.USER className='inline mr-1'/>
+                                <Icons.USER className='inline mr-1' />
                                 General Details
                             </p>
                             <button
@@ -149,28 +149,26 @@ const HistoryView = () => {
 
                     {/* ==========================[Activity History]==================== */}
                     {/* ================================================================ */}
-
-                    <div className="content__body__main">
-                        {
-                            historyData.length > 0 && (
+                    
+                    {
+                        historyData.length > 0 && (
+                            <div className="content__body__main">
                                 <div className='mb-4 border-b pb-2'>
                                     <div className='flex items-center gap-2'>
                                         <Icons.HISTORY size={"25px"} />
                                         <p className='font-bold'>Activity History</p>
                                     </div>
                                 </div>
-                            )
-                        }
-
-                        {
-                            historyData?.map((h, _) => {
-                                return (
-                                    <ActivityHistoryCard key={h._id} data={h} />
-                                )
-                            })
-                        }
-                    </div>
-
+                                {
+                                    historyData?.map((h, _) => {
+                                        return (
+                                            <ActivityHistoryCard key={h._id} data={h} />
+                                        )
+                                    })
+                                }
+                            </div>
+                        )
+                    }
                 </div>
             </main>
 
@@ -179,77 +177,80 @@ const HistoryView = () => {
                     <Drawer.Title></Drawer.Title>
                     <p className='text-[16px] font-bold'>Add History</p>
                 </Drawer.Header>
-                <Drawer.Body>
-                    <div className='flex items-center gap-4 flex-col md:flex-row mt-4 px-4 py-2'>
-                        <div className='w-full'>
-                            <p>Actity Type</p>
-                            <select
-                                onChange={(e) => {
-                                    setFormData({ ...formData, activityType: e.target.value })
-                                }}
-                                value={formData.activityType}
-                            >
-                                <option value="">Select</option>
-                                <option value="call">Call</option>
-                                <option value="message">Message</option>
-                                <option value="email">Email</option>
-                                <option value="whatsapp">Whatsapp</option>
-                            </select>
-                        </div>
-                        <div className='w-full'>
-                            <p>Status</p>
-                            <select
-                                onChange={(e) => {
-                                    setFormData({ ...formData, status: e.target.value })
-                                }}
-                                value={formData.status}
-                            >
-                                <option value="">Select</option>
-                                <option value="warm">Warm</option>
-                                <option value="hot">Hot</option>
-                                <option value="cold">Cold</option>
-                                <option value="dead">Dead</option>
-                            </select>
-                        </div>
+                <Drawer.Body className='flex flex-col justify-between'>
+                    <div>
+                        <div className='flex items-center gap-4 flex-col mt-4 px-4 py-2'>
+                            <div className='w-full'>
+                                <p>Actity Type</p>
+                                <select
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, activityType: e.target.value })
+                                    }}
+                                    value={formData.activityType}
+                                >
+                                    <option value="">Select</option>
+                                    <option value="call">Call</option>
+                                    <option value="message">Message</option>
+                                    <option value="email">Email</option>
+                                    <option value="whatsapp">Whatsapp</option>
+                                </select>
+                            </div>
+                            <div className='w-full'>
+                                <p>Status</p>
+                                <select
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, status: e.target.value })
+                                    }}
+                                    value={formData.status}
+                                >
+                                    <option value="">Select</option>
+                                    <option value="warm">Warm</option>
+                                    <option value="hot">Hot</option>
+                                    <option value="cold">Cold</option>
+                                    <option value="dead">Dead</option>
+                                </select>
+                            </div>
 
-                        <div className='w-full'>
-                            <p>Follow Up</p>
-                            <select
-                                onChange={(e) => {
-                                    setFormData({ ...formData, followUp: e.target.value })
-                                }}
-                                value={formData.followUp}
-                            >
-                                <option value="">Select</option>
-                                <option value="yes">Yes</option>
-                                <option value="no">No</option>
-                            </select>
+                            <div className='w-full'>
+                                <p>Follow Up</p>
+                                <select
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, followUp: e.target.value })
+                                    }}
+                                    value={formData.followUp}
+                                >
+                                    <option value="">Select</option>
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                            {
+                                formData.followUp === "yes" && (
+                                    <div className='w-full'>
+                                        <p>Follow up date</p>
+                                        <input type="date"
+                                            onChange={(e) => {
+                                                setFormData({ ...formData, followDate: e.target.value })
+                                            }}
+                                            value={formData.followDate}
+                                        />
+                                    </div>
+                                )
+                            }
                         </div>
-                        {
-                            formData.followUp === "yes" && (
-                                <div className='w-full'>
-                                    <p>Follow up date</p>
-                                    <input type="date"
-                                        onChange={(e) => {
-                                            setFormData({ ...formData, followDate: e.target.value })
-                                        }}
-                                        value={formData.followDate}
-                                    />
-                                </div>
-                            )
-                        }
+                        <div className='mt-2 px-4 pb-2'>
+                            <p>Feedback</p>
+                            <textarea rows={3}
+                                onChange={(e) => {
+                                    setFormData({ ...formData, feedback: e.target.value })
+                                }}
+                                value={formData.feedback}
+                            ></textarea>
+                        </div>
                     </div>
 
-                    <div className='mt-2 px-4 pb-2'>
-                        <p>Feedback</p>
-                        <textarea rows={3}
-                            onChange={(e) => {
-                                setFormData({ ...formData, feedback: e.target.value })
-                            }}
-                            value={formData.feedback}
-                        ></textarea>
-                    </div>
-                    <div className='w-full flex justify-center gap-3 mt-5'>
+
+                    <div className='w-full flex justify-start gap-4 border-t pt-4 pl-4'>
                         <button className='add-bill-btn' onClick={saveData}>
                             {!loading ? <Icons.CHECK /> : <Loading />} Save
                         </button>

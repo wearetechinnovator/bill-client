@@ -200,7 +200,7 @@ const SalesInvoice = ({ mode }) => {
 		const data = location.state.poClientData;
 
 		const filteredItems = data.items.filter((item) => Number(item.qun) > 0);
-		setItemRows(prev => ([ ...filteredItems ]))
+		setItemRows(prev => ([...filteredItems]))
 
 		// Convert JSON for remove object refarence;
 		const jsonData = JSON.stringify(filteredItems);
@@ -418,7 +418,9 @@ const SalesInvoice = ({ mode }) => {
 			...prevData,
 			finalAmount
 		}));
-	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType, formData.discountAmount, formData.discountType]);
+	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount,
+		formData.roundOffType, formData.discountAmount, formData.discountType
+	]);
 
 
 	// Return Sub-Total
@@ -634,24 +636,30 @@ const SalesInvoice = ({ mode }) => {
 									value={formData.DueDate}
 								/>
 							</div>
-							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
-								<p className='text-xs'>PO Number</p>
-								<input type="text"
-									onChange={(e) => {
-										setFormData({ ...formData, poNumber: e.target.value })
-									}}
-									value={formData.poNumber}
-								/>
-							</div>
-							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
-								<p className='text-xs'>PO Date</p>
-								<input type="date"
-									onChange={(e) => {
-										setFormData({ ...formData, poDate: e.target.value })
-									}}
-									value={formData.poDate}
-								/>
-							</div>
+							{
+								location.state?.poClientData && (
+									<>
+										<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+											<p className='text-xs'>PO Number</p>
+											<input type="text"
+												onChange={(e) => {
+													setFormData({ ...formData, poNumber: e.target.value })
+												}}
+												value={formData.poNumber}
+											/>
+										</div>
+										<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+											<p className='text-xs'>PO Date</p>
+											<input type="date"
+												onChange={(e) => {
+													setFormData({ ...formData, poDate: e.target.value })
+												}}
+												value={formData.poDate}
+											/>
+										</div>
+									</>
+								)
+							}
 						</div>
 
 						<div className='overflow-x-auto rounded'>
@@ -720,12 +728,10 @@ const SalesInvoice = ({ mode }) => {
 														// ---------------------[When PoClient to Invoice convert]-------------------
 														// User can't increes quantity, jeta PO te ache tar cheye besi dite parbe na.
 														const itemId = ItemRows[index].itemId;
-														console.log(poItems);
 														const filteredItems = poItems?.find((item) => item.itemId === itemId);
 
 														if (Number(e.target.value) > Number(filteredItems?.qun)) {
-															alert(`As per PO, you can add maximum: ${filteredItems?.qun} item for ${filteredItems.itemName}`);
-															return;
+															return toast(`As per PO, you can add maximum: ${filteredItems?.qun} item for ${filteredItems.itemName}`, 'error');
 														}
 														// --------------------------------------------------------------------------
 
