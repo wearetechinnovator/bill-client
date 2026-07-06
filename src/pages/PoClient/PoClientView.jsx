@@ -13,6 +13,7 @@ const PoClientView = () => {
     const toast = useMyToaster();
     const [loading, setLoading] = useState(false)
     const [data, setData] = useState();
+    const [salesInv, setSalesInv] = useState([])
 
 
     useEffect(() => {
@@ -38,6 +39,31 @@ const PoClientView = () => {
         })()
     }, [])
 
+    // Get Sales Invoice by PO Number
+    useEffect(() => {
+        if(!data?.poNumber) return;
+        (async () => {
+            try {
+                const URL = process.env.REACT_APP_API_URL + `/po-client/get-sales-invoice`;
+                const req = await fetch(URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify({ token, poNumber: data.poNumber })
+                });
+                const res = await req.json();
+                if (req.status !== 200) {
+                    return toast(res.err, 'error');
+                }
+                console.log(res)
+                setSalesInv(res);
+
+            } catch (err) {
+                return toast("Sales Invoice not fetch, Something went wrong");
+            }
+        })()
+    }, [data])
 
     return (
         <>
@@ -52,10 +78,18 @@ const PoClientView = () => {
                                 General Details
                             </p>
                         </div>
-                        <div className='w-full grid gird-cols-1 sm:grid-cols-2 md:grid-cols-4 pb-2 my-3'>
+                        <div className='w-full grid gird-cols-1 sm:grid-cols-2 md:grid-cols-4 pb-2 my-3 gap-4'>
                             <div>
                                 <p>PARTY NAME</p>
                                 <p className='font-bold'>{data?.party?.name}</p>
+                            </div>
+                            <div>
+                                <p>State</p>
+                                <p className='uppercase'>{data?.party?.state}</p>
+                            </div>
+                            <div>
+                                <p>City</p>
+                                <p>{data?.party?.city}</p>
                             </div>
                             <div>
                                 <p>PO NUMBER</p>
@@ -67,7 +101,7 @@ const PoClientView = () => {
                             </div>
                             <div>
                                 <p>PO FILE SOURCE</p>
-                                <a href={data?.driveLink} className='underline'>Click Here</a>
+                                <a href={data?.driveLink} target='_blank' className='underline'>Click Here</a>
                             </div>
                         </div>
                     </div>
@@ -87,10 +121,14 @@ const PoClientView = () => {
                                     <tr className="bg-[#F6F7FB]">
                                         <th className="border px-3 py-2 text-left font-bold">Name</th>
                                         <th className="border px-3 py-2 text-center font-bold">QTY</th>
-                                        <th className="border px-3 py-2 text-center font-bold">REMAINING QTY</th>
+                                        <th className="border px-3 py-2 text-center font-bold">Remining QTY</th>
                                         {/* <th className="border px-3 py-2 text-center font-bold">HSN</th> */}
                                         <th className="border px-3 py-2 text-center font-bold">Unit</th>
-                                        {/* <th className="border px-3 py-2 text-right font-bold">Price</th> */}
+                                        <th className="border px-3 py-2 text-right font-bold">Price</th>
+                                        <th className="border px-3 py-2 text-right font-bold">Total</th>
+                                        <th className="border px-3 py-2 text-right font-bold">GST %</th>
+                                        <th className="border px-3 py-2 text-right font-bold">Grand Total</th>
+                                        <th className="border px-3 py-2 text-right font-bold">Invoice Number</th>
                                     </tr>
                                 </thead>
 
@@ -115,9 +153,28 @@ const PoClientView = () => {
                                             <td className="border px-3 py-2 text-center">
                                                 {item.selectedUnit}
                                             </td>
-                                            {/* <td className="border px-3 py-2 text-right">
+                                            <td className="border px-3 py-2 text-right">
                                                 {item.price}
-                                            </td> */}
+                                            </td>
+                                            <td className="border px-3 py-2 text-right">
+                                                {Number(item.qun) * Number(item.price)}
+                                            </td>
+                                            <td className="border px-3 py-2 text-right">
+                                                {item.taxAmount} <span className='text-[10px] text-gray-500'>({item.tax}%)</span>
+                                            </td>
+                                            <td className="border px-3 py-2 text-right">
+                                                {item.amount}
+                                            </td>
+                                            <td className="border px-3 py-2 text-right">
+                                                {
+                                                    salesInv?.map((inv, _)=>{
+                                                        return <div key={inv._id} >
+                                                            <span className='text-xs bg-gray-100 border rounded px-1'>{inv.salesInvoiceNumber}</span>
+                                                            {/* <span className='block text-[10px]'>{inv.invoiceDate?.split("T")[0]}</span> */}
+                                                        </div>
+                                                    })
+                                                }
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

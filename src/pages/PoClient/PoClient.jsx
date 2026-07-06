@@ -423,6 +423,7 @@ const PoClient = () => {
                                             </th>
                                             <th align='left'>PO Number</th>
                                             <th align='left'>Party Name</th>
+                                            <th align='left'>Location</th>
                                             <th align='center'>PO File Source</th>
                                             <th align='center'>Status</th>
                                             <th align='center'>Action</th>
@@ -454,6 +455,10 @@ const PoClient = () => {
                                                     <td>{data.poDate.split("T")[0]}</td>
                                                     <td>{data.poNumber}</td>
                                                     <td>{data.party.name}</td>
+                                                    <td>
+                                                        <span className='uppercase'>{data.party.state}</span>,
+                                                        <span> {data.party.city}</span>
+                                                    </td>
                                                     <td align='center'>
                                                         <a href={data.driveLink} target='_blank' className='hover:text-black hover:underline'>
                                                             <Icons.EXTRANAL_LINK className='inline' /> Click Here
@@ -632,12 +637,10 @@ const PoClient = () => {
                                                 </div>
                                                 <div className='h-[15px]'></div>
                                             </div>
-
                                         </div>
                                     )
                                 })
                             }
-
                         </div>
                     </Drawer.Body>
                 </Drawer>

@@ -51,6 +51,10 @@ const Enquiry = () => {
 	const [enquiryModalData, setEnquiryModalData] = useState({});
 	const [allQuotations, setAllQuotations] = useState([]); //Enquiry wise Quotation;
 	const [allPO, setAllPO] = useState([]); //Enquiry wise PO;
+	const [salesUser, setSalesUser] = useState([]);
+	const [enquiryActiveTab, setEnquiryActiveTab] = useState('details');
+	const [billLogs, setBillLogs] = useState([]);
+
 
 
 
@@ -81,7 +85,33 @@ const Enquiry = () => {
 				setLoading(false);
 			}
 		})()
-	}, [tableStatusData, dataLimit, activePage, searchText])
+	}, [tableStatusData, dataLimit, activePage, searchText]);
+
+	// Get Invoice LOGS from Modal;
+	useEffect(() => {
+		if (!openEnquiryModal) return;
+		(async () => {
+			try {
+				const URL = `${process.env.REACT_APP_API_URL}/enquiry/get-log`;
+				const req = await fetch(URL, {
+					method: "POST",
+					headers: {
+						"Content-Type": 'application/json'
+					},
+					body: JSON.stringify({ token, enqNo: enquiryModalData.enqNo })
+				});
+				const res = await req.json();
+				if (req.status !== 200) {
+					return toast(res.err, 'error');
+				}
+				console.log(res);
+				setBillLogs(res.bills);
+
+			} catch (err) {
+				return toast("Something went wrong", "error");
+			}
+		})()
+	}, [openEnquiryModal]);
 
 	useEffect(() => {
 		if (!openEnquiryModal) return;
@@ -99,7 +129,6 @@ const Enquiry = () => {
 				if (req.status !== 200) {
 					return toast(res.err, 'error');
 				}
-				console.log(res);
 				setAllQuotations(res.quo);
 				setAllPO(res.po)
 
@@ -108,6 +137,32 @@ const Enquiry = () => {
 			}
 		})()
 	}, [openEnquiryModal])
+
+	// Get all User and store only sales
+	useEffect(() => {
+		(async () => {
+			try {
+				const URL = `${process.env.REACT_APP_API_URL}/user/get-all`;
+				const req = await fetch(URL, {
+					method: "POST",
+					headers: {
+						"Content-Type": 'application/json'
+					},
+					body: JSON.stringify({ token })
+				});
+				const res = await req.json();
+				if (req.status !== 200) {
+					return toast(res.err, "error");
+				}
+
+				// Filter sales person only
+				const salesPerson = res.filter(s => s.role === "sales");
+				setSalesUser(salesPerson);
+			} catch (err) {
+				return toast("Something went wrong!", 'error')
+			}
+		})()
+	}, [])
 
 	const selectAll = (e) => {
 		if (e.target.checked) {
@@ -285,10 +340,11 @@ const Enquiry = () => {
 															/>
 														</th>
 														<th align='left'>ENQ No.</th>
+														<th align='left'>Date Received</th>
 														<th align='left'>Party</th>
 														<th align='left'>City</th>
+														<th align='left'>Assign To</th>
 														<th align='left'>Contact Person</th>
-														<th align='left'>Date Received</th>
 														<th align='left'>Action Taken</th>
 														<th align='left'>Status</th>
 														<th>Items</th>
@@ -310,14 +366,23 @@ const Enquiry = () => {
 																	/>
 																</td>
 																<td align='left'>{data.enqNo}</td>
+																<td align='left'>{data.dateReceived?.split("T")[0] || "-"}</td>
 																<td align='left'>{data.party.name}</td>
 																<td align='left'>{data.party.city || '--'}</td>
+																<td align='left'>
+																	{
+																		salesUser.filter(s => {
+																			return s.parties.includes(data.party._id)
+																		}).map(u => {
+																			return <span className='badge indigo-badge ml-1 px-1'>{u.name}</span>
+																		})
+																	}
+																</td>
 																<td align='left'>
 																	{data.contactPerson.name} |
 																	<span className='font-bold text-xs mx-1'>T:</span>
 																	<span className='text-[10px] text-gray-600 ml-1'>{data.contactPerson.phone}</span>
 																</td>
-																<td align='left'>{data.dateReceived?.split("T")[0] || "-"}</td>
 																<td align='left'>
 																	{
 																		data.isConverted ? (
@@ -326,14 +391,32 @@ const Enquiry = () => {
 																			<span className='badge yellow-badge'>Enquiry Registerd</span>
 																		)
 																	}
+																	<span className='text-[10px] border bg-gray-100 px-1 rounded ml-1'>
+																		{data.createdAt.split("T")[0]}
+																	</span>
 																</td>
 																<td align='left'>
 																	{
-																		data.enquiryStatus ?
-																			<span className='badge green-badge'>
-																				{data.enquiryStatus?.toUpperCase() || "-"}
-																			</span> :
-																			"-"
+																		data.enquiryStatus && (
+																			data.enquiryStatus === "close" ? (
+																				<span className='badge red-badge'>
+																					{data.enquiryStatus?.toUpperCase() || "-"}
+																				</span>
+																			) : data.enquiryStatus === "open" ? (
+																				<span className='badge green-badge'>
+																					{data.enquiryStatus?.toUpperCase() || "-"}
+																				</span>
+																			) : data.enquiryStatus === "followup" ? (
+																				<span className='badge indigo-badge'>
+																					{data.enquiryStatus?.toUpperCase() || "-"}
+																				</span>
+																			) : (
+																				<span className='badge green-badge'>
+																					{data.enquiryStatus?.toUpperCase() || "-"}
+																				</span>
+																			)
+
+																		)
 																	}
 
 																</td>
@@ -415,120 +498,194 @@ const Enquiry = () => {
 			</main>
 
 			{/* Enquiry Details Modal */}
-			<Modal open={openEnquiryModal} size={'sm'} onClose={() => setOpenEnquiryModal(false)}>
+			<Modal open={openEnquiryModal} size={'xs'} onClose={() => setOpenEnquiryModal(false)}>
 				<Modal.Header>
 					<Modal.Title></Modal.Title>
-					<p className='font-bold'>Enquiry Details</p>
+					<p className='font-bold'>Enquiry Info</p>
 				</Modal.Header>
-				<Modal.Body>
-					<table className='enquiry__modal__view'>
-						<tbody>
-							<tr>
-								<td width={'30%'}>Enquiry NO.</td>
-								<td width={'70%'}>{enquiryModalData.enqNo}</td>
-							</tr>
-							<tr>
-								<td>Received Date</td>
-								<td>{enquiryModalData.dateReceived?.split("T")[0]}</td>
-							</tr>
-							<tr>
-								<td>Enquiry Source</td>
-								<td>{enquiryModalData.enquirySource}</td>
-							</tr>
-							<tr>
-								<td>City</td>
-								<td>{enquiryModalData.party?.city || "-"}</td>
-							</tr>
-							<tr>
-								<td>Contact Person</td>
-								<td>{enquiryModalData.contactPerson?.name || "-"}</td>
-							</tr>
-							<tr>
-								<td>Designation</td>
-								<td>{enquiryModalData.contactPerson?.designation || "-"}</td>
-							</tr>
-							<tr>
-								<td>Mobile Number</td>
-								<td>{enquiryModalData.contactPerson?.phone || "-"}</td>
-							</tr>
-							<tr>
-								<td>Email Id</td>
-								<td>{enquiryModalData.contactPerson?.email || "-"}</td>
-							</tr>
-							<tr>
-								<td>Industry</td>
-								<td>{enquiryModalData.industry || "-"}</td>
-							</tr>
-							<tr>
-								<td>Enquiry Status</td>
-								<td>{enquiryModalData.enquiryStatus || "-"}</td>
-							</tr>
-							<tr>
-								<td>Follow Up</td>
-								<td>{enquiryModalData.followUp?.toUpperCase() || "-"}</td>
-							</tr>
-							<tr>
-								<td>Follow Up Date</td>
-								<td>{enquiryModalData.followUpDate?.split("T")[0] || "-"}</td>
-							</tr>
-							<tr>
-								<td>Order Probablity (%)</td>
-								<td>{enquiryModalData.orderProbality || "-"}</td>
-							</tr>
-							<tr>
-								<td>Expected Order Date</td>
-								<td>{enquiryModalData.expectedOrderDate?.split("T")[0] || "-"}</td>
-							</tr>
-							<tr>
-								<td>Remark</td>
-								<td>
-									<p className='max-w-[80%]'>{enquiryModalData.message || "-"}</p>
-								</td>
-							</tr>
-							<tr>
-								<td>Quotation Number</td>
-								<td>
-									{
-										allQuotations?.map(q => {
-											return (
-												<span className='bg-gray-100 border rounded p-1 mr-1'>
-													{q.quotationNumber}
-												</span>
+				<div className='w-full flex items-center mt-1.5 bg-gray-100 enquiry__tab'>
+					<button
+						onClick={() => setEnquiryActiveTab('details')}
+						className={`${enquiryActiveTab === 'details' && 'active'}`}>
+						Details
+					</button>
+					<button
+						onClick={() => setEnquiryActiveTab('log')}
+						className={`${enquiryActiveTab === 'log' && 'active'}`}>
+						Logs
+					</button>
+				</div>
+				<Modal.Body className='enquiry__modal'>
+					{
+						enquiryActiveTab === 'details' && (
+							<>
+								<table className={`enquiry__modal__view `}>
+									<tbody>
+										<tr>
+											<td width={'35%'} className='pt-3'>Enquiry NO.</td>
+											<td width={'65%'}>{enquiryModalData.enqNo}</td>
+										</tr>
+										<tr>
+											<td>Received Date</td>
+											<td>{enquiryModalData.dateReceived?.split("T")[0]}</td>
+										</tr>
+										<tr>
+											<td>Enquiry Source</td>
+											<td className='capitalize'>{enquiryModalData.enquirySource}</td>
+										</tr>
+										{
+											enquiryModalData.enquirySource === "others" && (
+												<tr>
+													<td>Others Source</td>
+													<td className='capitalize'>{enquiryModalData.otherSource}</td>
+												</tr>
 											)
-										})
-									}
-								</td>
-							</tr>
-							<tr>
-								<td>PO Number</td>
-								<td>
-									{
-										allPO.map(q => {
-											return (
-												<span className='bg-gray-100 border rounded p-1 mr-1'>
-													{q.poNumber}
-												</span>
-											)
-										})
-									}
-								</td>
-							</tr>
-						</tbody>
-					</table>
+										}
+										<tr>
+											<td>City</td>
+											<td>{enquiryModalData.party?.city || "-"}</td>
+										</tr>
+										<tr>
+											<td>Contact Person</td>
+											<td>{enquiryModalData.contactPerson?.name || "-"}</td>
+										</tr>
+										<tr>
+											<td>Designation</td>
+											<td>{enquiryModalData.contactPerson?.designation || "-"}</td>
+										</tr>
+										<tr>
+											<td>Mobile Number</td>
+											<td>{enquiryModalData.contactPerson?.phone || "-"}</td>
+										</tr>
+										<tr>
+											<td>Email Id</td>
+											<td>{enquiryModalData.contactPerson?.email || "-"}</td>
+										</tr>
+										<tr>
+											<td>Industry</td>
+											<td>{enquiryModalData.industry || "-"}</td>
+										</tr>
+										<tr>
+											<td>Enquiry Status</td>
+											<td>{enquiryModalData.enquiryStatus || "-"}</td>
+										</tr>
+										<tr>
+											<td>Follow Up</td>
+											<td>{enquiryModalData.followUp?.toUpperCase() || "-"}</td>
+										</tr>
+										<tr>
+											<td>Follow Up Date</td>
+											<td>{enquiryModalData.followUpDate?.split("T")[0] || "-"}</td>
+										</tr>
+										<tr>
+											<td>Order Probablity (%)</td>
+											<td>{enquiryModalData.orderProbality || "-"}</td>
+										</tr>
+										<tr>
+											<td>Expected Order Date</td>
+											<td>{enquiryModalData.expectedOrderDate?.split("T")[0] || "-"}</td>
+										</tr>
+										<tr>
+											<td>Remark</td>
+											<td>
+												<p className='max-w-[80%]'>{enquiryModalData.message || "-"}</p>
+											</td>
+										</tr>
+										<tr>
+											<td>Quotation Number</td>
+											<td>
+												{
+													allQuotations?.map(q => {
+														return (
+															<span className='badge indigo-badge mr-1'>
+																{q.quotationNumber}
+															</span>
+														)
+													})
+												}
+											</td>
+										</tr>
+										<tr>
+											<td>PO Number</td>
+											<td>
+												{
+													allPO.map(q => {
+														return (
+															<span className='badge yellow-badge mr-1'>
+																{q.poNumber}
+															</span>
+														)
+													})
+												}
+											</td>
+										</tr>
+									</tbody>
+								</table>
 
-					<p className='font-bold mt-4'>Enquiry Item Details</p>
-					<table className='enquiry__modal__view mt-2'>
-						<tbody>
-							{
-								enquiryModalData.items?.map((data, i) => {
-									return <tr key={i}>
-										<td>{data.item?.title || "-"}</td>
-										<td>{data.qty || "-"}</td>
-									</tr>
-								})
-							}
-						</tbody>
-					</table>
+								<p className='font-bold mt-4'>Enquiry Item Details</p>
+								<table className='enquiry__modal__view mt-2'>
+									<tbody>
+										{
+											enquiryModalData.items?.map((data, i) => {
+												return <tr key={i}>
+													<td>{data.item?.title || "-"}</td>
+													<td>{data.qty || "-"}</td>
+												</tr>
+											})
+										}
+									</tbody>
+								</table>
+							</>
+						)
+					}
+					{
+						enquiryActiveTab === 'log' && (
+							billLogs.map((b, i) => {
+								return <div className={`w-full flex gap-2 pr-2 bg-gray-50 ${i === 0 && 'pt-2'}`} key={b._id}>
+									<div className='flex flex-col justify-center items-center'>
+										<div className='w-[14px] h-[16px] bg-[#003E32] rounded-full'></div>
+										<div className='w-[1px] h-full bg-[#003E32]'></div>
+									</div>
+									<div className='w-full'>
+										<div className='rounded-md w-full hover:border-gray-400 bg-white shadow'>
+											<div className='w-full flex items-center justify-between border-b px-1 py-1'>
+												<div>
+													<span className='badge indigo-badge uppercase'>{b.type}</span>
+												</div>
+												<div className='flex items-end gap-1'>
+													<span className='font-bold text-[13px]'>#{b.invoiceNumber}</span>
+													<span className='text-gray-500 text-[10px] mb-[2px]'>
+														{b.date?.split("T")[0]}
+													</span>
+												</div>
+											</div>
+											<table className='w-full p-3 text-xs'>
+												<thead className='bg-gray-50'>
+													<tr>
+														<td className='px-2 py-1 font-bold text-[11px]'>ITEMS</td>
+														<td className='font-bold text-[11px]'>QTY</td>
+													</tr>
+												</thead>
+												<tbody className='lowercase'>
+													{
+														b.items.map((item, _) => {
+															return (
+																<tr className='border-b border-gray-50'>
+																	<td className='px-2 py-1'>{item.itemName}</td>
+																	<td>{item.qun}</td>
+																</tr>
+															)
+														})
+													}
+												</tbody>
+											</table>
+										</div>
+										<div className='h-[15px]'></div>
+									</div>
+								</div>
+							})
+						)
+					}
 				</Modal.Body>
 			</Modal>
 		</>

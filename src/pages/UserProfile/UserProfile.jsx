@@ -47,12 +47,9 @@ const UserProfile = () => {
 				if (req.status !== 200) {
 					return toast(res.err, "error");
 				}
-
-				console.log(res);
 				setUserData([...res])
 
 			} catch (error) {
-				console.log(error)
 				return toast("Something went wrong", "error");
 			} finally {
 				setLoading(false);

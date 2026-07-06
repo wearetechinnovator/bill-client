@@ -40,7 +40,7 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
     const itemData = { item: '', qty: '' };
     const [formData, setFormData] = useState({
         party: '', contactPerson: '', items: [itemData], deliveryDate: '', enqNo: '',
-        message: '', enquirySource: '', enquiryStatus: '', compititor: '', followUp: 'no',
+        message: '', enquirySource: '', otherSource: "", enquiryStatus: 'open', compititor: '', followUp: 'no',
         followUpDate: '', orderProbality: '', expectedOrderDate: '', dateReceived: '', industry: ''
     })
     const [party, setParty] = useState([]);
@@ -270,7 +270,7 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
     const clearData = (e) => {
         setFormData({
             party: '', contactPerson: '', items: [itemData], deliveryDate: '', enqNo: '',
-            message: '', enquirySource: '', enquiryStatus: '', compititor: '', followUp: 'no',
+            message: '', enquirySource: '', otherSource: "", enquiryStatus: '', compititor: '', followUp: 'no',
             followUpDate: '', orderProbality: '', expectedOrderDate: '', dateReceived: '', industry: ''
         })
     }
@@ -442,6 +442,17 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                             <option value="others">Others</option>
                         </select>
                     </div>
+                    {
+                        formData.enquirySource === "others" && (
+                            <div className='w-full'>
+                                <p>Enter Source</p>
+                                <input type="text"
+                                    onChange={(e) => setFormData({ ...formData, otherSource: e.target.value })}
+                                    value={formData.otherSource}
+                                />
+                            </div>
+                        )
+                    }
                     <div className='w-full'>
                         <p>Enquiry Status</p>
                         <select
@@ -492,7 +503,9 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                         formData.followUp === "yes" && (
                             <div className='w-full'>
                                 <p>Follow Up Date</p>
-                                <input type="date"
+                                <input
+                                    type="date"
+                                    min={new Date().toISOString().split('T')[0]}
                                     onChange={(e) => setFormData({ ...formData, followUpDate: e.target.value })}
                                     value={formData.followUpDate}
                                 />

@@ -170,3 +170,7 @@
  .rs-drawer-header .rs-drawer-header-close {
    top: 16px !important;
  }
+
+ .enquiry__modal.rs-modal-body{
+  margin-top: 0px !important;
+ }
