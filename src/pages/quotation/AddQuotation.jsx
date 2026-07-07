@@ -57,8 +57,8 @@ const Quotation = ({ mode }) => {
 		7.	Dispute Resolution: Arbitration in Navi Mumbai, India, under Indian law.
 		8.	Indemnity: Buyer indemnifies seller against misuse-related claims.
 		9.	Governing Law: Governed by Indian law, jurisdiction in Navi Mumbai.`,
-		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '', 
-		autoRoundOff: false, roundOffType: '0', roundOffAmount: '', enqNumber: '', deliveryTime: '', 
+		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '',
+		autoRoundOff: false, roundOffType: '0', roundOffAmount: '', enqNumber: '', deliveryTime: '',
 		enquiryId: ''
 	})
 
@@ -185,6 +185,33 @@ const Quotation = ({ mode }) => {
 			);
 		}
 	}, [formData.discountAmount, ItemRows.length]);
+
+
+	// CONVERT: Enquiry to Qut;
+	useEffect(() => {
+		if (!location.state) return;
+		const data = location.state;
+
+		setFormData({
+			...formData,
+			party: data.party._id,
+			enqNumber: data.enqNo,
+			// deliveryTime: data.deliveryDate.split("T")[0],
+			enquiryId: data._id
+		});
+
+		setItemRows(
+			data.items.map((item) => ({
+				...itemRowSet,
+				itemName: item.item.title,
+				qun: item.qty,
+				itemId: item.item._id,
+				hsn: item.item.hsn,
+				price: item.item.salePrice,
+				unit: item.item.unit.map((u) => u.unit)
+			}))
+		);
+	}, [location]);
 
 
 	const onPerDiscountAmountChange = (val, index) => {
@@ -334,16 +361,14 @@ const Quotation = ({ mode }) => {
 		try {
 			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/quotation/add";
-			const token = Cookies.get("token");
-
 			const req = await fetch(url, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json"
 				},
 				body: JSON.stringify(
-					!mode ? { ...formData, token, accountId: accountDetails?._id } :
-						{ ...formData, token, update: true, id: id, accountId: accountDetails?._id }
+					!mode ? { ...formData, items: ItemRows, token, accountId: accountDetails?._id } :
+						{ ...formData, items: ItemRows, token, update: true, id: id, accountId: accountDetails?._id }
 				)
 			})
 			const res = await req.json();
@@ -369,32 +394,6 @@ const Quotation = ({ mode }) => {
 
 	}
 
-
-	// CONVERT: Enquiry to Qut;
-	useEffect(() => {
-		if (!location.state) return;
-		const data = location.state;
-
-		setFormData({
-			...formData,
-			party: data.party._id,
-			enqNumber: data.enqNo,
-			// deliveryTime: data.deliveryDate.split("T")[0],
-			enquiryId: data._id
-		});
-
-		setItemRows(
-			data.items.map((item) => ({
-				...itemRowSet,
-				itemName: item.item.title,
-				qun: item.qty,
-				itemId: item.item._id,
-				hsn: item.item.hsn,
-				price: item.item.salePrice,
-				unit: item.item.unit.map((u) => u.unit)
-			}))
-		);
-	}, [location]);
 
 	// *Clear form values;
 	const clearForm = () => {

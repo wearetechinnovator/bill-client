@@ -607,18 +607,18 @@ const PoClient = () => {
                                             </div>
 
                                             <div className='w-full'>
-                                                <div className='border rounded-md w-full hover:border-gray-400 bg-white'>
-                                                    <div className='w-full flex items-center justify-between border-b p-2'>
-                                                        <div>
+                                                <div className='rounded-md w-full hover:border-gray-400 bg-white shadow'>
+                                                    <div className='w-full flex items-center justify-between border-b p-1.5'>
+                                                        <div className='flex items-end gap-1'>
                                                             <p className='font-bold text-[13px]'>#{invoice.salesInvoiceNumber}</p>
                                                             <span className='text-gray-500 text-[11px]'>{invoice.invoiceDate?.split("T")[0]}</span>
                                                         </div>
                                                     </div>
-                                                    <table className='w-full p-3 text-xs'>
+                                                    <table className='w-full p-1.5 text-xs'>
                                                         <thead className='bg-gray-50'>
                                                             <tr>
-                                                                <td className='p-2 font-bold'>ITEM DESCRIPTION</td>
-                                                                <td className='font-bold'>QTY</td>
+                                                                <td className='p-1 px-2 font-bold text-[11px]'>ITEMS</td>
+                                                                <td className='font-bold text-[11px]'>QTY</td>
                                                             </tr>
                                                         </thead>
                                                         <tbody className='lowercase'>
@@ -626,7 +626,7 @@ const PoClient = () => {
                                                                 invoice.items.map((item, _) => {
                                                                     return (
                                                                         <tr className='border-b border-gray-50'>
-                                                                            <td className='p-2'>{item.itemName}</td>
+                                                                            <td className='p-1'>{item.itemName}</td>
                                                                             <td>{item.qun}</td>
                                                                         </tr>
                                                                     )

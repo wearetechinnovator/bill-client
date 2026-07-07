@@ -22,9 +22,9 @@ import Loading from '../../components/Loading';
 
 
 const Proforma = ({ mode }) => {
+	const token = Cookies.get("token");
 	const toast = useMyToaster();
 	const { id } = useParams()
-	const token = Cookies.get("token");
 	const [loading, setLoading] = useState(false);
 	const getBillPrefix = useBillPrefix("proforma");
 	const { getApiData } = useApi();
@@ -105,6 +105,7 @@ const Proforma = ({ mode }) => {
 			body: JSON.stringify({ token, id: id })
 		})
 		const res = await req.json();
+		console.log(res.data.items)
 
 		const removeQuotationNumber = { ...res.data };
 		delete removeQuotationNumber.quotationNumber;
@@ -263,7 +264,9 @@ const Proforma = ({ mode }) => {
 			...prevData,
 			finalAmount
 		}));
-	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount, formData.roundOffType, formData.discountAmount, formData.discountType]);
+	}, [ItemRows, additionalRows, formData.autoRoundOff, formData.roundOffAmount,
+		formData.roundOffType, formData.discountAmount, formData.discountType
+	]);
 
 
 
@@ -342,7 +345,6 @@ const Proforma = ({ mode }) => {
 		try {
 			setLoading(true);
 			const url = process.env.REACT_APP_API_URL + "/proforma/add";
-			const token = Cookies.get("token");
 
 			const req = await fetch(url, {
 				method: "POST",

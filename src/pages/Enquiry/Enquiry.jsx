@@ -54,6 +54,7 @@ const Enquiry = () => {
 	const [salesUser, setSalesUser] = useState([]);
 	const [enquiryActiveTab, setEnquiryActiveTab] = useState('details');
 	const [billLogs, setBillLogs] = useState([]);
+	const [lastAction, setLastAction] = useState([]);
 
 
 
@@ -113,6 +114,7 @@ const Enquiry = () => {
 		})()
 	}, [openEnquiryModal]);
 
+
 	useEffect(() => {
 		if (!openEnquiryModal) return;
 		(async () => {
@@ -137,6 +139,34 @@ const Enquiry = () => {
 			}
 		})()
 	}, [openEnquiryModal])
+
+
+	// Get Enquiry wise last action;
+	useEffect(() => {
+		(async () => {
+			try {
+				const URL = `${process.env.REACT_APP_API_URL}/enquiry/get-last-action`;
+				const req = await fetch(URL, {
+					method: "POST",
+					headers: {
+						"Content-Type": 'application/json'
+					},
+					body: JSON.stringify({ token, enqNo: enquiryModalData.enqNo })
+				});
+				const res = await req.json();
+				if (req.status !== 200) {
+					return toast(res.err, 'error');
+				}
+
+				console.log(res);
+				setLastAction(res.result);
+
+			} catch (err) {
+				return toast("Something went wrong", "error");
+			}
+		})()
+	}, [])
+
 
 	// Get all User and store only sales
 	useEffect(() => {
@@ -339,14 +369,14 @@ const Enquiry = () => {
 																checked={enquiryData.length > 0 && selected.length === enquiryData.length}
 															/>
 														</th>
-														<th align='left'>ENQ No.</th>
-														<th align='left'>Date Received</th>
+														<th align='left' className='w-[70px]'>ENQ No.</th>
+														<th align='left' className='w-[110px]'>Date Received</th>
 														<th align='left'>Party</th>
 														<th align='left'>City</th>
 														<th align='left'>Assign To</th>
 														<th align='left'>Contact Person</th>
-														<th align='left'>Action Taken</th>
-														<th align='left'>Status</th>
+														<th align='left' className='w-[140px]'>Last Action Taken</th>
+														<th align='left' className='w-[70px]'>Status</th>
 														<th>Items</th>
 														<th>Action</th>
 													</tr>
@@ -354,6 +384,8 @@ const Enquiry = () => {
 												<tbody>
 													{
 														enquiryData.map((data, i) => {
+															const action = lastAction?.find(a => a.enqNo === data.enqNo);
+
 															return <tr key={i} onClick={(e) => {
 																setEnquiryModalData(data);
 																setOpenEnquiryModal(true);
@@ -385,15 +417,18 @@ const Enquiry = () => {
 																</td>
 																<td align='left'>
 																	{
-																		data.isConverted ? (
-																			<span className='badge green-badge'>Converted</span>
+																		action?.lastAction ? (
+																			<>
+																				<span className='badge green-badge capitalize'>Convert to {action?.lastAction}</span>
+																				{/* <span className='text-[10px] border bg-gray-100 px-1 rounded ml-1'>
+																					{action?.lastActionDate.split("T")[0]}
+																				</span> */}
+																			</>
 																		) : (
-																			<span className='badge yellow-badge'>Enquiry Registerd</span>
+																			<span className='badge yellow-badge capitalize'>Enquiry Open</span>
 																		)
 																	}
-																	<span className='text-[10px] border bg-gray-100 px-1 rounded ml-1'>
-																		{data.createdAt.split("T")[0]}
-																	</span>
+
 																</td>
 																<td align='left'>
 																	{
