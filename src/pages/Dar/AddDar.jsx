@@ -28,7 +28,8 @@ const AddDar = () => {
     const { id } = useParams();
     const [formData, setFormData] = useState({
         name: '', email: '', phone: '', companyName: '', designation: '', companyName: '',
-        activityType: '', feedback: '', status: '', followUp: 'no', followDate: ''
+        activityType: 'call', feedback: '', status: '', followUp: 'no', followDate: '',
+        leadSource: '', city: '', industry: '', productInterested: '', priority: '', competitor: ''
     })
 
 
@@ -72,21 +73,22 @@ const AddDar = () => {
 
     const clearData = () => {
         setFormData({
-            name: '', email: '', phone: '', companyName: '', designation: '',
-            activityType: '', feedback: '', status: '', followUp: '', followDate: ''
+            name: '', email: '', phone: '', companyName: '', designation: '', companyName: '',
+            activityType: 'call', feedback: '', status: '', followUp: 'no', followDate: '',
+            leadSource: '', city: '', industry: '', productInterested: '', priority: '', competitor: ''
         })
     }
 
     return (
         <>
-            <Nav title={"Add Cold Calling Tracking" } />
+            <Nav title={"Add Cold Calling Tracking"} />
             <main id='main'>
                 <SideNav />
                 <div className='content__body'>
                     <div className='content__body__main bg-white '>
-                        <div className='justify-between grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gr gap-4'>
+                        <div className='justify-between grid  sm:grid-cols-1 md:grid-cols-5 gap-5'>
                             <div className='w-full'>
-                                <p>Name <span className='required__text'>*</span></p>
+                                <p>Contact Person Name <span className='required__text'>*</span></p>
                                 <input type="text"
                                     onChange={(e) => {
                                         setFormData({ ...formData, name: e.target.value })
@@ -107,7 +109,7 @@ const AddDar = () => {
                                 <p>Phone</p>
                                 <input type="text"
                                     onChange={(e) => {
-                                        setFormData({ ...formData, phone: e.target.value })
+                                        setFormData({ ...formData, phone: checkNumber(e.target.value )})
                                     }}
                                     value={formData.phone}
                                 />
@@ -121,8 +123,64 @@ const AddDar = () => {
                                     value={formData.designation}
                                 />
                             </div>
+                            <div className='w-full'>
+                                <p>City</p>
+                                <input type="text"
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, city: e.target.value })
+                                    }}
+                                    value={formData.city}
+                                />
+                            </div>
+                            <div className='w-full'>
+                                <p>Lead Source</p>
+                                <input type="text"
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, leadSource: e.target.value })
+                                    }}
+                                    value={formData.leadSource}
+                                />
+                            </div>
+                            <div className='w-full'>
+                                <p>Industry</p>
+                                <input type="text"
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, industry: e.target.value })
+                                    }}
+                                    value={formData.industry}
+                                />
+                            </div>
+                            <div className='w-full'>
+                                <p>Product Interested</p>
+                                <input type="text"
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, productInterested: e.target.value })
+                                    }}
+                                    value={formData.productInterested}
+                                />
+                            </div>
+                            <div className='w-full'>
+                                <p>Priority</p>
+                                <input type="text"
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, priority: e.target.value })
+                                    }}
+                                    value={formData.priority}
+                                />
+                            </div>
+                            <div className='w-full'>
+                                <p>Compititor</p>
+                                <input type="text"
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, competitor: e.target.value })
+                                    }}
+                                    value={formData.competitor}
+                                />
+                            </div>
                         </div>
-                        <div className='flex items-center gap-4 flex-col md:flex-row mt-4'>
+
+
+                        <div className='flex items-center gap-4 flex-col md:flex-row mt-3'>
                             <div className='w-full'>
                                 <p>Company Name</p>
                                 <input type="text"
@@ -133,7 +191,7 @@ const AddDar = () => {
                                 />
                             </div>
                             <div className='w-full'>
-                                <p>Actity Type</p>
+                                <p>Activity Type</p>
                                 <select
                                     onChange={(e) => {
                                         setFormData({ ...formData, activityType: e.target.value })
@@ -148,7 +206,7 @@ const AddDar = () => {
                                 </select>
                             </div>
                             <div className='w-full'>
-                                <p>Status</p>
+                                <p>Call Status</p>
                                 <select
                                     onChange={(e) => {
                                         setFormData({ ...formData, status: e.target.value })
@@ -191,9 +249,8 @@ const AddDar = () => {
                             }
                         </div>
 
-
                         <div className='mt-2'>
-                            <p>Feedback</p>
+                            <p>Remarks</p>
                             <textarea rows={3}
                                 onChange={(e) => {
                                     setFormData({ ...formData, feedback: e.target.value })

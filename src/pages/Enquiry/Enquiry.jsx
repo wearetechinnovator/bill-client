@@ -20,6 +20,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 import Pagination from '../../components/Pagination';
 import { Icons } from '../../helper/icons';
 import ContextMenu from '../../components/ContextMenu';
+import EnquiryLogCard from '../../components/EnquiryLogCard';
 
 
 
@@ -55,6 +56,7 @@ const Enquiry = () => {
 	const [enquiryActiveTab, setEnquiryActiveTab] = useState('details');
 	const [billLogs, setBillLogs] = useState([]);
 	const [lastAction, setLastAction] = useState([]);
+	const [currentEnquiryData, setCurrentEnquiryData] = useState(null) //for Modal LOGS;
 
 
 
@@ -81,7 +83,8 @@ const Enquiry = () => {
 				setEnquiryData([...res.data]);
 
 			} catch (error) {
-				console.log(error)
+				console.log(error);
+				return toast("Something went wrong, Data not fetch", "error");
 			} finally {
 				setLoading(false);
 			}
@@ -375,7 +378,7 @@ const Enquiry = () => {
 														<th align='left'>City</th>
 														<th align='left'>Assign To</th>
 														<th align='left'>Contact Person</th>
-														<th align='left' className='w-[140px]'>Last Action Taken</th>
+														<th align='left' className='w-[160px]'>Last Action Taken</th>
 														<th align='left' className='w-[70px]'>Status</th>
 														<th>Items</th>
 														<th>Action</th>
@@ -389,6 +392,8 @@ const Enquiry = () => {
 															return <tr key={i} onClick={(e) => {
 																setEnquiryModalData(data);
 																setOpenEnquiryModal(true);
+																setCurrentEnquiryData(data);
+																console.log(data)
 															}} className='cursor-pointer'>
 																<td className='py-2' align='center'>
 																	<input type='checkbox'
@@ -419,13 +424,15 @@ const Enquiry = () => {
 																	{
 																		action?.lastAction ? (
 																			<>
-																				<span className='badge green-badge capitalize'>Convert to {action?.lastAction}</span>
+																				<span className='badge green-badge'>
+																					Convert to <span className='uppercase'>{action?.lastAction}</span>
+																				</span>
 																				{/* <span className='text-[10px] border bg-gray-100 px-1 rounded ml-1'>
 																					{action?.lastActionDate.split("T")[0]}
 																				</span> */}
 																			</>
 																		) : (
-																			<span className='badge yellow-badge capitalize'>Enquiry Open</span>
+																			<span className='badge yellow-badge capitalize'>Enquiry Registerd</span>
 																		)
 																	}
 
@@ -515,14 +522,13 @@ const Enquiry = () => {
 													}
 												</tbody>
 											</table>
-											<p className='py-4'>Showing {enquiryData.length} of {totalData} entries</p>
+											<p className='pt-2'>Showing {enquiryData.length} of {totalData} entries</p>
 											<Pagination
 												activePage={activePage}
 												totalData={totalData}
 												dataLimit={dataLimit}
 												setActivePage={setActivePage}
 											/>
-											{/* pagination end */}
 										</div>
 									</div>
 								</>
@@ -557,77 +563,77 @@ const Enquiry = () => {
 								<table className={`enquiry__modal__view `}>
 									<tbody>
 										<tr>
-											<td width={'35%'} className='pt-3'>Enquiry NO.</td>
+											<td width={'35%'} className='pt-3 font-[650]'>Enquiry NO.</td>
 											<td width={'65%'}>{enquiryModalData.enqNo}</td>
 										</tr>
 										<tr>
-											<td>Received Date</td>
+											<td className='pt-3 font-[650]'>Received Date</td>
 											<td>{enquiryModalData.dateReceived?.split("T")[0]}</td>
 										</tr>
 										<tr>
-											<td>Enquiry Source</td>
+											<td className='pt-3 font-[650]'>Enquiry Source</td>
 											<td className='capitalize'>{enquiryModalData.enquirySource}</td>
 										</tr>
 										{
 											enquiryModalData.enquirySource === "others" && (
 												<tr>
-													<td>Others Source</td>
+													<td className='pt-3 font-[650]'>Others Source</td>
 													<td className='capitalize'>{enquiryModalData.otherSource}</td>
 												</tr>
 											)
 										}
 										<tr>
-											<td>City</td>
+											<td className='pt-3 font-[650]'>City</td>
 											<td>{enquiryModalData.party?.city || "-"}</td>
 										</tr>
 										<tr>
-											<td>Contact Person</td>
+											<td className='pt-3 font-[650]'>Contact Person</td>
 											<td>{enquiryModalData.contactPerson?.name || "-"}</td>
 										</tr>
 										<tr>
-											<td>Designation</td>
+											<td className='pt-3 font-[650]'>Designation</td>
 											<td>{enquiryModalData.contactPerson?.designation || "-"}</td>
 										</tr>
 										<tr>
-											<td>Mobile Number</td>
+											<td className='pt-3 font-[650]'>Mobile Number</td>
 											<td>{enquiryModalData.contactPerson?.phone || "-"}</td>
 										</tr>
 										<tr>
-											<td>Email Id</td>
+											<td className='pt-3 font-[650]'>Email Id</td>
 											<td>{enquiryModalData.contactPerson?.email || "-"}</td>
 										</tr>
 										<tr>
-											<td>Industry</td>
+											<td className='pt-3 font-[650]'>Industry</td>
 											<td>{enquiryModalData.industry || "-"}</td>
 										</tr>
 										<tr>
-											<td>Enquiry Status</td>
+											<td className='pt-3 font-[650]'>Enquiry Status</td>
 											<td>{enquiryModalData.enquiryStatus || "-"}</td>
 										</tr>
 										<tr>
-											<td>Follow Up</td>
+											<td className='pt-3 font-[650]'>Follow Up</td>
 											<td>{enquiryModalData.followUp?.toUpperCase() || "-"}</td>
 										</tr>
 										<tr>
-											<td>Follow Up Date</td>
+											<td className='pt-3 font-[650]'>Follow Up Date</td>
 											<td>{enquiryModalData.followUpDate?.split("T")[0] || "-"}</td>
 										</tr>
 										<tr>
-											<td>Order Probablity (%)</td>
+											<td className='pt-3 font-[650]'>Order Probablity (%)</td>
 											<td>{enquiryModalData.orderProbality || "-"}</td>
 										</tr>
 										<tr>
-											<td>Expected Order Date</td>
+											<td className='pt-3 font-[650]'>Expected Order Date</td>
 											<td>{enquiryModalData.expectedOrderDate?.split("T")[0] || "-"}</td>
 										</tr>
 										<tr>
-											<td>Remark</td>
+											<td className='pt-3 font-[650]'>Remark</td>
 											<td>
 												<p className='max-w-[80%]'>{enquiryModalData.message || "-"}</p>
 											</td>
 										</tr>
 										<tr>
-											<td>Quotation Number</td>
+											<td className='pt-3 font-[650]'>Quotation Number</td>
 											<td>
 												{
 													allQuotations?.map(q => {
@@ -641,7 +647,7 @@ const Enquiry = () => {
 											</td>
 										</tr>
 										<tr>
-											<td>PO Number</td>
+											<td className='pt-3 font-[650]'>PO Number</td>
 											<td>
 												{
 													allPO.map(q => {
@@ -663,8 +669,8 @@ const Enquiry = () => {
 										{
 											enquiryModalData.items?.map((data, i) => {
 												return <tr key={i}>
-													<td>{data.item?.title || "-"}</td>
-													<td>{data.qty || "-"}</td>
+													<td className='font-[650]'>{data.item?.title || "-"}</td>
+													<td className='font-[650]'>{data.qty || "-"}</td>
 												</tr>
 											})
 										}
@@ -675,50 +681,74 @@ const Enquiry = () => {
 					}
 					{
 						enquiryActiveTab === 'log' && (
-							billLogs.map((b, i) => {
-								return <div className={`w-full flex gap-2 pr-2 bg-gray-50 ${i === 0 && 'pt-2'}`} key={b._id}>
-									<div className='flex flex-col justify-center items-center'>
-										<div className='w-[14px] h-[16px] bg-[#003E32] rounded-full'></div>
-										<div className='w-[1px] h-full bg-[#003E32]'></div>
-									</div>
-									<div className='w-full'>
-										<div className='rounded-md w-full hover:border-gray-400 bg-white shadow'>
-											<div className='w-full flex items-center justify-between border-b px-1 py-1'>
-												<div>
-													<span className='badge indigo-badge uppercase'>{b.type}</span>
-												</div>
-												<div className='flex items-end gap-1'>
-													<span className='font-bold text-[13px]'>#{b.invoiceNumber}</span>
-													<span className='text-gray-500 text-[10px] mb-[2px]'>
-														{b.date?.split("T")[0]}
-													</span>
-												</div>
+							<>
+								{/* =======================[Enquiry Registerd]================== */}
+								{/* ============================================================ */}
+								<EnquiryLogCard
+									date={`Date :${currentEnquiryData?.createdAt.split("T")[0]}`}
+									enqNo={`ENQ Registerd #${currentEnquiryData?.enqNo}`}
+									items={currentEnquiryData?.items}
+									className={'pt-2'}
+								/>
+								<EnquiryLogCard
+									date={`Date :${currentEnquiryData?.dateReceived?.split("T")[0] || ''}`}
+									enqNo={`ENQ Received #${currentEnquiryData?.enqNo}`}
+									items={currentEnquiryData?.items}
+								/>
+
+								{
+									billLogs.map((b, i) => {
+										return <div className={`w-full flex gap-2 pr-2 bg-gray-50`} key={b._id}>
+											<div className='flex flex-col justify-center items-center'>
+												<div className='w-[14px] h-[16px] bg-[#003E32] rounded-full'></div>
+												<div className={`w-[1px] h-full bg-[#003E32]`}></div>
+												{/* ${i === (billLogs.length - 1) && 'invisible'} */}
 											</div>
-											<table className='w-full p-3 text-xs'>
-												<thead className='bg-gray-50'>
-													<tr>
-														<td className='px-2 py-1 font-bold text-[11px]'>ITEMS</td>
-														<td className='font-bold text-[11px]'>QTY</td>
-													</tr>
-												</thead>
-												<tbody className='lowercase'>
-													{
-														b.items.map((item, _) => {
-															return (
-																<tr className='border-b border-gray-50'>
-																	<td className='px-2 py-1'>{item.itemName}</td>
-																	<td>{item.qun}</td>
-																</tr>
-															)
-														})
-													}
-												</tbody>
-											</table>
+											<div className='w-full'>
+												<div className='rounded-md w-full hover:border-gray-400 bg-white shadow'>
+													<div className='w-full flex items-center justify-between p-2'>
+														<div className='w-full flex items-center gap-1.5'>
+															<span className='badge green-badge uppercase'>
+																{b.type} #{b.invoiceNumber}
+															</span>
+															<span className='badge indigo-badge'>
+																<Icons.CALENDAR className='inline mr-[2px] mt-[-2px]' />
+																Date : {b.date?.split("T")[0]}
+															</span>
+														</div>
+														<div className='flex items-end gap-1'>
+
+														</div>
+													</div>
+													<table className='w-full p-3 text-xs'>
+														<thead>
+															<tr>
+																<td className='px-2 py-0 font-bold text-[11px]'>Items</td>
+																<td className='font-bold text-[11px]'>QTY</td>
+															</tr>
+														</thead>
+														<tbody className='lowercase'>
+															{
+																b.items.map((item, i) => {
+																	return (
+																		<tr className={`${i !== (b.items.length - 1) ? 'border-b border-dashed border-gray-200' : ''}`} key={item.itemId}>
+																			<td className='px-2 py-1.5'>{item.itemName}</td>
+																			<td>
+																				{b.type === "po" ? item.invoice_qun : item.qun}
+																			</td>
+																		</tr>
+																	)
+																})
+															}
+														</tbody>
+													</table>
+												</div>
+												<div className='h-[15px]'></div>
+											</div>
 										</div>
-										<div className='h-[15px]'></div>
-									</div>
-								</div>
-							})
+									})
+								}
+							</>
 						)
 					}
 				</Modal.Body>

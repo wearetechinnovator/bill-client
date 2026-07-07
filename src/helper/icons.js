@@ -61,11 +61,13 @@ import { CgMail } from "react-icons/cg";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdAddCircleOutline } from "react-icons/md";
+import { FaRegCalendarAlt } from "react-icons/fa";
 
 
 
 
 export const Icons = {
+  CALENDAR: FaRegCalendarAlt,
   EXTRANAL_LINK: FaExternalLinkAlt,
   EMAIL: CgMail,
   MESSAGE: LuMessageCircleMore,

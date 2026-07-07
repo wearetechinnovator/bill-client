@@ -22,7 +22,7 @@ const HistoryView = () => {
     const [historyData, setHistoryData] = useState([]);
     const [openDrawer, setOpenDrawer] = useState(false);
     const [formData, setFormData] = useState({
-        activityType: '', feedback: '', status: '', followUp: 'no', followDate: ''
+        activityType: 'call', feedback: '', status: '', followUp: 'no', followDate: ''
     })
 
 
@@ -107,7 +107,7 @@ const HistoryView = () => {
 
     return (
         <>
-            <Nav title={"DAR (Daily Activity Report) History"} />
+            <Nav title={"Cold Calling Tracking History"} />
             <main id='main'>
                 <SideNav />
                 <div className='content__body'>
@@ -123,26 +123,50 @@ const HistoryView = () => {
                                 + Add History
                             </button>
                         </div>
-                        <div className='w-full grid gird-cols-1 sm:gird-cols-2 md:grid-cols-5 mt-3 pb-2'>
+                        <div className='w-full grid gird-cols-1 sm:gird-cols-2 md:grid-cols-5 mt-3 pb-2 gap-4'>
                             <div className='w-full'>
-                                <p>NAME</p>
-                                <p className='font-bold'>{darData?.name}</p>
+                                <p className='font-bold'>NAME</p>
+                                <p>{darData?.name}</p>
                             </div>
                             <div className='w-full'>
-                                <p>EMAIL</p>
+                                <p className='font-bold'>EMAIL</p>
                                 <p>{darData?.email}</p>
                             </div>
                             <div className='w-full'>
-                                <p>PHONE</p>
+                                <p className='font-bold'>PHONE</p>
                                 <p>{darData?.phone}</p>
                             </div>
                             <div className='w-full'>
-                                <p>DESIGNATION</p>
+                                <p className='font-bold'>DESIGNATION</p>
                                 <p>{darData?.designation || "--"}</p>
                             </div>
                             <div className='w-full'>
-                                <p>COMPANY NAME</p>
+                                <p className='font-bold'>COMPANY NAME</p>
                                 <p>{darData?.companyName || "--"}</p>
+                            </div>
+                            <div className='w-full'>
+                                <p className='font-bold'>City</p>
+                                <p>{darData?.city || "--"}</p>
+                            </div>
+                            <div className='w-full'>
+                                <p className='font-bold'>Lead Source</p>
+                                <p>{darData?.leadSource || "--"}</p>
+                            </div>
+                            <div className='w-full'>
+                                <p className='font-bold'>Industry</p>
+                                <p>{darData?.industry || "--"}</p>
+                            </div>
+                            <div className='w-full'>
+                                <p className='font-bold'>Product interested</p>
+                                <p>{darData?.productInterested || "--"}</p>
+                            </div>
+                            <div className='w-full'>
+                                <p className='font-bold'>Priority</p>
+                                <p>{darData?.priority || "--"}</p>
+                            </div>
+                            <div className='w-full'>
+                                <p className='font-bold'>Compititor</p>
+                                <p>{darData?.competitor || "--"}</p>
                             </div>
                         </div>
                     </div>

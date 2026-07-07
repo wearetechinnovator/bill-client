@@ -1017,6 +1017,9 @@ input[type="checkbox"]:checked::before {
 .indigo-badge{
   @apply bg-indigo-50 text-indigo-500 border border-indigo-200;
 }
+.black-badge{
+  @apply bg-[#013D2F] text-white border border-[#05644e];
+}
 
 .item__table {
   table-layout: fixed;
@@ -1596,7 +1599,7 @@ input {
   font-weight: 600;
 }
 .enquiry__tab button.active{
-  background-color: white;
   border-start-start-radius: 10px;
   border-start-end-radius: 10px;
+  @apply bg-gray-50
 }

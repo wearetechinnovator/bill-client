@@ -199,10 +199,15 @@ const Dar = () => {
                                             <table className='min-w-full bg-white' id='listQuotation' ref={tableRef}>
                                                 <thead className='list__table__head'>
                                                     <tr>
-                                                        <th align='left' className='py-2 min-w-[250px]'>Name</th>
+                                                        <th align='left' className='py-2 min-w-[120px]'>Date</th>
+                                                        <th align='left'>Lead Source</th>
+                                                        <th align='left'>Company Name</th>
+                                                        <th align='left'>City</th>
+                                                        <th align='left'>Contact Person</th>
                                                         <th align='left'>Email</th>
                                                         <th align='left'>Phone</th>
-                                                        <th align='left'>Company Name</th>
+                                                        <th align='left'>Product interested</th>
+                                                        <th align='left'>View</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -210,11 +215,19 @@ const Dar = () => {
                                                         darData.map((data, i) => {
                                                             return <tr onClick={(e) => { navigate(`/admin/dar/history/${data._id}`) }}
                                                                 key={i}
-                                                                className='cursor-pointer'>
+                                                                className='cursor-pointer'
+                                                            >
+                                                                <td align='left'>{data.createdAt.split("T")[0]}</td>
+                                                                <td align='left'>{data.leadSource}</td>
+                                                                <td align='left'>{data.companyName || "--"}</td>
+                                                                <td align='left'>{data.city}</td>
                                                                 <td align='left' className='py-2'>{data.name}</td>
                                                                 <td align='left'>{data.email}</td>
                                                                 <td align='left'>{data.phone}</td>
-                                                                <td align='left'>{data.companyName || "--"}</td>
+                                                                <td align='left'>{data.productInterested}</td>
+                                                                <td align='center'>
+                                                                    <Icons.EYE/>
+                                                                </td>
                                                             </tr>
                                                         })
                                                     }

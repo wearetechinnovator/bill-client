@@ -41,7 +41,8 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
     const [formData, setFormData] = useState({
         party: '', contactPerson: '', items: [itemData], deliveryDate: '', enqNo: '',
         message: '', enquirySource: '', otherSource: "", enquiryStatus: 'open', compititor: '', followUp: 'no',
-        followUpDate: '', orderProbality: '', expectedOrderDate: '', dateReceived: '', industry: ''
+        followUpDate: '', orderProbality: '', expectedOrderDate: '', dateReceived: '', industry: '',
+        applicationDetails: ''
     })
     const [party, setParty] = useState([]);
     const [items, setItems] = useState([]);
@@ -271,7 +272,8 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
         setFormData({
             party: '', contactPerson: '', items: [itemData], deliveryDate: '', enqNo: '',
             message: '', enquirySource: '', otherSource: "", enquiryStatus: '', compititor: '', followUp: 'no',
-            followUpDate: '', orderProbality: '', expectedOrderDate: '', dateReceived: '', industry: ''
+            followUpDate: '', orderProbality: '', expectedOrderDate: '', dateReceived: '', industry: '',
+            applicationDetails: ''
         })
     }
 
@@ -374,7 +376,7 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                             setFormData({ ...formData, items: [...formData.items, itemData] })
                         }}
                         className="font-semibold text-[11px] bg-blue-500 cursor-pointer px-2 py-[2px] rounded text-white mx-1">
-                        Add New +
+                        Add Items +
                     </button>
                     {
                         formData?.items?.map ? formData.items.map((d, i) => (
@@ -486,6 +488,13 @@ const AddEnquiryComponent = ({ mode, onSave }) => {
                         <input type="date"
                             onChange={(e) => setFormData({ ...formData, expectedOrderDate: e.target.value })}
                             value={formData.expectedOrderDate}
+                        />
+                    </div>
+                    <div className='w-full'>
+                        <p>Application Details</p>
+                        <input type="text"
+                            onChange={(e) => setFormData({ ...formData, applicationDetails: e.target.value })}
+                            value={formData.applicationDetails}
                         />
                     </div>
                     <div className='w-full'>

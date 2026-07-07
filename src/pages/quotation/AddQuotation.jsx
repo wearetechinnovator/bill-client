@@ -201,17 +201,23 @@ const Quotation = ({ mode }) => {
 		});
 
 		setItemRows(
-			data.items.map((item) => ({
-				...itemRowSet,
-				itemName: item.item.title,
-				qun: item.qty,
-				itemId: item.item._id,
-				hsn: item.item.hsn,
-				price: item.item.salePrice,
-				unit: item.item.unit.map((u) => u.unit)
-			}))
+			data.items.map((item) => {
+				const taxId = item.item.category?.tax || item.item.tax;
+				const getTax = tax.filter((t, _) => t._id === taxId)[0];
+
+				return {
+					...itemRowSet,
+					itemName: item.item.title,
+					qun: item.qty,
+					itemId: item.item._id,
+					hsn: item.item.hsn,
+					price: item.item.salePrice,
+					unit: item.item.unit.map((u) => u.unit),
+					tax: getTax?.gst ?? 0.0
+				}
+			})
 		);
-	}, [location]);
+	}, [location, tax]);
 
 
 	const onPerDiscountAmountChange = (val, index) => {
