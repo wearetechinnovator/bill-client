@@ -21,12 +21,16 @@ import Pagination from '../../components/Pagination';
 import { Icons } from '../../helper/icons';
 import ContextMenu from '../../components/ContextMenu';
 import EnquiryLogCard from '../../components/EnquiryLogCard';
+import useTopLoading from '../../hooks/useTopLoadingBar';
+
+
 
 
 
 const Enquiry = () => {
 	const token = Cookies.get("token");
 	const toast = useMyToaster();
+    const { TopLoadingBar, setTopLoading } = useTopLoading();
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
 	const [activePage, setActivePage] = useState(1);
 	const [dataLimit, setDataLimit] = useState(10);
@@ -70,6 +74,7 @@ const Enquiry = () => {
 					all: tableStatusData === "all" ? true : false,
 					searchText: searchText
 				}
+                setTopLoading(25);
 				const URL = `${process.env.REACT_APP_API_URL}/enquiry/get-all?page=${activePage}&limit=${dataLimit}`;
 				const req = await fetch(URL, {
 					method: "POST",
@@ -78,12 +83,16 @@ const Enquiry = () => {
 					},
 					body: JSON.stringify(data)
 				});
+                setTopLoading(50);
 				const res = await req.json();
+                setTopLoading(75);
+
 				setTotalData(res.totalData)
 				setEnquiryData([...res.data]);
+                setTopLoading(100);
 
 			} catch (error) {
-				console.log(error);
+                setTopLoading(0);
 				return toast("Something went wrong, Data not fetch", "error");
 			} finally {
 				setLoading(false);
@@ -274,7 +283,7 @@ const Enquiry = () => {
 
 	return (
 		<>
-
+			
 			<Nav title={"Enquiry Track"} />
 			<main id='main'>
 				<SideNav />
@@ -753,6 +762,7 @@ const Enquiry = () => {
 					}
 				</Modal.Body>
 			</Modal>
+			{TopLoadingBar}
 		</>
 	)
 }

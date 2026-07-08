@@ -184,9 +184,10 @@ const Ladger = ({ partyId }) => {
 								<tbody className='text-xs'>
 									{
 										ladgers.map((l, _) => {
+											console.log(l.voucher)
 											return <tr className='border-b'>
 												<td className='p-2'>{new Date(l.date).toLocaleDateString()}</td>
-												<td>{voucherInv[l.voucher].title}</td>
+												<td>{voucherInv[l?.voucher].title}</td>
 												<td>
 													{
 														l.voucher !== "opening_balance" ?

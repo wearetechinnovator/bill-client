@@ -18,12 +18,15 @@ import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import PrintPaymentInModal from '../../components/PrintPaymentInModal';
 import ContextMenu from '../../components/ContextMenu';
+import useTopLoading from '../../hooks/useTopLoadingBar';
+
 
 
 const PaymentIn = () => {
     const token = Cookies.get("token")
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
+    const { TopLoadingBar, setTopLoading } = useTopLoading();
     const [activePage, setActivePage] = useState(1);
     const [dataLimit, setDataLimit] = useState(10);
     const [totalData, setTotalData] = useState();
@@ -59,6 +62,8 @@ const PaymentIn = () => {
     useEffect(() => {
         const getData = async () => {
             setLoading(true);
+            setTopLoading(30);
+
             let data = {
                 token: Cookies.get("token"),
                 all: tableStatusData === "all" ? true : false
@@ -73,7 +78,8 @@ const PaymentIn = () => {
                 }
             }
 
-            try {
+            try {  
+                setTopLoading(40)
                 const url = process.env.REACT_APP_API_URL + `/paymentin/get?page=${activePage}&limit=${dataLimit}`;
                 const req = await fetch(url, {
                     method: "POST",
@@ -83,10 +89,13 @@ const PaymentIn = () => {
                     body: JSON.stringify(data)
                 });
                 const res = await req.json();
-                setTotalData(res.totalData)
+                setTopLoading(70);
+
+                setTotalData(res.totalData);
                 setBillData([...res.data]);
+
+                setTopLoading(100)
             } catch (error) {
-                console.log(error)
                 return toast("Something went wrong", "error");
             } finally {
                 setLoading(false);
@@ -210,6 +219,7 @@ const PaymentIn = () => {
 
     return (
         <>
+            {TopLoadingBar}
             <Nav title={"Payment in"} />
             <main id='main'>
                 <SideNav />

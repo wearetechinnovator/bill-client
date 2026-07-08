@@ -21,6 +21,7 @@ const Details = () => {
 	const userData = useSelector((store) => store.userDetail);
 	const isAdmin = !userData?.role || userData?.role === "admin";
 
+
 	// Update URL when tab button is clicked
 	const handleTabClick = (tabName) => {
 		navigate(`?tab=${tabName.toLowerCase()}`);

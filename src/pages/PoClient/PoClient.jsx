@@ -25,6 +25,7 @@ import { Icons } from '../../helper/icons';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import ContextMenu from '../../components/ContextMenu';
+import useTopLoading from '../../hooks/useTopLoadingBar';
 
 
 
@@ -34,6 +35,7 @@ const PoClient = () => {
     const token = Cookies.get("token");
     const toast = useMyToaster();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
+	const { TopLoadingBar, setTopLoading } = useTopLoading();
     const [activePage, setActivePage] = useState(1);
     const [dataLimit, setDataLimit] = useState(10);
     const [totalData, setTotalData] = useState();
@@ -70,6 +72,7 @@ const PoClient = () => {
     // Get data;
     const getData = async () => {
         setLoading(true);
+        setTopLoading(30);
         try {
             let data = {
                 token,
@@ -84,6 +87,7 @@ const PoClient = () => {
                     billNo: filter.billNo,
                 }
             }
+            setTopLoading(50)
             const url = process.env.REACT_APP_API_URL + `/po-client/get?page=${activePage}&limit=${dataLimit}`;
             const req = await fetch(url, {
                 method: "POST",
@@ -92,13 +96,15 @@ const PoClient = () => {
                 },
                 body: JSON.stringify(data)
             });
+            setTopLoading(70);
             const res = await req.json();
+
             setTotalData(res.totalData)
             setBillData([...res.data]);
             setLoading(false);
 
+            setTopLoading(100);
         } catch (error) {
-            console.log(error)
             return toast("Something went wrong", "error");
         } finally {
             setLoading(false);
@@ -219,6 +225,7 @@ const PoClient = () => {
 
     return (
         <>
+            {TopLoadingBar}
             <Nav title={"PO"} />
             <main id='main'>
                 <SideNav />
@@ -568,7 +575,6 @@ const PoClient = () => {
                                 </table>
                                 <div className='paginate__parent'>
                                     <p>Showing {billData.length} of {totalData} entries</p>
-                                    {/* ----- Paginatin ----- */}
                                     <Pagination
                                         activePage={activePage}
                                         totalData={totalData}
@@ -576,7 +582,6 @@ const PoClient = () => {
                                         setActivePage={setActivePage}
                                     />
                                 </div>
-                                {/* pagination end */}
                             </div>
                         </div>
                             : <AddNew title={"PO"} link={'/admin/po-client/add'} />

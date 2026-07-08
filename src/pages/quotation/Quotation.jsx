@@ -17,11 +17,13 @@ import ConfirmModal from '../../components/ConfirmModal';
 import { Constants } from '../../helper/constants';
 import ContextMenu from '../../components/ContextMenu';
 import { useSelector } from 'react-redux';
+import useTopLoading from '../../hooks/useTopLoadingBar';
 
 
 
 const Quotation = () => {
     const toast = useMyToaster();
+	const { TopLoadingBar, setTopLoading } = useTopLoading();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
     const [activePage, setActivePage] = useState(1);
     const [dataLimit, setDataLimit] = useState(10);
@@ -59,6 +61,7 @@ const Quotation = () => {
         (async () => {
             try {
                 setLoading(true);
+                setTopLoading(30);
                 let data = {
                     token: Cookies.get("token"),
                     all: tableStatusData === "all" ? true : false
@@ -72,6 +75,7 @@ const Quotation = () => {
                         billNo: filter.billNo,
                     }
                 }
+                setTopLoading(50);
                 const url = `${process.env.REACT_APP_API_URL}/quotation/get?page=${activePage}&limit=${dataLimit}`;
                 const req = await fetch(url, {
                     method: "POST",
@@ -80,14 +84,14 @@ const Quotation = () => {
                     },
                     body: JSON.stringify(data)
                 });
+                setTopLoading(70);
                 const res = await req.json();
 
                 setTotalData(res?.totalData)
                 setBillData([...res?.data])
 
-
+                setTopLoading(100);
             } catch (error) {
-                console.log(error)
                 return toast("Something went wrong", "error");
             } finally {
                 setLoading(false);
@@ -191,6 +195,7 @@ const Quotation = () => {
 
     return (
         <>
+            {TopLoadingBar}
             <Nav title={"Quotation / Estimate"} />
             <main id='main'>
                 <SideNav />

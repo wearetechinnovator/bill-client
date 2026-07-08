@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 const ACTIVITY_TYPE = {
     call: {
-        icon: <Icons.PHONE_ADD size={17}/>,
+        icon: <Icons.PHONE_ADD size={17} />,
         color: '#316BF3'
     },
     whatsapp: {
@@ -22,6 +22,12 @@ const ACTIVITY_TYPE = {
         color: '#003E32'
     }
 }
+const statusClass = {
+    warm: "bg-yellow-100 text-yellow-800 border border-yellow-300",
+    hot: "bg-green-100 text-green-800 border border-green-300",
+    cold: "bg-blue-100 text-blue-800 border border-blue-300",
+    dead: "bg-red-100 text-red-700 border border-red-300",
+};
 const ActivityHistoryCard = ({ data }) => {
     const [date, setDate] = useState('');
     const [currentDay, setCurrentDay] = useState('');
@@ -74,11 +80,34 @@ const ActivityHistoryCard = ({ data }) => {
                             <span className='capitalize font-bold'> {data.activityType}</span>
                         </p>
                         <div>
-                            <span className='text-[10px] mr-1 uppercase font-bold'>Status: </span>
-                            <span className='badge green-badge uppercase'>
+                            <span className="text-[10px] mr-1 uppercase font-bold">
+                                Status:
+                            </span>
+                            <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${statusClass[data?.status?.toLowerCase()] ||
+                                    "bg-gray-100 text-gray-700 border border-gray-300"
+                                    }`}
+                            >
                                 {data?.status}
                             </span>
                         </div>
+                        {
+                            data?.followUpDate ? (
+                                <div>
+                                    <span className='text-[10px] mr-1 uppercase font-bold'>Follow Up Date: </span>
+                                    <span className='badge green-badge uppercase'>
+                                        {data?.followUpDate?.split("T")[0] || "--"}
+                                    </span>
+                                </div>
+                            ):(
+                                 <div>
+                                    <span className='text-[10px] mr-1 uppercase font-bold'>Follow Up: </span>
+                                    <span className='badge yellow-badge uppercase'>
+                                        No
+                                    </span>
+                                </div>
+                            )
+                        }
                     </div>
                     <div className='bg-gray-100 p-3 rounded mt-2'>
                         <p className='font-bold mb-1 uppercase text-xs'>Feedback / Note</p>
@@ -92,4 +121,4 @@ const ActivityHistoryCard = ({ data }) => {
     )
 }
 
-export default ActivityHistoryCard
+export default ActivityHistoryCard;

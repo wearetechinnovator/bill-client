@@ -17,6 +17,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import ContextMenu from '../../components/ContextMenu';
+import useTopLoading from '../../hooks/useTopLoadingBar';
 
 
 
@@ -41,6 +42,7 @@ const DeliveryChalan = () => {
 		}));
 	}, [billData]);
 	const [loading, setLoading] = useState(true);
+	const { TopLoadingBar, setTopLoading } = useTopLoading();
 	const [filterToggle, setFilterToggle] = useState(false);
 	const [filter, setFilter] = useState({
 		startDate: '', endDate: '', billNo: '', party: '',
@@ -56,6 +58,8 @@ const DeliveryChalan = () => {
 	// Get data;
 	const getData = async () => {
 		setLoading(true);
+		setTopLoading(30);
+
 		try {
 			let data = {
 				token: Cookies.get("token"),
@@ -70,6 +74,7 @@ const DeliveryChalan = () => {
 					billNo: filter.billNo,
 				}
 			}
+			setTopLoading(40)
 			const url = process.env.REACT_APP_API_URL + `/deliverychalan/get?page=${activePage}&limit=${dataLimit}`;
 			const req = await fetch(url, {
 				method: "POST",
@@ -79,10 +84,13 @@ const DeliveryChalan = () => {
 				body: JSON.stringify(data)
 			});
 			const res = await req.json();
-			console.log(res)
+			setTopLoading(70)
+
 			setTotalData(res.totalData)
 			setBillData([...res.data]);
+
 			setLoading(false);
+			setTopLoading(100)
 
 		} catch (error) {
 			console.log(error);
@@ -210,6 +218,7 @@ const DeliveryChalan = () => {
 
 	return (
 		<>
+			{TopLoadingBar}
 			<Nav title={"Delivery Chalan"} />
 			<main id='main'>
 				<SideNav />
@@ -243,18 +252,11 @@ const DeliveryChalan = () => {
 								</select>
 							</div>
 							<div className='flex items-center gap-2'>
-								{/* <div className='flex w-full flex-col lg:w-[300px]'>
-									<input type='text'
-										placeholder='Search...'
-										onChange={searchTable}
-										className='p-[6px]'
-									/>
-								</div> */}
 								<button onClick={() => {
 									setFilterToggle(!filterToggle)
 								}}
 									className={`${filterToggle ? 'bg-gray-200 border-gray-300' : 'bg-gray-100'} border`}>
-									<Icons.FILTER size={17}/>
+									<Icons.FILTER size={17} />
 									Filter
 								</button>
 								<button
@@ -263,7 +265,7 @@ const DeliveryChalan = () => {
 										setOpenConfirm(true);
 									}}
 									className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
-									<Icons.DELETE size={15}/>
+									<Icons.DELETE size={15} />
 									Delete
 								</button>
 								<button

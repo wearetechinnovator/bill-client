@@ -4,7 +4,7 @@ import {
     BarChart, Bar, XAxis, YAxis, Tooltip, Legend,
     CartesianGrid
 } from "recharts";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
 import { BsArrowRight } from "react-icons/bs";
 import useMyToaster from "../../hooks/useMyToaster";
@@ -27,7 +27,14 @@ const COLORS = [
     "#00C49F", "#0088FE", "#FF8042", "#FFBB28",
     "#00C49F", "#0088FE", "#FF8042", "#FFBB28"
 ];
+const statusClass = {
+    warm: "bg-yellow-100 text-yellow-800 border border-yellow-300",
+    hot: "bg-green-100 text-green-800 border border-green-300",
+    cold: "bg-blue-100 text-blue-800 border border-blue-300",
+    dead: "bg-red-100 text-red-700 border border-red-300",
+};
 const AdminDashboard = () => {
+    const navigate = useNavigate();
     const toast = useMyToaster();
     const token = Cookies.get("token");
     const [accountBalanceData, setAccountBalanceData] = useState([])
@@ -46,6 +53,7 @@ const AdminDashboard = () => {
     const [totalOtherExpense, setTotalOtherExpense] = useState(0);
     const [totalOtherIncome, setTotalOtherIncome] = useState(0);
     const [salesBarChart, selsBarchart] = useState(null);
+    const [darData, setDarData] = useState([]);
 
 
 
@@ -350,6 +358,31 @@ const AdminDashboard = () => {
         })()
     }, [])
 
+
+    // Get Follow Up date;
+    useEffect(() => {
+        (async () => {
+            try {
+                const URL = process.env.REACT_APP_API_URL + `/dar/get-followup-notification`;
+                const req = await fetch(URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify({ token })
+                });
+                const res = await req.json();
+                if (req.status !== 200) return toast(res.err, "error");
+
+                console.log(res);
+                setDarData(res.data)
+
+            } catch (err) {
+                return toast("Something went wrong, Followup notification not fetch", "error")
+            }
+        })()
+    }, [])
+
     return (
         <div className="content__body p-4">
             <div className="dashboard-main-content glow-shape">
@@ -627,6 +660,62 @@ const AdminDashboard = () => {
                                         <td>{d['Sales Invoice']}</td>
                                     </tr>
                                 ))}
+                            </tbody>
+                        </table>
+
+
+                        <h1 className="text-[20px] xl:text-[20px] text-[#333333] font-[600] text-left mb-2 mt-4">
+                            Cold Calling Track <small className="text-xs text-black">(Follow up notification)</small>
+                        </h1>
+                        <table className="w-full border rounded">
+                            <thead>
+                                <tr>
+                                    <td className="p-2">Company Name</td>
+                                    <td>Contact Person</td>
+                                    <td>Phone</td>
+                                    <td>Status</td>
+                                    <td>Follow Up</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    darData.map((data, i) => {
+                                        return <tr onClick={(e) => { navigate(`/admin/dar/history/${data._id}`) }}
+                                            key={i}
+                                            className='cursor-pointer'
+                                        >
+                                            <td align='left'>{data.companyName || "--"}</td>
+                                            <td align='left' className='py-2'>{data.name}</td>
+                                            <td align='left'>{data.phone}</td>
+                                            <td align='left'>
+                                                <span
+                                                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${statusClass[data?.status?.toLowerCase()] ||
+                                                        "bg-gray-100 text-gray-700 border border-gray-300"
+                                                        }`}
+                                                >
+                                                    {data?.status}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {
+                                                    data.followUp === 'yes' ? (
+                                                        <span
+                                                            className={`badge ${new Date(data.followUpDate).setHours(0, 0, 0, 0) <
+                                                                new Date().setHours(0, 0, 0, 0)
+                                                                ? "red-badge animate-danger"
+                                                                : "green-badge"
+                                                                }`}
+                                                        >
+                                                            {new Date(data.followUpDate).toLocaleDateString()}
+                                                        </span>
+                                                    ) : (
+                                                        <span className='badge yellow-badge'>NO</span>
+                                                    )
+                                                }
+                                            </td>
+                                        </tr>
+                                    })
+                                }
                             </tbody>
                         </table>
                     </div>

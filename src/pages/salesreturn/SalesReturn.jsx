@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-// import MyBreadCrumb from '../../components/BreadCrumb';
 import { Popover, SelectPicker, Whisper } from 'rsuite';
 import { useNavigate } from 'react-router-dom';
 import useExportTable from '../../hooks/useExportTable';
@@ -17,13 +16,16 @@ import ConfirmModal from '../../components/ConfirmModal';
 import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import ContextMenu from '../../components/ContextMenu';
+import useTopLoading from '../../hooks/useTopLoadingBar';
 
 
 
 
 const SalesReturn = () => {
+	const token = Cookies.get("token");
 	const toast = useMyToaster();
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
+	const { TopLoadingBar, setTopLoading } = useTopLoading();
 	const [activePage, setActivePage] = useState(1);
 	const [dataLimit, setDataLimit] = useState(10);
 	const [totalData, setTotalData] = useState();
@@ -55,9 +57,11 @@ const SalesReturn = () => {
 	// Get data;
 	const getData = async () => {
 		setLoading(true);
+		setTopLoading(30);
+
 		try {
 			let data = {
-				token: Cookies.get("token"),
+				token,
 				all: tableStatusData === "all" ? true : false
 			}
 			if (applyFilter) {
@@ -69,8 +73,9 @@ const SalesReturn = () => {
 					billNo: filter.billNo,
 				}
 			}
-			const url = `${process.env.REACT_APP_API_URL}/salesreturn/get?page=${activePage}&limit=${dataLimit}`;
-			const req = await fetch(url, {
+			setTopLoading(60);
+			const URL = `${process.env.REACT_APP_API_URL}/salesreturn/get?page=${activePage}&limit=${dataLimit}`;
+			const req = await fetch(URL, {
 				method: "POST",
 				headers: {
 					"Content-Type": 'application/json'
@@ -78,9 +83,12 @@ const SalesReturn = () => {
 				body: JSON.stringify(data)
 			});
 			const res = await req.json();
+			setTopLoading(70);
+
 			setTotalData(res.totalData)
 			setBillData([...res.data]);
 			setLoading(false);
+			setTopLoading(100);
 
 		} catch (error) {
 			console.log(error);
@@ -208,6 +216,7 @@ const SalesReturn = () => {
 
 	return (
 		<>
+			{TopLoadingBar}
 			<Nav title={"Sales Return"} />
 			<main id='main'>
 				<SideNav />
@@ -240,13 +249,6 @@ const SalesReturn = () => {
 								</select>
 							</div>
 							<div className='flex items-center gap-2 listing__btn_grp'>
-								{/* <div className='flex w-full flex-col lg:w-[300px]'>
-									<input type='text'
-										placeholder='Search...'
-										onChange={searchTable}
-										className='p-[6px]'
-									/>
-								</div> */}
 								<button onClick={() => {
 									setFilterToggle(!filterToggle)
 								}}

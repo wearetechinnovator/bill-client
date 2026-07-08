@@ -17,12 +17,15 @@ import ContextMenu from '../../components/ContextMenu';
 import { toggleBarCodeModal } from '../../store/barcodeModalSlice';
 import { useDispatch } from 'react-redux';
 import BarCodeModal from '../../components/BarCodeModal';
+import useTopLoading from '../../hooks/useTopLoadingBar';
 
 
 
 const DEBOUNCE_TIME = 300;
 const Item = ({ mode }) => {
+	const token = Cookies.get("token");
 	const toast = useMyToaster();
+	const { TopLoadingBar, setTopLoading } = useTopLoading();
 	const dispatch = useDispatch();
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
 	const [activePage, setActivePage] = useState(1);
@@ -66,11 +69,13 @@ const Item = ({ mode }) => {
 		const getCategory = async () => {
 			try {
 				setLoading(true);
+				setTopLoading(20);
 				const data = {
-					token: Cookies.get("token"),
+					token,
 					all: tableStatusData === "all" ? true : false,
 					searchText: searchText
 				}
+				setTopLoading(40);
 				const url = process.env.REACT_APP_API_URL + `/item/get?page=${activePage}&limit=${dataLimit}`;
 				const req = await fetch(url, {
 					method: "POST",
@@ -79,13 +84,16 @@ const Item = ({ mode }) => {
 					},
 					body: JSON.stringify(data)
 				});
+				setTopLoading(80);
 				const res = await req.json();
+
 				setTotalData(res.totalData)
 				setItemData([...res.data])
 				setStock([...res.stock]);
+				setTopLoading(100);
 
 			} catch (error) {
-				console.log(error);
+				setTopLoading(0);
 				return toast("Item not get", "error");
 			} finally {
 				setLoading(false);
@@ -229,7 +237,7 @@ const Item = ({ mode }) => {
 										setOpenConfirm(true);
 									}}
 									className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
-									<Icons.DELETE size={15}/>
+									<Icons.DELETE size={15} />
 									Delete
 								</button>
 								<button
@@ -403,6 +411,7 @@ const Item = ({ mode }) => {
 					}
 				</div>
 			</main>
+			{TopLoadingBar}
 		</>
 	)
 }

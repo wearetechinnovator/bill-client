@@ -15,6 +15,7 @@ import Pagination from '../../components/Pagination';
 import ConfirmModal from '../../components/ConfirmModal';
 import ContextMenu from '../../components/ContextMenu';
 import TableNoData from '../../components/TableNoData';
+import useTopLoading from '../../hooks/useTopLoadingBar';
 
 
 
@@ -25,8 +26,10 @@ const CUSTOMER = 'customer';
 const SUPPLIER = 'supplier';
 const BOTHPARTY = 'both';
 const DEBOUNCE_TIME = 300;
+
 const Party = () => {
 	const token = Cookies.get("token");
+	const { TopLoadingBar, setTopLoading } = useTopLoading();
 	const navigate = useNavigate();
 	const toast = useMyToaster();
 	const tableRef = useRef(null);
@@ -67,6 +70,7 @@ const Party = () => {
 				all: tableStatusData === "all" ? true : false,
 				searchText: searchText
 			}
+			setTopLoading(30);
 			const url = process.env.REACT_APP_API_URL + `/party/get?page=${activePage}&limit=${dataLimit}`;
 			const req = await fetch(url, {
 				method: "POST",
@@ -76,6 +80,7 @@ const Party = () => {
 				body: JSON.stringify(data)
 			});
 			const res = await req.json();
+			setTopLoading(60);
 
 			if (selectedTab === TOTAL_COLLECT) {
 				const party = res.data?.reduce((acc, i) => {
@@ -104,8 +109,9 @@ const Party = () => {
 				setPartyData([...res.data]);
 			}
 
+			setTopLoading(100);
+
 		} catch (error) {
-			console.log(error);
 			return toast("Party data not get", "error")
 		}
 	}
@@ -146,6 +152,7 @@ const Party = () => {
 				setTotalPay((Math.abs(totalPayment)).toFixed(2));
 
 				setPartyBalance(res.data);
+
 			} catch (err) {
 				return toast("Party Balance not get", "error");
 			} finally {
@@ -240,6 +247,7 @@ const Party = () => {
 
 	return (
 		<>
+			{TopLoadingBar}
 			<Nav title={"Parties"} />
 			<main id='main' >
 				<SideNav />
@@ -286,7 +294,7 @@ const Party = () => {
 										setOpenConfirm(true);
 									}}
 									className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
-									<Icons.DELETE size={15}/>
+									<Icons.DELETE size={15} />
 									Delete
 								</button>
 								<button

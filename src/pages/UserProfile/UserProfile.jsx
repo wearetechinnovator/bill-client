@@ -16,6 +16,7 @@ import { IoIosAdd, IoMdMore } from 'react-icons/io';
 import AddNew from '../../components/AddNew';
 import { FiMoreHorizontal } from 'react-icons/fi';
 import { Icons } from '../../helper/icons';
+import useTopLoading from '../../hooks/useTopLoadingBar';
 
 
 
@@ -27,6 +28,7 @@ const UserProfile = () => {
 	const navigate = useNavigate();
 	const [userData, setUserData] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const { TopLoadingBar, setTopLoading } = useTopLoading();
 
 
 
@@ -34,6 +36,7 @@ const UserProfile = () => {
 	useEffect(() => {
 		(async () => {
 			try {
+				setTopLoading(30);
 				setLoading(true);
 				const URL = `${process.env.REACT_APP_API_URL}/user/get-all`;
 				const req = await fetch(URL, {
@@ -43,11 +46,13 @@ const UserProfile = () => {
 					},
 					body: JSON.stringify({ token })
 				});
+				setTopLoading(70);
 				const res = await req.json();
 				if (req.status !== 200) {
 					return toast(res.err, "error");
 				}
 				setUserData([...res])
+				setTopLoading(100);
 
 			} catch (error) {
 				return toast("Something went wrong", "error");
@@ -60,7 +65,7 @@ const UserProfile = () => {
 
 	return (
 		<>
-
+			{TopLoadingBar}
 			<Nav title={"User Profile"} />
 			<main id='main'>
 				<SideNav />

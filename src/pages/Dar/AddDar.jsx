@@ -38,6 +38,7 @@ const AddDar = () => {
         const validations = [
             { field: formData.name, msg: "Name can't be blank" },
             { field: formData.email, msg: "Email can't be blank" },
+            { field: formData.status, msg: "Select Call status" },
         ];
 
         for (const item of validations) {
@@ -206,7 +207,7 @@ const AddDar = () => {
                                 </select>
                             </div>
                             <div className='w-full'>
-                                <p>Call Status</p>
+                                <p>Call Status <span className='required__text'>*</span></p>
                                 <select
                                     onChange={(e) => {
                                         setFormData({ ...formData, status: e.target.value })

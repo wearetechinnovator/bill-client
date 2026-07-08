@@ -21,15 +21,23 @@ import ConfirmModal from '../../components/ConfirmModal';
 import Pagination from '../../components/Pagination';
 import { Icons } from '../../helper/icons';
 import ContextMenu from '../../components/ContextMenu';
+import useTopLoading from '../../hooks/useTopLoadingBar';
 
 
 
 // ==========================
 // Cold Calling Tracking Page
 // ==========================
+const statusClass = {
+    warm: "bg-yellow-100 text-yellow-800 border border-yellow-300",
+    hot: "bg-green-100 text-green-800 border border-green-300",
+    cold: "bg-blue-100 text-blue-800 border border-blue-300",
+    dead: "bg-red-100 text-red-700 border border-red-300",
+};
 const Dar = () => {
     const token = Cookies.get("token");
     const toast = useMyToaster();
+    const { TopLoadingBar, setTopLoading } = useTopLoading();
     const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
     const [activePage, setActivePage] = useState(1);
     const [dataLimit, setDataLimit] = useState(10);
@@ -58,6 +66,7 @@ const Dar = () => {
     useEffect(() => {
         (async () => {
             try {
+                setTopLoading(10);
                 const URL = `${process.env.REACT_APP_API_URL}/dar/get-all?page=${activePage}&limit=${dataLimit}`;
                 const req = await fetch(URL, {
                     method: "POST",
@@ -66,10 +75,13 @@ const Dar = () => {
                     },
                     body: JSON.stringify({ token })
                 });
+                setTopLoading(30);
                 const res = await req.json();
+                setTopLoading(60);
 
                 setTotalData(res.totalData)
                 setDarData([...res.data]);
+                setTopLoading(100);
 
             } catch (error) {
                 console.log(error)
@@ -92,6 +104,7 @@ const Dar = () => {
             setSelected([]);
         }
     };
+
 
     const handleCheckboxChange = (id) => {
         setSelected((prevSelected) => {
@@ -127,6 +140,7 @@ const Dar = () => {
         <>
 
             <Nav title={"Cold Calling Tracking"} />
+            {TopLoadingBar}
             <main id='main'>
                 <SideNav />
                 <Tooltip id='accoutnTooltip' />
@@ -206,7 +220,9 @@ const Dar = () => {
                                                         <th align='left'>Contact Person</th>
                                                         <th align='left'>Email</th>
                                                         <th align='left'>Phone</th>
-                                                        <th align='left'>Product interested</th>
+                                                        <th align='left'>Product Interested</th>
+                                                        <th align='left'>Status</th>
+                                                        <th align='left'>Follow Up</th>
                                                         <th align='left'>View</th>
                                                     </tr>
                                                 </thead>
@@ -225,15 +241,33 @@ const Dar = () => {
                                                                 <td align='left'>{data.email}</td>
                                                                 <td align='left'>{data.phone}</td>
                                                                 <td align='left'>{data.productInterested}</td>
+                                                                <td align='left'>
+                                                                    <span
+                                                                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${statusClass[data?.status?.toLowerCase()] ||
+                                                                            "bg-gray-100 text-gray-700 border border-gray-300"
+                                                                            }`}
+                                                                    >
+                                                                        {data?.status}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    {
+                                                                    data.followUp === 'yes'?(
+                                                                        <span className='badge green-badge'>{new Date(data.followUpDate?.split("T")[0]).toLocaleDateString()}</span>
+                                                                    ):(
+                                                                        <span className='badge yellow-badge'>NO</span>
+                                                                    )
+                                                                }
+                                                                </td>
                                                                 <td align='center'>
-                                                                    <Icons.EYE/>
+                                                                    <Icons.EYE />
                                                                 </td>
                                                             </tr>
                                                         })
                                                     }
                                                 </tbody>
                                             </table>
-                                            <p className='py-4'>Showing {darData.length} of {totalData} entries</p>
+                                            <p className='mt-2'>Showing {darData.length} of {totalData} entries</p>
                                             <Pagination
                                                 activePage={activePage}
                                                 totalData={totalData}
@@ -249,7 +283,6 @@ const Dar = () => {
                     }
                 </div>
             </main>
-
         </>
     )
 }

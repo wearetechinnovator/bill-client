@@ -182,7 +182,7 @@ h6 {
   font-weight: 600;
 }
 
-.side__nav .active__link a span{
+.side__nav .active__link a span {
   color: #003628 !important;
 }
 
@@ -206,7 +206,8 @@ h6 {
 .side__nav__links li:hover svg {
   color: #003628;
 }
-.side__nav__links li:hover a span{
+
+.side__nav__links li:hover a span {
   color: #003628;
 }
 
@@ -1014,10 +1015,12 @@ input[type="checkbox"]:checked::before {
 .yellow-badge {
   @apply bg-yellow-50 text-yellow-600 border border-yellow-200;
 }
-.indigo-badge{
+
+.indigo-badge {
   @apply bg-indigo-50 text-indigo-500 border border-indigo-200;
 }
-.black-badge{
+
+.black-badge {
   @apply bg-[#013D2F] text-white border border-[#05644e];
 }
 
@@ -1574,32 +1577,53 @@ input {
   outline-offset: 1px;
 }
 
-.enquiry__modal__view{
+.enquiry__modal__view {
   width: 100%;
 
 }
-.enquiry__modal__view tr td{
+
+.enquiry__modal__view tr td {
   padding: 5px 5px;
   font-size: 12px;
 }
 
-.enquiry__modal__view tr:nth-child(odd){
+.enquiry__modal__view tr:nth-child(odd) {
   background-color: rgba(245, 245, 245, 0.479);
 }
 
-.enquiry__tab{
+.enquiry__tab {
   padding-left: 7px;
   padding-top: 7px;
   border-start-end-radius: 5px;
   border-start-start-radius: 5px;
 }
-.enquiry__tab button{
+
+.enquiry__tab button {
   padding: 6px 12px;
   font-size: 13px;
   font-weight: 600;
 }
-.enquiry__tab button.active{
+
+.enquiry__tab button.active {
   border-start-start-radius: 10px;
   border-start-end-radius: 10px;
   @apply bg-gray-50
+}
+
+
+@keyframes dangerBlink {
+  0%,
+  100% {
+    /* background: #991b1b; */
+    box-shadow: 0 0 0 rgba(220, 38, 38, 0);
+  }
+
+  50% {
+    /* background: #7f1d1d; */
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.8);
+  }
+}
+
+.animate-danger {
+  animation: dangerBlink 1.3s infinite;
 }

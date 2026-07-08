@@ -10,6 +10,7 @@ import { Drawer } from 'rsuite';
 import { Icons } from '../../helper/icons';
 import ActivityHistoryCard from '../../components/ActivityHistoryCard';
 import Loading from '../../components/Loading';
+import useTopLoading from '../../hooks/useTopLoadingBar';
 
 
 
@@ -17,7 +18,8 @@ const HistoryView = () => {
     const token = Cookies.get("token");
     const { id } = useParams();
     const toast = useMyToaster();
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const { TopLoadingBar, setTopLoading } = useTopLoading();
     const [darData, setDarData] = useState([]);
     const [historyData, setHistoryData] = useState([]);
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -33,6 +35,7 @@ const HistoryView = () => {
         (async () => {
             try {
                 setLoading(true);
+                setTopLoading(30);
                 const URL = `${process.env.REACT_APP_API_URL}/dar/get-dar-with-history`;
                 const req = await fetch(URL, {
                     method: "POST",
@@ -42,6 +45,7 @@ const HistoryView = () => {
                     body: JSON.stringify({ token, darId: id })
                 });
                 const res = await req.json();
+                setTopLoading(70);
 
                 if (req.status !== 200 || res.err) {
                     toast(res.err, "error")
@@ -49,6 +53,8 @@ const HistoryView = () => {
                     setDarData(res.dar);
                     setHistoryData(res.history);
                 }
+                
+                setTopLoading(100);
             } catch (err) {
                 return toast("Something went wrong", "error");
             } finally {
@@ -85,7 +91,7 @@ const HistoryView = () => {
                 return toast(res.err, 'error');
             }
 
-            setHistoryData([...historyData, res.data]);
+            setHistoryData([res.data, ...historyData]);
             toast(res.msg, 'success')
 
             clearData();
@@ -107,6 +113,7 @@ const HistoryView = () => {
 
     return (
         <>
+            {TopLoadingBar}
             <Nav title={"Cold Calling Tracking History"} />
             <main id='main'>
                 <SideNav />
@@ -173,7 +180,7 @@ const HistoryView = () => {
 
                     {/* ==========================[Activity History]==================== */}
                     {/* ================================================================ */}
-                    
+
                     {
                         historyData.length > 0 && (
                             <div className="content__body__main">

@@ -18,6 +18,7 @@ import { Constants } from '../../helper/constants';
 import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import ContextMenu from '../../components/ContextMenu';
 import { useSelector } from 'react-redux';
+import useTopLoading from '../../hooks/useTopLoadingBar';
 
 
 
@@ -25,6 +26,7 @@ import { useSelector } from 'react-redux';
 const Proforma = () => {
 	const toast = useMyToaster();
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
+	const { TopLoadingBar, setTopLoading } = useTopLoading();
 	const [activePage, setActivePage] = useState(1);
 	const [dataLimit, setDataLimit] = useState(10);
 	const [totalData, setTotalData] = useState();
@@ -59,6 +61,7 @@ const Proforma = () => {
 	const getData = async () => {
 		setLoading(true);
 		try {
+			setTopLoading(30);
 			let data = {
 				token: Cookies.get("token"),
 				all: tableStatusData === "all" ? true : false
@@ -72,6 +75,7 @@ const Proforma = () => {
 					billNo: filter.billNo,
 				}
 			}
+			setTopLoading(50);
 			const url = process.env.REACT_APP_API_URL + `/proforma/get?page=${activePage}&limit=${dataLimit}`;
 			const req = await fetch(url, {
 				method: "POST",
@@ -80,12 +84,14 @@ const Proforma = () => {
 				},
 				body: JSON.stringify(data)
 			});
+			setTopLoading(70);
 			const res = await req.json();
 
 			setTotalData(res.totalData)
 			setBillData([...res.data]);
+
+			setTopLoading(100);
 		} catch (error) {
-			console.log(error)
 			return toast("Something went wrong", "error");
 		} finally {
 			setLoading(false);
@@ -208,6 +214,7 @@ const Proforma = () => {
 
 	return (
 		<>
+			{TopLoadingBar}
 			<Nav title={"Proforma"} />
 			<main id='main'>
 				<SideNav />
@@ -244,7 +251,7 @@ const Proforma = () => {
 									setFilterToggle(!filterToggle)
 								}}
 									className={`${filterToggle ? 'bg-gray-200 border-gray-300' : 'bg-gray-100'} border`}>
-									<Icons.FILTER size={17}/>
+									<Icons.FILTER size={17} />
 									Filter
 								</button>
 								<button
@@ -253,7 +260,7 @@ const Proforma = () => {
 										setOpenConfirm(true);
 									}}
 									className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
-									<Icons.DELETE size={15}/>
+									<Icons.DELETE size={15} />
 									Delete
 								</button>
 								{
@@ -266,7 +273,7 @@ const Proforma = () => {
 										</button>
 									)
 								}
-								
+
 								{
 									billData?.length > 0 && (
 										<div className='flex justify-end'>

@@ -18,6 +18,7 @@ import { getAdvanceFilterData } from '../../helper/advanceFilter';
 import ContextMenu from '../../components/ContextMenu';
 import TableNoData from '../../components/TableNoData';
 import { useSelector } from 'react-redux';
+import useTopLoading from '../../hooks/useTopLoadingBar';
 
 
 
@@ -25,6 +26,7 @@ import { useSelector } from 'react-redux';
 const SalesInvoice = () => {
 	const toast = useMyToaster();
 	const userData = useSelector((store) => store.userDetail);
+	const { TopLoadingBar, setTopLoading } = useTopLoading();
 	const role = userData.role;
 	const isAdmin = !userData?.role || userData?.role === "admin";
 	const { copyTable, downloadExcel, printTable, exportPdf } = useExportTable();
@@ -81,6 +83,7 @@ const SalesInvoice = () => {
 	const getData = async () => {
 		try {
 			setLoading(true);
+			setTopLoading(30)
 			let data = {
 				token: Cookies.get("token"),
 				all: tableStatusData === "all" ? true : false
@@ -95,6 +98,7 @@ const SalesInvoice = () => {
 				}
 			}
 
+			setTopLoading(60);
 			const url = `${process.env.REACT_APP_API_URL}/salesinvoice/get?page=${activePage}&limit=${dataLimit}`;
 			const req = await fetch(url, {
 				method: "POST",
@@ -104,6 +108,7 @@ const SalesInvoice = () => {
 				body: JSON.stringify(data)
 			});
 			const res = await req.json();
+			setTopLoading(70);
 
 			if (req.status === 200) {
 				// Total Amount
@@ -166,6 +171,7 @@ const SalesInvoice = () => {
 				}
 			}
 
+			setTopLoading(100);
 		} catch (error) {
 			return toast("Sales invoice not get", "error");
 		} finally {
@@ -271,6 +277,7 @@ const SalesInvoice = () => {
 
 	return (
 		<>
+			{TopLoadingBar}
 			<Nav title={"Sales Invoice"} />
 			<main id='main'>
 				<SideNav />
