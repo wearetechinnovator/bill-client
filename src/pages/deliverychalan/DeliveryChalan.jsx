@@ -444,14 +444,11 @@ const DeliveryChalan = () => {
 													</td>
 													<td>
 														{
-															data.validDate ? <span className={`${data.validDate ? 'green-badge' : 'red-badge'} badge`}>
-																{
-																	new Date(Date.parse(new Date().toLocaleDateString())).toISOString() >
-																		new Date(Date.parse(data.validDate)).toISOString() ?
-																		"Expired" : "Valid"
-																}
-															</span>
-																: "--"
+															data?.validDate ? (
+																<span className={`${Date.now() > new Date(data.validDate).getTime() ? "red-badge" : "green-badge"} badge`}>
+																	{Date.now() > new Date(data.validDate).getTime() ? "Expired" : "Valid"}
+																</span>
+															) : "--"
 														}
 													</td>
 
