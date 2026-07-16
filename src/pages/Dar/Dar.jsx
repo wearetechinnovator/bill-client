@@ -83,6 +83,8 @@ const Dar = () => {
                 setDarData([...res.data]);
                 setTopLoading(100);
 
+                console.log(res.data)
+
             } catch (error) {
                 console.log(error)
             } finally {
@@ -223,6 +225,7 @@ const Dar = () => {
                                                         <th align='left'>Product Interested</th>
                                                         <th align='left'>Status</th>
                                                         <th align='left'>Follow Up</th>
+                                                        <th align='left'>Done By</th>
                                                         <th align='left'>View</th>
                                                     </tr>
                                                 </thead>
@@ -259,6 +262,7 @@ const Dar = () => {
                                                                     )
                                                                 }
                                                                 </td>
+                                                                <td align='left'>{data?.userId?.name || "--"}</td>
                                                                 <td align='center'>
                                                                     <Icons.EYE />
                                                                 </td>

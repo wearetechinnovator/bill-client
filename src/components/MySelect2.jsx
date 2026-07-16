@@ -16,6 +16,7 @@ import { Constants } from '../helper/constants';
 
 
 const MySelect2 = ({ model, onType, value, partyType }) => {
+	const token = Cookies.get("token");
 	const dispatch = useDispatch()
 	const toast = useMyToaster();
 	const [selectedValue, setSelectedValue] = useState('');
@@ -54,7 +55,7 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 				headers: {
 					"Content-Type": 'application/json'
 				},
-				body: JSON.stringify({ token: Cookies.get("token"), id: value })
+				body: JSON.stringify({ token, id: value })
 			})
 			const res = await req.json();
 
@@ -85,7 +86,7 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 			try {
 				const url = process.env.REACT_APP_API_URL + `/${model}/get`;
 				const payload = {
-					token: Cookies.get("token"),
+					token,
 					search: true,
 					searchText: v
 				};

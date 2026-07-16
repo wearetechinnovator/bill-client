@@ -175,6 +175,10 @@ const HistoryView = () => {
                                 <p className='font-bold'>Compititor</p>
                                 <p>{darData?.competitor || "--"}</p>
                             </div>
+                            <div className='w-full'>
+                                <p className='font-bold'>Done By</p>
+                                <p>{darData?.userId?.name || "--"}</p>
+                            </div>
                         </div>
                     </div>
 
