@@ -3,18 +3,23 @@ import Cookies from 'js-cookie';
 const useApi = () => {
   const getApiData = async (model, id, barCode) => {
     let payload = { token: Cookies.get("token") };
+
     if (id) {
       payload = { ...payload, id };
     }
     if (barCode) {
       payload = { ...payload, barCode };
     }
+    if (model === "item") {
+      payload = { ...payload, all: true };
+    }
 
     try {
       let route = 'get';
-      if(model === 'party-contacts'){
+      if (model === 'party-contacts') {
         route = 'get-all';
       }
+
 
       const url = process.env.REACT_APP_API_URL + `/${model}/${route}`;
       const req = await fetch(url, {

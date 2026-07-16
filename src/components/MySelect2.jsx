@@ -225,7 +225,9 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 							searchList.map((d, i) => {
 								return <li
 									key={i}
-									onMouseDown={() => setSelectedData(d)}
+									onMouseDown={() => {
+										setSelectedData(d)
+									}}
 									className={`${model === "item" ? 'p-3 text-left' : 'p-1 px-2'}  cursor-pointer`}
 								>
 									{(d.title || d.name) || d}
