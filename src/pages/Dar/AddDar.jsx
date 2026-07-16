@@ -37,7 +37,7 @@ const AddDar = () => {
     const saveData = async (e) => {
         const validations = [
             { field: formData.name, msg: "Name can't be blank" },
-            { field: formData.email, msg: "Email can't be blank" },
+            { field: formData.phone, msg: "Phone can't be blank" },
             { field: formData.status, msg: "Select Call status" },
         ];
 
@@ -98,7 +98,7 @@ const AddDar = () => {
                                 />
                             </div>
                             <div className='w-full'>
-                                <p>Email <span className='required__text'>*</span></p>
+                                <p>Email </p>
                                 <input type="email"
                                     onChange={(e) => {
                                         setFormData({ ...formData, email: e.target.value })
@@ -107,7 +107,7 @@ const AddDar = () => {
                                 />
                             </div>
                             <div className='w-full'>
-                                <p>Phone</p>
+                                <p>Phone <span className='required__text'>*</span></p>
                                 <input type="text"
                                     onChange={(e) => {
                                         setFormData({ ...formData, phone: checkNumber(e.target.value )})

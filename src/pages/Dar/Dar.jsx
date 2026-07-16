@@ -83,8 +83,6 @@ const Dar = () => {
                 setDarData([...res.data]);
                 setTopLoading(100);
 
-                console.log(res.data)
-
             } catch (error) {
                 console.log(error)
             } finally {
