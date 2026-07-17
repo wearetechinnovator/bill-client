@@ -200,7 +200,7 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 						setSearchText(e.target.value);
 						searchData(e.target.value);
 					}}
-					placeholder="Search..."
+					placeholder={model === "item" ? "Search Product name or Product Code": "Search Party..."}
 				/>
 				{selectedValue ?
 					<IoClose

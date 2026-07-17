@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Nav from '../../components/Nav';
 import SideNav from '../../components/SideNav';
-import { Popover, Whisper } from 'rsuite';
+import { Popover, Whisper, SelectPicker } from 'rsuite';
 import { BiPrinter } from "react-icons/bi";
 import { FaRegCopy, FaRegEdit } from "react-icons/fa";
 import { FaRegFilePdf } from "react-icons/fa";
@@ -22,6 +22,10 @@ import Pagination from '../../components/Pagination';
 import { Icons } from '../../helper/icons';
 import ContextMenu from '../../components/ContextMenu';
 import useTopLoading from '../../hooks/useTopLoadingBar';
+import { getAdvanceFilterData } from '../../helper/advanceFilter';
+import { Constants } from '../../helper/constants';
+import { checkNumber } from '../../helper/validation';
+
 
 
 
@@ -58,16 +62,26 @@ const Dar = () => {
     const [loading, setLoading] = useState(true);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [searchText, setSearchText] = useState("");
+    const [filterToggle, setFilterToggle] = useState(false);
+    const [filter, setFilter] = useState({
+        startDate: '', endDate: '', doneBy: '', phone: '', companyName: '', status: '',
+        registerStartDate: '', registerEndDate: ''
+    })
+    const [isCustomDate, setIsCustomDate] = useState(false);
+    const [isRegisterCustomDate, setIsRegisterCustomDate] = useState(false);
     let debounceRef = useRef(null);
+    const [applyFilter, setApplyFilter] = useState(null);
+    const [userList, setUserList] = useState([])
 
 
 
-    // Get data;
+
+
+    // Get User List
     useEffect(() => {
         (async () => {
             try {
-                setTopLoading(10);
-                const URL = `${process.env.REACT_APP_API_URL}/dar/get-all?page=${activePage}&limit=${dataLimit}`;
+                const URL = `${process.env.REACT_APP_API_URL}/user/get-all`;
                 const req = await fetch(URL, {
                     method: "POST",
                     headers: {
@@ -75,20 +89,55 @@ const Dar = () => {
                     },
                     body: JSON.stringify({ token })
                 });
-                setTopLoading(30);
-                const res = await req.json();
-                setTopLoading(60);
 
-                setTotalData(res.totalData)
-                setDarData([...res.data]);
-                setTopLoading(100);
+                const res = await req.json();
+                if (req.status !== 200) {
+                    return toast(res.err, "error");
+                }
+                setUserList(res.filter(r => r.role !== "accountant"))
 
             } catch (error) {
-                console.log(error)
+                return toast("Something went wrong", "error");
             } finally {
                 setLoading(false);
             }
         })()
+    }, [])
+
+    // Get data;
+    const getData = async (searchFilters) => {
+
+        try {
+            setLoading(true)
+            setTopLoading(10);
+            const URL = `${process.env.REACT_APP_API_URL}/dar/get-all?page=${activePage}&limit=${dataLimit}`;
+            const req = await fetch(URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": 'application/json'
+                },
+                body: JSON.stringify({
+                    token,
+                    ...searchFilters
+                })
+            });
+            setTopLoading(30);
+            const res = await req.json();
+            setTopLoading(60);
+
+            setTotalData(res.totalData)
+            setDarData([...res.data]);
+            setTopLoading(100);
+
+        } catch (error) {
+            console.log(error);
+            return toast('Data not fetch Something went wrong', "error");
+        } finally {
+            setLoading(false);
+        }
+    }
+    useEffect(() => {
+        getData(filter);
     }, [tableStatusData, dataLimit, activePage, searchText])
 
 
@@ -105,7 +154,6 @@ const Dar = () => {
         }
     };
 
-
     const handleCheckboxChange = (id) => {
         setSelected((prevSelected) => {
             if (prevSelected.includes(id)) {
@@ -115,7 +163,6 @@ const Dar = () => {
             }
         });
     };
-
 
     const exportTable = async (whichType) => {
         if (whichType === "copy") {
@@ -133,7 +180,19 @@ const Dar = () => {
         }
     }
 
+    const clearFilterData = () => {
+        setFilter(pv => {
+            return {
+                startDate: '', endDate: '', doneBy: '', phone: '', companyName: '', status: '',
+                registerStartDate: '', registerEndDate: ''
+            }
+        })
 
+        getData({
+            startDate: '', endDate: '', doneBy: '', phone: '', companyName: '', status: '',
+            registerStartDate: '', registerEndDate: ''
+        })
+    }
 
 
     return (
@@ -162,6 +221,14 @@ const Dar = () => {
                                 </select>
                             </div>
                             <div className='flex items-center gap-2'>
+                                <button
+                                    onClick={() => {
+                                        setFilterToggle(!filterToggle)
+                                    }}
+                                    className={`${filterToggle ? 'bg-gray-200 border-gray-300' : 'bg-gray-100'} border`}>
+                                    <Icons.FILTER size={17} />
+                                    Filter
+                                </button>
                                 <button
                                     onClick={() => navigate("/admin/dar/add")}
                                     className='bg-[#003E32] text-white '>
@@ -201,6 +268,167 @@ const Dar = () => {
 
                             </div>
                         </div>
+
+                        {
+                            filterToggle && (
+                                <div>
+                                    <hr />
+                                    <div className='w-full flex items-center gap-4 text-xs'>
+                                        <div className='w-full'>
+                                            <p>Managed By</p>
+                                            <select
+                                                className='text-xs'
+                                                onChange={(e) => setFilter({ ...filter, doneBy: e.target.value })}
+                                                value={filter.doneBy}
+                                            >
+                                                <option value="">Select</option>
+                                                {
+                                                    userList.map((u, _) => {
+                                                        return <option value={u._id}>{u.name}</option>
+                                                    })
+                                                }
+                                            </select>
+                                        </div>
+                                        <div className='w-full'>
+                                            <p>Search By Contact Person Number</p>
+                                            <input type="text"
+                                                placeholder='Enter Phone Number'
+                                                className='text-xs'
+                                                value={filter.phone}
+                                                onChange={(e) => setFilter({
+                                                    ...filter, phone: checkNumber(e.target.value)
+                                                })}
+                                            />
+                                        </div>
+                                        <div className='w-full'>
+                                            <label htmlFor="categorySelect">
+                                                Search By Last Follow Up Date
+                                            </label>
+                                            <SelectPicker
+                                                searchable={false}
+                                                className='w-full'
+                                                menuMaxHeight={"250px"}
+                                                onChange={async (v) => {
+                                                    if (v === Constants.CUSTOM) {
+                                                        setIsCustomDate(true);
+                                                        return;
+                                                    }
+                                                    const { fromDate, toDate } = await getAdvanceFilterData(v);
+                                                    setFilter({ ...filter, startDate: fromDate, endDate: toDate })
+                                                    setIsCustomDate(false);
+                                                    setApplyFilter(false);
+                                                }}
+                                                data={[
+                                                    { label: "Custom Date", value: Constants.CUSTOM },
+                                                    { label: "Today", value: Constants.TODAY },
+                                                    { label: "Yesterday", value: Constants.YESTERDAY },
+                                                    { label: "This Week", value: Constants.THISWEEK },
+                                                    { label: "This Month", value: Constants.THISMONTH },
+                                                    { label: "Last 7 Days", value: Constants.LAST7DAY },
+                                                    { label: "Last Week", value: Constants.LASTWEEK },
+                                                    { label: "Last 30 Days", value: Constants.LAST30DAY },
+                                                    { label: "Previous Month", value: Constants.PREVMONTH },
+                                                    { label: "Last 365 Days", value: Constants.LAST365DAY },
+                                                ]}
+                                            />
+                                        </div>
+                                        <div className='w-full'>
+                                            <label htmlFor="categorySelect">Search By Register Date</label>
+                                            <SelectPicker
+                                                searchable={false}
+                                                className='w-full'
+                                                menuMaxHeight={"250px"}
+                                                onChange={async (v) => {
+                                                    if (v === Constants.CUSTOM) {
+                                                        setIsRegisterCustomDate(true);
+                                                        return;
+                                                    }
+                                                    const { fromDate, toDate } = await getAdvanceFilterData(v);
+                                                    setFilter({
+                                                        ...filter,
+                                                        registerStartDate: fromDate,
+                                                        registerEndDate: toDate
+                                                    })
+                                                    setIsRegisterCustomDate(false);
+                                                    setApplyFilter(false);
+                                                }}
+                                                data={[
+                                                    { label: "Custom Date", value: Constants.CUSTOM },
+                                                    { label: "Today", value: Constants.TODAY },
+                                                    { label: "Yesterday", value: Constants.YESTERDAY },
+                                                    { label: "This Week", value: Constants.THISWEEK },
+                                                    { label: "This Month", value: Constants.THISMONTH },
+                                                    { label: "Last 7 Days", value: Constants.LAST7DAY },
+                                                    { label: "Last Week", value: Constants.LASTWEEK },
+                                                    { label: "Last 30 Days", value: Constants.LAST30DAY },
+                                                    { label: "Previous Month", value: Constants.PREVMONTH },
+                                                    { label: "Last 365 Days", value: Constants.LAST365DAY },
+                                                ]}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className='w-full flex items-center gap-4 mt-4 text-xs'>
+                                        {
+                                            isCustomDate && (
+                                                <>
+                                                    <div className='w-full'>
+                                                        <p>Follow Up Start Date</p>
+                                                        <input type="date"
+                                                            value={filter.startDate}
+                                                            onChange={(e) => setFilter({ ...filter, startDate: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className='w-full'>
+                                                        <p>Follow Up End Date</p>
+                                                        <input type="date"
+                                                            value={filter.endDate}
+                                                            onChange={(e) => setFilter({ ...filter, endDate: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className='w-full'></div>
+                                                </>
+                                            )
+                                        }
+                                    </div>
+                                    <div className='w-full flex items-center gap-4 mt-4 text-xs'>
+                                        {
+                                            isRegisterCustomDate && (
+                                                <>
+                                                    <div className='w-full'>
+                                                        <p>Register Start Date</p>
+                                                        <input type="date"
+                                                            value={filter.registerStartDate}
+                                                            onChange={(e) => setFilter({ ...filter, registerStartDate: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className='w-full'>
+                                                        <p>Register End Date</p>
+                                                        <input type="date"
+                                                            value={filter.registerEndDate}
+                                                            onChange={(e) => setFilter({ ...filter, registerEndDate: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className='w-full'></div>
+                                                </>
+                                            )
+                                        }
+                                    </div>
+
+                                    <div className='w-full flex justify-end gap-2 mt-2 pb-2' id='filterBtnGrp'>
+                                        <button onClick={() => getData(filter)}>
+                                            <Icons.SEARCH />
+                                            Search
+                                        </button>
+                                        <button onClick={() => {
+                                            clearFilterData();
+                                        }}>
+                                            {<Icons.RESET />}
+                                            Reset
+                                        </button>
+                                    </div>
+                                </div>
+                            )
+                        }
                     </div>
 
                     {
@@ -223,18 +451,21 @@ const Dar = () => {
                                                         <th align='left'>Product Interested</th>
                                                         <th align='left'>Status</th>
                                                         <th align='left'>Follow Up</th>
-                                                        <th align='left'>Done By</th>
+                                                        <th align='left' className='w-[8%]'>Managed By</th>
                                                         <th align='left'>View</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {
                                                         darData.map((data, i) => {
-                                                            return <tr onClick={(e) => { navigate(`/admin/dar/history/${data._id}`) }}
+                                                            return <tr
+                                                                onClick={(e) => { navigate(`/admin/dar/history/${data._id}`) }}
                                                                 key={i}
                                                                 className='cursor-pointer'
                                                             >
-                                                                <td align='left'>{data.createdAt.split("T")[0]}</td>
+                                                                <td align='left'>
+                                                                    {new Date(data.createdAt.split("T")[0]).toLocaleDateString()}
+                                                                </td>
                                                                 <td align='left'>{data.leadSource}</td>
                                                                 <td align='left'>{data.companyName || "--"}</td>
                                                                 <td align='left'>{data.city}</td>
@@ -253,12 +484,12 @@ const Dar = () => {
                                                                 </td>
                                                                 <td>
                                                                     {
-                                                                    data.followUp === 'yes'?(
-                                                                        <span className='badge green-badge'>{new Date(data.followUpDate?.split("T")[0]).toLocaleDateString()}</span>
-                                                                    ):(
-                                                                        <span className='badge yellow-badge'>NO</span>
-                                                                    )
-                                                                }
+                                                                        data.followUp === 'yes' ? (
+                                                                            <span className='badge green-badge'>{new Date(data.followUpDate?.split("T")[0]).toLocaleDateString()}</span>
+                                                                        ) : (
+                                                                            <span className='badge yellow-badge'>NO</span>
+                                                                        )
+                                                                    }
                                                                 </td>
                                                                 <td align='left'>{data?.userId?.name || "--"}</td>
                                                                 <td align='center'>

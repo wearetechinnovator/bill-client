@@ -51,9 +51,9 @@ const Item = ({ mode }) => {
 			}
 			return {
 				"Name": data.title,
+				"Product Code": data.itemUniqCode || "--",
 				"HSN": data.category?.hsn || data.hsn || "--",
 				"Sale Price": data.salePrice,
-				//"STOCK": stockStr
 			}
 		});
 	}, [itemData]);
@@ -226,7 +226,7 @@ const Item = ({ mode }) => {
 							<div className='flex items-center gap-2'>
 								<div className='flex w-full flex-col lg:w-[300px]'>
 									<input type='search'
-										placeholder='Search Item Name or HSN Code...'
+										placeholder='Search Item Name or Product Code...'
 										onChange={searchData}
 										className='p-[6px] text-xs'
 									/>
@@ -293,6 +293,7 @@ const Item = ({ mode }) => {
 												/>
 											</th>
 											<th align='left'>Name</th>
+											<th align='left' className='w-[100px]'>Product Code</th>
 											<th align='left'>HSN</th>
 											<th align='left'>Sale Price</th>
 											{/* <th align='left'>STOCK</th> */}
@@ -348,6 +349,7 @@ const Item = ({ mode }) => {
 																</span>
 															)}
 														</td>
+														<td>{data.itemUniqCode || "--"}</td>
 														<td>{data.category?.hsn || data.hsn || "--"}</td>
 														<td>{data.salePrice || 0.00}</td>
 														{/* <td className={`${isOutOfStock ? 'text-orange-600' : ''}`}>{stockStr}</td> */}
