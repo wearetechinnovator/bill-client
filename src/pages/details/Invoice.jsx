@@ -21,6 +21,7 @@ import QRCode from "qrcode";
 import PaymentInModal from '../../components/PaymentInModal';
 import PaymentOutModal from '../../components/PaymentOutModal';
 import ConfirmModal from '../../components/ConfirmModal';
+import numberToWords from '../../helper/numberToWord';
 
 
 
@@ -122,12 +123,7 @@ const Invoice = () => {
                     const res = await req.json();
                     if (req.status === 200) {
                         setBillData(res.data)
-                        console.log("Payment Amount", res.data.paymentAmount);
-                        console.log("isCancel", res.data.isCancel);
-                        console.log("final");
-                        console.log(billData?.paymentAmount !== undefined &&
-                            billData?.isCancel !== undefined &&
-                            Number(billData?.paymentAmount || 0) <= 0 && billData?.isCancel === false)
+
                         setBillNumber(
                             res.data?.quotationNumber ||
                             res.data?.proformaNumber ||
@@ -209,8 +205,10 @@ const Invoice = () => {
             const qty = Number(b.qun) || 0;
             const price = Number(b.price) || 0;
             const taxRate = Number(b.tax) || 0;
+            const discont = Number(b.discountPerAmount) || 0;
 
-            const taxableValue = qty * price;
+
+            const taxableValue = qty * price - discont;
             const taxAmount = (taxableValue * taxRate) / 100;
 
             if (hsnMap[hsn]) {
@@ -230,6 +228,7 @@ const Invoice = () => {
     }, [billData]);
 
 
+    // All Total Amount Calculation
     useEffect(() => {
         let qun = 0;
         let taxAmount = 0;
@@ -238,19 +237,32 @@ const Invoice = () => {
 
         billData && billData.items.map((b, _) => {
             qun += parseInt(b.qun)
-            taxAmount += (parseInt(b.qun) * parseInt(b.price)) / 100 * b.tax;
+            taxAmount += ((parseInt(b.qun) * parseInt(b.price) - b.discountPerAmount)) / 100 * b.tax;
             discount += parseInt(b.discountPerAmount || 0);
 
-            let a = ((Number(b.qun) * Number(b.price)) + (Number(b.qun) * Number(b.price)) / 100 * b.tax);
-            amount += a - Number(b.discountPerAmount || 0);
+            const q = Number(b.qun) || 0;
+            const p = Number(b.price) || 0;
+            const d = Number(b.discountPerAmount) || 0;
+            const taxRate = Number(b.tax) || 0;
+
+            const taxableAmount = q * p - d;
+            const taxAmount1 = (taxableAmount / 100) * taxRate;
+            const a = taxableAmount + taxAmount1;
+
+            amount += a
         })
 
         setBillDetails({
-            ...billDetails, qun, taxAmount: (taxAmount).toFixed(2), discount, amount: (amount).toFixed(2)
+            ...billDetails,
+            qun,
+            taxAmount: (taxAmount).toFixed(2),
+            discount,
+            amount: (amount).toFixed(2)
         })
 
+        // setTotalAmountInText(toWords(amount || 0));
+        setTotalAmountInText(numberToWords(amount || 0))
 
-        setTotalAmountInText(toWords(amount || 0));
 
     }, [billData])
 
@@ -1066,13 +1078,31 @@ const Invoice = () => {
                                                                             }
                                                                         </div>
                                                                     </td>
+
                                                                     <td valign='top' align='center'>
-                                                                        {((data.qun * data.price) / 100 * data.tax).toFixed(2)}
+                                                                        {(() => {
+                                                                            const qty = parseFloat(data.qun) || 0;
+                                                                            const price = parseFloat(data.price) || 0;
+                                                                            const discount = parseFloat(data.discountPerAmount) || 0;
+                                                                            const taxRate = parseFloat(data.tax) || 0;
+                                                                            const taxableAmount = qty * price - discount;
+                                                                            const taxAmount = (taxableAmount / 100) * taxRate;
+                                                                            return taxAmount.toFixed(2);
+                                                                        })()}
                                                                         <div className='text-gray-500 discount-font'>{`(${data.tax || '0.00'}%)`}</div>
                                                                     </td>
-                                                                    <td valign='top' align='center'> {
-                                                                        (parseFloat(data.price) * parseFloat(data.qun) - parseFloat(data.discountPerAmount || 0) + ((data.qun * data.price) / 100 * data.tax)).toFixed(2)
-                                                                    }</td>
+                                                                    <td valign='top' align='center'>
+                                                                        {(() => {
+                                                                            const qty = parseFloat(data.qun) || 0;
+                                                                            const price = parseFloat(data.price) || 0;
+                                                                            const discount = parseFloat(data.discountPerAmount) || 0;
+                                                                            const taxRate = parseFloat(data.tax) || 0;
+                                                                            const taxableAmount = qty * price - discount;
+                                                                            const taxAmount = (taxableAmount / 100) * taxRate;
+                                                                            const total = taxableAmount + taxAmount;
+                                                                            return total.toFixed(2);
+                                                                        })()}
+                                                                    </td>
                                                                 </tr>
                                                             })
                                                         }
@@ -1315,4 +1345,4 @@ const Invoice = () => {
     );
 }
 
-export default Invoice
+export default Invoice;
