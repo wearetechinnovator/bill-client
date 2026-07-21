@@ -134,7 +134,11 @@ shared without written approval.
 					});
 					setAdditionalRow([...res.data.additionalCharge])
 
-					setItemRows([...res.data.items]);
+					setItemRows(res.data.items.map(item => ({
+						...itemRowSet,
+						...item,
+						expireDate: item.expireDate?.split("T")[0] || ""
+					})))
 
 					if (res.data.discountType != "no") {
 						setDiscountToggler(false);

@@ -116,7 +116,7 @@ const PurchaseInvoice = ({ mode }) => {
 					const res = await req.json();
 					setFormData({
 						...formData, ...res.data,
-						returnDate: res.data.returnDate.split('T')[0]
+						returnDate: res.data.returnDate?.split('T')[0]
 					});
 					setAdditionalRow([...res.data.additionalCharge])
 					setItemRows([...res.data.items]);
