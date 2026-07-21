@@ -24,6 +24,7 @@ import Loading from '../../components/Loading';
 
 
 const PurchaseInvoice = ({ mode }) => {
+	const token = Cookies.get("token");
 	const toast = useMyToaster();
 	const { id } = useParams()
 	const [loading, setLoading] = useState(false);
@@ -115,17 +116,22 @@ shared without written approval.
 						url = `${process.env.REACT_APP_API_URL}${"/po/get"}`
 					}
 
-					const cookie = Cookies.get("token");
 
 					const req = await fetch(url, {
 						method: "POST",
 						headers: {
 							"Content-Type": 'application/json'
 						},
-						body: JSON.stringify({ token: cookie, id: id })
+						body: JSON.stringify({ token, id: id })
 					})
 					const res = await req.json();
-					setFormData({ ...formData, ...res.data });
+
+					setFormData({
+						...formData,
+						...res.data,
+						...mode === 'edit' && ({ invoiceDate: res.data?.invoiceDate?.split("T")[0] }),
+						validDate: res.data?.validDate?.split("T")[0]
+					});
 					setAdditionalRow([...res.data.additionalCharge])
 
 					setItemRows([...res.data.items]);
@@ -134,6 +140,7 @@ shared without written approval.
 						setDiscountToggler(false);
 					}
 				} catch (error) {
+					console.log(error)
 					return toast("Something went wrong for get data", 'error')
 				}
 			}
@@ -144,22 +151,22 @@ shared without written approval.
 
 
 	useEffect(() => {
-    if (getBillPrefix && (mode === "convert" || !mode)) {
-        setFormData(prev => {
-            // Only set if field is currently empty (initial state)
-            if (prev.purchaseInvoiceNumber) return prev;
+		if (getBillPrefix && (mode === "convert" || !mode)) {
+			setFormData(prev => {
+				// Only set if field is currently empty (initial state)
+				if (prev.purchaseInvoiceNumber) return prev;
 
-            const prefix0 = getBillPrefix[0] ?? "";
-            const prefix1 = getBillPrefix[1] ?? "";
-            const newPrefix = prefix0 + prefix1;
+				const prefix0 = getBillPrefix[0] ?? "";
+				const prefix1 = getBillPrefix[1] ?? "";
+				const newPrefix = prefix0 + prefix1;
 
-            return {
-                ...prev,
-                purchaseInvoiceNumber: newPrefix || "1"
-            };
-        });
-    }
-}, [getBillPrefix, mode]);
+				return {
+					...prev,
+					purchaseInvoiceNumber: newPrefix || "1"
+				};
+			});
+		}
+	}, [getBillPrefix, mode]);
 
 
 	// Get all data from api

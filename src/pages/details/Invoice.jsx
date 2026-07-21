@@ -1300,17 +1300,16 @@ const Invoice = () => {
                                                 <div className='w-full flex'>
                                                     <div className='p-2' style={{ width: "70%" }}>
                                                         {billData?.note && <p className='font-semibold text-md'>Notes:</p>}
-                                                        <p style={{ fontSize: '10px' }}>{billData?.note}</p>
-                                                        <br />
+                                                        <p style={{ fontSize: '10px', marginTop:'-3px' }}>{billData?.note}</p>
 
-                                                        <p className='font-semibold text-md'>Terms & Conditions:</p>
+                                                        <p className='font-semibold text-md' style={{marginTop: '-1px'}}>Terms & Conditions:</p>
                                                         <ul className='space-y-1' style={{ fontSize: '10px' }}>
                                                             {billData?.terms
                                                                 ?.replace(/(\d{1,2}\.)/g, '||$1')   // add separator before each number
                                                                 .split('||')
                                                                 .filter(t => t.trim())
                                                                 .map((term, i) => (
-                                                                    <li key={i}>{term.trim()}</li>
+                                                                    <li key={i} style={{lineHeight: '10px'}}>{term.trim()}</li>
                                                                 ))
                                                             }
                                                         </ul>

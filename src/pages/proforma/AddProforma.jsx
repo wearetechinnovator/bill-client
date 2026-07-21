@@ -105,7 +105,6 @@ const Proforma = ({ mode }) => {
 			body: JSON.stringify({ token, id: id })
 		})
 		const res = await req.json();
-		console.log(res.data.items)
 
 		const removeQuotationNumber = { ...res.data };
 		delete removeQuotationNumber.quotationNumber;
@@ -117,6 +116,9 @@ const Proforma = ({ mode }) => {
 				: "",
 			poDate: res.data.poDate
 				? new Date(res.data.poDate).toISOString().split("T")[0]
+				: "",
+			validDate: res.data.validDate
+				? new Date(res.data.validDate).toISOString().split("T")[0]
 				: "",
 		};
 

@@ -266,7 +266,7 @@ const PO = () => {
 										setOpenConfirm(true);
 									}}
 									className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
-									<Icons.DELETE size={15}/>
+									<Icons.DELETE size={15} />
 									Delete
 								</button>
 								<button
@@ -449,15 +449,15 @@ const PO = () => {
 													</td>
 													<td>
 														{
-															data.validDate ?
-																<span className={`${data.validDate ? 'green-badge' : ''} badge`}>
-																	{
-																		new Date(Date.parse(new Date().toLocaleDateString())).toISOString() >
-																			new Date(Date.parse(data.validDate)).toISOString() ?
-																			"Expired" : "Valid"
-																	}
+															data.validDate ? (
+																<span className="green-badge badge">
+																	{new Date() > new Date(data.validDate)
+																		? "Expired"
+																		: "Valid"}
 																</span>
-																: "--"
+															) : (
+																"--"
+															)
 														}
 													</td>
 
