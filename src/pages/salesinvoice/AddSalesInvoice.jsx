@@ -492,31 +492,60 @@ const SalesInvoice = ({ mode }) => {
 			row.taxAmount = calculatePerTaxAmount(index);
 			row.amount = calculatePerAmount(index);
 		});
+
 		setItemRows([...ItemRows]);
 
 		try {
 			setLoading(true);
-			const url = process.env.REACT_APP_API_URL + "/salesinvoice/add";
-			const req = await fetch(url, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify(!mode || mode !== "edit" ?
-					{ ...formData, token, accountId: accountDetails?._id } :
-					{ ...formData, token, update: true, id: id, accountId: accountDetails?._id }
-				)
-			})
-			const res = await req.json();
-			if (req.status !== 200 || res.err) {
-				return toast(res.err, 'error');
+			let newFormData = { ...formData }
+
+			while (true) {
+				const URL = process.env.REACT_APP_API_URL + "/salesinvoice/add";
+				const req = await fetch(URL, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(!mode || mode !== "edit" ?
+						{ ...newFormData, token, accountId: accountDetails?._id } :
+						{ ...newFormData, token, update: true, id: id, accountId: accountDetails?._id }
+					)
+				})
+				const res = await req.json();
+
+				if (req.status === 409) {
+					let msg;
+					if (res.role === "admin") {
+						msg = `This invoice number (${newFormData.salesInvoiceNumber}) is already created by ${res.data.userId.name}.\nWould you like to generate a new invoice number and save the invoice?`
+					} else {
+						msg = `This invoice number (${newFormData.salesInvoiceNumber}) is already create.\nWould you like to generate a new invoice number and save the invoice?`
+					}
+
+					const newInv = window.confirm(msg)
+
+					if (!newInv) return;
+
+					newFormData = {
+						...newFormData,
+						salesInvoiceNumber: getBillPrefix[0] + String(Number(getBillPrefix[1]) + 1)
+					}
+
+					continue;
+				}
+
+				if (req.status !== 200 || res.err) {
+					return toast(res.err, 'error');
+				}
+
+				clearForm();
+				break;
 			}
+
 
 			if (mode === "edit") {
 				return toast('Invoice update successfully', 'success');
 			}
 
-			clearForm();
 
 			// if this is converted by proforma then delete the Proforma or Quotation
 			// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -552,6 +581,7 @@ const SalesInvoice = ({ mode }) => {
 			}
 
 			toast('Invoice add successfully', 'success');
+
 			if (isNew) {
 				clearForm();
 				setFormData(prev => ({ ...prev, salesInvoiceNumber: getBillPrefix[0] + getBillPrefix[1] }));

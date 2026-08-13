@@ -667,57 +667,60 @@ const AdminDashboard = () => {
                         <h1 className="text-[20px] xl:text-[20px] text-[#333333] font-[600] text-left mb-2 mt-4">
                             Cold Calling Track <small className="text-xs text-black">(Follow up notification)</small>
                         </h1>
-                        <table className="w-full border rounded">
-                            <thead>
-                                <tr>
-                                    <td className="p-2">Company Name</td>
-                                    <td>Contact Person</td>
-                                    <td>Phone</td>
-                                    <td>Status</td>
-                                    <td>Follow Up</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    darData.map((data, i) => {
-                                        return <tr onClick={(e) => { navigate(`/admin/dar/history/${data._id}`) }}
-                                            key={i}
-                                            className='cursor-pointer'
-                                        >
-                                            <td align='left'>{data.companyName || "--"}</td>
-                                            <td align='left' className='py-2'>{data.name}</td>
-                                            <td align='left'>{data.phone}</td>
-                                            <td align='left'>
-                                                <span
-                                                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${statusClass[data?.status?.toLowerCase()] ||
-                                                        "bg-gray-100 text-gray-700 border border-gray-300"
-                                                        }`}
-                                                >
-                                                    {data?.status}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                {
-                                                    data.followUp === 'yes' ? (
-                                                        <span
-                                                            className={`badge ${new Date(data.followUpDate).setHours(0, 0, 0, 0) <
-                                                                new Date().setHours(0, 0, 0, 0)
-                                                                ? "red-badge animate-danger"
-                                                                : "green-badge"
-                                                                }`}
-                                                        >
-                                                            {new Date(data.followUpDate).toLocaleDateString()}
-                                                        </span>
-                                                    ) : (
-                                                        <span className='badge yellow-badge'>NO</span>
-                                                    )
-                                                }
-                                            </td>
-                                        </tr>
-                                    })
-                                }
-                            </tbody>
-                        </table>
+                        <div className="max-h-[217px] overflow-y-auto">
+                            <table className="w-full border rounded">
+                                <thead>
+                                    <tr>
+                                        <td className="p-2">Company Name</td>
+                                        <td>Contact Person</td>
+                                        <td>Phone</td>
+                                        <td>Status</td>
+                                        <td>Follow Up</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {
+                                        darData.map((data, i) => {
+                                            return <tr onClick={(e) => { navigate(`/admin/dar/history/${data._id}`) }}
+                                                key={i}
+                                                className='cursor-pointer'
+                                            >
+                                                <td align='left'>{data.companyName || "--"}</td>
+                                                <td align='left' className='py-2'>{data.name}</td>
+                                                <td align='left'>{data.phone}</td>
+                                                <td align='left'>
+                                                    <span
+                                                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${statusClass[data?.status?.toLowerCase()] ||
+                                                            "bg-gray-100 text-gray-700 border border-gray-300"
+                                                            }`}
+                                                    >
+                                                        {data?.status}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {
+                                                        data.followUp === 'yes' ? (
+                                                            <span
+                                                                className={`badge ${new Date(data.followUpDate).setHours(0, 0, 0, 0) <
+                                                                    new Date().setHours(0, 0, 0, 0)
+                                                                    ? "red-badge animate-danger"
+                                                                    : "green-badge"
+                                                                    }`}
+                                                            >
+                                                                {new Date(data.followUpDate).toLocaleDateString()}
+                                                            </span>
+                                                        ) : (
+                                                            <span className='badge yellow-badge'>NO</span>
+                                                        )
+                                                    }
+                                                </td>
+                                            </tr>
+                                        })
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
                     </div>
                 </div>
 

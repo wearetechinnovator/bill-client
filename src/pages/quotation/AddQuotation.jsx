@@ -339,22 +339,23 @@ const Quotation = ({ mode }) => {
 
 	// *Save bill
 	const saveBill = async () => {
-		if (formData.party === "") {
+		if (formData.party === "")
 			return toast("Please select party", "error")
-		} else if (formData.estimateDate === "") {
-			return toast("Please enter sales return number", "error")
-		}
+		else if (formData.estimateDate === "")
+			return toast("Please enter estimateDate", "error")
+		else if (formData.quotationNumber === "")
+			return toast("Please enter Quotation Number", "error")
+
 
 		for (let row of ItemRows) {
-			if (row.itemName === "") {
+			if (row.itemName === "")
 				return toast("Please select item", "error")
-			} else if (row.qun === "") {
+			else if (row.qun === "")
 				return toast("Please enter quantity", "error")
-			} else if (row.unit === "") {
+			else if (row.unit === "")
 				return toast("Please select unit", "error")
-			} else if (row.price === "") {
+			else if (row.price === "")
 				return toast("Please enter price", "error")
-			}
 		}
 
 		// Add Per Item Tax and Amound before save
@@ -362,35 +363,62 @@ const Quotation = ({ mode }) => {
 			row.taxAmount = calculatePerTaxAmount(index);
 			row.amount = calculatePerAmount(index);
 		});
+
 		setItemRows([...ItemRows]);
 
 		try {
 			setLoading(true);
-			const url = process.env.REACT_APP_API_URL + "/quotation/add";
-			const req = await fetch(url, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify(
-					!mode ? { ...formData, items: ItemRows, token, accountId: accountDetails?._id } :
-						{ ...formData, items: ItemRows, token, update: true, id: id, accountId: accountDetails?._id }
-				)
-			})
-			const res = await req.json();
-			if (req.status !== 200 || res.err) {
-				return toast(res.err, 'error');
+			let newFormData = { ...formData }
+
+			while (true) {
+				const URL = process.env.REACT_APP_API_URL + "/quotation/add";
+				const req = await fetch(URL, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(
+						!mode ? { ...newFormData, items: ItemRows, token, accountId: accountDetails?._id } :
+							{ ...newFormData, items: ItemRows, token, update: true, id: id, accountId: accountDetails?._id }
+					)
+				})
+				const res = await req.json();
+
+				if (req.status === 409) {
+					let msg;
+					if (res.role === "admin") {
+						msg = `This quotation number (${newFormData.quotationNumber}) is already created by ${res.data.userId.name}.\nWould you like to generate a new quotation number and save the quotation?`
+					}else{
+						msg = `This quotation number (${newFormData.quotationNumber}) is already create.\nWould you like to generate a new quotation number and save the quotation?`
+					}
+
+					const newQuot = window.confirm(msg)
+
+					if (!newQuot) break;
+
+					newFormData = {
+						...newFormData,
+						quotationNumber: getBillPrefix[0] + String(Number(getBillPrefix[1]) + 1)
+					}
+
+					continue;
+				}
+
+				if (req.status !== 200 || res.err) {
+					return toast(res.err, 'error');
+				}
+
+				clearForm();
+
+				toast('Quotation add successfully', 'success');
+				navigate('/admin/quotation-estimate')
+				return
 			}
+
 
 			if (mode) {
 				return toast('Quotation update successfully', 'success');
 			}
-
-			clearForm();
-
-			toast('Quotation add successfully', 'success');
-			navigate('/admin/quotation-estimate')
-			return
 
 		} catch (error) {
 			return toast('Something went wrong', 'error')
@@ -449,7 +477,11 @@ const Quotation = ({ mode }) => {
 							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
 								<p className='text-xs'>Quotation / Est. Number <span className='required__text'>*</span></p>
 								<input type="text"
-									onChange={(e) => setFormData({ ...formData, quotationNumber: e.target.value })}
+									onChange={(e) => {
+										setFormData({
+											...formData, quotationNumber: e.target.value,
+										})
+									}}
 									value={formData.quotationNumber}
 								/>
 							</div>

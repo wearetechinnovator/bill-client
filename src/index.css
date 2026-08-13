@@ -636,6 +636,7 @@ select {
 
 .list__table tbody tr {
   border: 1px solid #efefef !important;
+  cursor: pointer;
 }
 
 .list__table tbody tr td {

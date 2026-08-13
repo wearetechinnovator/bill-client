@@ -342,26 +342,59 @@ const Proforma = ({ mode }) => {
 			row.taxAmount = calculatePerTaxAmount(index);
 			row.amount = calculatePerAmount(index);
 		});
+
 		setItemRows([...ItemRows]);
 
 		try {
 			setLoading(true);
-			const url = process.env.REACT_APP_API_URL + "/proforma/add";
+			let newFormData = { ...formData }
 
-			const req = await fetch(url, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify(!mode || mode !== "edit" ?
-					{ ...formData, token, accountId: accountDetails?._id } :
-					{ ...formData, token, update: true, id: id, accountId: accountDetails?._id }
-				)
-			})
-			const res = await req.json();
-			if (req.status !== 200 || res.err) {
-				return toast(res.err, 'error');
+			while (true) {
+				const URL = process.env.REACT_APP_API_URL + "/proforma/add";
+				const req = await fetch(URL, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(!mode || mode !== "edit" ?
+						{ ...newFormData, token, accountId: accountDetails?._id } :
+						{ ...newFormData, token, update: true, id: id, accountId: accountDetails?._id }
+					)
+				})
+				const res = await req.json();
+
+				if (req.status === 409) {
+					let msg;
+					if (res.role === "admin") {
+						msg = `This proforma number is already in use by ${res.data.userId.name}.\nWould you like to generate a new proforma number and save the proforma?`
+					} else {
+						msg = `This proforma number is already in use.\nWould you like to generate a new proforma number and save the proforma?`
+					}
+
+					const neProforma = window.confirm(msg)
+
+					if (!neProforma) break;
+
+					newFormData = {
+						...newFormData,
+						proformaNumber: getBillPrefix[0] + String(Number(getBillPrefix[1]) + 1)
+					}
+
+					continue;
+				}
+
+				if (req.status !== 200 || res.err) {
+					return toast(res.err, 'error');
+				}
+
+				clearForm();
+
+				toast('Proforma add successfully', 'success');
+				navigate('/admin/proforma-invoice');
+				return;
+
 			}
+
 
 			if (mode === 'edit') {
 				return toast('Proforma update successfully', 'success');
@@ -385,12 +418,6 @@ const Proforma = ({ mode }) => {
 					return toast('Quotation status not change', 'error')
 				}
 			}
-
-			clearForm();
-
-			toast('Proforma add successfully', 'success');
-			navigate('/admin/proforma-invoice');
-			return;
 
 		} catch (error) {
 			return toast('Something went wrong', 'error')
