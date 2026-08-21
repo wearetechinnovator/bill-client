@@ -228,7 +228,7 @@ const MySelect2 = ({ model, onType, value, partyType }) => {
 									onMouseDown={() => {
 										setSelectedData(d)
 									}}
-									className={`${model === "item" ? 'p-3 text-left' : 'p-1 px-2'}  cursor-pointer`}
+									className={`${model === "item" ? 'px-3  py-1.5 text-left' : 'p-1 px-2'} cursor-pointer leading-[12px]`}
 								>
 									{(d.title || d.name) || d}
 								</li>
