@@ -56,6 +56,8 @@ const Invoice = () => {
     const [openConfirm, setOpenConfirm] = useState(false);
     const userData = useSelector((store) => store.userDetail);
     const role = userData.role;
+    const [totalAdditionalCharge, setTotalAdditionalCharge] = useState(null);
+    const [isAdditionalCharge, setIsAdditionalCharge] = useState(false);
 
 
 
@@ -156,6 +158,14 @@ const Invoice = () => {
                             const upiLink = `upi://pay?pa=${account.upiId}&pn=${account.accountHolderName}&am=${res.data.finalAmount}&cu=INR`;
                             QRCode.toDataURL(upiLink).then(setQr);
                         }
+
+
+                        // Set Total Additional Charge;
+                        const totalAdditionalCharge = res?.data?.additionalCharge.reduce((acc, i) => {
+                            return acc += i.amount;
+                        }, 0);
+                        if(totalAdditionalCharge > 0) setIsAdditionalCharge(true)
+                        setTotalAdditionalCharge(totalAdditionalCharge);
                     }
                     return res;
                 }
@@ -667,7 +677,7 @@ const Invoice = () => {
                                                                                                 color: 'black'
                                                                                             }}
                                                                                         >
-                                                                                        MOBILE
+                                                                                            MOBILE
                                                                                         </span>{' '}
                                                                                         :&nbsp;
                                                                                         {companyDetails?.phone}
@@ -1089,14 +1099,26 @@ const Invoice = () => {
                                                                 }
                                                             </td>
                                                         </tr>}
-                                                        {billData?.roundOffAmount && (
+                                                        {
+                                                            isAdditionalCharge && billData?.additionalCharge.map((a, _) => {
+                                                                return (
+                                                                    <tr className='font-semibold'>
+                                                                        <td colSpan={7} align='center' className='italic'>{a.particular}</td>
+                                                                        <td align='center'><Icons.RUPES className='inline' />
+                                                                            {a.amount}
+                                                                        </td>
+                                                                    </tr>
+                                                                )
+                                                            })
+                                                        }
+                                                        {(billData?.roundOffAmount || isAdditionalCharge) && (
                                                             <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
                                                                 <td colSpan={7} align='center'>SUB TOTAL</td>
                                                                 <td align='center'><Icons.RUPES className='inline' />
                                                                     {
                                                                         billData.roundOffType === "0" ?
-                                                                            (Number(billDetails.amount) - Number(billData?.roundOffAmount)) :
-                                                                            Number(billDetails.amount) + Number(billData?.roundOffAmount)
+                                                                            (Number(billDetails.amount) - Number(billData?.roundOffAmount) + Number(totalAdditionalCharge)) :
+                                                                            Number(billDetails.amount) + Number(billData?.roundOffAmount) + Number(totalAdditionalCharge)
                                                                     }
                                                                 </td>
                                                             </tr>
@@ -1181,7 +1203,7 @@ const Invoice = () => {
                                                                             <td align='center'>SGST</td>
                                                                             <td align='center'>{halfRate}%</td>
                                                                             <td align='center'>{sgstAmount}</td>
-                                                                            <td align='center' rowSpan={2} align='center'>{totalTax}</td>
+                                                                            <td align='center' rowSpan={2}>{totalTax}</td>
                                                                         </tr>
                                                                         <tr>
                                                                             <td align='center'>CGST</td>

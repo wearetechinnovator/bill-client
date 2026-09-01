@@ -1,8 +1,8 @@
 import SideNav from '../components/SideNav'
 import Nav from '../components/Nav'
 import { SelectPicker, TagInput } from 'rsuite';
-import { MdEditSquare, MdUploadFile } from "react-icons/md";
-import { LuFileX2 } from "react-icons/lu";
+import { MdEditSquare, MdOutlineCloudDownload, MdSettingsBackupRestore, MdUploadFile } from "react-icons/md";
+import { LuDatabaseBackup, LuFileX2 } from "react-icons/lu";
 import { countryList, statesAndUTs } from '../helper/data';
 import { FaAddressBook, FaRegCheckCircle } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
@@ -18,6 +18,7 @@ import Loading from '../components/Loading';
 
 
 const Setting = () => {
+    const token = Cookies.get("token");
     const toast = useMyToaster();
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
@@ -43,6 +44,7 @@ const Setting = () => {
     const [partyCategory, setPartyCategory] = useState([]);
     const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
     const [partyCategoryId, setPartyCategoryId] = useState('');
+    const [backupFiles, setBackupFiles] = useState([]);
 
 
 
@@ -78,7 +80,7 @@ const Setting = () => {
                     headers: {
                         "Content-Type": 'application/json'
                     },
-                    body: JSON.stringify({ token: Cookies.get("token") })
+                    body: JSON.stringify({ token })
                 });
                 const res = await req.json();
 
@@ -94,6 +96,87 @@ const Setting = () => {
         getPartyCategory();
     }, [])
 
+    // Get Backup files
+    useEffect(() => {
+        (async () => {
+            try {
+                const URL = process.env.REACT_APP_API_URL + "/user/get-backup-files";
+                const req = await fetch(URL, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ token })
+                });
+                const res = await req.json();
+
+                setBackupFiles(res.data);
+            } catch (err) {
+                return toast("Something went wrong", "error");
+            }
+        })()
+    }, [])
+
+    const downloadBackupFile = async (fileId) => {
+        try {
+            const URL = process.env.REACT_APP_API_URL + "/user/download-backup-files";
+            const req = await fetch(URL, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ token, fileId })
+            });
+            const blob = await req.blob();
+            if (req.status !== 200) {
+                const res = await req.json();
+                return toast(res.err, "error");
+            }
+
+            const downloadUrl = window.URL.createObjectURL(blob);
+
+            // Try to get filename from Content-Disposition header
+            const disposition = req.headers.get("Content-Disposition");
+            let filename = "backup.zip";
+            if (disposition && disposition.includes("filename=")) {
+                filename = disposition.split("filename=")[1].replace(/"/g, "").trim();
+            }
+
+            const a = document.createElement("a");
+            a.href = downloadUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+        } catch (err) {
+            console.log(err);
+            return toast("Something went wrong", "error");
+        }
+    }
+
+    const restoreBackupFile = async (fileId) => {
+        try {
+            const URL = process.env.REACT_APP_API_URL + "/user/restore-backup-files";
+            const req = await fetch(URL, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ token, fileId })
+            });
+            const res = await req.json();
+            if (req.status !== 200 || res.err) {
+                return toast(res.err, 'error')
+            }
+
+            window.location.reload();
+
+        } catch (err) {
+            console.log("Restore Error", err);
+            return toast("Something went wrong", "error");
+        }
+    }
 
     const fileUpload = async (e, field) => {
         const validatefile = await checkfile(e.target.files[0], ["jpg", "png", 'jpeg'], 1);
@@ -191,8 +274,6 @@ const Setting = () => {
         }
 
     }
-
-
 
     const removePartyCategory = async (id) => {
         const token = Cookies.get("token");
@@ -481,6 +562,60 @@ const Setting = () => {
                                     Reset
                                 </button>
                             </div>
+                        </div>
+                    </div>
+
+
+                    <div className="content__body__main">
+                        <p className='font-bold'>Backup Setting</p>
+                        <hr />
+                        <div className='w-full flex items-center gap-4'>
+                            {
+                                backupFiles.length > 0 && (
+                                    <div className='w-full flex items-center justify-between rounded'>
+                                        <ul className='w-full space-y-1'>
+                                            {
+                                                backupFiles?.map((b, i) => {
+                                                    return (
+                                                        <li key={b._id} className='w-full flex items-center justify-between bg-blue-50 text-blue-600 p-1 rounded'>
+                                                            <p className='capitalize text-xs'>{b.fileName}</p>
+                                                            <div className='flex items-center gap-3'>
+                                                                <div
+                                                                    title='Download'
+                                                                    onClick={() => downloadBackupFile(b._id)}
+                                                                    className='w-[30px] h-[30px] bg-[#003E32] flex items-center justify-center rounded cursor-pointer'
+                                                                >
+                                                                    <MdOutlineCloudDownload
+                                                                        size={18}
+                                                                        className='text-white'
+                                                                    />
+                                                                </div>
+                                                                <div
+                                                                    title='Restore'
+                                                                    onClick={() => restoreBackupFile(b._id)}
+                                                                    className='w-[30px] h-[30px] bg-[#143caa] flex items-center justify-center rounded cursor-pointer'>
+                                                                    <LuDatabaseBackup
+                                                                        size={18}
+                                                                        className='text-white'
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    )
+                                                })
+                                            }
+                                        </ul>
+                                    </div>
+                                )
+                            }
+
+                            {
+                                backupFiles.length === 0 && (
+                                    <div className='w-full flex items-center justify-center p-4 bg-gray-100'>
+                                        <p className='font-sans'>No Backup Files yet</p>
+                                    </div>
+                                )
+                            }
                         </div>
                     </div>
 

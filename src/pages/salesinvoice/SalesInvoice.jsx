@@ -314,7 +314,7 @@ const SalesInvoice = () => {
 										setFilterToggle(!filterToggle);
 									}}
 									className={`${filterToggle ? 'bg-gray-200' : 'bg-gray-100'} border`}>
-									<Icons.FILTER size={17}/>
+									<Icons.FILTER size={17} />
 									Filter
 								</button>
 								<button
@@ -323,7 +323,7 @@ const SalesInvoice = () => {
 										setOpenConfirm(true);
 									}}
 									className={`${selected.length > 0 ? 'bg-red-400 text-white' : 'bg-gray-100'} border`}>
-									<Icons.DELETE size={15}/>
+									<Icons.DELETE size={15} />
 									Delete
 								</button>
 								{
@@ -336,7 +336,7 @@ const SalesInvoice = () => {
 										</button>
 									)
 								}
-							
+
 								{
 									billData?.length > 0 && (
 										<div className='flex justify-end'>
