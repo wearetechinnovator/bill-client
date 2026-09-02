@@ -17,6 +17,7 @@ import SelectAccountModal from '../../components/SelectAccountModal';
 import { Constants } from '../../helper/constants';
 import Loading from '../../components/Loading';
 import { checkNumber } from '../../helper/validation'
+import { statesAndUTs } from '../../helper/data';
 
 
 
@@ -61,7 +62,7 @@ const SalesInvoice = ({ mode }) => {
 		discountType: '', discountAmount: '', discountPercentage: '', paymentStatus: false,
 		paymentType: Constants.CASH, paymentAccount: '', paymentAmount: '', autoRoundOff: false,
 		roundOffType: '0', roundOffAmount: '', finalAmount: '', poNumber: '', poDate: '',
-		isPoConvert: false, poId: ''
+		isPoConvert: false, poId: '', placeOfSupply: ''
 	})
 	const location = useLocation();
 	const fromWhichBill = location.state?.fromWhichBill || null;
@@ -468,6 +469,8 @@ const SalesInvoice = ({ mode }) => {
 	const saveBill = async ({ isNew = false }) => {
 		if (!formData.party) {
 			return toast("Please select party", "error");
+		} else if (!formData.placeOfSupply) {
+			return toast("Please select palce of supply", "error");
 		} else if (!formData.salesInvoiceNumber) {
 			return toast("Please enter invoice number", "error");
 		} else if (!formData.invoiceDate) {
@@ -537,7 +540,8 @@ const SalesInvoice = ({ mode }) => {
 					return toast(res.err, 'error');
 				}
 
-				clearForm();
+				if (mode !== "edit") clearForm();
+
 				break;
 			}
 
@@ -606,7 +610,7 @@ const SalesInvoice = ({ mode }) => {
 		setFormData({
 			party: '', salesInvoiceNumber: '', invoiceDate: '', DueDate: '', items: ItemRows,
 			additionalCharge: additionalRows, note: '', terms: '',
-			discountType: '', discountAmount: '', discountPercentage: ''
+			discountType: '', discountAmount: '', discountPercentage: '', placeOfSupply: ''
 		});
 	}
 
@@ -639,6 +643,14 @@ const SalesInvoice = ({ mode }) => {
 										setFormData({ ...formData, party: v })
 									}}
 									value={formData.party?._id}
+								/>
+							</div>
+							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
+								<p className='text-xs'>Place of Supply <span className='required__text'>*</span></p>
+								<SelectPicker className='w-full' data={statesAndUTs}
+									value={formData.placeOfSupply}
+									onChange={(v) => setFormData({ ...formData, placeOfSupply: v })}
+									menuMaxHeight={150}
 								/>
 							</div>
 							<div className='flex flex-col gap-2 w-full lg:w-1/2'>

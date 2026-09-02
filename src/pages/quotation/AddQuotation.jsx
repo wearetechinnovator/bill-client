@@ -18,6 +18,7 @@ import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
 import Loading from '../../components/Loading';
+import { statesAndUTs } from '../../helper/data';
 
 
 
@@ -59,7 +60,7 @@ const Quotation = ({ mode }) => {
 		9.	Governing Law: Governed by Indian law, jurisdiction in Navi Mumbai.`,
 		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '',
 		autoRoundOff: false, roundOffType: '0', roundOffAmount: '', enqNumber: '', deliveryTime: '',
-		enquiryId: ''
+		enquiryId: '', placeOfSupply: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -341,6 +342,8 @@ const Quotation = ({ mode }) => {
 	const saveBill = async () => {
 		if (formData.party === "")
 			return toast("Please select party", "error")
+		else if (formData.placeOfSupply === "")
+			return toast("Please select Place of supply", "error")
 		else if (formData.estimateDate === "")
 			return toast("Please enter estimateDate", "error")
 		else if (formData.quotationNumber === "")
@@ -388,7 +391,7 @@ const Quotation = ({ mode }) => {
 					let msg;
 					if (res.role === "admin") {
 						msg = `This quotation number (${newFormData.quotationNumber}) is already created by ${res.data.userId.name}.\nWould you like to generate a new quotation number and save the quotation?`
-					}else{
+					} else {
 						msg = `This quotation number (${newFormData.quotationNumber}) is already create.\nWould you like to generate a new quotation number and save the quotation?`
 					}
 
@@ -435,8 +438,8 @@ const Quotation = ({ mode }) => {
 		setAdditionalRow([additionalRowSet])
 		setFormData({
 			party: '', quotationNumber: '', estimateDate: '', validDate: '', items: ItemRows,
-			additionalCharge: additionalRows, note: '', terms: '',
-			discountType: '', discountAmount: '', discountPercentage: '',
+			additionalCharge: additionalRows, note: '', terms: '', discountType: '', discountAmount: '',
+			discountPercentage: '', placeOfSupply: ''
 		});
 
 	}
@@ -475,7 +478,15 @@ const Quotation = ({ mode }) => {
 								/>
 							</div>
 							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
-								<p className='text-xs'>Quotation / Est. Number <span className='required__text'>*</span></p>
+								<p className='text-xs'>Place of Supply <span className='required__text'>*</span></p>
+								<SelectPicker className='w-full' data={statesAndUTs}
+									value={formData.placeOfSupply}
+									onChange={(v) => setFormData({ ...formData, placeOfSupply: v })}
+									menuMaxHeight={150}
+								/>
+							</div>
+							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
+								<p className='text-xs'>Quotation Number <span className='required__text'>*</span></p>
 								<input type="text"
 									onChange={(e) => {
 										setFormData({
@@ -486,7 +497,7 @@ const Quotation = ({ mode }) => {
 								/>
 							</div>
 							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
-								<p className='text-xs'>Quotation / Est. Date <span className='required__text'>*</span></p>
+								<p className='text-xs'>Quotation Date <span className='required__text'>*</span></p>
 								<input
 									type='date'
 									onChange={(e) => {

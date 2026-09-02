@@ -16,6 +16,7 @@ import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
 import Loading from '../../components/Loading';
+import { statesAndUTs } from '../../helper/data';
 
 
 
@@ -60,7 +61,7 @@ const Proforma = ({ mode }) => {
 		12.	Law & Jurisdiction: Governed by Indian laws; disputes resolved in Navi Mumbai courts
 		13.	Acceptance: Payment and order confirmation signify buyer’s agreement to terms`,
 		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '', autoRoundOff: false,
-		roundOffType: '0', roundOffAmount: '', poNumber: '', poDate: '', deliveryTime: ''
+		roundOffType: '0', roundOffAmount: '', poNumber: '', poDate: '', deliveryTime: '', placeOfSupply: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -315,13 +316,15 @@ const Proforma = ({ mode }) => {
 
 	// *Save bill
 	const saveBill = async () => {
-		if (formData.party === "") {
+		if (formData.party === "")
 			return toast("Please select party", "error")
-		} else if (formData.estimateDate === "") {
+		else if (formData.placeOfSupply === "")
+			return toast("Please select Place of supply", "error")
+		else if (formData.estimateDate === "")
 			return toast("Please enter sales return number", "error")
-		} else if (formData.proformaNumber === "") {
+		else if (formData.proformaNumber === "")
 			return toast("Please enter proforma number", "error")
-		}
+
 
 
 		for (let row of ItemRows) {
@@ -347,7 +350,7 @@ const Proforma = ({ mode }) => {
 
 		try {
 			setLoading(true);
-			let newFormData = { ...formData }
+			let newFormData = { ...formData };
 
 			while (true) {
 				const URL = process.env.REACT_APP_API_URL + "/proforma/add";
@@ -424,7 +427,6 @@ const Proforma = ({ mode }) => {
 		} finally {
 			setLoading(false);
 		}
-
 	}
 
 	// *Clear form values;
@@ -433,8 +435,8 @@ const Proforma = ({ mode }) => {
 		setAdditionalRow([additionalRowSet])
 		setFormData({
 			party: '', proformaNumber: getBillPrefix, estimateDate: '', validDate: '', items: ItemRows,
-			additionalCharge: additionalRows, note: '', terms: '',
-			discountType: '', discountAmount: '', discountPercentage: '',
+			additionalCharge: additionalRows, note: '', terms: '', discountType: '',
+			discountAmount: '', discountPercentage: '', placeOfSupply: ''
 		});
 
 	}
@@ -460,7 +462,7 @@ const Proforma = ({ mode }) => {
 				<div className='content__body'>
 					<div className='content__body__main bg-white' id='addQuotationTable'>
 						<div className='flex flex-col lg:flex-row items-center justify-around gap-4'>
-							<div className='flex flex-col gap-2 w-full'>
+							<div className='flex flex-col gap-1 w-full'>
 								<p className='text-xs'>Select Party <span className='required__text'>*</span></p>
 								<MySelect2
 									model={"party"}
@@ -471,14 +473,14 @@ const Proforma = ({ mode }) => {
 									value={formData.party?._id}
 								/>
 							</div>
-							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+							<div className='flex flex-col gap-1 w-full lg:w-1/3'>
 								<p className='text-xs'>Proforma Number <span className='required__text'>*</span></p>
 								<input type="text"
 									onChange={(e) => setFormData({ ...formData, proformaNumber: e.target.value })}
 									value={formData.proformaNumber}
 								/>
 							</div>
-							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+							<div className='flex flex-col gap-1 w-full lg:w-1/3'>
 								<p className='text-xs'>Proforma Date <span className='required__text'>*</span></p>
 								<input
 									type='date'
@@ -488,7 +490,18 @@ const Proforma = ({ mode }) => {
 									value={formData.estimateDate}
 								/>
 							</div>
-							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+						</div>
+
+						<div className='flex flex-col lg:flex-row items-center justify-end gap-4 mt-2'>
+							<div className='flex flex-col gap-1 w-full lg:w-1/2'>
+								<p className='text-xs'>Place of Supply <span className='required__text'>*</span></p>
+								<SelectPicker className='w-full' data={statesAndUTs}
+									value={formData.placeOfSupply}
+									onChange={(v) => setFormData({ ...formData, placeOfSupply: v })}
+									menuMaxHeight={150}
+								/>
+							</div>
+							<div className='flex flex-col gap-1 w-full lg:w-1/3'>
 								<p className='text-xs'>Valid To</p>
 								<input type="date"
 									onChange={(e) => {
@@ -497,7 +510,7 @@ const Proforma = ({ mode }) => {
 									value={formData.validDate}
 								/>
 							</div>
-							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+							<div className='flex flex-col w-full lg:w-1/5'>
 								<p className='text-xs'>PO Number</p>
 								<input type="text"
 									onChange={(e) => {
@@ -506,7 +519,7 @@ const Proforma = ({ mode }) => {
 									value={formData.poNumber}
 								/>
 							</div>
-							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+							<div className='flex flex-col w-full lg:w-1/5'>
 								<p className='text-xs'>PO Date</p>
 								<input type="date"
 									onChange={(e) => {
@@ -515,7 +528,7 @@ const Proforma = ({ mode }) => {
 									value={formData.poDate}
 								/>
 							</div>
-							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+							<div className='flex flex-col gap-1 w-full lg:w-1/5'>
 								<p className='text-xs'>Delivery Time</p>
 								<input type="text"
 									onChange={(e) => {

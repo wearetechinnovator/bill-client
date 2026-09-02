@@ -112,6 +112,7 @@ const Setting = () => {
 
                 setBackupFiles(res.data);
             } catch (err) {
+                console.log(err);
                 return toast("Something went wrong", "error");
             }
         })()
@@ -155,7 +156,7 @@ const Setting = () => {
         }
     }
 
-    const restoreBackupFile = async (fileId) => {
+    const restoreBackupFile = async (fileName) => {
         try {
             const URL = process.env.REACT_APP_API_URL + "/user/restore-backup-files";
             const req = await fetch(URL, {
@@ -163,7 +164,7 @@ const Setting = () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ token, fileId })
+                body: JSON.stringify({ token, fileName })
             });
             const res = await req.json();
             if (req.status !== 200 || res.err) {
@@ -577,12 +578,12 @@ const Setting = () => {
                                             {
                                                 backupFiles?.map((b, i) => {
                                                     return (
-                                                        <li key={b._id} className='w-full flex items-center justify-between bg-blue-50 text-blue-600 p-1 rounded'>
-                                                            <p className='capitalize text-xs'>{b.fileName}</p>
+                                                        <li key={b} className='w-full flex items-center justify-between bg-blue-50 text-blue-600 p-1 rounded'>
+                                                            <p className='capitalize text-xs'>{b}</p>
                                                             <div className='flex items-center gap-3'>
                                                                 <div
                                                                     title='Download'
-                                                                    onClick={() => downloadBackupFile(b._id)}
+                                                                    onClick={() => downloadBackupFile(b)}
                                                                     className='w-[30px] h-[30px] bg-[#003E32] flex items-center justify-center rounded cursor-pointer'
                                                                 >
                                                                     <MdOutlineCloudDownload
@@ -592,7 +593,7 @@ const Setting = () => {
                                                                 </div>
                                                                 <div
                                                                     title='Restore'
-                                                                    onClick={() => restoreBackupFile(b._id)}
+                                                                    onClick={() => restoreBackupFile(b)}
                                                                     className='w-[30px] h-[30px] bg-[#143caa] flex items-center justify-center rounded cursor-pointer'>
                                                                     <LuDatabaseBackup
                                                                         size={18}

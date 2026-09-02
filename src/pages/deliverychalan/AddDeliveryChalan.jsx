@@ -15,6 +15,7 @@ import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
 import Loading from '../../components/Loading';
+import { statesAndUTs } from '../../helper/data';
 
 
 
@@ -57,8 +58,8 @@ const DeliveryChalan = ({ mode }) => {
 		shared without written approval.
 		9. Force Majeure: Delays due to uncontrollable events must be communicated immediately.
 		10. Jurisdiction: Any dispute will fall under Mumbai jurisdiction.`,
-		discountType: '', discountAmount: '',
-		discountPercentage: '', finalAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: ''
+		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '', autoRoundOff: false,
+		roundOffType: '0', roundOffAmount: '', placeOfSupply: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -300,6 +301,8 @@ const DeliveryChalan = ({ mode }) => {
 	const saveBill = async () => {
 		if (formData.party === "") {
 			return toast("Please select party", "error")
+		} else if (formData.placeOfSupply === "") {
+			return toast("Please select Place of supply", "error")
 		} else if (formData.chalanNumber === "") {
 			return toast("Please enter chalan number", "error")
 		} else if (formData.chalanDate === "") {
@@ -396,8 +399,8 @@ const DeliveryChalan = ({ mode }) => {
 		setAdditionalRow([additionalRowSet])
 		setFormData({
 			party: '', chalanNumber: '', chalanDate: '', validDate: '', items: ItemRows,
-			additionalCharge: additionalRows, note: '', terms: '',
-			discountType: '', discountAmount: '', discountPercentage: '',
+			additionalCharge: additionalRows, note: '', terms: '', discountType: '', discountAmount: '',
+			discountPercentage: '', placeOfSupply: ""
 		});
 
 	}
@@ -452,6 +455,14 @@ const DeliveryChalan = ({ mode }) => {
 										setFormData({ ...formData, party: v })
 									}}
 									value={formData.party?._id}
+								/>
+							</div>
+							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
+								<p className='text-xs'>Place of Supply <span className='required__text'>*</span></p>
+								<SelectPicker className='w-full' data={statesAndUTs}
+									value={formData.placeOfSupply}
+									onChange={(v) => setFormData({ ...formData, placeOfSupply: v })}
+									menuMaxHeight={150}
 								/>
 							</div>
 							<div className='flex flex-col gap-2 w-full lg:w-1/3'>

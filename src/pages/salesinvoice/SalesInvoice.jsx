@@ -582,42 +582,48 @@ const SalesInvoice = () => {
 															)
 														}
 													</td>
-													<td className='text-center'>
-														<Whisper
-															placement='leftStart'
-															trigger={"click"}
-															speaker={<Popover full className='table__list__action__parent'>
-																<div
-																	className='table__list__action__icon'
-																	onClick={(e) => {
-																		e.stopPropagation();
-																		if (paymentStatus === Constants.UNPAID) {
-																			navigate(`/admin/sales-invoice/edit/${data._id}`)
-																		} else {
-																			return toast("This voucher can't be edited, because it's linked to another entry", "error")
-																		}
-																	}}
+													{
+														paymentStatus == Constants.UNPAID ? (
+															<td className='text-center'>
+																<Whisper
+																	placement='leftStart'
+																	trigger={"click"}
+																	speaker={<Popover full className='table__list__action__parent'>
+																		<div className={`table__list__action__icon ${paymentStatus !== Constants.UNPAID && 'text-gray-400'}`}
+																			onClick={(e) => {
+																				e.stopPropagation();
+																				if (paymentStatus === Constants.UNPAID) {
+																					navigate(`/admin/sales-invoice/edit/${data._id}`)
+																				} else {
+																					return toast("This voucher can't be edited, because it's linked to another entry", "error")
+																				}
+																			}}
+																		>
+																			<Icons.EDIT className='text-[16px]' />
+																			Edit
+																		</div>
+																		<div
+																			className='table__list__action__icon'
+																			onClick={(e) => {
+																				e.stopPropagation();
+																				navigate(`/admin/sales-invoice/add/${data._id}`)
+																			}}
+																		>
+																			<Icons.COPY className='text-[16px]' />
+																			Clone
+																		</div>
+																	</Popover>}
 																>
-																	<Icons.EDIT className='text-[16px]' />
-																	Edit
-																</div>
-																<div
-																	className='table__list__action__icon'
-																	onClick={(e) => {
-																		e.stopPropagation();
-																		navigate(`/admin/sales-invoice/add/${data._id}`)
-																	}}
-																>
-																	<Icons.COPY className='text-[16px]' />
-																	Clone
-																</div>
-															</Popover>}
-														>
-															<div className='table__list__action' onClick={(e) => e.stopPropagation()}>
-																<Icons.HORIZONTAL_MORE />
-															</div>
-														</Whisper>
-													</td>
+																	<div className='table__list__action' onClick={(e) => e.stopPropagation()}>
+																		<Icons.HORIZONTAL_MORE />
+																	</div>
+																</Whisper>
+															</td>
+														) : (
+															<td></td>
+														)
+													}
+
 												</tr>
 											}) : (
 												<TableNoData />

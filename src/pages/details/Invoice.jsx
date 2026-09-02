@@ -593,8 +593,22 @@ const Invoice = () => {
                                 !loading ? (
                                     <div id='mainBill' ref={mainBillRef} className='border border-slate-600 rounded p-4'>
                                         <div ref={downloadRef} id='invoice'>
-                                            <p className='font-bold text-center uppercase'>{billName}</p>
-                                            <div className='border border-b-0 w-full mt-3 relative'>
+                                            <p className='font-bold text-center uppercase' style={{fontSize: "14px", color: "gray"}}>
+                                                {
+                                                    (()=>{
+                                                        if(billName === "Sales Invoice") return "Tax Invoice";
+                                                        else if(billName === "Proforma") return "Proforma Invoice";
+                                                        else return billName
+                                                    })()
+                                                }
+                                            </p>
+                                            {bill === 'salesinvoice' && (
+                                                <p style={{textAlign:"center", fontSize: "12px", marginTop: "-3px", color: "gray"}}>
+                                                    Original for recipient
+                                                </p>
+                                            )}
+
+                                            <div className='border border-b-0 w-full mt-1 relative'>
                                                 {
                                                     billData?.isCancel && (
                                                         <h1 className='cancel__invoice'>Cancelled</h1>
@@ -950,7 +964,6 @@ const Invoice = () => {
                                                             </td>
 
                                                             {/* Right: Bill Info */}
-
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -983,6 +996,9 @@ const Invoice = () => {
                                                                 </>
                                                             )}
                                                         </div>
+                                                        <p style={{ fontSize: '10px', margin: "1px 0px" }} >
+                                                            <span className='text-black font-semibold'>POS:</span> <span className='capitalize'>{billData?.party?.state}</span>
+                                                        </p>
                                                     </div>
 
                                                     <div className='p-3' style={{ width: '40%' }}>
@@ -1230,19 +1246,19 @@ const Invoice = () => {
                                                     {
                                                         accountDetails && (
                                                             <div className='w-full p-2'>
-                                                                <p className='font-bold text-md'>Bank Details</p>
-                                                                <div className='w-full flex items-center mt-2' style={{ fontSize: '12px' }}>
+                                                                <p className='font-bold' style={{fontSize: "12px"}}>Bank Details</p>
+                                                                <div className='w-full flex items-center mt-1' style={{ fontSize: '10px' }}>
                                                                     <div style={{ width: "30%" }}>
-                                                                        <p className='font-semibold' style={{ lineHeight: '11px' }}>Name :</p>
-                                                                        <p className='font-semibold' style={{ lineHeight: '11px' }}>IFC Code :</p>
-                                                                        <p className='font-semibold' style={{ lineHeight: '11px' }}>Account No :</p>
-                                                                        <p className='font-semibold' style={{ lineHeight: '11px' }}>Bank Name:</p>
+                                                                        <p className='font-semibold' style={{ lineHeight: '10px' }}>Name :</p>
+                                                                        <p className='font-semibold' style={{ lineHeight: '10px' }}>IFC Code :</p>
+                                                                        <p className='font-semibold' style={{ lineHeight: '10px' }}>Account No :</p>
+                                                                        <p className='font-semibold' style={{ lineHeight: '10px' }}>Bank Name:</p>
                                                                     </div>
                                                                     <div style={{ width: "70%" }}>
-                                                                        <p style={{ lineHeight: '11px' }}>{accountDetails?.accountHolderName}</p>
-                                                                        <p style={{ lineHeight: '11px' }}>{accountDetails?.ifscCode}</p>
-                                                                        <p style={{ lineHeight: '11px' }}>{accountDetails?.accountNumber}</p>
-                                                                        <p style={{ lineHeight: '11px' }}>{accountDetails?.branchName}</p>
+                                                                        <p style={{ lineHeight: '10px' }}>{accountDetails?.accountHolderName}</p>
+                                                                        <p style={{ lineHeight: '10px' }}>{accountDetails?.ifscCode}</p>
+                                                                        <p style={{ lineHeight: '10px' }}>{accountDetails?.accountNumber}</p>
+                                                                        <p style={{ lineHeight: '10px' }}>{accountDetails?.branchName}</p>
                                                                     </div>
                                                                 </div>
                                                             </div>

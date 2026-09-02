@@ -64,7 +64,7 @@ shared without written approval.
 10. Jurisdiction: Any dispute will fall under Mumbai jurisdiction.`, discountType: '',
 		discountAmount: '', discountPercentage: '', paymentStatus: false, paymentType: Constants.CASH,
 		paymentAccount: '', paymentAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: '',
-		finalAmount: ''
+		finalAmount: '', placeOfSupply: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);

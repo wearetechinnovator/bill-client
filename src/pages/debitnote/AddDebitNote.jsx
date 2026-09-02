@@ -56,7 +56,7 @@ const DebitNote = ({ mode }) => {
 		9. Force Majeure: Delays due to uncontrollable events must be communicated immediately.
 		10. Jurisdiction: Any dispute will fall under Mumbai jurisdiction.`,
 		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '',
-		autoRoundOff: false, roundOffType: '0', roundOffAmount: ''
+		autoRoundOff: false, roundOffType: '0', roundOffAmount: '', placeOfSupply: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);

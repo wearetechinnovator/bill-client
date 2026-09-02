@@ -63,7 +63,7 @@ const PurchaseInvoice = ({ mode }) => {
 		discountType: '',
 		discountAmount: '', discountPercentage: '', finalAmount: '', paymentStatus: false,
 		paymentType: Constants.CASH, paymentAccount: '', paymentAmount: '',
-		autoRoundOff: false, roundOffType: '0', roundOffAmount: ''
+		autoRoundOff: false, roundOffType: '0', roundOffAmount: '', placeOfSupply: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
