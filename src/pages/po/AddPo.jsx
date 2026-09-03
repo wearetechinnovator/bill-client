@@ -397,8 +397,12 @@ const PO = ({ mode }) => {
                                 <MySelect2
                                     model={"party"}
                                     partyType={"supplier"}
-                                    onType={(v) => {
-                                        setFormData({ ...formData, party: v })
+                                    onType={async (v) => {
+                                        const partyData = await getApiData("party", v);
+                                        setFormData({
+                                            ...formData, party: v,
+                                            placeOfSupply: partyData?.data.state
+                                        })
                                     }}
                                     value={formData.party?._id}
                                 />
