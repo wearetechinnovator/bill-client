@@ -22,6 +22,7 @@ import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
 import { Constants } from '../../helper/constants';
 import Loading from '../../components/Loading';
+import { statesAndUTs } from '../../helper/data';
 
 
 
@@ -60,8 +61,7 @@ const PurchaseInvoice = ({ mode }) => {
 		8. Confidentiality: All documents, drawings, and information are confidential and cannot be shared without written approval.
 		9. Force Majeure: Delays due to uncontrollable events must be communicated immediately.
 		10. Jurisdiction: Any dispute will fall under Mumbai jurisdiction.`,
-		discountType: '',
-		discountAmount: '', discountPercentage: '', finalAmount: '', paymentStatus: false,
+		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '', paymentStatus: false,
 		paymentType: Constants.CASH, paymentAccount: '', paymentAmount: '',
 		autoRoundOff: false, roundOffType: '0', roundOffAmount: '', placeOfSupply: ''
 	})
@@ -302,6 +302,8 @@ const PurchaseInvoice = ({ mode }) => {
 	const saveBill = async () => {
 		if (formData.party === "")
 			return toast("Please select party", "error")
+		else if (!formData.placeOfSupply)
+			return toast("Please select palce of supply", "error");
 		else if (formData.purchaseReturnNumber === "")
 			return toast("Please enter purchase return number", "error")
 		else if (formData.returnDate === "")
@@ -429,6 +431,14 @@ const PurchaseInvoice = ({ mode }) => {
 										setFormData({ ...formData, party: v })
 									}}
 									value={formData.party?._id}
+								/>
+							</div>
+							<div className='flex flex-col gap-2 w-full lg:w-1/3'>
+								<p className='text-xs'>Place of Supply <span className='required__text'>*</span></p>
+								<SelectPicker className='w-full' data={statesAndUTs}
+									value={formData.placeOfSupply}
+									onChange={(v) => setFormData({ ...formData, placeOfSupply: v })}
+									menuMaxHeight={150}
 								/>
 							</div>
 							<div className='flex flex-col gap-2 w-full lg:w-1/3'>

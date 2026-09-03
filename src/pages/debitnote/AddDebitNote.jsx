@@ -18,6 +18,7 @@ import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
 import Loading from '../../components/Loading';
+import { statesAndUTs } from '../../helper/data';
 
 
 
@@ -324,6 +325,8 @@ const DebitNote = ({ mode }) => {
 	const saveBill = async () => {
 		if (formData.party === "") {
 			return toast("Please select party", "error")
+		} else if (!formData.placeOfSupply) {
+			return toast("Please select palce of supply", "error");
 		} else if (formData.debitNoteNumber === "") {
 			return toast("Please enter debit note number", "error")
 		} else if (formData.debitNoteDate === "") {
@@ -394,9 +397,9 @@ const DebitNote = ({ mode }) => {
 		setItemRows([itemRowSet]);
 		setAdditionalRow([additionalRowSet])
 		setFormData({
-			party: '', debitNoteNumber: '', debitNoteDate: '', items: ItemRows,
-			additionalCharge: additionalRows, note: '', terms: '',
-			discountType: '', discountAmount: '', discountPercentage: ''
+			party: '', debitNoteNumber: '', debitNoteDate: '', items: ItemRows, additionalCharge: additionalRows,
+			note: '', terms: '', discountType: '', discountAmount: '', discountPercentage: '',
+			placeOfSupply: ''
 		});
 
 	}
@@ -420,7 +423,6 @@ const DebitNote = ({ mode }) => {
 				/>
 				<div className='content__body'>
 					<div className='content__body__main bg-white' id='addQuotationTable'>
-
 						<div className='flex flex-col lg:flex-row items-center justify-around gap-4'>
 							<div className='flex flex-col gap-2 w-full lg:max-w-[450px]'>
 								<p className='text-xs'>Select Party <span className='required__text'>*</span></p>
@@ -457,11 +459,20 @@ const DebitNote = ({ mode }) => {
 										setItemRows([...selectedInvoice?.items]);
 										setFormData({
 											...formData, purchaseInvoice: v,
-											items: selectedInvoice?.items
+											items: selectedInvoice?.items,
+											placeOfSupply: selectedInvoice.placeOfSupply
 										});
 									}}
 
 									value={formData.purchaseInvoice}
+								/>
+							</div>
+							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
+								<p className='text-xs'>Place of Supply <span className='required__text'>*</span></p>
+								<SelectPicker className='w-full' data={statesAndUTs}
+									value={formData.placeOfSupply}
+									onChange={(v) => setFormData({ ...formData, placeOfSupply: v })}
+									menuMaxHeight={150}
 								/>
 							</div>
 							<div className='flex flex-col gap-2 w-full lg:w-1/3'>

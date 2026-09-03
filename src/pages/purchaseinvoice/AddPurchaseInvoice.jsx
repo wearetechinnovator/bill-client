@@ -19,6 +19,7 @@ import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import { Constants } from '../../helper/constants';
 import Loading from '../../components/Loading';
+import { statesAndUTs } from '../../helper/data';
 
 
 
@@ -48,23 +49,23 @@ const PurchaseInvoice = ({ mode }) => {
 	const [formData, setFormData] = useState({
 		party: '', purchaseInvoiceNumber: '', originalInvoiceNumber: '', invoiceDate: new Date().toISOString().split('T')[0],
 		validDate: '', items: ItemRows, additionalCharge: additionalRows, note: '', terms: `1. Price: Rates are firm and final as per PO. No extra charges will be accepted unless approved
-in writing.
-2. Delivery: Material must be delivered within the agreed schedule. Delays must be informed in
-advance. Yantra reserves the right to cancel delayed orders.
-3. Quality: Goods must be as per specifications. Defective or non-conforming material will be
-rejected or replaced at supplier’s cost.
-4. Packing: Supplier is responsible for proper packaging to avoid transit damage.
-5. Warranty: Minimum 12 months warranty from supply date unless otherwise agreed.
-6. Payment: As per PO terms and after acceptance of material. Invoice discrepancies may delay
-payment.
-7. Risk: Supply remains at supplier’s risk until received and accepted by Yantra.
-8. Confidentiality: All documents, drawings, and information are confidential and cannot be
-shared without written approval.
-9. Force Majeure: Delays due to uncontrollable events must be communicated immediately.
-10. Jurisdiction: Any dispute will fall under Mumbai jurisdiction.`, discountType: '',
-		discountAmount: '', discountPercentage: '', paymentStatus: false, paymentType: Constants.CASH,
-		paymentAccount: '', paymentAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: '',
-		finalAmount: '', placeOfSupply: ''
+		in writing.
+		2. Delivery: Material must be delivered within the agreed schedule. Delays must be informed in
+		advance. Yantra reserves the right to cancel delayed orders.
+		3. Quality: Goods must be as per specifications. Defective or non-conforming material will be
+		rejected or replaced at supplier’s cost.
+		4. Packing: Supplier is responsible for proper packaging to avoid transit damage.
+		5. Warranty: Minimum 12 months warranty from supply date unless otherwise agreed.
+		6. Payment: As per PO terms and after acceptance of material. Invoice discrepancies may delay
+		payment.
+		7. Risk: Supply remains at supplier’s risk until received and accepted by Yantra.
+		8. Confidentiality: All documents, drawings, and information are confidential and cannot be
+		shared without written approval.
+		9. Force Majeure: Delays due to uncontrollable events must be communicated immediately.
+		10. Jurisdiction: Any dispute will fall under Mumbai jurisdiction.`,
+		discountType: '', discountAmount: '', discountPercentage: '', paymentStatus: false,
+		paymentType: Constants.CASH, paymentAccount: '', paymentAmount: '', autoRoundOff: false,
+		roundOffType: '0', roundOffAmount: '', finalAmount: '', placeOfSupply: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);
@@ -277,6 +278,8 @@ shared without written approval.
 	const saveBill = async () => {
 		if (formData.party === "")
 			return toast("Please select party", "error")
+		else if (!formData.placeOfSupply)
+			return toast("Please select palce of supply", "error");
 		else if (formData.purchaseInvoiceNumber === "")
 			return toast("Please enter purchase invoice number", "error")
 		else if (formData.invoiceDate === "")
@@ -345,8 +348,8 @@ shared without written approval.
 		setAdditionalRow([additionalRowSet])
 		setFormData({
 			party: '', purchaseInvoiceNumber: getBillPrefix, invoiceDate: '', validDate: '', items: ItemRows,
-			additionalCharge: additionalRows, note: '', terms: '', paymentStatus: '',
-			discountType: '', discountAmount: '', discountPercentage: '', originalInvoiceNumber: ''
+			additionalCharge: additionalRows, note: '', terms: '', paymentStatus: '', discountType: '',
+			discountAmount: '', discountPercentage: '', originalInvoiceNumber: '', placeOfSupply: ''
 		});
 
 	}
@@ -396,6 +399,14 @@ shared without written approval.
 										setFormData({ ...formData, party: v })
 									}}
 									value={formData.party?._id}
+								/>
+							</div>
+							<div className='flex flex-col gap-2 w-full lg:w-1/2'>
+								<p className='text-xs'>Place of Supply <span className='required__text'>*</span></p>
+								<SelectPicker className='w-full' data={statesAndUTs}
+									value={formData.placeOfSupply}
+									onChange={(v) => setFormData({ ...formData, placeOfSupply: v })}
+									menuMaxHeight={150}
 								/>
 							</div>
 							<div className='flex flex-col gap-2 w-full lg:w-1/2'>

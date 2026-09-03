@@ -20,6 +20,7 @@ import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
 import Loading from '../../components/Loading';
+import { statesAndUTs } from '../../helper/data';
 
 
 
@@ -303,6 +304,8 @@ const PO = ({ mode }) => {
     const saveBill = async () => {
         if (formData.party === "") {
             return toast("Please select party", "error")
+        } else if (!formData.placeOfSupply) {
+            return toast("Please select palce of supply", "error");
         } else if (formData.poNumber === "") {
             return toast("Please enter purchase order number", "error")
         } else if (formData.poDate === "") {
@@ -371,8 +374,8 @@ const PO = ({ mode }) => {
         setAdditionalRow([additionalRowSet])
         setFormData({
             party: '', poNumber: getBillPrefix, poDate: '', validDate: '', items: ItemRows,
-            additionalCharge: additionalRows, note: '', terms: '',
-            discountType: '', discountAmount: '', discountPercentage: '',
+            additionalCharge: additionalRows, note: '', terms: '', discountType: '', discountAmount: '',
+            discountPercentage: '', placeOfSupply: ''
         });
 
     }
@@ -398,6 +401,14 @@ const PO = ({ mode }) => {
                                         setFormData({ ...formData, party: v })
                                     }}
                                     value={formData.party?._id}
+                                />
+                            </div>
+                            <div className='flex flex-col gap-2 w-full lg:w-1/2'>
+                                <p className='text-xs'>Place of Supply <span className='required__text'>*</span></p>
+                                <SelectPicker className='w-full' data={statesAndUTs}
+                                    value={formData.placeOfSupply}
+                                    onChange={(v) => setFormData({ ...formData, placeOfSupply: v })}
+                                    menuMaxHeight={150}
                                 />
                             </div>
                             <div className='flex flex-col gap-2 w-full lg:w-1/3'>

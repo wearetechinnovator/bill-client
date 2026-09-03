@@ -125,6 +125,7 @@ const Invoice = () => {
                     const res = await req.json();
                     if (req.status === 200) {
                         setBillData(res.data)
+                        console.log("Billdata", res.data.placeOfSupply)
 
                         setBillNumber(
                             res.data?.quotationNumber ||
@@ -164,7 +165,7 @@ const Invoice = () => {
                         const totalAdditionalCharge = res?.data?.additionalCharge.reduce((acc, i) => {
                             return acc += i.amount;
                         }, 0);
-                        if(totalAdditionalCharge > 0) setIsAdditionalCharge(true)
+                        if (totalAdditionalCharge > 0) setIsAdditionalCharge(true)
                         setTotalAdditionalCharge(totalAdditionalCharge);
                     }
                     return res;
@@ -593,26 +594,24 @@ const Invoice = () => {
                                 !loading ? (
                                     <div id='mainBill' ref={mainBillRef} className='border border-slate-600 rounded p-4'>
                                         <div ref={downloadRef} id='invoice'>
-                                            <p className='font-bold text-center uppercase' style={{fontSize: "14px", color: "gray"}}>
+                                            <p className='font-bold text-center uppercase' style={{ fontSize: "14px", color: "gray" }}>
                                                 {
-                                                    (()=>{
-                                                        if(billName === "Sales Invoice") return "Tax Invoice";
-                                                        else if(billName === "Proforma") return "Proforma Invoice";
+                                                    (() => {
+                                                        if (billName === "Sales Invoice") return "Tax Invoice";
+                                                        else if (billName === "Proforma") return "Proforma Invoice";
                                                         else return billName
                                                     })()
                                                 }
                                             </p>
                                             {bill === 'salesinvoice' && (
-                                                <p style={{textAlign:"center", fontSize: "12px", marginTop: "-3px", color: "gray"}}>
+                                                <p style={{ textAlign: "center", fontSize: "12px", marginTop: "-3px", color: "gray" }}>
                                                     Original for recipient
                                                 </p>
                                             )}
 
                                             <div className='border border-b-0 w-full mt-1 relative'>
                                                 {
-                                                    billData?.isCancel && (
-                                                        <h1 className='cancel__invoice'>Cancelled</h1>
-                                                    )
+                                                    billData?.isCancel && (<h1 className='cancel__invoice'>Cancelled</h1>)
                                                 }
 
                                                 <table style={{ width: '100%', borderCollapse: 'collapse' }} className='invoice__header'>
@@ -670,8 +669,7 @@ const Invoice = () => {
 
                                                                                 {companyDetails?.pan && (
                                                                                     <p style={{ fontSize: '12px', margin: '0px 0 0 0' }}>
-                                                                                        <span
-                                                                                            style={{
+                                                                                        <span style={{
                                                                                                 fontWeight: '600',
                                                                                                 color: 'black'
                                                                                             }}
@@ -685,8 +683,7 @@ const Invoice = () => {
 
                                                                                 {companyDetails?.phone && (
                                                                                     <p style={{ fontSize: '12px', margin: '0px 0 0 0' }}>
-                                                                                        <span
-                                                                                            style={{
+                                                                                        <span style={{
                                                                                                 fontWeight: '600',
                                                                                                 color: 'black'
                                                                                             }}
@@ -702,16 +699,14 @@ const Invoice = () => {
                                                                     </tbody>
                                                                 </table>
                                                             </td>
-                                                            <td
-                                                                style={{
+                                                            <td style={{
                                                                     width: '22%',
                                                                     padding: '12px 12px 0 0',
                                                                     fontSize: '12px',
                                                                     verticalAlign: 'top',  // ← align to top
                                                                 }}
                                                             >
-                                                                <table
-                                                                    style={{
+                                                                <table style={{
                                                                         borderCollapse: 'collapse',
                                                                         width: '100%',
                                                                         margin: 'auto'
@@ -719,8 +714,7 @@ const Invoice = () => {
                                                                 >
                                                                     <tbody>
                                                                         <tr>
-                                                                            <td
-                                                                                width={'65%'}
+                                                                            <td width={'65%'}
                                                                                 style={{
                                                                                     padding: '0 0 4px 0',
                                                                                     fontWeight: '600',
@@ -730,8 +724,7 @@ const Invoice = () => {
                                                                                 {billName} No:
                                                                             </td>
 
-                                                                            <td
-                                                                                style={{
+                                                                            <td style={{
                                                                                     padding: '0 0 4px 0',
                                                                                     fontWeight: '600'
                                                                                 }}
@@ -997,7 +990,7 @@ const Invoice = () => {
                                                             )}
                                                         </div>
                                                         <p style={{ fontSize: '10px', margin: "1px 0px" }} >
-                                                            <span className='text-black font-semibold'>POS:</span> <span className='capitalize'>{billData?.party?.state}</span>
+                                                            <span className='text-black font-semibold'>POS:</span> <span className='capitalize'>{billData?.placeOfSupply}</span>
                                                         </p>
                                                     </div>
 
@@ -1100,14 +1093,14 @@ const Invoice = () => {
                                                     <tfoot className='w-full'>
                                                         <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
                                                             <td align='right' colSpan={5}>TOTAL</td>
-                                                            <td align='center'><Icons.RUPES className='inline' />{billDetails.discount}</td>
-                                                            <td align='center'><Icons.RUPES className='inline' />{billDetails.taxAmount}</td>
-                                                            <td align='center'><Icons.RUPES className='inline' />{billDetails.amount}</td>
+                                                            <td align='center'><Icons.RUPES className='inline -mt-[2px]' />{billDetails.discount}</td>
+                                                            <td align='center'><Icons.RUPES className='inline -mt-[2px]' />{billDetails.taxAmount}</td>
+                                                            <td align='center'><Icons.RUPES className='inline -mt-[2px]' />{billDetails.amount}</td>
                                                         </tr>
 
                                                         {billData?.roundOffAmount && <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
                                                             <td colSpan={7} align='center' className='italic'>Round Off</td>
-                                                            <td align='center'><Icons.RUPES className='inline' />
+                                                            <td align='center'><Icons.RUPES className='inline -mt-[2px]' />
                                                                 {
                                                                     billData.roundOffType === "0" ?
                                                                         "-" + billData?.roundOffAmount :
@@ -1120,7 +1113,7 @@ const Invoice = () => {
                                                                 return (
                                                                     <tr className='font-semibold'>
                                                                         <td colSpan={7} align='center' className='italic'>{a.particular}</td>
-                                                                        <td align='center'><Icons.RUPES className='inline' />
+                                                                        <td align='center'><Icons.RUPES className='inline -mt-[2px]' />
                                                                             {a.amount}
                                                                         </td>
                                                                     </tr>
@@ -1130,7 +1123,7 @@ const Invoice = () => {
                                                         {(billData?.roundOffAmount || isAdditionalCharge) && (
                                                             <tr className='font-semibold' style={{ background: "#C4E9F7" }}>
                                                                 <td colSpan={7} align='center'>SUB TOTAL</td>
-                                                                <td align='center'><Icons.RUPES className='inline' />
+                                                                <td align='center'><Icons.RUPES className='inline -mt-[2px]' />
                                                                     {
                                                                         billData.roundOffType === "0" ?
                                                                             (Number(billDetails.amount) - Number(billData?.roundOffAmount) + Number(totalAdditionalCharge)) :
@@ -1142,12 +1135,12 @@ const Invoice = () => {
 
                                                         <tr className='font-semibold' style={{ background: "#F3F4F6" }}>
                                                             <td colSpan={7} align='right'>Received Amount</td>
-                                                            <td align='center'><Icons.RUPES className='inline' />{billData?.paymentAmount || "0.00"}</td>
+                                                            <td align='center'><Icons.RUPES className='inline -mt-[2px]' />{billData?.paymentAmount || "0.00"}</td>
                                                         </tr>
                                                         <tr className='font-semibold' style={{ background: "#F3F4F6" }}>
                                                             <td colSpan={7} align='right'>Balance Due</td>
                                                             <td align='center'>
-                                                                <Icons.RUPES className='inline' />
+                                                                <Icons.RUPES className='inline -mt-[2px]' />
                                                                 {((Number(billData?.finalAmount) - Number(billData?.paymentAmount)) || 0).toFixed(2)}
                                                             </td>
                                                         </tr>
@@ -1165,7 +1158,7 @@ const Invoice = () => {
                                                             <td align='center'>Taxable Value</td>
                                                             <td align='center'>Tax Type</td>
                                                             <td align='center'>Rate</td>
-                                                            {companyDetails?.state === billData?.party.state && (
+                                                            {companyDetails?.state === (billData?.placeOfSupply || billData?.party.state) && (
                                                                 <td align='center'>Amount</td>
                                                             )}
                                                             <td align='center'>Total Tax Amount</td>
@@ -1173,7 +1166,7 @@ const Invoice = () => {
                                                     </thead>
                                                     <tbody>
                                                         {/* IGST - Inter-state */}
-                                                        {hsnData && companyDetails?.state !== billData?.party.state && (() => {
+                                                        {hsnData && companyDetails?.state !== (billData?.placeOfSupply || billData?.party.state) && (() => {
                                                             const rows = [];
                                                             const seen = {};
 
@@ -1203,7 +1196,7 @@ const Invoice = () => {
                                                         })()}
 
                                                         {/* SGST/CGST - Intra-state */}
-                                                        {hsnData && companyDetails?.state === billData?.party.state && (
+                                                        {hsnData && companyDetails?.state === (billData?.placeOfSupply || billData?.party.state) && (
                                                             [...new Map(hsnData.map(item => [item.hsn, item])).values()].map((data, i) => {
                                                                 const taxableValue = data.taxableValue;
                                                                 const halfRate = data.rate / 2;
@@ -1246,7 +1239,7 @@ const Invoice = () => {
                                                     {
                                                         accountDetails && (
                                                             <div className='w-full p-2'>
-                                                                <p className='font-bold' style={{fontSize: "12px"}}>Bank Details</p>
+                                                                <p className='font-bold' style={{ fontSize: "12px" }}>Bank Details</p>
                                                                 <div className='w-full flex items-center mt-1' style={{ fontSize: '10px' }}>
                                                                     <div style={{ width: "30%" }}>
                                                                         <p className='font-semibold' style={{ lineHeight: '10px' }}>Name :</p>

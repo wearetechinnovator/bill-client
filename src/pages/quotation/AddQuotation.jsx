@@ -19,6 +19,7 @@ import useFormHandle from '../../hooks/useFormHandle';
 import SelectAccountModal from '../../components/SelectAccountModal';
 import Loading from '../../components/Loading';
 import { statesAndUTs } from '../../helper/data';
+import { TERMS } from '../../helper/constants';
 
 
 
@@ -49,15 +50,7 @@ const Quotation = ({ mode }) => {
 	const [formData, setFormData] = useState({
 		party: '', quotationNumber: '', estimateDate: new Date().toISOString().split('T')[0], validDate: '',
 		items: ItemRows, additionalCharge: additionalRows, note: '',
-		terms: `1.	Shipping: Buyer bears shipping costs unless stated otherwise.
-		2.	Order Changes & Cancellations: Allowed before shipment. Extra charges will apply post-
-		3.	Warranties & Returns: Warranty for defects; defective returns accepted within an
-		4.	Intellectual Property: Seller retains IP rights unless otherwise agreed.
-		5.	Force Majeure: Seller not liable for delays caused by uncontrollable events (e.g., natural disasters).
-		6.	Confidentiality: Both parties must keep shared information private.
-		7.	Dispute Resolution: Arbitration in Navi Mumbai, India, under Indian law.
-		8.	Indemnity: Buyer indemnifies seller against misuse-related claims.
-		9.	Governing Law: Governed by Indian law, jurisdiction in Navi Mumbai.`,
+		terms: TERMS.QUOTATION.trim(),
 		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '',
 		autoRoundOff: false, roundOffType: '0', roundOffAmount: '', enqNumber: '', deliveryTime: '',
 		enquiryId: '', placeOfSupply: ''

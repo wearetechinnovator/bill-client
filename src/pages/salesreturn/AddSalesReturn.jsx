@@ -14,7 +14,7 @@ import AddItemModal from '../../components/AddItemModal';
 import MySelect2 from '../../components/MySelect2';
 import { Icons } from '../../helper/icons';
 import useFormHandle from '../../hooks/useFormHandle';
-import { Constants } from '../../helper/constants';
+import { Constants, TERMS } from '../../helper/constants';
 import Loading from '../../components/Loading';
 import { statesAndUTs } from '../../helper/data';
 
@@ -43,24 +43,9 @@ const SalesReturn = ({ mode }) => {
 	const [formData, setFormData] = useState({
 		party: '', salesReturnNumber: '', returnDate: new Date().toISOString().split('T')[0],
 		items: ItemRows, additionalCharge: additionalRows, note: '',
-		terms: `1. Price: Rates are firm and final as per PO. No extra charges will be accepted unless approved
-		in writing.
-		2. Delivery: Material must be delivered within the agreed schedule. Delays must be informed in
-		advance. Yantra reserves the right to cancel delayed orders.
-		3. Quality: Goods must be as per specifications. Defective or non-conforming material will be
-		rejected or replaced at supplier’s cost.
-		4. Packing: Supplier is responsible for proper packaging to avoid transit damage.
-		5. Warranty: Minimum 12 months warranty from supply date unless otherwise agreed.
-		6. Payment: As per PO terms and after acceptance of material. Invoice discrepancies may delay
-		payment.
-		7. Risk: Supply remains at supplier’s risk until received and accepted by Yantra.
-		8. Confidentiality: All documents, drawings, and information are confidential and cannot be
-		shared without written approval.
-		9. Force Majeure: Delays due to uncontrollable events must be communicated immediately.
-		10. Jurisdiction: Any dispute will fall under Mumbai jurisdiction.`,
-		discountType: '', discountAmount: '', discountPercentage: '', finalAmount: '', paymentStatus: false,
-		paymentType: Constants.CASH, paymentAccount: '', paymentAmount: '', autoRoundOff: false,
-		roundOffType: '0', roundOffAmount: '', placeOfSupply: ''
+		terms: TERMS.SALES_RETURN.trim(), discountType: '', discountAmount: '', discountPercentage: '',
+		finalAmount: '', paymentStatus: false, paymentType: Constants.CASH, paymentAccount: '',
+		paymentAmount: '', autoRoundOff: false, roundOffType: '0', roundOffAmount: '', placeOfSupply: ''
 	})
 
 	const [perPrice, setPerPrice] = useState(null);

@@ -1,6 +1,6 @@
 import SideNav from '../components/SideNav'
 import Nav from '../components/Nav'
-import { SelectPicker, TagInput } from 'rsuite';
+import { Modal, SelectPicker, TagInput } from 'rsuite';
 import { MdEditSquare, MdOutlineCloudDownload, MdSettingsBackupRestore, MdUploadFile } from "react-icons/md";
 import { LuDatabaseBackup, LuFileX2 } from "react-icons/lu";
 import { countryList, statesAndUTs } from '../helper/data';
@@ -14,11 +14,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toggle } from '../store/partyModalSlice';
 import { Icons } from '../helper/icons';
 import Loading from '../components/Loading';
+import { IoWarning } from 'react-icons/io5';
 
 
 
 const Setting = () => {
     const token = Cookies.get("token");
+    const userData = useSelector((store) => store.userDetail);
     const toast = useMyToaster();
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
@@ -45,6 +47,9 @@ const Setting = () => {
     const getPartyModalState = useSelector((store) => store.partyModalSlice.show);
     const [partyCategoryId, setPartyCategoryId] = useState('');
     const [backupFiles, setBackupFiles] = useState([]);
+    const [restoreModal, setRestoreModal] = useState(false);
+    const [restoreConfirmText, setRestoreConfirmText] = useState(null);
+    const [restoreFileName, setRestoreFileName] = useState(null);
 
 
 
@@ -118,7 +123,7 @@ const Setting = () => {
         })()
     }, [])
 
-    const downloadBackupFile = async (fileId) => {
+    const downloadBackupFile = async (fileName) => {
         try {
             const URL = process.env.REACT_APP_API_URL + "/user/download-backup-files";
             const req = await fetch(URL, {
@@ -126,7 +131,7 @@ const Setting = () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ token, fileId })
+                body: JSON.stringify({ token, fileName })
             });
             const blob = await req.blob();
             if (req.status !== 200) {
@@ -156,7 +161,9 @@ const Setting = () => {
         }
     }
 
-    const restoreBackupFile = async (fileName) => {
+    const restoreBackupFile = async () => {
+        if (!restoreFileName) return;
+
         try {
             const URL = process.env.REACT_APP_API_URL + "/user/restore-backup-files";
             const req = await fetch(URL, {
@@ -164,7 +171,7 @@ const Setting = () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ token, fileName })
+                body: JSON.stringify({ token, fileName: restoreFileName })
             });
             const res = await req.json();
             if (req.status !== 200 || res.err) {
@@ -567,58 +574,64 @@ const Setting = () => {
                     </div>
 
 
-                    <div className="content__body__main">
-                        <p className='font-bold'>Backup Setting</p>
-                        <hr />
-                        <div className='w-full flex items-center gap-4'>
-                            {
-                                backupFiles.length > 0 && (
-                                    <div className='w-full flex items-center justify-between rounded'>
-                                        <ul className='w-full space-y-1'>
-                                            {
-                                                backupFiles?.map((b, i) => {
-                                                    return (
-                                                        <li key={b} className='w-full flex items-center justify-between bg-blue-50 text-blue-600 p-1 rounded'>
-                                                            <p className='capitalize text-xs'>{b}</p>
-                                                            <div className='flex items-center gap-3'>
-                                                                <div
-                                                                    title='Download'
-                                                                    onClick={() => downloadBackupFile(b)}
-                                                                    className='w-[30px] h-[30px] bg-[#003E32] flex items-center justify-center rounded cursor-pointer'
-                                                                >
-                                                                    <MdOutlineCloudDownload
-                                                                        size={18}
-                                                                        className='text-white'
-                                                                    />
-                                                                </div>
-                                                                <div
-                                                                    title='Restore'
-                                                                    onClick={() => restoreBackupFile(b)}
-                                                                    className='w-[30px] h-[30px] bg-[#143caa] flex items-center justify-center rounded cursor-pointer'>
-                                                                    <LuDatabaseBackup
-                                                                        size={18}
-                                                                        className='text-white'
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </li>
-                                                    )
-                                                })
-                                            }
-                                        </ul>
-                                    </div>
-                                )
-                            }
-
-                            {
-                                backupFiles.length === 0 && (
-                                    <div className='w-full flex items-center justify-center p-4 bg-gray-100'>
-                                        <p className='font-sans'>No Backup Files yet</p>
-                                    </div>
-                                )
-                            }
-                        </div>
-                    </div>
+                    {
+                        userData.role === "admin" && (
+                            <div className="content__body__main">
+                                <p className='font-bold'>Backup Setting</p>
+                                <hr />
+                                <div className='w-full flex items-center gap-4'>
+                                    {
+                                        backupFiles.length > 0 && (
+                                            <div className='w-full flex items-center justify-between rounded'>
+                                                <ul className='w-full space-y-1'>
+                                                    {
+                                                        backupFiles?.map((b, i) => {
+                                                            return (
+                                                                <li key={b} className='w-full flex items-center justify-between bg-blue-50 text-blue-600 p-1 rounded'>
+                                                                    <p className='capitalize text-xs'>{b}</p>
+                                                                    <div className='flex items-center gap-3'>
+                                                                        <div
+                                                                            title='Download'
+                                                                            onClick={() => downloadBackupFile(b)}
+                                                                            className='w-[30px] h-[30px] bg-[#003E32] flex items-center justify-center rounded cursor-pointer'
+                                                                        >
+                                                                            <MdOutlineCloudDownload
+                                                                                size={18}
+                                                                                className='text-white'
+                                                                            />
+                                                                        </div>
+                                                                        <div
+                                                                            title='Restore'
+                                                                            onClick={() => {
+                                                                                setRestoreModal(true);
+                                                                                setRestoreFileName(b)
+                                                                            }}
+                                                                            className='w-[30px] h-[30px] bg-[#143caa] flex items-center justify-center rounded cursor-pointer'>
+                                                                            <LuDatabaseBackup
+                                                                                size={18}
+                                                                                className='text-white'
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            )
+                                                        })
+                                                    }
+                                                </ul>
+                                            </div>
+                                        )
+                                    }
+                                    {
+                                        backupFiles.length === 0 && (
+                                            <div className='w-full flex items-center justify-center p-4 bg-gray-100'>
+                                                <p className='font-sans'>No Backup Files yet</p>
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                            </div>
+                        )
+                    }
 
                     {/* ==================== Party Category  ===================*/}
                     {/* ========================================================*/}
@@ -693,8 +706,73 @@ const Setting = () => {
                     }
                 }}
             />
+
+            <Modal open={restoreModal} onClose={() => {
+                setRestoreModal(false);
+                setRestoreConfirmText(null);
+                setRestoreFileName(null);
+            }}>
+                <Modal.Header></Modal.Header>
+                <Modal.Body className='w-full flex flex-col gap-3 justify-center items-center'>
+                    <div className='border-2 border-yellow-400 w-[60px] h-[60px] rounded-full grid place-items-center'>
+                        <IoWarning size={40} className='text-yellow-400' />
+                    </div>
+                    <h3 className='text-lg font-bold my-1'>Warning!</h3>
+                    <p className='font-semibold'>You are about to restore a backup.</p>
+                    <div className='w-[70%] border border-yellow-300 rounded bg-yellow-50 p-2 text-xs'>
+                        <div className='w-full flex items-center gap-1'>
+                            <IoWarning size={20} className='text-orange-600' />
+                            <p>
+                                This action will 
+                                <span className='text-orange-600'>replace all current data </span>
+                                in the server.
+                            </p>
+                        </div>
+                        <div className='w-full flex items-center gap-1 my-2'>
+                            <IoWarning size={20} className='text-orange-600' />
+                            <p>
+                                This process <span className='text-orange-600'>cannot be undone.</span>
+                            </p>
+                        </div>
+                        <div className='w-full flex items-start gap-1 my-2'>
+                            <IoWarning size={20} className='text-orange-600' />
+                            <p>Please ensure you have a recent backup of your current data before proceding.</p>
+                        </div>
+                    </div>
+                    <div className='w-[70%] mt-3'>
+                        <h3 className='text-semibold text-sm text-left'>
+                            Type <span className='text-orange-600'>Restore </span>
+                            to continue restore your data
+                        </h3>
+                        <input type="text"
+                            className='w-full mt-3'
+                            onChange={(e) => setRestoreConfirmText(e.target.value)}
+                            value={restoreConfirmText}
+                        />
+                    </div>
+
+                    <div className='mt-5 w-full flex items-start justify-center gap-4'>
+                        <button
+                            onClick={() => setRestoreModal(false)}
+                            className='px-4 py-2.5 rounded text-xs border font-semibold'
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (restoreConfirmText === 'Restore') restoreBackupFile()
+                            }}
+                            className={`px-4 py-2.5 rounded text-xs border text-white 
+                                ${restoreConfirmText === "Restore" ? 'bg-red-600' : 'bg-red-300'}`
+                            }
+                        >
+                            Yes, Restore Backup
+                        </button>
+                    </div>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }
 
-export default Setting
+export default Setting;
