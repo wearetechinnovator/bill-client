@@ -114,8 +114,8 @@ const Setting = () => {
                     body: JSON.stringify({ token })
                 });
                 const res = await req.json();
-
-                setBackupFiles(res.data);
+                
+                setBackupFiles(res.data ?? []);
             } catch (err) {
                 console.log(err);
                 return toast("Something went wrong", "error");
@@ -581,7 +581,7 @@ const Setting = () => {
                                 <hr />
                                 <div className='w-full flex items-center gap-4'>
                                     {
-                                        backupFiles.length > 0 && (
+                                        backupFiles?.length > 0 && (
                                             <div className='w-full flex items-center justify-between rounded'>
                                                 <ul className='w-full space-y-1'>
                                                     {
@@ -622,7 +622,7 @@ const Setting = () => {
                                         )
                                     }
                                     {
-                                        backupFiles.length === 0 && (
+                                        backupFiles?.length === 0 && (
                                             <div className='w-full flex items-center justify-center p-4 bg-gray-100'>
                                                 <p className='font-sans'>No Backup Files yet</p>
                                             </div>
