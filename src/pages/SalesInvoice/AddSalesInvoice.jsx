@@ -247,7 +247,8 @@ const SalesInvoice = ({ mode }) => {
 
 			setFormData(prev => ({
 				...prev,
-				...cleanedData
+				...cleanedData,
+				terms: TERMS.SALESINVOICE.trim(),
 			}));
 
 			if (mode) {

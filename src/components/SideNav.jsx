@@ -74,7 +74,7 @@ const links = {
     { name: 'PO from Client', icon: <Icons.SMAEICON />, link: '/admin/po-client' },
     { name: 'Quotation / Estimate', icon: <Icons.SMAEICON />, link: '/admin/quotation-estimate' },
     { name: 'Proforma Invoice', icon: <Icons.SMAEICON />, link: '/admin/proforma-invoice' },
-    { name: 'Sales Invoice', icon: <Icons.SMAEICON />, link: '/admin/sales-invoice' },
+    { name: 'Tax Invoice', icon: <Icons.SMAEICON />, link: '/admin/sales-invoice' },
     { name: 'Sales Return', icon: <Icons.SMAEICON />, link: '/admin/sales-return' },
     { name: 'Payment In', icon: <Icons.SMAEICON />, link: '/admin/payment-in' },
     { name: 'Credit Note', icon: <Icons.SMAEICON />, link: '/admin/credit-note' },

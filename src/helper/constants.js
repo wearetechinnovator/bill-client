@@ -77,19 +77,17 @@ export const TERMS = {
         13. Acceptance: Payment and order confirmation signify buyer’s agreement to terms
     `,
     SALESINVOICE: `
-        1.	Payment Terms: Payment is due within [7/15] days of the invoice date; late payments incur 2% weekly interest.
-        2.	Taxes & Duties: Prices exclude GST and other taxes unless stated; buyers bear additional taxes imposed by authorities
-        3.	Delivery: Goods are delivered as per order terms; delays beyond our control are not our responsibility
-        4.	Shipping & Handling: Buyers pay shipping unless specified; goods are dispatched at their risk, and insurance is recommended
-        5.	Goods Condition: Buyers must inspect goods upon receipt and report issues within 3 days, or they are considered accepted
-        6.	Warranty: Warranty covers manufacturing defects for 6/12 months; misuse and wear not covered
-        7.	Returns & Replacements: Defective goods can be returned within [3/5] days in original condition; buyers cover return shipping unless agreed otherwise
-        8.	Cancellation: Confirmed orders require written consent for cancellation and may incur a fee
-        9.	Liability: Our liability is limited to the value of supplied goods; we are not responsible for indirect or consequential damages
-        10.	Force Majeure: We are not liable for delays due to uncontrollable events like natural disasters or strikes
-        12. Dispute Resolution: Disputes will first be resolved amicably; if unresolved, arbitration under
-        11. Law & Jurisdiction: Governed by Indian laws; disputes resolved in Navi Mumbai courts
-        12. Acceptance: Payment and order confirmation signify buyer’s agreement to terms
+        1.	Pricing: Prices are in INR, exclusive of GST and other taxes, to be borne by the buyer.
+        2.	Delivery: Goods are delivered as per order terms; delays beyond our control are not our responsibility.
+        3.	Shipping & Handling: Buyers pay shipping unless specified; goods are dispatched at their risk, and insurance is recommended.
+        4.	Goods Condition: Buyers must inspect goods upon receipt and report issues within 3 days, or they are considered accepted.
+        5.	Warranty: Warranty covers manufacturing defects for 6/12 months; misuse and wear not covered
+        6.	Returns & Replacements: Defective goods can be returned within [3/5] days in original condition; buyers cover return shipping unless agreed otherwise.
+        7.	Cancellation: Confirmed orders require written consent for cancellation and may incur a fee.
+        8.	Liability: Our liability is limited to the value of supplied goods; we are not responsible for indirect or consequential damages.
+        9.	Force Majeure: We are not liable for delays due to uncontrollable events like natural disasters or strikes.
+        10.	Law & Jurisdiction: Governed by Indian laws; disputes resolved in Navi Mumbai courts.
+        11. Acceptance: Payment and order confirmation signify buyer’s agreement to terms
     `,
     SALES_RETURN: `
         1. Price: Rates are firm and final as per PO. No extra charges will be accepted unless approved in writing.
