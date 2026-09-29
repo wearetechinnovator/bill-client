@@ -114,7 +114,8 @@ const Proforma = ({ mode }) => {
 
 		setFormData(prev => ({
 			...prev,
-			...cleanedData
+			...cleanedData,
+			terms: TERMS.PROFORMA.trim()
 		}));
 
 		setAdditionalRow([...res.data.additionalCharge])
@@ -133,7 +134,11 @@ const Proforma = ({ mode }) => {
 
 	useEffect(() => {
 		if ((getBillPrefix && mode === "convert") || (getBillPrefix && !mode)) {
-			setFormData(prev => ({ ...prev, proformaNumber: getBillPrefix[0] + getBillPrefix[1] }));
+			setFormData(prev => ({
+				...prev,
+				proformaNumber: getBillPrefix[0] + getBillPrefix[1]
+
+			}));
 		}
 		else if (getBillPrefix && mode === "edit") {
 			get();
