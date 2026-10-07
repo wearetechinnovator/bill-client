@@ -31,7 +31,7 @@ const EnquiryLogCard = ({
                         <thead>
                             <tr>
                                 <td className='px-2 py-0 font-bold text-[11px]'>Items</td>
-                                <td className='font-bold text-[11px]'>QTY</td>
+                                <td className='font-bold text-[11px]' align='center'>QTY</td>
                             </tr>
                         </thead>
                         <tbody className='lowercase'>
@@ -39,8 +39,8 @@ const EnquiryLogCard = ({
                                 items.map((item, i) => {
                                     return (
                                         <tr className={`${i !== (items.length - 1) ? 'border-b border-dashed border-gray-200' : ''}`}>
-                                            <td className='px-2 py-1.5'>{item.item.title}</td>
-                                            <td>{item.qty}</td>
+                                            <td className='px-2 py-1.5 w-[280px]'>{item.item.title}</td>
+                                            <td align='center'>{item.qty}</td>
                                         </tr>
                                     )
                                 })

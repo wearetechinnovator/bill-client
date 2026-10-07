@@ -117,7 +117,6 @@ const Enquiry = () => {
 				if (req.status !== 200) {
 					return toast(res.err, 'error');
 				}
-				console.log(res);
 				setBillLogs(res.bills);
 
 			} catch (err) {
@@ -733,7 +732,7 @@ const Enquiry = () => {
 														<thead>
 															<tr>
 																<td className='px-2 py-0 font-bold text-[11px]'>Items</td>
-																<td className='font-bold text-[11px]'>QTY</td>
+																<td className='font-bold text-[11px]' align='center'>QTY</td>
 															</tr>
 														</thead>
 														<tbody className='lowercase'>
@@ -741,9 +740,12 @@ const Enquiry = () => {
 																b.items.map((item, i) => {
 																	return (
 																		<tr className={`${i !== (b.items.length - 1) ? 'border-b border-dashed border-gray-200' : ''}`} key={item.itemId}>
-																			<td className='px-2 py-1.5'>{item.itemName}</td>
-																			<td>
-																				{b.type === "po" ? item.invoice_qun : item.qun}
+																			<td className='px-2 py-1.5 w-[280px]'>
+																				<p className=''>{item.itemName}</p>
+																			</td>
+																			<td align='center'>
+																				{/* {b.type === "po" ? item.invoice_qun : item.qun} */}
+																				{item.qun}
 																			</td>
 																		</tr>
 																	)

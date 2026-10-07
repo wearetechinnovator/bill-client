@@ -892,8 +892,8 @@ const Quotation = ({ mode }) => {
 													<div>
 														<p>{accountDetails?.accountNumber}</p>
 														<p>{accountDetails?.ifscCode}</p>
-														<p>{accountDetails?.bankName}</p>
-														<p>{accountDetails?.holderName}</p>
+														<p>{accountDetails?.branchName}</p>
+														<p>{accountDetails?.accountHolderName}</p>
 													</div>
 												</div>
 											</div>
