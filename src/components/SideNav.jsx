@@ -191,6 +191,7 @@ const managerNotAllowLinks = [
 ]
 
 const accountantAllowRotues = [
+  "/admin/party",
   "/admin/dashboard",
   "/report/daybook",
   "/report/party-statement"

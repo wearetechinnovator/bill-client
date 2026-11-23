@@ -117,6 +117,7 @@ const ProtectRoute = ({ children }) => {
 
     // Accountant Access this routes;
     const accountantRotues = [
+        "/admin/party",
         "/admin/dashboard",
         "/report/daybook",
         "/report/party-statement",
